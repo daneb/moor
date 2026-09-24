@@ -90,6 +90,9 @@ default = true
 timeout_secs = 900
 
 [verify]
+build = "cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml"
+test = "cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml"
+lint = "cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml"
 
 [oracle]
 test_cmd = ""
