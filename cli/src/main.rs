@@ -5,6 +5,7 @@ mod compose;
 mod egress_log;
 mod manifest;
 mod paths;
+mod posture;
 mod proc;
 mod secrets;
 mod session;

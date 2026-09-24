@@ -174,6 +174,11 @@ pub fn compose_up(name: &str) -> Result<()> {
     )?;
     crate::proc::require_success("docker compose up", status)?;
     sync_git_identity(&m);
+    // A warning, not a failure: keel already blocks any run whose required
+    // posture has no attestation, so refusing to come up would add nothing.
+    if let Err(e) = crate::posture::attest(name, &m) {
+        eprintln!("warning: could not attest the sandbox's posture: {e:#}");
+    }
     Ok(())
 }
 

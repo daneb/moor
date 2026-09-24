@@ -1,0 +1,61 @@
+{
+  "schema": "keel.gate/1",
+  "gate": "G2",
+  "run": "2026-09-24-001",
+  "spec": "moor-evidence-chain",
+  "verdict": "fail",
+  "generated_at": "2026-09-24T18:34:10.038941+02:00",
+  "checks": [
+    {
+      "id": "build",
+      "verdict": "blocked",
+      "detail": "no `build` command configured — set verify.build in .keel/keel.toml"
+    },
+    {
+      "id": "test",
+      "verdict": "blocked",
+      "detail": "no `test` command configured — set verify.test in .keel/keel.toml"
+    },
+    {
+      "id": "lint",
+      "verdict": "blocked",
+      "detail": "no `lint` command configured — set verify.lint in .keel/keel.toml"
+    },
+    {
+      "id": "oracle-coverage",
+      "verdict": "fail",
+      "expected": "all 8 criteria satisfied",
+      "actual": "AC-8 (expected exit 0, got 1)",
+      "evidence": "evidence/oracles.json"
+    },
+    {
+      "id": "blast-radius",
+      "verdict": "pass",
+      "detail": "10 changed file(s) inside scope, 11 file(s) downstream",
+      "evidence": "evidence/diff-stat.txt"
+    },
+    {
+      "id": "line-budget",
+      "verdict": "fail",
+      "expected": "at most 700 lines of churn",
+      "actual": "825 lines — raise the budget deliberately or split the work",
+      "evidence": "evidence/diff-stat.txt"
+    },
+    {
+      "id": "baseline-ratchet",
+      "verdict": "pass",
+      "detail": "1 metric(s) held",
+      "evidence": "evidence/ratchet.json"
+    },
+    {
+      "id": "store-drift",
+      "verdict": "pass",
+      "detail": "4 projections current"
+    },
+    {
+      "id": "shared-stores",
+      "verdict": "pass",
+      "detail": "none configured"
+    }
+  ]
+}

@@ -18,6 +18,13 @@ services:
     read_only: true
     tmpfs:
       - /tmp
+      # keel's evidence chain (keel ADR-0001), without a host bind mount.
+      # /run/moor holds the posture attestation moor writes as root after
+      # `up`; 0755 and root-owned, so the agent can read it but not
+      # replace it. /run/moor-sink is where keel leaves chain payloads for
+      # moor to fold into the host chain with `docker exec cat`.
+      - /run/moor:mode=0755
+      - /run/moor-sink:mode=1777
     cap_drop:
       - ALL
     security_opt:
@@ -32,6 +39,8 @@ services:
       HTTPS_PROXY: "http://egress:8888"
       NO_PROXY: "localhost,127.0.0.1"
       MOOR_CANARY_TOKEN: "{{CANARY_TOKEN}}"
+      KEEL_RUNTIME_ATTESTATION: "/run/moor/posture.json"
+      KEEL_CHAIN_SINK: "/run/moor-sink/keel.jsonl"
 {{SECRET_ENV_LINES}}
     volumes:
       - workspace:/workspace

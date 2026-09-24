@@ -35,6 +35,18 @@ pub fn egress_offset_path(name: &str) -> Result<PathBuf> {
     Ok(audit_dir(name)?.join(".egress-offset"))
 }
 
+/// How many lines of keel's chain sink (inside the sandbox) have already
+/// been folded into chain.jsonl.
+pub fn sink_offset_path(name: &str) -> Result<PathBuf> {
+    Ok(audit_dir(name)?.join(".sink-offset"))
+}
+
+/// The host's copy of the posture attestation last written into the
+/// sandbox, so what keel was handed can be compared after the fact.
+pub fn posture_path(name: &str) -> Result<PathBuf> {
+    Ok(project_dir(name)?.join("posture.json"))
+}
+
 /// The session id the next `moor ask` turn resumes from. Host-side and
 /// host-written only: nothing inside a sandbox has this path mounted, so
 /// the agent cannot nominate which session it continues.
