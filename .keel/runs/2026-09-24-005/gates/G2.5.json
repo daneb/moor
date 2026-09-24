@@ -1,0 +1,36 @@
+{
+  "schema": "keel.gate/1",
+  "gate": "G2.5",
+  "run": "2026-09-24-006",
+  "spec": "moor-evidence-chain",
+  "verdict": "blocked",
+  "generated_at": "2026-09-24T20:06:16.510046+02:00",
+  "checks": [
+    {
+      "id": "test-invalidation",
+      "verdict": "blocked",
+      "detail": "1 added line(s) mock or weaken behaviour — confirm the test still tests, then `keel approve --stage review moor-evidence-chain`: docs/THREAT-MODEL.md: could append a fake `gate` payload or rewrite lines moor has not folded",
+      "evidence": "evidence/review-test-invalidation.txt"
+    },
+    {
+      "id": "test-movement",
+      "verdict": "pass",
+      "detail": "15 code file(s), 1 test file(s)"
+    },
+    {
+      "id": "conventions",
+      "verdict": "pass",
+      "detail": "3 house rule(s) in force"
+    },
+    {
+      "id": "lessons",
+      "verdict": "pass",
+      "detail": "no lessons in force yet (Phase 3 populates these)"
+    },
+    {
+      "id": "reviewer",
+      "verdict": "pass",
+      "detail": "no adversarial reviewer configured — the heuristics above are the whole pass"
+    }
+  ]
+}

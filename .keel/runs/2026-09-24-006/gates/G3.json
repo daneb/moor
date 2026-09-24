@@ -1,0 +1,30 @@
+{
+  "schema": "keel.gate/1",
+  "gate": "G3",
+  "run": "2026-09-24-007",
+  "spec": "moor-evidence-chain",
+  "verdict": "pass",
+  "generated_at": "2026-09-24T20:29:23.559504+02:00",
+  "checks": [
+    {
+      "id": "earlier-gates",
+      "verdict": "pass",
+      "detail": "G2.5 and G2 passed"
+    },
+    {
+      "id": "reviewable-size",
+      "verdict": "pass",
+      "detail": "947/1000 reviewable lines"
+    },
+    {
+      "id": "evidence-complete",
+      "verdict": "pass",
+      "detail": "trajectory, metadata and gate results present"
+    },
+    {
+      "id": "human-verdict",
+      "verdict": "pass",
+      "detail": "approved by Dane Balia at 2026-09-24T20:28:46"
+    }
+  ]
+}

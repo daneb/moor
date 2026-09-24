@@ -1,0 +1,1 @@
+docs/THREAT-MODEL.md: could append a fake `gate` payload or rewrite lines moor has not folded

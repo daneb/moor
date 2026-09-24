@@ -1,0 +1,62 @@
+{
+  "schema": "keel.gate/1",
+  "gate": "G2",
+  "run": "2026-09-24-006",
+  "spec": "moor-evidence-chain",
+  "verdict": "pass",
+  "generated_at": "2026-09-24T20:06:16.475492+02:00",
+  "checks": [
+    {
+      "id": "build",
+      "verdict": "pass",
+      "detail": "`cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml` exited 0",
+      "evidence": "evidence/build.txt"
+    },
+    {
+      "id": "test",
+      "verdict": "pass",
+      "detail": "`cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml` exited 0",
+      "evidence": "evidence/test.txt"
+    },
+    {
+      "id": "lint",
+      "verdict": "pass",
+      "detail": "`cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml` exited 0",
+      "evidence": "evidence/lint.txt"
+    },
+    {
+      "id": "oracle-coverage",
+      "verdict": "pass",
+      "detail": "8/8 oracles pass (0 awaiting human judgement)",
+      "evidence": "evidence/oracles.json"
+    },
+    {
+      "id": "blast-radius",
+      "verdict": "pass",
+      "detail": "16 changed file(s) inside scope, 11 file(s) downstream",
+      "evidence": "evidence/diff-stat.txt"
+    },
+    {
+      "id": "line-budget",
+      "verdict": "pass",
+      "detail": "947/1000 lines of churn",
+      "evidence": "evidence/diff-stat.txt"
+    },
+    {
+      "id": "baseline-ratchet",
+      "verdict": "pass",
+      "detail": "1 metric(s) held",
+      "evidence": "evidence/ratchet.json"
+    },
+    {
+      "id": "store-drift",
+      "verdict": "pass",
+      "detail": "4 projections current"
+    },
+    {
+      "id": "shared-stores",
+      "verdict": "pass",
+      "detail": "none configured"
+    }
+  ]
+}

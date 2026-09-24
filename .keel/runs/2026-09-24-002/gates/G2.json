@@ -1,0 +1,65 @@
+{
+  "schema": "keel.gate/1",
+  "gate": "G2",
+  "run": "2026-09-24-003",
+  "spec": "moor-evidence-chain",
+  "verdict": "fail",
+  "generated_at": "2026-09-24T19:47:39.483750+02:00",
+  "checks": [
+    {
+      "id": "build",
+      "verdict": "pass",
+      "detail": "`cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml` exited 0",
+      "evidence": "evidence/build.txt"
+    },
+    {
+      "id": "test",
+      "verdict": "pass",
+      "detail": "`cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml` exited 0",
+      "evidence": "evidence/test.txt"
+    },
+    {
+      "id": "lint",
+      "verdict": "pass",
+      "detail": "`cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml` exited 0",
+      "evidence": "evidence/lint.txt"
+    },
+    {
+      "id": "oracle-coverage",
+      "verdict": "fail",
+      "expected": "all 8 criteria satisfied",
+      "actual": "AC-8 (expected exit 0, got 1)",
+      "evidence": "evidence/oracles.json"
+    },
+    {
+      "id": "blast-radius",
+      "verdict": "fail",
+      "expected": "diff ⊆ cli/src/audit.rs, cli/src/posture.rs, cli/src/paths.rs, cli/src/main.rs, cli/src/commands/mod.rs, cli/src/commands/run_cmd.rs, cli/src/commands/audit_cmd.rs, cli/src/compose.rs, cli/templates/project.compose.yml.tmpl, tests/e2e.sh",
+      "actual": "6 outside scope: README.md (+15 -6), docs/ARCHITECTURE.md (+43 -12), docs/CI.md (+1 -1), docs/THREAT-MODEL.md (+33 -5), docs/WALKTHROUGH.md (+2 -2), … and 1 more",
+      "evidence": "evidence/diff-stat.txt"
+    },
+    {
+      "id": "line-budget",
+      "verdict": "fail",
+      "expected": "at most 850 lines of churn",
+      "actual": "947 lines — raise the budget deliberately or split the work",
+      "evidence": "evidence/diff-stat.txt"
+    },
+    {
+      "id": "baseline-ratchet",
+      "verdict": "pass",
+      "detail": "1 metric(s) held",
+      "evidence": "evidence/ratchet.json"
+    },
+    {
+      "id": "store-drift",
+      "verdict": "pass",
+      "detail": "4 projections current"
+    },
+    {
+      "id": "shared-stores",
+      "verdict": "pass",
+      "detail": "none configured"
+    }
+  ]
+}

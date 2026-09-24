@@ -1,10 +1,10 @@
 {
   "schema": "keel.gate/1",
   "gate": "G0",
-  "run": "2026-09-24-001",
+  "run": "2026-09-24-004",
   "spec": "moor-evidence-chain",
   "verdict": "pass",
-  "generated_at": "2026-09-24T18:37:39.650040+02:00",
+  "generated_at": "2026-09-24T19:59:20.130129+02:00",
   "checks": [
     {
       "id": "schema",
@@ -54,17 +54,17 @@
     {
       "id": "spec-length",
       "verdict": "pass",
-      "detail": "121/250 lines"
+      "detail": "123/250 lines"
     },
     {
       "id": "scope-declared",
       "verdict": "pass",
-      "detail": "10 glob(s): cli/src/audit.rs, cli/src/posture.rs, cli/src/paths.rs, cli/src/main.rs, cli/src/commands/mod.rs, cli/src/commands/run_cmd.rs, cli/src/commands/audit_cmd.rs, cli/src/compose.rs, cli/templates/project.compose.yml.tmpl, tests/e2e.sh"
+      "detail": "12 glob(s): cli/src/audit.rs, cli/src/posture.rs, cli/src/paths.rs, cli/src/main.rs, cli/src/commands/mod.rs, cli/src/commands/run_cmd.rs, cli/src/commands/audit_cmd.rs, cli/src/compose.rs, cli/templates/project.compose.yml.tmpl, tests/e2e.sh, README.md, docs/**"
     },
     {
       "id": "change-budget",
       "verdict": "pass",
-      "detail": "850 lines of diff budgeted"
+      "detail": "1000 lines of diff budgeted"
     },
     {
       "id": "oracle-mix",

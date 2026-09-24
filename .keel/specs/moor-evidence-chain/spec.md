@@ -14,9 +14,11 @@ scope:
 - cli/src/compose.rs
 - cli/templates/project.compose.yml.tmpl
 - tests/e2e.sh
+- README.md
+- docs/**
 budget:
   criteria: 8
-  lines: 850
+  lines: 1000
 verified_at: 2026-09-24
 ---
 
