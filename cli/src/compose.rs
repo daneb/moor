@@ -123,6 +123,33 @@ mod tests {
     }
 
     #[test]
+    fn sandbox_gets_attestation_and_sink_without_bind_mounts() {
+        let m = Manifest::new("sample-app", "moor/base:latest");
+        let rendered = render(&m);
+        let sandbox = rendered.split("\n  egress:").next().unwrap();
+        assert!(sandbox.contains("KEEL_RUNTIME_ATTESTATION: \"/run/moor/posture.json\""));
+        assert!(sandbox.contains("KEEL_CHAIN_SINK: \"/run/moor-sink/keel.jsonl\""));
+        assert!(sandbox.contains("- /run/moor:mode=0755"));
+        assert!(sandbox.contains("- /run/moor-sink:mode=1777"));
+        // Both paths are tmpfs; every volume is still a named volume.
+        for line in sandbox
+            .lines()
+            .map(str::trim)
+            .filter(|l| l.starts_with("- ") && l.contains(':'))
+        {
+            let source = line.trim_start_matches("- ").split(':').next().unwrap();
+            assert!(
+                !source.starts_with('/') || line.contains("mode="),
+                "host path mounted: {line}"
+            );
+            assert!(
+                !source.starts_with('.') && !source.starts_with('~') && !source.contains('$'),
+                "host path mounted: {line}"
+            );
+        }
+    }
+
+    #[test]
     fn sandbox_network_is_internal_only() {
         let m = Manifest::new("sample-app", "moor/base:latest");
         let rendered = render(&m);

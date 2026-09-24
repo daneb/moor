@@ -5,8 +5,11 @@ mod compose;
 mod egress_log;
 mod manifest;
 mod paths;
+mod posture;
 mod proc;
 mod secrets;
+mod session;
+mod studio;
 
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
@@ -125,6 +128,37 @@ enum Command {
         /// followed by a free-text description of the desired outcome).
         file: PathBuf,
     },
+    /// Put one instruction in front of the project's agent and get its
+    /// answer back — a single chained, resumable turn. Unlike `moor
+    /// shell`, the whole exchange lands in the audit chain; unlike `moor
+    /// recipe`, you can think the change through first. Project defaults
+    /// the same way `moor keel` does.
+    Ask {
+        #[arg(short = 'p', long = "project")]
+        project: Option<String>,
+        /// brainstorm (Read/Glob/Grep only) | build (adds Edit/Write and
+        /// keel's verification verbs over MCP).
+        #[arg(long, default_value = "brainstorm")]
+        role: String,
+        /// Start a new session instead of resuming the stored one.
+        #[arg(long)]
+        new: bool,
+        /// Write the agent's answer out as a recipe file, but only if it
+        /// parses — see `moor recipe`.
+        #[arg(long, value_name = "PATH")]
+        emit_recipe: Option<PathBuf>,
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        prompt: Vec<String>,
+    },
+    /// One console over every project: which sandboxes are up, what
+    /// stage each spec is at per `keel next`, a conversational turn with
+    /// any of them, and the two-key stage approval. Local terminal only —
+    /// no socket, no port, no daemon.
+    Studio {
+        /// Show just this project instead of every project on disk.
+        #[arg(short = 'p', long = "project")]
+        project: Option<String>,
+    },
     /// Show (or follow) a running `moor recipe`'s progress — stage
     /// transitions, gate attempts, pauses for approval — from the same
     /// tamper-evident audit chain `moor audit` reads, so you can check
@@ -197,6 +231,16 @@ fn main() {
         Command::Secrets(SecretsCommand::Status { project }) => {
             commands::secrets_status::run(&project)
         }
+        Command::Ask {
+            project,
+            role,
+            new,
+            emit_recipe,
+            prompt,
+        } => commands::resolve_project_announced(project).and_then(|name| {
+            commands::ask_cmd::run(&name, &role, new, emit_recipe.as_deref(), &prompt)
+        }),
+        Command::Studio { project } => commands::studio_cmd::run(project),
         Command::Recipe { name, file } => commands::recipe::run(&name, &file),
         Command::Logs {
             name,

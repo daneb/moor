@@ -10,6 +10,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 RUN cargo install keel-harness --locked
 
+# moor's own MCP server, built from this repo's mcp/ crate — the agent's
+# only route to keel (see docs/decisions/0008-agent-session-protocol.md).
+# Built from source here, not fetched: it ships with the moor that drives
+# it, so the tool surface in the image can never lag the protocol the CLI
+# expects. This COPY is why the base image's build context is the repo
+# root — see images/build.sh.
+COPY mcp /build/mcp
+RUN cargo install --locked --path /build/mcp --root /usr/local
+
 # --- stage 2: runtime image ---------------------------------------------
 FROM debian:bookworm-slim AS runtime
 
@@ -51,6 +60,13 @@ RUN npm install -g npm@11 && npm cache clean --force
 RUN npm install -g @anthropic-ai/claude-code && npm cache clean --force
 
 COPY --from=keel-build /usr/local/cargo/bin/keel /usr/local/bin/keel
+COPY --from=keel-build /usr/local/bin/moor-keel-mcp /usr/local/bin/moor-keel-mcp
+
+# How `claude` finds that server. Read-only, root-owned, outside any
+# volume and outside /workspace: the agent can read this file but has no
+# way to point it somewhere else, so the tool surface it gets is the one
+# moor shipped. `moor ask` passes it explicitly with --mcp-config.
+COPY images/base/mcp-config.json /etc/moor/mcp-config.json
 
 RUN groupadd -g "${AGENT_GID}" agent \
     && useradd -l -m -u "${AGENT_UID}" -g "${AGENT_GID}" -s /bin/bash agent \
@@ -78,7 +94,7 @@ RUN groupadd -g "${AGENT_GID}" agent \
 # Same volume-population mechanic as above: this has to exist in the
 # image *before* the claude-state volume's first mount, or the settings
 # file simply isn't there for a fresh project.
-COPY --chown=agent:agent claude-settings.json /home/agent/.claude/settings.json
+COPY --chown=agent:agent images/base/claude-settings.json /home/agent/.claude/settings.json
 
 WORKDIR /workspace
 USER agent

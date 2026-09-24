@@ -1,0 +1,17 @@
+[package]
+name = "moor-keel-mcp"
+version = "0.1.0"
+edition = "2021"
+description = "MCP server exposing keel's verification verbs to an agent inside a moor sandbox"
+license = "MIT"
+repository = "https://github.com/daneb/moor"
+
+[[bin]]
+name = "moor-keel-mcp"
+path = "src/main.rs"
+
+[dependencies]
+serde_json = "1"
+
+[profile.release]
+opt-level = 2

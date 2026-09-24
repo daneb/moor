@@ -1,0 +1,67 @@
+{
+  "runs": [
+    {
+      "criterion": "AC-1",
+      "kind": "cmd",
+      "oracle": "`cargo test --manifest-path cli/Cargo.toml audit::tests::matches_a_keel_written_golden_entry -- --exact 2>&1 | grep -q '1 passed'` exits 0",
+      "outcome": "pass",
+      "exit_code": 0
+    },
+    {
+      "criterion": "AC-2",
+      "kind": "cmd",
+      "oracle": "`cargo test --manifest-path cli/Cargo.toml audit::tests::legacy_chain_is_sealed_into_the_new_one -- --exact 2>&1 | grep -q '1 passed'` exits 0",
+      "outcome": "pass",
+      "exit_code": 0
+    },
+    {
+      "criterion": "AC-3",
+      "kind": "cmd",
+      "oracle": "`cargo test --manifest-path cli/Cargo.toml posture::tests::attestation_is_derived_from_inspect_output -- --exact 2>&1 | grep -q '1 passed'` exits 0",
+      "outcome": "pass",
+      "exit_code": 0
+    },
+    {
+      "criterion": "AC-4",
+      "kind": "cmd",
+      "oracle": "`cargo test --manifest-path cli/Cargo.toml posture::tests::missing_inspect_fields_are_unproven -- --exact 2>&1 | grep -q '1 passed'` exits 0",
+      "outcome": "pass",
+      "exit_code": 0
+    },
+    {
+      "criterion": "AC-5",
+      "kind": "cmd",
+      "oracle": "`cargo test --manifest-path cli/Cargo.toml compose::tests::sandbox_gets_attestation_and_sink_without_bind_mounts -- --exact 2>&1 | grep -q '1 passed'` exits 0",
+      "outcome": "pass",
+      "exit_code": 0
+    },
+    {
+      "criterion": "AC-6",
+      "kind": "cmd",
+      "oracle": "`cargo test --manifest-path cli/Cargo.toml audit::tests::sink_lines_fold_in_order_and_malformed_ones_are_kept -- --exact 2>&1 | grep -q '1 passed'` exits 0",
+      "outcome": "pass",
+      "exit_code": 0
+    },
+    {
+      "criterion": "AC-7",
+      "kind": "cmd",
+      "oracle": "`cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::push_entry_names_ref_and_commit -- --exact 2>&1 | grep -q '1 passed'` exits 0",
+      "outcome": "pass",
+      "exit_code": 0
+    },
+    {
+      "criterion": "AC-8",
+      "kind": "cmd",
+      "oracle": "`bash tests/e2e.sh` exits 0",
+      "outcome": "pass",
+      "exit_code": 0,
+      "output": "…\nSS] moor audit --export\naudit bundle written to /tmp/e2e-96646-audit-20260924T192929Z.tar.gz\n  [PASS] export bundle exists and contains chain.jsonl\n\n== import: an existing local repo (no bind mount, ever) ==\n         ==> importing /private/var/folders/qd/rd_v3fjs0_s5w8n7vwt35f3w0000gn/T/tmp.ChRcESuOcq/local-repo as 'e2e-import-96646' (image: moor/node:latest)\n         ==> starting sandbox + egress for 'e2e-import-96646'\n          Network e2e-import-96646-egress-net Creating \n          Network e2e-import-96646-egress-net Created \n          Network e2e-import-96646-internal Creating \n          Network e2e-import-96646-internal Created \n          Volume e2e-import-96646-claude-state Creating \n          Volume e2e-import-96646-claude-state Created \n          Volume e2e-import-96646-workspace Creating \n          Volume e2e-import-96646-workspace Created \n          Volume e2e-import-96646-cache Creating \n          Volume e2e-import-96646-cache Created \n          Container e2e-import-96646-egress Creating \n          Container e2e-import-96646-egress Created \n          Container e2e-import-96646-sandbox Creating \n          Container e2e-import-96646-sandbox Created \n          Container e2e-import-96646-egress Starting \n          Container e2e-import-96646-egress Started \n          Container e2e-import-96646-sandbox Starting \n          Container e2e-import-96646-sandbox Started \n         ==> bundling /private/var/folders/qd/rd_v3fjs0_s5w8n7vwt35f3w0000gn/T/tmp.ChRcESuOcq/local-repo (all branches and tags)\n         ==> streaming the bundle into the sandbox and cloning it\n         Cloning into '.'...\n         branch 'a-second-branch' set up to track 'origin/a-second-branch'.\n            no remote configured — set one with `moor run e2e-import-96646 -- git remote add origin <url>` when ready\n         ==> checking for existing keel configuration\n            none found — running `keel init` inside the sandbox\n           created .keel/keel.toml\n           created drivers/_common.sh\n           created drivers/claude-code\n           created drivers/codex\n           added   [[driver]] codex to keel.toml\n           created drivers/copilot\n           added   [[driver]] copilot to keel.toml\n           created drivers/kiro\n           added   [[driver]] kiro to keel.toml\n           created drivers/noop\n           added   [[driver]] noop to keel.toml\n           created sast/semgrep\n           created product.md\n           created tech.md\n           created conventions.md\n           updated .gitignore\n         \n           store seeded at .keel/store\n           detected: Node/TypeScript (npm)\n         \n         Building the first map…\n           0 files · 0 symbols · 0 references · 0 import edges  (42 ms)\n           structure.md 13/400 lines · 0 CODEMAPs\n         \n         Rendering projections…\n           claude   CLAUDE.md — 68/180 lines\n           agents   AGENTS.md — 68/180 lines\n           kiro     .kiro/steering/keel.md — 68/200 lines\n           copilot  .github/copilot-instructions.md — 68/120 lines\n         \n         keel is initialised.\n         \n         Next:\n           1. Correct .keel/store/steering/product.md and .keel/store/steering/tech.md — they are seeded, not right.\n           2. `keel hook install` so a drifted projection cannot be committed.\n           3. `keel status` any time you want to know if the picture is current.\n         \n         \n         'e2e-import-96646' is up, imported from /private/var/folders/qd/rd_v3fjs0_s5w8n7vwt35f3w0000gn/T/tmp.ChRcESuOcq/local-repo. Manifest: /Users/danebalia/.moor/projects/e2e-import-96646/moor.yaml\n         Next: moor shell e2e-import-96646\n  [PASS] moor import exits 0\n  [PASS] auto-detected the node image from package.json\n  [PASS] ran keel init (no prior .keel/ in the source)\n  [PASS] imported commit is present in the sandbox\n  [PASS] the second branch came across too (--all bundle)\n  [PASS] imported project passes selftest too\n\ne2e: all checks passed.\n\n== cleanup =="
+    }
+  ],
+  "criteria": 8,
+  "executed": 8,
+  "passed": 8,
+  "failed": 0,
+  "blocked": 0,
+  "human": 0
+}

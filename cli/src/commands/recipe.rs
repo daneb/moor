@@ -13,8 +13,8 @@ const DEFAULT_MAX_RUN_ATTEMPTS: u32 = 2;
 /// free text, handed to the agent as-is — deliberately not a DSL, so the
 /// operator never has to learn one to describe what they want.
 #[derive(Debug, Deserialize)]
-struct FrontMatter {
-    slug: String,
+pub struct FrontMatter {
+    pub slug: String,
     #[serde(default)]
     scope: Vec<String>,
     #[serde(default)]
@@ -34,12 +34,15 @@ fn default_max_run_attempts() -> u32 {
 }
 
 #[derive(Debug)]
-struct Recipe {
-    front: FrontMatter,
-    description: String,
+pub struct Recipe {
+    pub front: FrontMatter,
+    pub description: String,
 }
 
-fn parse_recipe(path: &Path) -> Result<Recipe> {
+/// Also the gate `session::emit_recipe` puts an agent-drafted recipe
+/// through before the host writes it — one parser, so an emitted recipe
+/// cannot be one `moor recipe` then refuses.
+pub fn parse_recipe(path: &Path) -> Result<Recipe> {
     let text = std::fs::read_to_string(path)
         .with_context(|| format!("reading recipe {}", path.display()))?;
     let rest = text
@@ -115,12 +118,16 @@ fn next_report(name: &str, m: &Manifest, slug: &str) -> Result<NextReport> {
 }
 
 /// Ask an agent to author `.keel/specs/<slug>/spec.md` from the recipe's
-/// free-text description. Restricted to the Write tool only — not a
-/// prompt-worded request for restraint, an actual tool-access boundary —
-/// because a concrete description of a desired outcome reliably makes
-/// Claude Code just go implement it instead of writing a spec about it
-/// (verified directly: it built the feature and left the spec untouched
-/// when given Bash/Edit access during this feature's own development).
+/// free-text description. Granted the Write tool only, because a concrete
+/// description of a desired outcome reliably makes Claude Code just go
+/// implement it instead of writing a spec about it (verified directly: it
+/// built the feature and left the spec untouched when given Bash/Edit
+/// access during this feature's own development).
+///
+/// `--allowedTools` alone does *not* make that a boundary: measured against
+/// a live sandbox, Claude Code runs `Bash` regardless of being granted only
+/// other tools, under every permission mode. `session::deny_shell_argv`
+/// supplies the `--disallowedTools` half that actually denies it.
 fn author_spec(name: &str, m: &Manifest, slug: &str, description: &str) -> Result<()> {
     let (_, keel_prompt) = exec_capture(
         name,
@@ -135,13 +142,14 @@ fn author_spec(name: &str, m: &Manifest, slug: &str, description: &str) -> Resul
     // come *before* it or claude sees no positional prompt at all
     // (verified directly: with the flag first, claude errors "Input must
     // be provided either through stdin or as a prompt argument").
-    let argv = vec![
+    let mut argv = vec![
         "claude".into(),
         "--print".into(),
         full,
         "--allowedTools".into(),
         "Write".into(),
     ];
+    argv.extend(crate::session::deny_shell_argv());
     let (ok, out) = exec_capture(name, m, &argv)?;
     println!("{out}");
     if !ok {
@@ -184,13 +192,14 @@ fn drive_gate(
         let fix_prompt = format!(
             "The following keel gate failed for spec '{slug}'. Using only your Edit tool, fix exactly what it names below — do not touch any other file, do not implement the feature, do not run any command.\n\n{out}"
         );
-        let claude_argv = vec![
+        let mut claude_argv = vec![
             "claude".into(),
             "--print".into(),
             fix_prompt,
             "--allowedTools".into(),
             "Edit".into(),
         ];
+        claude_argv.extend(crate::session::deny_shell_argv());
         let (fixed_ok, fix_out) = exec_capture(name, m, &claude_argv)?;
         println!("{fix_out}");
         if !fixed_ok {

@@ -19,6 +19,10 @@ anyhow = "1"
 chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
 sha2 = "0.10"
 hex = "0.4"
+# Raw-mode keypresses and terminal setup/teardown for `moor studio`. The
+# only thing taken on for it: rendering stays hand-rolled ANSI, the same
+# call `commands/view.rs` made for markdown highlighting.
+crossterm = "0.29"
 
 [profile.release]
 opt-level = 2

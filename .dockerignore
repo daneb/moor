@@ -1,0 +1,13 @@
+# The base image's build context is the repo root (images/build.sh), so
+# keep everything the image doesn't need out of what gets sent to the
+# daemon — build artefacts above all.
+.git
+**/target
+.keel
+.kiro
+.github
+docs
+tests
+proxy
+cli
+.DS_Store

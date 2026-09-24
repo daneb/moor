@@ -9,6 +9,11 @@ throwaway container, never the Mac Mini it runs on.
 
 See [docs/THREAT-MODEL.md](docs/THREAT-MODEL.md) and
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full design,
+[docs/MCP.md](docs/MCP.md) for the transport in both directions — how moor
+puts an instruction in front of the agent, and how the agent reaches keel
+through an MCP server that deliberately has no `approve` verb in it —
+[docs/IMAGES.md](docs/IMAGES.md) for what is in each image, what is pinned
+and what isn't, and the build mechanics that are easy to get wrong,
 [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md) for a real ideation-to-shipped
 run against an actual GitHub repo — including the three bugs it found —
 [docs/MIGRATING.md](docs/MIGRATING.md) for bringing an existing project
@@ -33,7 +38,10 @@ for `moor logs` — a live, timestamped status view of a running recipe
 from any terminal, not just the one driving it —
 [docs/decisions/0007-git-identity.md](docs/decisions/0007-git-identity.md)
 for why the sandbox's git identity is synced from the host's, so
-`keel approve` records a real name instead of "unknown" — and
+`keel approve` records a real name instead of "unknown",
+[docs/decisions/0008-agent-session-protocol.md](docs/decisions/0008-agent-session-protocol.md)
+for why the agent reaches keel through moor's own MCP server rather than a
+scoped shell with a hand-maintained verb allowlist — and
 [docs/examples/ascii-banner](docs/examples/ascii-banner) for a small
 utility built end to end by a real Claude Code agent running inside a
 sandbox — including two real bugs that run found and fixed, and the
@@ -184,13 +192,17 @@ failures within half a second of a real recipe run producing them.
 
 ## Layout
 
-- `images/` — the sandbox base image + per-language layers (node, rust, python)
+- `images/` — the sandbox base image + per-language layers (node, rust,
+  python); see [docs/IMAGES.md](docs/IMAGES.md)
+- `mcp/` — `moor-keel-mcp`, the MCP server that ships *inside* the
+  sandbox and is the agent's only route to keel; see
+  [docs/MCP.md](docs/MCP.md)
 - `proxy/` — the egress gateway (default-deny forward proxy)
 - `policies/` — the hardening baseline and the manifest schema, documented
 - `cli/` — the `moor` Rust CLI, including `cli/templates/` (the
   per-project docker-compose template — lives inside the crate, not a
   top-level `compose/`, so a published crate can actually embed it)
-- `docs/` — threat model and architecture
+- `docs/` — threat model, architecture, transport, images
 - `Makefile` — local dev tooling (`make help`); mirrors
   `.github/workflows/ci.yml` so `make ci` runs the same checks locally
 
@@ -215,7 +227,10 @@ real container and written up with the evidence attached:
   entry hash-chains to the one before it; `moor audit --verify`
   recomputes the whole chain and names exactly which entry was edited,
   deleted, reordered, or forged if any was — proven with a live tamper
-  test in `tests/e2e.sh`, not just asserted.
+  test in `tests/e2e.sh`, not just asserted. The chain is keel's
+  `keel.chain/1` format, so keel's own `keel chain verify` checks it too,
+  and it holds keel's gate verdicts and the sandbox's posture attestation
+  alongside moor's own entries: one chain, not two logs to reconcile.
 - **The agent's own permission checks are a second layer, not skipped.**
   Every project defaults to Claude Code's `auto` permission mode
   (`images/base/claude-settings.json`) instead of
@@ -228,6 +243,40 @@ real container and written up with the evidence attached:
   get past *two* independent things, not one: Claude's own per-call
   risk judgment, and the sandbox's structural containment below if that
   judgment is ever fooled.
+- **The agent cannot advance its own work past a human checkpoint — and
+  the first attempt at that claim was wrong, which is documented rather
+  than quietly fixed.** The agent reaches keel through an MCP server moor
+  ships into the sandbox ([docs/MCP.md](docs/MCP.md)), exposing `keel
+  gate` and `keel next` and nothing else; `keel approve` is not a tool it
+  defines, and every argv the server can produce is a compiled-in verb
+  plus at most a validated slug and a gate id matched against a fixed
+  table — asserted three ways in `mcp/src/main.rs`, including over every
+  argv any accepted call can produce. But that alone did **not** hold:
+  `--allowedTools` turned out to be an auto-approval list, not a
+  restriction, so Claude Code ran `Bash` regardless and the `build` role
+  reached `keel approve --help` through it. Every role now also passes
+  `--disallowedTools` for every route to a shell or a subagent, which is
+  what actually denies it — verified live both before and after. The
+  honest accounting, including that this makes the control half list-based
+  and therefore something moor must keep current, is in
+  [ADR-0008's correction](docs/decisions/0008-agent-session-protocol.md).
+- **An agent's reply cannot address your terminal.** The sandbox
+  constrains what the agent can *execute*, not what it can *say* — and a
+  reply drawn straight into a terminal can move the cursor, rewrite lines
+  already read, or drive an OSC handler. Everything `moor studio` draws
+  from a turn is stripped of every ANSI/CSI escape, every OSC sequence,
+  and every C0 control except newline and tab (`\r` included) first. The
+  renderer is a pure function, so what it *would* draw is asserted on
+  directly in tests rather than eyeballed.
+- **Every conversational turn is chained before you see it, and the chain
+  holds no conversation.** `moor ask`/`moor studio` append one
+  `agent-turn` entry — role, granted tool set, session id, SHA-256 hashes
+  of prompt and response — before printing anything, so there is no code
+  path to a response that skips the record. Text is deliberately *not* in
+  the chain: `moor audit --export` bundles that file wholesale, so it goes
+  to the redacted `transcript.jsonl` instead. Session continuity is the
+  host's: the id is stored only after it validates as a UUID, and the
+  agent's own response text is never parsed for one.
 - **Every design decision that matters is written down, including the
   ones that didn't go moor's way.** ADR-0001 explains why gVisor and
   Apple's `container` tool were both rejected (and exactly what would
@@ -327,24 +376,42 @@ not separate from it:
 
 ## Testing
 
-- `cd cli && cargo test` — 84 unit tests: selftest's hardening evaluator
+- `cd cli && cargo test` — 122 unit tests: selftest's hardening evaluator
   (fed synthetic `docker inspect` JSON, including fail-safe-on-missing-data
   cases), manifest validation and round-tripping, compose template
   rendering, the tinyproxy access-log parser, the audit hash chain
   (append/verify, plus deliberately editing, deleting, reordering, and
-  forging entries to confirm `--verify` catches each one), Keychain
+  forging entries to confirm `--verify` catches each one; a golden entry
+  written by keel that moor must hash identically; sealing a legacy
+  chain; folding keel's sink, malformed lines included), the posture
+  attestation derived from `docker inspect` (unproven when a field is
+  missing), push ref and commit capture, Keychain
   service-name scoping, `moor import`'s image auto-detection and
   GitHub-URL parsing, `moor keel`/`moor view`'s project-resolution
   precedence (explicit flag, sticky `moor use` default, the one sandbox
   that's up, ambiguity errors), `moor keel`'s argv building, `moor use`'s
-  known-project validation, and `moor view`'s artifact-name mapping and
-  markdown highlighting.
+  known-project validation, `moor view`'s artifact-name mapping and
+  markdown highlighting, the agent session protocol (role tool sets,
+  `is_error`-based turn failure, UUID-validated session continuity, the
+  content-free `agent-turn` chain entry, transcript redaction, recipe
+  emission), and `moor studio` (one container query per refresh, input
+  handled while a turn is in flight, escape-sequence stripping, the
+  two-distinct-key approval, the `docker exec -i` artifact round-trip,
+  per-project session isolation, stage read from `keel next`).
+- `cargo test --manifest-path mcp/Cargo.toml` — 8 unit tests over the MCP
+  server's tool surface: that it covers `gate` and `next` and that no argv
+  any accepted call can produce reaches an advancement verb, that a slug
+  must pass the same rule `manifest::validate_name` applies, that a gate
+  id is matched against a fixed table rather than passed through, and that
+  an unexpected argument key is refused rather than ignored.
 - `./tests/e2e.sh` — end-to-end against real Docker containers: creates a
   throwaway project, runs `moor selftest`'s static checks and active
   breakout battery, confirms egress allow/deny against github.com and
-  example.com, confirms a `git push` attempt is tagged distinctly in the
-  audit chain, folds the egress log in via `moor audit`, verifies the
-  chain, **live-tampers with the real chain.jsonl file and confirms
+  example.com, confirms a `git push` attempt is recorded with its ref,
+  confirms the posture attestation is in the chain and that the agent
+  cannot replace it, folds keel's sink and the egress log in, checks the
+  host chain with `keel chain verify` (`$KEEL`, default `keel`), verifies
+  the chain, **live-tampers with the real chain.jsonl file and confirms
   `--verify` detects it**, exports an audit bundle, and imports a
   throwaway local multi-branch repo end-to-end (image auto-detect, `keel
   init`, both branches present, selftest still passes). Requires the

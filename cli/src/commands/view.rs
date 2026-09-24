@@ -53,6 +53,22 @@ fn highlight(markdown: &str) -> String {
     out
 }
 
+pub fn run(project: &str, slug: &str, artifact: &str) -> Result<()> {
+    let filename = artifact_filename(artifact)?;
+    let m = Manifest::load(&paths::manifest_path(project)?)?;
+    let container = m.sandbox_container();
+    let path = format!(".keel/specs/{slug}/{filename}");
+
+    let (status, out) = proc::run_capture("docker", &["exec", &container, "cat", &path])?;
+    if !status.success() {
+        anyhow::bail!(
+            "no {filename} found for spec '{slug}' in project '{project}' (looked for {path})"
+        );
+    }
+    print!("{}", highlight(&out));
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -108,20 +124,4 @@ mod tests {
             format!("{DIM}```{RESET}\n{DIM}# not a heading{RESET}\n{DIM}```{RESET}\n")
         );
     }
-}
-
-pub fn run(project: &str, slug: &str, artifact: &str) -> Result<()> {
-    let filename = artifact_filename(artifact)?;
-    let m = Manifest::load(&paths::manifest_path(project)?)?;
-    let container = m.sandbox_container();
-    let path = format!(".keel/specs/{slug}/{filename}");
-
-    let (status, out) = proc::run_capture("docker", &["exec", &container, "cat", &path])?;
-    if !status.success() {
-        anyhow::bail!(
-            "no {filename} found for spec '{slug}' in project '{project}' (looked for {path})"
-        );
-    }
-    print!("{}", highlight(&out));
-    Ok(())
 }

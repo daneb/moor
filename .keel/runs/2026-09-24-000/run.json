@@ -1,0 +1,11 @@
+{
+  "schema": "keel.run/1",
+  "id": "2026-09-24-000",
+  "spec": "moor-evidence-chain",
+  "keel_version": "0.6.7",
+  "store_hash": "4e07f093d6afa16aeb50b4bab14c069797586ba01befb262b14b96bbd0213f0e",
+  "started_at": "2026-09-24T18:33:41.741463+02:00",
+  "finished_at": "2026-09-24T18:34:10.040610+02:00",
+  "verdict": "fail",
+  "base_commit": "fd14f670ec82d21ad5c94a3885c4cf53c875b941"
+}

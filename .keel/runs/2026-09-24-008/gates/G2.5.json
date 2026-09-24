@@ -1,0 +1,36 @@
+{
+  "schema": "keel.gate/1",
+  "gate": "G2.5",
+  "run": "2026-09-24-009",
+  "spec": "moor-evidence-chain",
+  "verdict": "pass",
+  "generated_at": "2026-09-24T21:29:52.409384+02:00",
+  "checks": [
+    {
+      "id": "test-invalidation",
+      "verdict": "pass",
+      "detail": "1 flagged line(s) reviewed and accepted by Dane Balia",
+      "evidence": "evidence/review-test-invalidation.txt"
+    },
+    {
+      "id": "test-movement",
+      "verdict": "pass",
+      "detail": "16 code file(s), 1 test file(s)"
+    },
+    {
+      "id": "conventions",
+      "verdict": "pass",
+      "detail": "3 house rule(s) in force"
+    },
+    {
+      "id": "lessons",
+      "verdict": "pass",
+      "detail": "no lessons in force yet (Phase 3 populates these)"
+    },
+    {
+      "id": "reviewer",
+      "verdict": "pass",
+      "detail": "no adversarial reviewer configured — the heuristics above are the whole pass"
+    }
+  ]
+}

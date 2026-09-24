@@ -112,10 +112,37 @@ step "git push is tagged distinctly in the audit chain"
 "$CLI" run "$PROJECT" -- git -C /workspace init -q >/dev/null 2>&1 || true
 "$CLI" run "$PROJECT" -- git -C /workspace push origin main >/dev/null 2>&1 || true
 CHAIN_FILE="$HOME/.moor/projects/$PROJECT/audit/chain.jsonl"
-if grep -q '"kind":"git-push"' "$CHAIN_FILE" 2>/dev/null; then
-  pass "a git-push attempt was tagged kind=git-push in the chain"
+if grep -q '"kind":"push"' "$CHAIN_FILE" 2>/dev/null \
+  && grep '"kind":"push"' "$CHAIN_FILE" | grep -q '"ref":"main"'; then
+  pass "a git push attempt was recorded as kind=push with its ref"
 else
-  fail "no kind=git-push entry found in $CHAIN_FILE"
+  fail "no kind=push entry naming ref main in $CHAIN_FILE"
+fi
+
+step "one evidence chain: attestation, keel's sink, keel's verifier"
+if grep -q '"kind":"attest"' "$CHAIN_FILE" 2>/dev/null; then
+  pass "moor up attested the sandbox's posture into the host chain"
+else
+  fail "no kind=attest entry in $CHAIN_FILE"
+fi
+POSTURE_OUT=$("$CLI" run "$PROJECT" -- cat /run/moor/posture.json 2>&1)
+assert_contains "keel can read the attestation inside the sandbox" "$POSTURE_OUT" '"schema": "keel.posture/1"'
+expect_failure "the agent cannot replace the attestation" \
+  "$CLI" run "$PROJECT" -- sh -c 'echo forged > /run/moor/posture.json'
+# keel records G0's verdict through KEEL_CHAIN_SINK; moor folds it on the
+# next exec, so the gate lands in the host chain marked as the sandbox's.
+"$CLI" run "$PROJECT" -- keel init --yes >/dev/null 2>&1 || true
+"$CLI" run "$PROJECT" -- keel spec new e2e-chain >/dev/null 2>&1 || true
+"$CLI" run "$PROJECT" -- true >/dev/null 2>&1 || true
+if grep '"kind":"gate"' "$CHAIN_FILE" 2>/dev/null | grep -q '"source":"sandbox"'; then
+  pass "keel's G0 verdict was folded from the sink into the host chain"
+else
+  fail "no sandbox-sourced kind=gate entry in $CHAIN_FILE"
+fi
+if "$CLI" run "$PROJECT" -- test -e /workspace/.keel/chain.jsonl >/dev/null 2>&1; then
+  fail "keel wrote its own chain file inside the sandbox despite the sink"
+else
+  pass "keel never held the pen inside the sandbox"
 fi
 
 step "audit: egress log folds into the chain"
@@ -123,6 +150,30 @@ AUDIT_OUT=$("$CLI" audit "$PROJECT" 2>&1)
 assert_contains "audit output mentions folded entries" "$AUDIT_OUT" "folded in"
 assert_contains "audit chain recorded the github.com allow" "$AUDIT_OUT" "github.com"
 assert_contains "audit chain recorded the example.com deny" "$AUDIT_OUT" "example.com"
+
+step "audit: keel's own verifier accepts the host chain"
+if grep -q '"kind":"egress"' "$CHAIN_FILE" 2>/dev/null; then
+  pass "egress verdicts are in the same chain"
+else
+  fail "no kind=egress entry in $CHAIN_FILE"
+fi
+KEEL_BIN="${KEEL:-keel}"
+if command -v "$KEEL_BIN" >/dev/null 2>&1; then
+  VERIFY_DIR="$(mktemp -d)"
+  mkdir -p "$VERIFY_DIR/.keel" && cp "$CHAIN_FILE" "$VERIFY_DIR/.keel/chain.jsonl"
+  KEEL_VERIFY_OUT=$(cd "$VERIFY_DIR" && "$KEEL_BIN" chain verify 2>&1)
+  KEEL_VERIFY_EXIT=$?
+  rm -rf "$VERIFY_DIR"
+else
+  # No keel on this host (CI): use the one in moor/base, the same keel the
+  # sandbox runs. The chain goes in on stdin, so nothing is mounted.
+  KEEL_VERIFY_OUT=$(docker run --rm -i --network none --entrypoint sh moor/base:latest -c \
+    'mkdir -p /tmp/v/.keel && cat > /tmp/v/.keel/chain.jsonl && cd /tmp/v && keel chain verify' \
+    <"$CHAIN_FILE" 2>&1)
+  KEEL_VERIFY_EXIT=$?
+fi
+if [ "$KEEL_VERIFY_EXIT" -eq 0 ]; then pass "keel chain verify accepts moor's chain"; else fail "keel chain verify accepts moor's chain"; fi
+indent "$KEEL_VERIFY_OUT"
 
 step "audit: chain verifies OK before tampering"
 VERIFY_OUT=$("$CLI" audit "$PROJECT" --verify 2>&1)

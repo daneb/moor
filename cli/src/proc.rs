@@ -27,6 +27,25 @@ pub fn run_capture(program: &str, args: &[&str]) -> Result<(ExitStatus, String)>
     Ok((output.status, stdout))
 }
 
+/// Like `run_capture`, but keeps stdout and stderr as separate strings.
+/// Needed when stdout must stay machine-parseable (`claude --output-format
+/// json`) *and* stderr is the only place the real explanation goes: a
+/// `claude` that refuses to start writes nothing to stdout at all, so
+/// discarding stderr turns "Invalid MCP configuration" into an
+/// uninterpretable "EOF while parsing a value at line 1 column 0".
+pub fn run_capture_split(program: &str, args: &[&str]) -> Result<(ExitStatus, String, String)> {
+    let output = Command::new(program)
+        .args(args)
+        .stdin(Stdio::null())
+        .output()
+        .with_context(|| format!("spawning `{program} {}`", args.join(" ")))?;
+    Ok((
+        output.status,
+        String::from_utf8_lossy(&output.stdout).into_owned(),
+        String::from_utf8_lossy(&output.stderr).into_owned(),
+    ))
+}
+
 /// Like `run_capture`, but returns stdout and stderr concatenated
 /// (stdout first). Needed by anything that has to parse *or*
 /// pattern-match a command's own explanatory text regardless of which

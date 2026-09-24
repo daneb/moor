@@ -8,7 +8,8 @@ use std::path::PathBuf;
 /// run`/`shell` happened to observe directly.
 pub fn run(name: &str, verify: bool, export: Option<PathBuf>) -> Result<()> {
     let m = Manifest::load(&paths::manifest_path(name)?)?;
-    let folded = audit::fold_egress_log(name, &m).unwrap_or(0);
+    let folded =
+        audit::fold_egress_log(name, &m).unwrap_or(0) + audit::fold_sink(name, &m).unwrap_or(0);
     let path = paths::chain_log_path(name)?;
 
     if let Some(out_dir) = export {
@@ -18,6 +19,20 @@ pub fn run(name: &str, verify: bool, export: Option<PathBuf>) -> Result<()> {
     }
 
     if verify {
+        // A chain sealed at the switch to keel.chain/1 is still history;
+        // the new chain commits to its head, and it is checked here with
+        // the hash it was written under.
+        let legacy = audit::legacy_path(&path);
+        if legacy.exists() {
+            match audit::verify_legacy(&legacy)? {
+                audit::VerifyOutcome::Ok { entries } => {
+                    println!("legacy chain OK — {entries} entries ({})", legacy.display());
+                }
+                audit::VerifyOutcome::Tampered { at_seq, reason } => {
+                    anyhow::bail!("TAMPERED: legacy chain broken at seq {at_seq}: {reason}");
+                }
+            }
+        }
         match audit::verify_chain(&path)? {
             audit::VerifyOutcome::Ok { entries } => {
                 println!("chain OK — {entries} entries, no tampering detected.");
@@ -35,7 +50,7 @@ pub fn run(name: &str, verify: bool, export: Option<PathBuf>) -> Result<()> {
     }
 
     if folded > 0 {
-        println!("(folded in {folded} new egress-log entries)\n");
+        println!("(folded in {folded} new egress-log and keel-sink entries)\n");
     }
 
     println!("== audit chain: {} ==", path.display());
