@@ -131,7 +131,7 @@ real "code leaves the sandbox" event, and it shows up in the audit chain
 tagged distinctly:
 
 ```json
-{"kind":"git-push","data":{"argv":["git","push","-u","origin","main"],"exit_code":0,...}}
+{"schema":"keel.chain/1","kind":"push","writer":"moor","data":{"argv":["git","push","-u","origin","main"],"commit":"3f1c…","exit_code":0,"ref":"main",...},...}
 ```
 
 ## 5. Review the trail
@@ -143,7 +143,7 @@ moor audit isolator-sample-app --export /tmp
 ```
 
 The chain covers the whole session: every `moor run`/`shell` command,
-every widened-scope retry, the git-push, and the egress gateway's own
+every widened-scope retry, the push, and the egress gateway's own
 record of connections to `registry.npmjs.org` and `github.com` — folded
 in automatically, not something anyone inside the sandbox could suppress.
 **Third bug found here:** the export bundle's "keel evidence" step was

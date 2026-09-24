@@ -14,7 +14,7 @@ documented, narrow suppression. Nothing here is a rubber stamp.
 
 | Job | Tool | What it checks |
 |---|---|---|
-| `rust` | `cargo fmt --check`, `cargo clippy -D warnings`, `cargo test` | Formatting, lint-level correctness issues, the 59 unit tests |
+| `rust` | `cargo fmt --check`, `cargo clippy -D warnings`, `cargo test` | Formatting, lint-level correctness issues, the unit tests |
 | `rust-security` | [`cargo-audit`](https://github.com/RustSec/rustsec) (via `rustsec/audit-check`), [`cargo-deny`](https://github.com/EmbarkStudios/cargo-deny) | Known-vulnerable dependencies (RustSec advisory DB), license compliance, banned/duplicate/untrusted dependency sources |
 | `shell-lint` | [`shellcheck`](https://www.shellcheck.net/) | Every `.sh` script |
 | `docker-lint` | [`hadolint`](https://github.com/hadolint/hadolint) | Every Dockerfile (base, node, rust, python, egress) |

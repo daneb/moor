@@ -227,7 +227,10 @@ real container and written up with the evidence attached:
   entry hash-chains to the one before it; `moor audit --verify`
   recomputes the whole chain and names exactly which entry was edited,
   deleted, reordered, or forged if any was — proven with a live tamper
-  test in `tests/e2e.sh`, not just asserted.
+  test in `tests/e2e.sh`, not just asserted. The chain is keel's
+  `keel.chain/1` format, so keel's own `keel chain verify` checks it too,
+  and it holds keel's gate verdicts and the sandbox's posture attestation
+  alongside moor's own entries: one chain, not two logs to reconcile.
 - **The agent's own permission checks are a second layer, not skipped.**
   Every project defaults to Claude Code's `auto` permission mode
   (`images/base/claude-settings.json`) instead of
@@ -373,12 +376,16 @@ not separate from it:
 
 ## Testing
 
-- `cd cli && cargo test` — 109 unit tests: selftest's hardening evaluator
+- `cd cli && cargo test` — 122 unit tests: selftest's hardening evaluator
   (fed synthetic `docker inspect` JSON, including fail-safe-on-missing-data
   cases), manifest validation and round-tripping, compose template
   rendering, the tinyproxy access-log parser, the audit hash chain
   (append/verify, plus deliberately editing, deleting, reordering, and
-  forging entries to confirm `--verify` catches each one), Keychain
+  forging entries to confirm `--verify` catches each one; a golden entry
+  written by keel that moor must hash identically; sealing a legacy
+  chain; folding keel's sink, malformed lines included), the posture
+  attestation derived from `docker inspect` (unproven when a field is
+  missing), push ref and commit capture, Keychain
   service-name scoping, `moor import`'s image auto-detection and
   GitHub-URL parsing, `moor keel`/`moor view`'s project-resolution
   precedence (explicit flag, sticky `moor use` default, the one sandbox
@@ -400,9 +407,11 @@ not separate from it:
 - `./tests/e2e.sh` — end-to-end against real Docker containers: creates a
   throwaway project, runs `moor selftest`'s static checks and active
   breakout battery, confirms egress allow/deny against github.com and
-  example.com, confirms a `git push` attempt is tagged distinctly in the
-  audit chain, folds the egress log in via `moor audit`, verifies the
-  chain, **live-tampers with the real chain.jsonl file and confirms
+  example.com, confirms a `git push` attempt is recorded with its ref,
+  confirms the posture attestation is in the chain and that the agent
+  cannot replace it, folds keel's sink and the egress log in, checks the
+  host chain with `keel chain verify` (`$KEEL`, default `keel`), verifies
+  the chain, **live-tampers with the real chain.jsonl file and confirms
   `--verify` detects it**, exports an audit bundle, and imports a
   throwaway local multi-branch repo end-to-end (image auto-detect, `keel
   init`, both branches present, selftest still passes). Requires the

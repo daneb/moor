@@ -5,6 +5,7 @@ Host (Mac Mini, OrbStack/Docker)
  └─ moor (Rust CLI)                     ← the only thing you run on host
      ├─ ~/.moor/projects/<name>/moor.yaml   (manifest: allowlist, limits, secret refs)
      ├─ ~/.moor/projects/<name>/audit/*.jsonl    (host-only-writable, append-only)
+     ├─ ~/.moor/projects/<name>/posture.json     (host copy of the attestation keel reads)
      ├─ ~/.moor/projects/<name>/session          (agent session id — host-authoritative)
      ├─ ~/.moor/projects/<name>/transcript.jsonl (turn text, redacted at rest)
      └─ docker compose per project:
@@ -14,6 +15,8 @@ Host (Mac Mini, OrbStack/Docker)
          │     non-root user, read-only rootfs, cap-drop ALL, no-new-privileges,
          │     seccomp default, pids/mem/cpu limits, no docker.sock
          │     claude ──stdio──► moor-keel-mcp ──► keel gate / keel next
+         │     /run/moor       tmpfs, root-owned 0755: posture.json (read-only to agent)
+         │     /run/moor-sink  tmpfs, 1777: keel's chain payloads, folded by moor
          └─ <name>-egress    container   ← forward proxy, domain allowlist,
                logs every request, holds the canary token watch
 ```
@@ -87,17 +90,27 @@ for the planted canary token.
 ### Audit pipeline
 
 One hash-chained, append-only file per project:
-`~/.moor/projects/<name>/audit/chain.jsonl`. Every entry has a `kind`
-(`exec`, `git-push`, `egress`, `tripwire`, `tripwire-check`,
-`recipe-event`, `agent-turn`, `studio`), a timestamp, and a `hash` that
-commits to the entry's own contents plus the previous entry's hash — a
-Merkle-style chain, not just a log file. Four things append to it:
+`~/.moor/projects/<name>/audit/chain.jsonl`, in keel's `keel.chain/1`
+format ([keel ADR-0001](https://github.com/daneb/keel/blob/master/docs/decisions/0001-one-chain-runtime-writes.md)):
+keel owns the format and the verifier, and moor, as the host process no
+sandbox can reach, is the only thing that writes it. Every entry has a
+`kind` (`exec`, `push`, `egress`, `tripwire`, `tripwire-check`,
+`recipe-event`, `agent-turn`, `studio`, `attest`, `legacy_seal`, and
+whatever keel folds in through the sink, such as `gate` and `approval`),
+`writer: "moor"`, a timestamp, and a `hash` that commits to the entry's
+own contents plus the previous entry's hash: a Merkle-style chain, not
+just a log file. The hashing is keel's, byte for byte, so `keel chain
+verify` accepts a moor chain with no moor-specific knowledge. A chain
+written before the switch is moved to `chain.legacy.jsonl` unchanged, and
+the new chain opens with a `legacy_seal` entry that commits to its head.
+Six things append to it:
 
 1. **Exec entries** — every `moor run`/`shell` invocation (redacted
    argv, exit code), written directly by the CLI as it happens. A command
-   that looks like `git push` is tagged `kind: "git-push"` instead of the
-   generic `exec`, since that's the one channel through which code
-   actually leaves the sandbox for real.
+   that looks like `git push` is recorded as `kind: "push"` instead of the
+   generic `exec`, with the ref it pushed and the commit that ref resolved
+   to just before the push, since that's the one channel through which
+   code actually leaves the sandbox for real.
 2. **Egress entries** — folded in from the egress gateway's own access
    log by `moor audit` / `moor selftest` (idempotent — a
    `.egress-offset` checkpoint tracks how much has already been folded).
@@ -115,10 +128,28 @@ Merkle-style chain, not just a log file. Four things append to it:
    operator is shown anything, so there is no path to a response that
    skips the record. Full text goes to `transcript.jsonl` instead, passed
    through `audit::redact` first — see [MCP.md](MCP.md).
+5. **The attestation** — after `compose up`, moor reads the running
+   sandbox with `docker inspect` and derives a `keel.posture/1`
+   attestation: read-only root, no bind mounts, non-root user, all
+   capabilities dropped, no-new-privileges, not privileged, internal-only
+   networks. Anything inspect does not establish is `unproven`, never
+   assumed. moor writes it as root into `/run/moor/posture.json`, keeps a
+   host copy at `posture.json`, and appends `kind: "attest"` with its
+   SHA-256. keel reads it through `KEEL_RUNTIME_ATTESTATION` and blocks a
+   run whose required properties are not `proven`.
+6. **keel's own evidence** — keel inside the sandbox never writes a chain.
+   It appends payloads (gate verdicts, approvals, run start and end) to
+   `KEEL_CHAIN_SINK`, a tmpfs at `/run/moor-sink`. After every exec, and on
+   `moor audit`, moor pulls new lines with `docker exec cat` (tracked by
+   `.sink-offset`, like the egress fold) and appends each under its own
+   `kind` with `source: "sandbox"`. A line that isn't a payload is kept as
+   `sink_malformed` rather than dropped.
 
-`moor audit <name> --verify` recomputes the whole chain and reports
-exactly which entry (if any) has been edited, deleted, reordered, or
-forged — see docs/THREAT-MODEL.md's "audit tampering" section.
+`moor audit <name> --verify` recomputes the whole chain, and a sealed
+legacy chain with the hash it was written under, and reports exactly which
+entry (if any) has been edited, deleted, reordered, or forged — see
+docs/THREAT-MODEL.md's "audit tampering" section. keel's `keel chain
+verify` checks the same file independently.
 `moor audit <name> --export <dir>` bundles `chain.jsonl` plus keel's
 own exported run bundles (`.keel/bundles/keel-<run-id>.tar.gz`, written by
 `keel export` and pulled out of the workspace volume via `docker cp` —

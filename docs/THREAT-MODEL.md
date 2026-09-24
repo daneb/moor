@@ -124,7 +124,9 @@ of trusting it equal to "one throwaway container," never "the Mac Mini."
    direct filesystem access to `~/.moor/` (not the sandbox — the
    *operator's own machine*) can't edit, delete, reorder, or insert an
    entry without `moor audit <name> --verify` detecting exactly where
-   the chain breaks. This defends against accidental corruption and
+   the chain breaks. The format is keel's `keel.chain/1`, so keel's own
+   `keel chain verify` is a second, independent verifier that shares no
+   code with moor. This defends against accidental corruption and
    against a compromised process on the host with file access but not
    the ability to observe every command as it ran; it does not defend
    against someone who controls the `moor` binary itself (see
@@ -159,11 +161,13 @@ config — the agent (or a cloned repo's `.gitattributes`/`core.hooksPath`
 override) can simply reconfigure or bypass it, so it would be a control
 that looks like a boundary but isn't one. Instead:
 
-- `moor run <project> -- git push ...` is tagged `kind: "git-push"` in
+- `moor run <project> -- git push ...` is recorded as `kind: "push"` in
   the audit chain by the CLI itself (host-side, so it's a real signal,
-  not something the sandbox can suppress) — but it only sees commands run
-  through `moor run`, not ones typed inside an interactive `moor
-  shell` session.
+  not something the sandbox can suppress), with the ref and the commit it
+  resolved to just before the push. The commit comes from a separate
+  `git rev-parse` exec, so it names what the repository held, not what the
+  agent claims it pushed. It only sees commands run through `moor run`,
+  not ones typed inside an interactive `moor shell` session.
 - The **egress gateway's own log**, folded into the audit chain by
   `moor audit`, is the reliable signal: every connection to
   `github.com` is recorded from *outside* the sandbox, and nothing inside
@@ -171,6 +175,30 @@ that looks like a boundary but isn't one. Instead:
   push from a fetch/clone (TLS isn't intercepted — see
   proxy/README.md) but it can't be lied to about whether the connection
   happened at all.
+
+## The posture attestation and keel's sink
+
+keel runs inside the sandbox and cannot inspect the box it runs in, so
+two things cross the boundary for it, neither through a bind mount:
+
+- **The attestation goes in, read-only.** moor derives it on the host from
+  `docker inspect` and writes it as root into `/run/moor`, a tmpfs mounted
+  root-owned `0755`, as a `0444` file. The `agent` user can read it and
+  cannot replace it (`tests/e2e.sh` tries). Its SHA-256 is in the host
+  chain, so a copy keel reports back can be compared against what moor
+  actually wrote. It is a record of Docker's configuration for the
+  container, not proof about the kernel underneath: a runc escape would
+  not show up in `docker inspect`. That is still out of scope, below.
+- **keel's payloads come out, as claims.** keel writes to
+  `/run/moor-sink`, which the agent can also write to. Everything folded
+  from it is marked `source: "sandbox"`: moor records faithfully what the
+  sandbox said and when moor saw it, but cannot make it true. An agent
+  could append a fake `gate` payload or rewrite lines moor has not folded
+  yet. It cannot alter anything already folded, because that is in the
+  host chain. moor folds after every exec to keep that window short, and
+  a line that doesn't parse is recorded as `sink_malformed`, so breaking a
+  line doesn't hide it. The tmpfs empties when the container restarts;
+  unfolded lines are lost then, the same as the egress log.
 
 ## Explicitly out of scope for v1
 
