@@ -1,0 +1,31 @@
+{
+  "schema": "keel.gate/1",
+  "gate": "G3",
+  "run": "2026-09-24-009",
+  "spec": "moor-evidence-chain",
+  "verdict": "fail",
+  "generated_at": "2026-09-24T21:29:52.427836+02:00",
+  "checks": [
+    {
+      "id": "earlier-gates",
+      "verdict": "pass",
+      "detail": "G2.5 and G2 passed"
+    },
+    {
+      "id": "reviewable-size",
+      "verdict": "pass",
+      "detail": "1087/1100 reviewable lines"
+    },
+    {
+      "id": "evidence-complete",
+      "verdict": "pass",
+      "detail": "trajectory, metadata and gate results present"
+    },
+    {
+      "id": "human-verdict",
+      "verdict": "fail",
+      "expected": "the approved artefacts are the current ones",
+      "actual": "changed after approval (46797bba9162 → 1405f0be7aee) — re-approve"
+    }
+  ]
+}

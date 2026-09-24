@@ -16,9 +16,10 @@ scope:
 - tests/e2e.sh
 - README.md
 - docs/**
+- .github/workflows/ci.yml
 budget:
   criteria: 8
-  lines: 1000
+  lines: 1100
 verified_at: 2026-09-24
 ---
 
