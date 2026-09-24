@@ -132,10 +132,20 @@ mod tests {
         assert!(sandbox.contains("- /run/moor:mode=0755"));
         assert!(sandbox.contains("- /run/moor-sink:mode=1777"));
         // Both paths are tmpfs; every volume is still a named volume.
-        for line in sandbox.lines().map(str::trim).filter(|l| l.starts_with("- ") && l.contains(':')) {
+        for line in sandbox
+            .lines()
+            .map(str::trim)
+            .filter(|l| l.starts_with("- ") && l.contains(':'))
+        {
             let source = line.trim_start_matches("- ").split(':').next().unwrap();
-            assert!(!source.starts_with('/') || line.contains("mode="), "host path mounted: {line}");
-            assert!(!source.starts_with('.') && !source.starts_with('~') && !source.contains('$'), "host path mounted: {line}");
+            assert!(
+                !source.starts_with('/') || line.contains("mode="),
+                "host path mounted: {line}"
+            );
+            assert!(
+                !source.starts_with('.') && !source.starts_with('~') && !source.contains('$'),
+                "host path mounted: {line}"
+            );
         }
     }
 

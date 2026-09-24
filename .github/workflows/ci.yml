@@ -63,7 +63,7 @@ jobs:
       - uses: ludeeus/action-shellcheck@2.0.0
         with:
           scandir: .
-          ignore_paths: cli/target
+          ignore_paths: cli/target .keel
 
   docker-lint:
     name: Hadolint

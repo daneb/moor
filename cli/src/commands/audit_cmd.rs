@@ -8,8 +8,8 @@ use std::path::PathBuf;
 /// run`/`shell` happened to observe directly.
 pub fn run(name: &str, verify: bool, export: Option<PathBuf>) -> Result<()> {
     let m = Manifest::load(&paths::manifest_path(name)?)?;
-    let folded = audit::fold_egress_log(name, &m).unwrap_or(0)
-        + audit::fold_sink(name, &m).unwrap_or(0);
+    let folded =
+        audit::fold_egress_log(name, &m).unwrap_or(0) + audit::fold_sink(name, &m).unwrap_or(0);
     let path = paths::chain_log_path(name)?;
 
     if let Some(out_dir) = export {

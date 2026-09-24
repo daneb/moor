@@ -49,7 +49,14 @@ fn frame(h: &mut Sha256, name: &str, content: &[u8]) {
     h.update([0u8]);
 }
 
-fn compute_hash(prev_hash: &str, seq: u64, ts: &str, kind: &str, writer: &str, data: &Value) -> String {
+fn compute_hash(
+    prev_hash: &str,
+    seq: u64,
+    ts: &str,
+    kind: &str,
+    writer: &str,
+    data: &Value,
+) -> String {
     let mut h = Sha256::new();
     frame(&mut h, "prev_hash", prev_hash.as_bytes());
     frame(&mut h, "seq", seq.to_string().as_bytes());
@@ -144,8 +151,12 @@ fn append_entry(path: &Path, kind: &str, data: Value) -> Result<ChainEntry> {
 /// stays verifiable with the hash it was written under, and the new chain
 /// is verifiable by keel from its first entry.
 fn seal_legacy(path: &Path) -> Result<()> {
-    let Ok(text) = std::fs::read_to_string(path) else { return Ok(()) };
-    let Some(first) = text.lines().find(|l| !l.trim().is_empty()) else { return Ok(()) };
+    let Ok(text) = std::fs::read_to_string(path) else {
+        return Ok(());
+    };
+    let Some(first) = text.lines().find(|l| !l.trim().is_empty()) else {
+        return Ok(());
+    };
     let is_current = serde_json::from_str::<Value>(first)
         .map(|v| v.get("schema").is_some())
         .unwrap_or(false);
@@ -355,7 +366,11 @@ pub fn fold_sink(project: &str, m: &Manifest) -> Result<usize> {
         .and_then(|s| s.trim().parse().ok())
         .unwrap_or(0);
     let lines: Vec<&str> = out.lines().collect();
-    let start = if prev_offset > lines.len() { 0 } else { prev_offset };
+    let start = if prev_offset > lines.len() {
+        0
+    } else {
+        prev_offset
+    };
 
     let folded = fold_sink_lines(
         &paths::chain_log_path(project)?,
@@ -679,19 +694,33 @@ mod tests {
     fn matches_a_keel_written_golden_entry() {
         let golden: ChainEntry = serde_json::from_str(KEEL_GOLDEN).unwrap();
         let recomputed = compute_hash(
-            &golden.prev_hash, golden.seq, &golden.ts, &golden.kind, &golden.writer, &golden.data,
+            &golden.prev_hash,
+            golden.seq,
+            &golden.ts,
+            &golden.kind,
+            &golden.writer,
+            &golden.data,
         );
         assert_eq!(recomputed, golden.hash, "moor hashes differently from keel");
 
         let path = temp_path("golden");
         std::fs::write(&path, format!("{KEEL_GOLDEN}\n")).unwrap();
-        assert_eq!(verify_chain(&path).unwrap(), VerifyOutcome::Ok { entries: 1 });
+        assert_eq!(
+            verify_chain(&path).unwrap(),
+            VerifyOutcome::Ok { entries: 1 }
+        );
 
         // And what moor writes next is keel's shape, linked to keel's entry.
         let e = append_chained(&path, "exec", json!({"argv": ["keel", "next"]})).unwrap();
-        assert_eq!((e.schema.as_str(), e.writer.as_str(), e.seq), (CHAIN_SCHEMA, WRITER, 2));
+        assert_eq!(
+            (e.schema.as_str(), e.writer.as_str(), e.seq),
+            (CHAIN_SCHEMA, WRITER, 2)
+        );
         assert_eq!(e.prev_hash, golden.hash);
-        assert_eq!(verify_chain(&path).unwrap(), VerifyOutcome::Ok { entries: 2 });
+        assert_eq!(
+            verify_chain(&path).unwrap(),
+            VerifyOutcome::Ok { entries: 2 }
+        );
         let _ = std::fs::remove_file(&path);
     }
 
@@ -703,7 +732,14 @@ mod tests {
             let ts = "2026-09-01T00:00:00+00:00".to_string();
             let data = json!({"n": seq});
             let hash = legacy_hash(&prev, seq as u64, &ts, kind, &data);
-            let e = LegacyEntry { seq: seq as u64, ts, kind: kind.to_string(), data, prev_hash: prev, hash: hash.clone() };
+            let e = LegacyEntry {
+                seq: seq as u64,
+                ts,
+                kind: kind.to_string(),
+                data,
+                prev_hash: prev,
+                hash: hash.clone(),
+            };
             out.push_str(&format!("{}\n", serde_json::to_string(&e).unwrap()));
             prev = hash;
         }
@@ -721,8 +757,15 @@ mod tests {
         append_chained(&path, "exec", json!({"n": "newer"})).unwrap();
 
         let legacy = legacy_path(&path);
-        assert_eq!(std::fs::read(&legacy).unwrap(), before, "legacy chain was altered");
-        assert_eq!(verify_legacy(&legacy).unwrap(), VerifyOutcome::Ok { entries: 2 });
+        assert_eq!(
+            std::fs::read(&legacy).unwrap(),
+            before,
+            "legacy chain was altered"
+        );
+        assert_eq!(
+            verify_legacy(&legacy).unwrap(),
+            VerifyOutcome::Ok { entries: 2 }
+        );
 
         let text = std::fs::read_to_string(&path).unwrap();
         let seal: ChainEntry = serde_json::from_str(text.lines().next().unwrap()).unwrap();
@@ -730,7 +773,11 @@ mod tests {
         assert_eq!(seal.data["legacy_head"], json!(head));
         assert_eq!(seal.data["legacy_entries"], json!(2));
         assert_eq!(seal.data["legacy_verified"], json!(true));
-        assert_eq!(verify_chain(&path).unwrap(), VerifyOutcome::Ok { entries: 3 }, "sealed once, not per append");
+        assert_eq!(
+            verify_chain(&path).unwrap(),
+            VerifyOutcome::Ok { entries: 3 },
+            "sealed once, not per append"
+        );
 
         // A second pre-keel chain beside an existing seal is refused, not clobbered.
         write_legacy(&path, &["exec"]);
@@ -750,19 +797,29 @@ mod tests {
             "",
             r#"{"schema":"keel.chain/1","kind":"approval","data":{"stage":"spec"}}"#,
         ];
-        let folded = fold_sink_lines(&path, &lines, 1, &["MOOR_TEST_SINK_SECRET".to_string()]).unwrap();
+        let folded =
+            fold_sink_lines(&path, &lines, 1, &["MOOR_TEST_SINK_SECRET".to_string()]).unwrap();
         std::env::remove_var("MOOR_TEST_SINK_SECRET");
         assert_eq!(folded, 3);
 
         let text = std::fs::read_to_string(&path).unwrap();
-        let entries: Vec<ChainEntry> = text.lines().map(|l| serde_json::from_str(l).unwrap()).collect();
+        let entries: Vec<ChainEntry> = text
+            .lines()
+            .map(|l| serde_json::from_str(l).unwrap())
+            .collect();
         let kinds: Vec<&str> = entries.iter().map(|e| e.kind.as_str()).collect();
         assert_eq!(kinds, ["gate", "sink_malformed", "approval"]);
         assert!(entries.iter().all(|e| e.data["source"] == "sandbox"));
         assert_eq!(entries[0].data["verdict"], "pass");
         assert_eq!(entries[1].data["line_no"], 2);
-        assert!(!text.contains("hunter2-sink-value"), "a secret reached the chain");
-        assert_eq!(verify_chain(&path).unwrap(), VerifyOutcome::Ok { entries: 3 });
+        assert!(
+            !text.contains("hunter2-sink-value"),
+            "a secret reached the chain"
+        );
+        assert_eq!(
+            verify_chain(&path).unwrap(),
+            VerifyOutcome::Ok { entries: 3 }
+        );
         let _ = std::fs::remove_file(&path);
     }
 }

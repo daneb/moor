@@ -40,8 +40,14 @@ pub fn derive(container: &Value, networks: &[Value]) -> Value {
     let host = &container["HostConfig"];
     let mut p = serde_json::Map::new();
 
-    p.insert("fs.read_only_root".into(), flag(&host["ReadonlyRootfs"], "HostConfig.ReadonlyRootfs", true));
-    p.insert("privileged.off".into(), flag(&host["Privileged"], "HostConfig.Privileged", false));
+    p.insert(
+        "fs.read_only_root".into(),
+        flag(&host["ReadonlyRootfs"], "HostConfig.ReadonlyRootfs", true),
+    );
+    p.insert(
+        "privileged.off".into(),
+        flag(&host["Privileged"], "HostConfig.Privileged", false),
+    );
 
     p.insert(
         "mounts.no_host_bind".into(),
@@ -54,7 +60,10 @@ pub fn derive(container: &Value, networks: &[Value]) -> Value {
                     .filter_map(|m| m["Destination"].as_str())
                     .collect();
                 if binds.is_empty() {
-                    verdict("proven", format!("{} mount(s), none of type bind", mounts.len()))
+                    verdict(
+                        "proven",
+                        format!("{} mount(s), none of type bind", mounts.len()),
+                    )
                 } else {
                     verdict("violated", format!("bind mount(s) at {}", binds.join(", ")))
                 }
@@ -77,15 +86,26 @@ pub fn derive(container: &Value, networks: &[Value]) -> Value {
         },
     );
 
-    let listed = |field: &str, wanted: &dyn Fn(&str) -> bool, what: &str| match host[field].as_array() {
-        None => unproven(&format!("HostConfig.{field}")),
-        Some(items) => {
-            let items: Vec<&str> = items.iter().filter_map(Value::as_str).collect();
-            let status = if items.iter().any(|i| wanted(i)) { "proven" } else { "violated" };
-            verdict(status, format!("HostConfig.{field} is [{}] ({what})", items.join(", ")))
-        }
-    };
-    p.insert("caps.dropped_all".into(), listed("CapDrop", &|c| c.eq_ignore_ascii_case("ALL"), "needs ALL"));
+    let listed =
+        |field: &str, wanted: &dyn Fn(&str) -> bool, what: &str| match host[field].as_array() {
+            None => unproven(&format!("HostConfig.{field}")),
+            Some(items) => {
+                let items: Vec<&str> = items.iter().filter_map(Value::as_str).collect();
+                let status = if items.iter().any(|i| wanted(i)) {
+                    "proven"
+                } else {
+                    "violated"
+                };
+                verdict(
+                    status,
+                    format!("HostConfig.{field} is [{}] ({what})", items.join(", ")),
+                )
+            }
+        };
+    p.insert(
+        "caps.dropped_all".into(),
+        listed("CapDrop", &|c| c.eq_ignore_ascii_case("ALL"), "needs ALL"),
+    );
     p.insert(
         "privileges.no_new".into(),
         listed(
@@ -104,7 +124,11 @@ pub fn derive(container: &Value, networks: &[Value]) -> Value {
                 let mut open = vec![];
                 let mut unknown = vec![];
                 for name in attached.keys() {
-                    match networks.iter().find(|n| n["Name"] == name.as_str()).map(|n| &n["Internal"]) {
+                    match networks
+                        .iter()
+                        .find(|n| n["Name"] == name.as_str())
+                        .map(|n| &n["Internal"])
+                    {
                         Some(Value::Bool(true)) => {}
                         Some(Value::Bool(false)) => open.push(name.as_str()),
                         _ => unknown.push(name.as_str()),
@@ -115,7 +139,13 @@ pub fn derive(container: &Value, networks: &[Value]) -> Value {
                 } else if !unknown.is_empty() {
                     unproven(&format!("Internal for {}", unknown.join(", ")))
                 } else {
-                    verdict("proven", format!("internal: {}", attached.keys().cloned().collect::<Vec<_>>().join(", ")))
+                    verdict(
+                        "proven",
+                        format!(
+                            "internal: {}",
+                            attached.keys().cloned().collect::<Vec<_>>().join(", ")
+                        ),
+                    )
                 }
             }
         },
@@ -141,7 +171,11 @@ pub fn attest(name: &str, m: &Manifest) -> Result<()> {
     let container = inspect(&["inspect", &sandbox])?;
     let networks: Vec<Value> = container["NetworkSettings"]["Networks"]
         .as_object()
-        .map(|nets| nets.keys().filter_map(|n| inspect(&["network", "inspect", n]).ok()).collect())
+        .map(|nets| {
+            nets.keys()
+                .filter_map(|n| inspect(&["network", "inspect", n]).ok())
+                .collect()
+        })
         .unwrap_or_default();
 
     let doc = json!({
@@ -153,12 +187,19 @@ pub fn attest(name: &str, m: &Manifest) -> Result<()> {
     });
     let text = serde_json::to_string_pretty(&doc)?;
     let host_copy = paths::posture_path(name)?;
-    std::fs::write(&host_copy, &text).with_context(|| format!("writing {}", host_copy.display()))?;
+    std::fs::write(&host_copy, &text)
+        .with_context(|| format!("writing {}", host_copy.display()))?;
 
     let status = proc::run_with_stdin_file(
         "docker",
         &[
-            "exec", "-i", "-u", "root", &sandbox, "sh", "-c",
+            "exec",
+            "-i",
+            "-u",
+            "root",
+            &sandbox,
+            "sh",
+            "-c",
             &format!("cat > {IN_SANDBOX_PATH} && chmod 0444 {IN_SANDBOX_PATH}"),
         ],
         &host_copy,
@@ -205,7 +246,10 @@ mod tests {
     }
 
     fn status(props: &Value, name: &str) -> String {
-        props[name]["status"].as_str().unwrap_or("<absent>").to_string()
+        props[name]["status"]
+            .as_str()
+            .unwrap_or("<absent>")
+            .to_string()
     }
 
     const ALL: [&str; 7] = [

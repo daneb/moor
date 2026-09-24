@@ -64,7 +64,13 @@ fn push_target(cmd: &[String]) -> (String, String) {
     let positional: Vec<&String> = args.filter(|a| !a.starts_with('-')).collect();
     let git_ref = positional
         .get(1)
-        .map(|spec| spec.trim_start_matches('+').split(':').next().unwrap_or("").to_string())
+        .map(|spec| {
+            spec.trim_start_matches('+')
+                .split(':')
+                .next()
+                .unwrap_or("")
+                .to_string()
+        })
         .filter(|r| !r.is_empty())
         .unwrap_or_else(|| "HEAD".to_string());
     (dir, git_ref)
@@ -74,7 +80,17 @@ fn resolve_commit(container: &str, dir: &str, git_ref: &str) -> Option<String> {
     let rev = format!("{git_ref}^{{commit}}");
     let (status, out) = proc::run_capture(
         "docker",
-        &["exec", container, "git", "-C", dir, "rev-parse", "--verify", "--quiet", &rev],
+        &[
+            "exec",
+            container,
+            "git",
+            "-C",
+            dir,
+            "rev-parse",
+            "--verify",
+            "--quiet",
+            &rev,
+        ],
     )
     .ok()?;
     let sha = out.trim();
@@ -135,11 +151,22 @@ mod tests {
 
     #[test]
     fn push_entry_names_ref_and_commit() {
-        assert_eq!(push_target(&argv("git push")), ("/workspace".into(), "HEAD".into()));
-        assert_eq!(push_target(&argv("git push origin")), ("/workspace".into(), "HEAD".into()));
-        assert_eq!(push_target(&argv("git push -u origin feature")), ("/workspace".into(), "feature".into()));
         assert_eq!(
-            push_target(&argv("git -C /workspace/app push --force origin +main:release")),
+            push_target(&argv("git push")),
+            ("/workspace".into(), "HEAD".into())
+        );
+        assert_eq!(
+            push_target(&argv("git push origin")),
+            ("/workspace".into(), "HEAD".into())
+        );
+        assert_eq!(
+            push_target(&argv("git push -u origin feature")),
+            ("/workspace".into(), "feature".into())
+        );
+        assert_eq!(
+            push_target(&argv(
+                "git -C /workspace/app push --force origin +main:release"
+            )),
             ("/workspace/app".into(), "main".into())
         );
 
