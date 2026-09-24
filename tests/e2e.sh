@@ -158,11 +158,20 @@ else
   fail "no kind=egress entry in $CHAIN_FILE"
 fi
 KEEL_BIN="${KEEL:-keel}"
-VERIFY_DIR="$(mktemp -d)"
-mkdir -p "$VERIFY_DIR/.keel" && cp "$CHAIN_FILE" "$VERIFY_DIR/.keel/chain.jsonl"
-KEEL_VERIFY_OUT=$(cd "$VERIFY_DIR" && "$KEEL_BIN" chain verify 2>&1)
-KEEL_VERIFY_EXIT=$?
-rm -rf "$VERIFY_DIR"
+if command -v "$KEEL_BIN" >/dev/null 2>&1; then
+  VERIFY_DIR="$(mktemp -d)"
+  mkdir -p "$VERIFY_DIR/.keel" && cp "$CHAIN_FILE" "$VERIFY_DIR/.keel/chain.jsonl"
+  KEEL_VERIFY_OUT=$(cd "$VERIFY_DIR" && "$KEEL_BIN" chain verify 2>&1)
+  KEEL_VERIFY_EXIT=$?
+  rm -rf "$VERIFY_DIR"
+else
+  # No keel on this host (CI): use the one in moor/base, the same keel the
+  # sandbox runs. The chain goes in on stdin, so nothing is mounted.
+  KEEL_VERIFY_OUT=$(docker run --rm -i --network none --entrypoint sh moor/base:latest -c \
+    'mkdir -p /tmp/v/.keel && cat > /tmp/v/.keel/chain.jsonl && cd /tmp/v && keel chain verify' \
+    <"$CHAIN_FILE" 2>&1)
+  KEEL_VERIFY_EXIT=$?
+fi
 if [ "$KEEL_VERIFY_EXIT" -eq 0 ]; then pass "keel chain verify accepts moor's chain"; else fail "keel chain verify accepts moor's chain"; fi
 indent "$KEEL_VERIFY_OUT"
 
