@@ -79,7 +79,7 @@ max_ambiguities = 0
 blast_depth = 2
 max_task_lines = 150
 max_tasks = 15
-max_reviewable_lines = 600
+max_reviewable_lines = 1000
 
 [gate]
 
