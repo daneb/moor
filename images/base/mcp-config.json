@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "moor-keel": {
+      "command": "/usr/local/bin/moor-keel-mcp",
+      "args": [],
+      "env": {}
+    }
+  }
+}

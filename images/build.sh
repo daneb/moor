@@ -4,8 +4,11 @@ set -euo pipefail
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
+# Built from the repo root, not ./base: the base image compiles moor's
+# own MCP server from the mcp/ crate, so the context has to include it.
+# See images/base/Dockerfile and /.dockerignore.
 echo "==> building moor/base:latest"
-docker build -t moor/base:latest ./base
+docker build -t moor/base:latest -f base/Dockerfile ..
 
 for lang in node rust python; do
   echo "==> building moor/${lang}:latest"

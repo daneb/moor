@@ -1,3 +1,4 @@
+pub mod ask_cmd;
 pub mod audit_cmd;
 pub mod down;
 pub mod import_cmd;
@@ -10,6 +11,7 @@ pub mod secrets_status;
 pub mod selftest;
 pub mod shell;
 pub mod status;
+pub mod studio_cmd;
 pub mod up;
 pub mod use_cmd;
 pub mod view;
@@ -21,7 +23,7 @@ use std::io::{self, Write};
 /// Of all known projects, the ones whose sandbox container is currently
 /// running (`moor up`'d). A single `docker ps` covers every project at
 /// once rather than shelling out per project.
-fn running_projects(names: &[String]) -> Result<Vec<String>> {
+pub(crate) fn running_projects(names: &[String]) -> Result<Vec<String>> {
     let (_status, out) = crate::proc::run_capture("docker", &["ps", "--format", "{{.Names}}"])?;
     let running: std::collections::HashSet<&str> = out.lines().collect();
     let mut matches = vec![];

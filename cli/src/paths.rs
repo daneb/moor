@@ -35,6 +35,20 @@ pub fn egress_offset_path(name: &str) -> Result<PathBuf> {
     Ok(audit_dir(name)?.join(".egress-offset"))
 }
 
+/// The session id the next `moor ask` turn resumes from. Host-side and
+/// host-written only: nothing inside a sandbox has this path mounted, so
+/// the agent cannot nominate which session it continues.
+pub fn session_path(name: &str) -> Result<PathBuf> {
+    Ok(project_dir(name)?.join("session"))
+}
+
+/// The full, redacted text of every `moor ask` turn. Separate from
+/// chain.jsonl on purpose: the chain carries hashes and is exported by
+/// `moor audit --export`, this carries conversation.
+pub fn transcript_path(name: &str) -> Result<PathBuf> {
+    Ok(project_dir(name)?.join("transcript.jsonl"))
+}
+
 pub fn ensure_project_dirs(name: &str) -> Result<()> {
     std::fs::create_dir_all(audit_dir(name)?)?;
     Ok(())

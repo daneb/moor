@@ -5,12 +5,15 @@ Host (Mac Mini, OrbStack/Docker)
  └─ moor (Rust CLI)                     ← the only thing you run on host
      ├─ ~/.moor/projects/<name>/moor.yaml   (manifest: allowlist, limits, secret refs)
      ├─ ~/.moor/projects/<name>/audit/*.jsonl    (host-only-writable, append-only)
+     ├─ ~/.moor/projects/<name>/session          (agent session id — host-authoritative)
+     ├─ ~/.moor/projects/<name>/transcript.jsonl (turn text, redacted at rest)
      └─ docker compose per project:
          ├─ <name>-sandbox   container   ← keel + agent CLIs + toolchain run here
          │     workspace = named volume <name>-workspace (no host mount)
          │     network   = <name>-net (custom bridge, egress via proxy only)
          │     non-root user, read-only rootfs, cap-drop ALL, no-new-privileges,
          │     seccomp default, pids/mem/cpu limits, no docker.sock
+         │     claude ──stdio──► moor-keel-mcp ──► keel gate / keel next
          └─ <name>-egress    container   ← forward proxy, domain allowlist,
                logs every request, holds the canary token watch
 ```
@@ -47,6 +50,29 @@ as it does on a bare host today (see keel's `SECURITY.md` — keel assumes
 a trusted host and does no sandboxing itself; this container *is* that
 trust boundary instead of the Mac Mini).
 
+See [IMAGES.md](IMAGES.md) for what is in each image layer, what is
+pinned and what is not, and the three build mechanics (apt upgrade,
+`pipefail`, volume mount-point ownership) that are easy to get wrong.
+
+### The agent's route to keel (`moor-keel-mcp`, in the sandbox)
+
+A third binary ships inside the sandbox: `moor-keel-mcp`, built from
+this repository's `mcp/` crate. It is an MCP server — hand-rolled
+JSON-RPC 2.0 over newline-delimited stdio, `serde_json` only — that
+`claude` spawns as a child process and reaches over pipes. It exposes
+keel's *verification* verbs as tools (`keel_gate`, `keel_next`) and
+nothing else.
+
+`keel approve` is not a tool it defines, so advancing a spec past a human
+checkpoint is absent from the agent's tool surface rather than denied by
+a configuration file someone has to keep current. Each tool's argv is a
+compiled-in verb plus, at most, a slug that passes
+`manifest::validate_name` and a gate id matched against a fixed table.
+
+No socket is opened and nothing crosses a network in either direction.
+See [MCP.md](MCP.md) for the wire format, the role/tool table, and how to
+probe a live sandbox's tool list yourself.
+
 ### Egress container (untrusted-facing, moor-controlled)
 
 A forward proxy that is the sandbox's only route to the internet
@@ -62,10 +88,10 @@ for the planted canary token.
 
 One hash-chained, append-only file per project:
 `~/.moor/projects/<name>/audit/chain.jsonl`. Every entry has a `kind`
-(`exec`, `git-push`, `egress`, `tripwire`, `tripwire-check`), a
-timestamp, and a `hash` that commits to the entry's own contents plus the
-previous entry's hash — a Merkle-style chain, not just a log file. Three
-things append to it:
+(`exec`, `git-push`, `egress`, `tripwire`, `tripwire-check`,
+`recipe-event`, `agent-turn`, `studio`), a timestamp, and a `hash` that
+commits to the entry's own contents plus the previous entry's hash — a
+Merkle-style chain, not just a log file. Four things append to it:
 
 1. **Exec entries** — every `moor run`/`shell` invocation (redacted
    argv, exit code), written directly by the CLI as it happens. A command
@@ -80,6 +106,15 @@ things append to it:
 3. **Tripwire-check entries** — a marker written each time `moor
    selftest`'s active breakout battery runs (canary-domain reachability,
    read-only-filesystem write attempt, `docker.sock` presence).
+4. **Agent-turn entries** — one per `moor ask`/`moor studio` turn,
+   carrying the role, the granted tool set, the session id, and SHA-256
+   hashes of the prompt and the response. **Hashes, not text**: the chain
+   is exported wholesale by `--export`, so conversation content in it
+   would leak through every bundle, and `permission_denials` is recorded
+   as a count for the same reason. The entry is appended *before* the
+   operator is shown anything, so there is no path to a response that
+   skips the record. Full text goes to `transcript.jsonl` instead, passed
+   through `audit::redact` first — see [MCP.md](MCP.md).
 
 `moor audit <name> --verify` recomputes the whole chain and reports
 exactly which entry (if any) has been edited, deleted, reordered, or
@@ -117,6 +152,34 @@ and scrub it — this matters specifically because a value that only ever
 existed in Keychain (never exported to a shell) would otherwise be
 invisible to redaction in a *different* `moor run` invocation than the
 one that first resolved it.
+
+### Console (`moor studio`, host)
+
+One local terminal process over every project at once: which sandboxes
+are up (one `docker ps` for all of them, not one per project), what stage
+each spec is at according to that project's own `keel next --json`, a
+conversational turn with any of them, and stage approval behind two
+distinct keypresses. It opens no socket, binds no port and runs no
+daemon; it drives the same `docker exec` path as everything else and
+records through the same chained-audit path, writing no console-only log.
+
+Two properties are load-bearing there rather than incidental:
+
+- **Agent text is untrusted bytes being drawn into the operator's
+  terminal.** The sandbox protects the host from the agent's
+  *execution*; it does nothing about a reply that contains escape
+  sequences which move the cursor, rewrite lines already drawn, or drive
+  an OSC handler. Everything the console draws from a turn passes
+  through `studio::render::sanitize` first, which strips every ANSI/CSI
+  escape, every OSC sequence, and every C0 control except newline and
+  tab (`\r` included — a lone carriage return rewrites the line just
+  drawn).
+- **Approval is two different keys, and can only name what keel named.**
+  `a` arms it against the currently selected project and the slug keel
+  itself reported; only `y` confirms, and any other key — including a
+  second `a` — cancels. The argv run is keel's own `approve` command
+  taken verbatim from `keel next --json`, and it is refused outright if
+  it does not begin `keel approve`.
 
 ## Why no bind mount
 
