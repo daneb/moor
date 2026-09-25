@@ -1,0 +1,18 @@
+{"t":"2026-09-25T14:21:39.728061+02:00","seq":1,"kind":"run_start","spec":"moor-bundle","keel_version":"0.7.0","store_hash":"4e07f093d6afa16aeb50b4bab14c069797586ba01befb262b14b96bbd0213f0e"}
+{"t":"2026-09-25T14:21:39.729270+02:00","seq":2,"kind":"inject","source":".keel/store/steering/conventions.md","tokens":177,"bytes":705}
+{"t":"2026-09-25T14:21:39.729295+02:00","seq":3,"kind":"inject","source":".keel/store/steering/tech.md","tokens":85,"bytes":338}
+{"t":"2026-09-25T14:21:39.729435+02:00","seq":4,"kind":"inject","source":".keel/store/steering/structure.md","tokens":4230,"bytes":16917}
+{"t":"2026-09-25T14:21:39.729707+02:00","seq":5,"kind":"inject","source":".keel/specs/moor-bundle/spec.md","tokens":918,"bytes":3669}
+{"t":"2026-09-25T14:21:40.205076+02:00","seq":6,"kind":"command","cmd":"cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/build.txt"}
+{"t":"2026-09-25T14:21:40.313203+02:00","seq":7,"kind":"command","cmd":"cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/test.txt"}
+{"t":"2026-09-25T14:21:40.530256+02:00","seq":8,"kind":"command","cmd":"cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/lint.txt"}
+{"t":"2026-09-25T14:22:08.347787+02:00","seq":9,"kind":"oracle","criterion":"AC-1","oracle":"`cargo test --manifest-path cli/Cargo.toml commands::bundle_cmd::tests::export_runs_in_a_throwaway_container_with_no_network -- --exact 2>&1 | grep -q '1 passed'` exits 0","verdict":"pass","exit_code":0}
+{"t":"2026-09-25T14:22:08.347989+02:00","seq":10,"kind":"oracle","criterion":"AC-2","oracle":"`cargo test --manifest-path cli/Cargo.toml commands::bundle_cmd::tests::export_hands_keel_the_host_chain -- --exact 2>&1 | grep -q '1 passed'` exits 0","verdict":"pass","exit_code":0}
+{"t":"2026-09-25T14:22:08.347998+02:00","seq":11,"kind":"oracle","criterion":"AC-3","oracle":"`cargo test --manifest-path cli/Cargo.toml proc::tests::stdout_to_file_keeps_binary_bytes -- --exact 2>&1 | grep -q '1 passed'` exits 0","verdict":"pass","exit_code":0}
+{"t":"2026-09-25T14:22:08.348006+02:00","seq":12,"kind":"oracle","criterion":"AC-4","oracle":"`cargo test --manifest-path cli/Cargo.toml commands::bundle_cmd::tests::a_failed_export_removes_the_partial_archive -- --exact 2>&1 | grep -q '1 passed'` exits 0","verdict":"pass","exit_code":0}
+{"t":"2026-09-25T14:22:08.348009+02:00","seq":13,"kind":"oracle","criterion":"AC-5","oracle":"`cargo test --manifest-path cli/Cargo.toml commands::bundle_cmd::tests::verify_runs_in_a_throwaway_container_with_no_network -- --exact 2>&1 | grep -q '1 passed'` exits 0","verdict":"pass","exit_code":0}
+{"t":"2026-09-25T14:22:08.348012+02:00","seq":14,"kind":"oracle","criterion":"AC-6","oracle":"`bash tests/e2e.sh` exits 0","verdict":"pass","exit_code":0}
+{"t":"2026-09-25T14:22:08.394847+02:00","seq":15,"kind":"gate","gate":"G2","verdict":"pass","result":"gates/G2.json"}
+{"t":"2026-09-25T14:22:08.429711+02:00","seq":16,"kind":"gate","gate":"G2.5","verdict":"pass","result":"gates/G2.5.json"}
+{"t":"2026-09-25T14:22:08.446098+02:00","seq":17,"kind":"gate","gate":"G3","verdict":"pass","result":"gates/G3.json"}
+{"t":"2026-09-25T14:22:08.446115+02:00","seq":18,"kind":"run_end","verdict":"pass","duration_ms":28732}

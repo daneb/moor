@@ -1,5 +1,6 @@
 pub mod ask_cmd;
 pub mod audit_cmd;
+pub mod bundle_cmd;
 pub mod down;
 pub mod import_cmd;
 pub mod keel_cmd;

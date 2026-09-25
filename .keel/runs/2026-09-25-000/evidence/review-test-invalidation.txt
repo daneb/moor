@@ -1,0 +1,1 @@
+cli/src/commands/bundle_cmd.rs: std::process::exit(status.code().unwrap_or(1));

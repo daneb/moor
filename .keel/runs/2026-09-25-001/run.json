@@ -1,0 +1,11 @@
+{
+  "schema": "keel.run/1",
+  "id": "2026-09-25-001",
+  "spec": "moor-bundle",
+  "keel_version": "0.7.0",
+  "store_hash": "4e07f093d6afa16aeb50b4bab14c069797586ba01befb262b14b96bbd0213f0e",
+  "started_at": "2026-09-25T14:21:39.727322+02:00",
+  "finished_at": "2026-09-25T14:22:08.446266+02:00",
+  "verdict": "pass",
+  "base_commit": "6e05e99379117633a1871e2274d1fcc5a3f45a35"
+}
