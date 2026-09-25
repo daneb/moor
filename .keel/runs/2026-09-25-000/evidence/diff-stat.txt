@@ -1,0 +1,22 @@
+     6      0  .keel/chain.jsonl
+     2      0  .keel/runs/2026-09-25-000/evidence/build.txt
+     2      0  .keel/runs/2026-09-25-000/evidence/lint.txt
+    53      0  .keel/runs/2026-09-25-000/evidence/oracles.json
+    13      0  .keel/runs/2026-09-25-000/evidence/test.txt
+     9      0  .keel/runs/2026-09-25-000/run.json
+    14      0  .keel/runs/2026-09-25-000/trajectory.jsonl
+     2      0  .keel/specs/moor-bundle/approvals.jsonl
+    90      0  .keel/specs/moor-bundle/gates/G0.json
+    95      0  .keel/specs/moor-bundle/gates/G1.json
+    89      0  .keel/specs/moor-bundle/plan.md
+    91      0  .keel/specs/moor-bundle/spec.md
+    34      0  .keel/specs/moor-bundle/tasks.md
+     3      0  README.md
+   206      0  cli/src/commands/bundle_cmd.rs
+     1      0  cli/src/commands/mod.rs
+    15      0  cli/src/main.rs
+    43      0  cli/src/proc.rs
+    11      0  docs/ARCHITECTURE.md
+    61      0  tests/e2e.sh
+
+20 file(s), +840 -0 (840 lines of churn) against 6e05e99379117633a1871e2274d1fcc5a3f45a35

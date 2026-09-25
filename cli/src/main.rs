@@ -77,6 +77,19 @@ enum Command {
         #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
         args: Vec<String>,
     },
+    /// Build a keel evidence bundle that carries this project's host audit
+    /// chain, then verify it with keel. Runs in throwaway containers with
+    /// no network, never the sandbox. Project defaults the same way
+    /// `moor keel` does.
+    Bundle {
+        #[arg(short = 'p', long = "project")]
+        project: Option<String>,
+        /// keel run id; defaults to the latest run
+        run: Option<String>,
+        /// Directory to write the bundle into (default: current directory)
+        #[arg(long, value_name = "DIR")]
+        out: Option<PathBuf>,
+    },
     /// Print one of keel's spec-produced markdown artifacts (spec.md,
     /// plan.md, tasks.md) for a given spec slug, lightly highlighted.
     /// Project defaults the same way `moor keel` does.
@@ -210,6 +223,8 @@ fn main() {
         Command::Run { name, cmd } => commands::run_cmd::run(&name, &cmd),
         Command::Keel { project, args } => commands::resolve_project_announced(project)
             .and_then(|name| commands::keel_cmd::run(&name, &args)),
+        Command::Bundle { project, run, out } => commands::resolve_project_announced(project)
+            .and_then(|name| commands::bundle_cmd::run(&name, run.as_deref(), out)),
         Command::View {
             project,
             slug,

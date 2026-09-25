@@ -218,6 +218,71 @@ else
   fail "export bundle missing or does not contain chain.jsonl"
 fi
 
+step "moor bundle: a keel bundle carrying the host chain, verified"
+# A spec taken through keel's pipeline inside the sandbox: G0, approval,
+# plan, G1, and a driverless run whose run_end reaches the host chain
+# through the sink. `moor run` passes no stdin, so the spec travels as
+# an argument.
+# shellcheck disable=SC2016 # the backticks are literal spec text
+SPEC_TEXT='---
+id: SPEC-0099
+slug: e2e-bundle
+schema: keel.spec/1
+status: draft
+scope:
+  - "src/**"
+budget:
+  criteria: 4
+  lines: 40
+---
+
+# e2e bundle
+
+## Acceptance criteria
+
+### AC-1 The run completes
+
+WHEN keel runs this spec THE SYSTEM SHALL record a run_end entry.
+
+oracle: cmd `true` exit 0
+'
+# shellcheck disable=SC2016 # $1 and $2 belong to the sandbox's shell
+"$CLI" run "$PROJECT" -- sh -c 'mkdir -p "$(dirname "$1")" && printf "%s" "$2" > "$1"' \
+  sh .keel/specs/e2e-bundle/spec.md "$SPEC_TEXT" >/dev/null 2>&1 || true
+# keel diffs a run against a commit; the workspace repo has none yet.
+"$CLI" run "$PROJECT" -- git -C /workspace -c user.name=e2e -c user.email=e2e@moor.invalid \
+  commit -q --allow-empty -m base >/dev/null 2>&1 || true
+for step_args in "gate g0 e2e-bundle" "approve e2e-bundle --stage spec" "plan e2e-bundle" \
+  "gate g1 e2e-bundle" "run e2e-bundle --no-driver"; do
+  # shellcheck disable=SC2086 # each entry is a keel argv, split on purpose
+  "$CLI" run "$PROJECT" -- keel $step_args >/dev/null 2>&1 || true
+done
+BUNDLE_DIR="$(mktemp -d)"
+BUNDLE_OUT=$("$CLI" bundle -p "$PROJECT" --out "$BUNDLE_DIR" 2>&1)
+BUNDLE_EXIT=$?
+indent "$BUNDLE_OUT"
+if [ "$BUNDLE_EXIT" -eq 0 ]; then pass "moor bundle exits 0 (keel's verdict)"; else fail "moor bundle exits 0 (got $BUNDLE_EXIT)"; fi
+for check in chain approvals gate-verdicts trajectory; do
+  if grep -qE "pass +$check " <<<"$BUNDLE_OUT"; then
+    pass "bundle check '$check' passes"
+  else
+    fail "bundle check '$check' did not pass"
+  fi
+done
+shopt -s nullglob
+BUNDLE_FILES=("$BUNDLE_DIR"/keel-"$PROJECT"-*.tar.gz)
+shopt -u nullglob
+# Listed first, then searched: `tar | grep -q` under pipefail fails on GNU
+# tar, which gets SIGPIPE when grep stops reading at an early match.
+BUNDLE_LIST=""
+[ "${#BUNDLE_FILES[@]}" -eq 1 ] && BUNDLE_LIST=$(tar -tzf "${BUNDLE_FILES[0]}")
+if [ "${#BUNDLE_FILES[@]}" -eq 1 ] && grep -q "chain.jsonl" <<<"$BUNDLE_LIST"; then
+  pass "the bundle on the host carries chain.jsonl"
+else
+  fail "no single bundle with chain.jsonl in $BUNDLE_DIR"
+fi
+rm -rf "$BUNDLE_DIR"
+
 step "import: an existing local repo (no bind mount, ever)"
 mkdir -p "$IMPORT_SRC"
 (cd "$IMPORT_SRC" && git init -q && git config user.email t@t.local && git config user.name t \

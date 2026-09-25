@@ -156,6 +156,17 @@ own exported run bundles (`.keel/bundles/keel-<run-id>.tar.gz`, written by
 that data is keel's job, not moor's, so moor only ever reads it,
 never generates it) into one `tar.gz` for review.
 
+`moor bundle [-p <name>] [run] --out <dir>` builds the one keel bundle an
+auditor can verify alone. keel inside the sandbox never holds the chain, so
+a bundle it exports there has none and verifies as blocked. moor folds
+keel's sink, then runs `keel export --chain` in a **throwaway** container
+from the project's image: `--rm`, `--network none`, the workspace's named
+volume, and the host chain on stdin. It's never the sandbox, because the
+agent could hand keel a chain of its own there. The archive streams back
+byte for byte. A second throwaway container, with no network and no volume,
+runs `keel bundle verify` on it, and `moor bundle` exits with keel's
+verdict.
+
 Secret values known to the `moor` process's own environment (per the
 manifest's `secrets:` list) are redacted from every chain entry before
 it's written — see `audit::redact` and its stated limits in

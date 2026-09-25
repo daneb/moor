@@ -97,6 +97,9 @@ moor selftest my-app
 # see what's happened in this project so far
 moor audit my-app
 
+# a keel evidence bundle for the latest run, carrying this chain, verified
+moor bundle -p my-app --out /tmp
+
 moor down my-app
 ```
 

@@ -100,3 +100,46 @@ pub fn require_success(what: &str, status: ExitStatus) -> Result<()> {
     }
     Ok(())
 }
+
+/// Stream a local file to a command's stdin and write its stdout, byte for
+/// byte, to another file; stderr stays on the terminal. For getting binary
+/// output (an archive) back out of a container: `run_capture` goes through
+/// a lossy String and would corrupt it.
+pub fn run_stdin_to_file(
+    program: &str,
+    args: &[&str],
+    stdin_path: &Path,
+    stdout_path: &Path,
+) -> Result<ExitStatus> {
+    let out = std::fs::File::create(stdout_path)
+        .with_context(|| format!("creating {}", stdout_path.display()))?;
+    let input = std::fs::File::open(stdin_path)
+        .with_context(|| format!("opening {}", stdin_path.display()))?;
+    Command::new(program)
+        .args(args)
+        .stdin(Stdio::from(input))
+        .stdout(Stdio::from(out))
+        .stderr(Stdio::inherit())
+        .status()
+        .with_context(|| format!("spawning `{program} {}`", args.join(" ")))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn stdout_to_file_keeps_binary_bytes() {
+        let dir = std::env::temp_dir().join(format!("moor-proc-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let (input, output) = (dir.join("in.bin"), dir.join("out.bin"));
+        // Every byte value, including NUL and bytes that are not valid UTF-8.
+        let bytes: Vec<u8> = (0..=255u8).cycle().take(4096).collect();
+        std::fs::write(&input, &bytes).unwrap();
+
+        let status = run_stdin_to_file("cat", &[], &input, &output).unwrap();
+        assert!(status.success());
+        assert_eq!(std::fs::read(&output).unwrap(), bytes);
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+}
