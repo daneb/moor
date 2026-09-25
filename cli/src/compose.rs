@@ -10,6 +10,54 @@ const TEMPLATE: &str = include_str!("../templates/project.compose.yml.tmpl");
 /// `include_str!` can't reach outside the package a published crate
 /// actually ships.
 pub fn render(m: &Manifest) -> String {
+    render_with(m, &host_git_identity())
+}
+
+/// The host's git identity, whichever of `user.name` and `user.email` are set.
+fn host_git_identity() -> Vec<(&'static str, String)> {
+    ["user.name", "user.email"]
+        .into_iter()
+        .filter_map(|key| {
+            let (status, out) = crate::proc::run_capture("git", &["config", "--get", key]).ok()?;
+            let value = out.trim().to_string();
+            (status.success() && !value.is_empty()).then_some((key, value))
+        })
+        .collect()
+}
+
+/// A value inside a double-quoted YAML scalar that compose then interpolates:
+/// backslash and quote escaped for YAML, `$` doubled so compose keeps it.
+fn compose_quoted(v: &str) -> String {
+    format!(
+        "\"{}\"",
+        v.replace('\\', "\\\\")
+            .replace('"', "\\\"")
+            .replace('$', "$$")
+    )
+}
+
+/// git reads `GIT_CONFIG_COUNT`/`GIT_CONFIG_KEY_n`/`GIT_CONFIG_VALUE_n` from
+/// the environment without writing a file, in any directory. The sandbox's
+/// root filesystem is read-only and a new project's /workspace is not a repo
+/// yet, so writing git config there fails; this is how keel inside finds who
+/// is approving.
+fn git_config_env_lines(identity: &[(&str, String)]) -> String {
+    if identity.is_empty() {
+        return String::new();
+    }
+    let mut lines = format!("      GIT_CONFIG_COUNT: \"{}\"\n", identity.len());
+    for (i, (key, value)) in identity.iter().enumerate() {
+        lines.push_str(&format!("      GIT_CONFIG_KEY_{i}: \"{key}\"\n"));
+        lines.push_str(&format!(
+            "      GIT_CONFIG_VALUE_{i}: {}\n",
+            compose_quoted(value)
+        ));
+    }
+    lines.trim_end_matches('\n').to_string()
+}
+
+/// `render` with the host's git identity supplied, so it can be tested.
+pub fn render_with(m: &Manifest, identity: &[(&str, String)]) -> String {
     let secret_env_lines = if m.secrets.is_empty() {
         String::new()
     } else {
@@ -30,6 +78,7 @@ pub fn render(m: &Manifest) -> String {
         .replace("{{MEM_LIMIT}}", &m.resources.mem)
         .replace("{{PIDS_LIMIT}}", &m.resources.pids.to_string())
         .replace("{{SECRET_ENV_LINES}}", &secret_env_lines)
+        .replace("{{GIT_CONFIG_ENV_LINES}}", &git_config_env_lines(identity))
         .replace("{{EXTRA_ALLOW_DOMAINS}}", &extra_allow)
         .replace("{{CANARY_TOKEN}}", &m.canary_token)
 }
@@ -53,6 +102,7 @@ mod tests {
             "{{MEM_LIMIT}}",
             "{{PIDS_LIMIT}}",
             "{{SECRET_ENV_LINES}}",
+            "{{GIT_CONFIG_ENV_LINES}}",
             "{{EXTRA_ALLOW_DOMAINS}}",
             "{{CANARY_TOKEN}}",
         ] {
@@ -147,6 +197,40 @@ mod tests {
                 "host path mounted: {line}"
             );
         }
+    }
+
+    #[test]
+    fn host_git_identity_is_rendered_as_git_config_env() {
+        let m = Manifest::new("sample-app", "moor/base:latest");
+        let identity = [
+            ("user.name", r#"Dane "D" Balia $HOME\x"#.to_string()),
+            ("user.email", "dane@example.com".to_string()),
+        ];
+        let rendered = render_with(&m, &identity);
+        let sandbox = rendered.split("\n  egress:").next().unwrap();
+        assert!(
+            sandbox.contains("      GIT_CONFIG_COUNT: \"2\""),
+            "{sandbox}"
+        );
+        assert!(sandbox.contains("      GIT_CONFIG_KEY_0: \"user.name\""));
+        assert!(
+            sandbox.contains(r#"      GIT_CONFIG_VALUE_0: "Dane \"D\" Balia $$HOME\\x""#),
+            "quote, $ and backslash not escaped:\n{sandbox}"
+        );
+        assert!(sandbox.contains("      GIT_CONFIG_KEY_1: \"user.email\""));
+        assert!(sandbox.contains("      GIT_CONFIG_VALUE_1: \"dane@example.com\""));
+        // Still valid YAML, and the value survives the round trip.
+        let doc: serde_yaml::Value = serde_yaml::from_str(&rendered).unwrap();
+        let env = &doc["services"]["sandbox"]["environment"];
+        assert_eq!(env["GIT_CONFIG_VALUE_0"], r#"Dane "D" Balia $$HOME\x"#);
+    }
+
+    #[test]
+    fn no_host_identity_renders_no_git_config_env() {
+        let m = Manifest::new("sample-app", "moor/base:latest");
+        let rendered = render_with(&m, &[]);
+        assert!(!rendered.contains("GIT_CONFIG_"), "{rendered}");
+        serde_yaml::from_str::<serde_yaml::Value>(&rendered).unwrap();
     }
 
     #[test]

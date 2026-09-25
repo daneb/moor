@@ -1,0 +1,1911 @@
+diff --git a/.keel/chain.jsonl b/.keel/chain.jsonl
+index c049c1d..03ede87 100644
+--- a/.keel/chain.jsonl
++++ b/.keel/chain.jsonl
+@@ -73,3 +73,15 @@
+ {"schema":"keel.chain/1","seq":73,"ts":"2026-09-25T14:29:24.229849+02:00","kind":"gate","writer":"in-process","data":{"gate":"G2.5","run":"2026-09-25-003","sha256":"49651b27ffa2692dcbd37d2d640e6810b064c00f566c8f9b6bd3a869a44e720e","spec":"moor-bundle","verdict":"pass"},"prev_hash":"752a297ce67a6e772bf16eade8a12daab9528c873a78ea822e34dff86c93add1","hash":"dfecf3a9e281c77c1c8ff5a0ea193551414f6b7cca09aa359f47d2755c867b12"}
+ {"schema":"keel.chain/1","seq":74,"ts":"2026-09-25T14:29:24.245307+02:00","kind":"gate","writer":"in-process","data":{"gate":"G3","run":"2026-09-25-003","sha256":"0da88f9b6c8e1fe35e2c77b5fe9d7924c6b1b597fa927fb3f621c12b9febe0c9","spec":"moor-bundle","verdict":"pass"},"prev_hash":"dfecf3a9e281c77c1c8ff5a0ea193551414f6b7cca09aa359f47d2755c867b12","hash":"b979d714f323c26b8f6bd2f4472f7f8ab3bae45d7eecf1050323cc0f128f5266"}
+ {"schema":"keel.chain/1","seq":75,"ts":"2026-09-25T14:29:24.245454+02:00","kind":"run_end","writer":"in-process","data":{"run":"2026-09-25-002","trajectory_sha256":"eee31a556b5cb41494634b1f3d3ae49feee997d0c268724729676d23b4fe6a8b","verdict":"pass"},"prev_hash":"b979d714f323c26b8f6bd2f4472f7f8ab3bae45d7eecf1050323cc0f128f5266","hash":"5b4d31e023eca13bf124abbb30996476077ea40f262ec4b08411329624980aa9"}
++{"schema":"keel.chain/1","seq":76,"ts":"2026-09-25T19:16:00.737878+02:00","kind":"gate","writer":"in-process","data":{"gate":"G0","run":"2026-09-25-003","sha256":"dc17fee362832c88125a790b75b3cd4e490b3d78979ab46e6c7efc4b284af7f0","spec":"moor-papercuts","verdict":"fail"},"prev_hash":"5b4d31e023eca13bf124abbb30996476077ea40f262ec4b08411329624980aa9","hash":"132371a36b31e853bf55dff16eedb683209b45db89973c1a1a72c87b05b1603a"}
++{"schema":"keel.chain/1","seq":77,"ts":"2026-09-25T19:16:17.610420+02:00","kind":"gate","writer":"in-process","data":{"gate":"G0","run":"2026-09-25-003","sha256":"4614ebe09b36cbad778285024614cc58e5bad36303f9a66b70b6180eb03a106c","spec":"moor-papercuts","verdict":"pass"},"prev_hash":"132371a36b31e853bf55dff16eedb683209b45db89973c1a1a72c87b05b1603a","hash":"46ab14c6ef1526670fd98adeac9181ecc51f67403009867ca1204d8d74d0ff48"}
++{"schema":"keel.chain/1","seq":78,"ts":"2026-09-25T19:39:15.060976+02:00","kind":"approval","writer":"in-process","data":{"artefact_hash":"f91be8c311108ba25b5859a99df12a455e9feca8daccbe0cdb352b6ef56214c0","by":"Dane Balia","decision":"approved","spec":"moor-papercuts","stage":"spec"},"prev_hash":"46ab14c6ef1526670fd98adeac9181ecc51f67403009867ca1204d8d74d0ff48","hash":"bc8239fa2d7567c351571ea4c9acc7a302b0c104a5e4349bb84d54481b354b50"}
++{"schema":"keel.chain/1","seq":79,"ts":"2026-09-25T19:40:05.438892+02:00","kind":"gate","writer":"in-process","data":{"gate":"G1","run":"2026-09-25-003","sha256":"5b330889849f7a2ff0552fb51cd86f3f0fd412f87820023465268e057a26a3c0","spec":"moor-papercuts","verdict":"pass"},"prev_hash":"bc8239fa2d7567c351571ea4c9acc7a302b0c104a5e4349bb84d54481b354b50","hash":"fcdf7d66566663baa2c6d9ef4109b8e229b15d86a1fc3c71daa1d66444a8f9d1"}
++{"schema":"keel.chain/1","seq":80,"ts":"2026-09-25T20:05:40.746811+02:00","kind":"approval","writer":"in-process","data":{"artefact_hash":"021a6e5e56f6308539b7ac6e427da21e0684e010af94f60d094e1becb6c85091","by":"Dane Balia","decision":"approved","spec":"moor-papercuts","stage":"plan"},"prev_hash":"fcdf7d66566663baa2c6d9ef4109b8e229b15d86a1fc3c71daa1d66444a8f9d1","hash":"95f05e6b550ce18a6f6197a8df146b6a226a970ee6b40b741a889c9caff4df9f"}
++{"schema":"keel.chain/1","seq":81,"ts":"2026-09-25T20:09:34.094654+02:00","kind":"run_start","writer":"in-process","data":{"run":"2026-09-25-003","spec":"moor-papercuts","task":null},"prev_hash":"95f05e6b550ce18a6f6197a8df146b6a226a970ee6b40b741a889c9caff4df9f","hash":"9b00181e3231a6644855721603708806d79b71a4152edf1300f72cf21524991f"}
++{"schema":"keel.chain/1","seq":82,"ts":"2026-09-25T20:10:05.722932+02:00","kind":"gate","writer":"in-process","data":{"gate":"G2","run":"2026-09-25-004","sha256":"6dfa91bf4193854883e3cedab934a22a2ff22c28a23b804a97bd91c7c97d4fc3","spec":"moor-papercuts","verdict":"pass"},"prev_hash":"9b00181e3231a6644855721603708806d79b71a4152edf1300f72cf21524991f","hash":"eab48e1eeb27f479dc9ab1c973e30e7d22a90a4772b7164a3539d3b367fc95bf"}
++{"schema":"keel.chain/1","seq":83,"ts":"2026-09-25T20:10:05.752761+02:00","kind":"gate","writer":"in-process","data":{"gate":"G2.5","run":"2026-09-25-004","sha256":"c27103c7fce795e0e43015140c9907f2965c9ebf752ad73c94b404a3014f6b10","spec":"moor-papercuts","verdict":"pass"},"prev_hash":"eab48e1eeb27f479dc9ab1c973e30e7d22a90a4772b7164a3539d3b367fc95bf","hash":"8d373d73dfa7263fe7312dd1b1f2609af46ca5a9e07544624c75bceb340ae5f4"}
++{"schema":"keel.chain/1","seq":84,"ts":"2026-09-25T20:10:05.767690+02:00","kind":"gate","writer":"in-process","data":{"gate":"G3","run":"2026-09-25-004","sha256":"2a28a857f235bb9408b82f00d1a23848fb549667f758d5072663caa59641d866","spec":"moor-papercuts","verdict":"fail"},"prev_hash":"8d373d73dfa7263fe7312dd1b1f2609af46ca5a9e07544624c75bceb340ae5f4","hash":"915ff57808b6eb6f4ed952d5d895a7af3d064f5888383bc1ed6bf959205a392a"}
++{"schema":"keel.chain/1","seq":85,"ts":"2026-09-25T20:10:05.767864+02:00","kind":"run_end","writer":"in-process","data":{"run":"2026-09-25-003","trajectory_sha256":"2604d69372f1033ecf2560961364625e71fc6e2f564bf8cfd0ee15e183548402","verdict":"fail"},"prev_hash":"915ff57808b6eb6f4ed952d5d895a7af3d064f5888383bc1ed6bf959205a392a","hash":"0a2e4b9de76d30ba76514db2805178f31ddb51e7785ab5ccf519a783adcf430e"}
++{"schema":"keel.chain/1","seq":86,"ts":"2026-09-25T20:11:15.334298+02:00","kind":"approval","writer":"in-process","data":{"artefact_hash":"5d595aaeca9ef3e2265ec2123f266af528aa0017395b535d27024d012fe32a31","by":"Dane Balia","decision":"approved","spec":"moor-papercuts","stage":"merge"},"prev_hash":"0a2e4b9de76d30ba76514db2805178f31ddb51e7785ab5ccf519a783adcf430e","hash":"fe805e1f2c3813f244e0306eb5dec8c063dbed6919b9154bfbee996dead90956"}
++{"schema":"keel.chain/1","seq":87,"ts":"2026-09-25T20:11:28.597059+02:00","kind":"run_start","writer":"in-process","data":{"run":"2026-09-25-004","spec":"moor-papercuts","task":null},"prev_hash":"fe805e1f2c3813f244e0306eb5dec8c063dbed6919b9154bfbee996dead90956","hash":"e101125dad744a2a5bdb9d280fcf2b5663e57a1151869eb0186091deafc9263b"}
+diff --git a/cli/src/compose.rs b/cli/src/compose.rs
+index 8ea7b30..ae3bd2e 100644
+--- a/cli/src/compose.rs
++++ b/cli/src/compose.rs
+@@ -10,6 +10,54 @@ const TEMPLATE: &str = include_str!("../templates/project.compose.yml.tmpl");
+ /// `include_str!` can't reach outside the package a published crate
+ /// actually ships.
+ pub fn render(m: &Manifest) -> String {
++    render_with(m, &host_git_identity())
++}
++
++/// The host's git identity, whichever of `user.name` and `user.email` are set.
++fn host_git_identity() -> Vec<(&'static str, String)> {
++    ["user.name", "user.email"]
++        .into_iter()
++        .filter_map(|key| {
++            let (status, out) = crate::proc::run_capture("git", &["config", "--get", key]).ok()?;
++            let value = out.trim().to_string();
++            (status.success() && !value.is_empty()).then_some((key, value))
++        })
++        .collect()
++}
++
++/// A value inside a double-quoted YAML scalar that compose then interpolates:
++/// backslash and quote escaped for YAML, `$` doubled so compose keeps it.
++fn compose_quoted(v: &str) -> String {
++    format!(
++        "\"{}\"",
++        v.replace('\\', "\\\\")
++            .replace('"', "\\\"")
++            .replace('$', "$$")
++    )
++}
++
++/// git reads `GIT_CONFIG_COUNT`/`GIT_CONFIG_KEY_n`/`GIT_CONFIG_VALUE_n` from
++/// the environment without writing a file, in any directory. The sandbox's
++/// root filesystem is read-only and a new project's /workspace is not a repo
++/// yet, so writing git config there fails; this is how keel inside finds who
++/// is approving.
++fn git_config_env_lines(identity: &[(&str, String)]) -> String {
++    if identity.is_empty() {
++        return String::new();
++    }
++    let mut lines = format!("      GIT_CONFIG_COUNT: \"{}\"\n", identity.len());
++    for (i, (key, value)) in identity.iter().enumerate() {
++        lines.push_str(&format!("      GIT_CONFIG_KEY_{i}: \"{key}\"\n"));
++        lines.push_str(&format!(
++            "      GIT_CONFIG_VALUE_{i}: {}\n",
++            compose_quoted(value)
++        ));
++    }
++    lines.trim_end_matches('\n').to_string()
++}
++
++/// `render` with the host's git identity supplied, so it can be tested.
++pub fn render_with(m: &Manifest, identity: &[(&str, String)]) -> String {
+     let secret_env_lines = if m.secrets.is_empty() {
+         String::new()
+     } else {
+@@ -30,6 +78,7 @@ pub fn render(m: &Manifest) -> String {
+         .replace("{{MEM_LIMIT}}", &m.resources.mem)
+         .replace("{{PIDS_LIMIT}}", &m.resources.pids.to_string())
+         .replace("{{SECRET_ENV_LINES}}", &secret_env_lines)
++        .replace("{{GIT_CONFIG_ENV_LINES}}", &git_config_env_lines(identity))
+         .replace("{{EXTRA_ALLOW_DOMAINS}}", &extra_allow)
+         .replace("{{CANARY_TOKEN}}", &m.canary_token)
+ }
+@@ -53,6 +102,7 @@ mod tests {
+             "{{MEM_LIMIT}}",
+             "{{PIDS_LIMIT}}",
+             "{{SECRET_ENV_LINES}}",
++            "{{GIT_CONFIG_ENV_LINES}}",
+             "{{EXTRA_ALLOW_DOMAINS}}",
+             "{{CANARY_TOKEN}}",
+         ] {
+@@ -149,6 +199,40 @@ mod tests {
+         }
+     }
+ 
++    #[test]
++    fn host_git_identity_is_rendered_as_git_config_env() {
++        let m = Manifest::new("sample-app", "moor/base:latest");
++        let identity = [
++            ("user.name", r#"Dane "D" Balia $HOME\x"#.to_string()),
++            ("user.email", "dane@example.com".to_string()),
++        ];
++        let rendered = render_with(&m, &identity);
++        let sandbox = rendered.split("\n  egress:").next().unwrap();
++        assert!(
++            sandbox.contains("      GIT_CONFIG_COUNT: \"2\""),
++            "{sandbox}"
++        );
++        assert!(sandbox.contains("      GIT_CONFIG_KEY_0: \"user.name\""));
++        assert!(
++            sandbox.contains(r#"      GIT_CONFIG_VALUE_0: "Dane \"D\" Balia $$HOME\\x""#),
++            "quote, $ and backslash not escaped:\n{sandbox}"
++        );
++        assert!(sandbox.contains("      GIT_CONFIG_KEY_1: \"user.email\""));
++        assert!(sandbox.contains("      GIT_CONFIG_VALUE_1: \"dane@example.com\""));
++        // Still valid YAML, and the value survives the round trip.
++        let doc: serde_yaml::Value = serde_yaml::from_str(&rendered).unwrap();
++        let env = &doc["services"]["sandbox"]["environment"];
++        assert_eq!(env["GIT_CONFIG_VALUE_0"], r#"Dane "D" Balia $$HOME\x"#);
++    }
++
++    #[test]
++    fn no_host_identity_renders_no_git_config_env() {
++        let m = Manifest::new("sample-app", "moor/base:latest");
++        let rendered = render_with(&m, &[]);
++        assert!(!rendered.contains("GIT_CONFIG_"), "{rendered}");
++        serde_yaml::from_str::<serde_yaml::Value>(&rendered).unwrap();
++    }
++
+     #[test]
+     fn sandbox_network_is_internal_only() {
+         let m = Manifest::new("sample-app", "moor/base:latest");
+diff --git a/cli/templates/project.compose.yml.tmpl b/cli/templates/project.compose.yml.tmpl
+index 475050c..93837a3 100644
+--- a/cli/templates/project.compose.yml.tmpl
++++ b/cli/templates/project.compose.yml.tmpl
+@@ -42,6 +42,7 @@ services:
+       KEEL_RUNTIME_ATTESTATION: "/run/moor/posture.json"
+       KEEL_CHAIN_SINK: "/run/moor-sink/keel.jsonl"
+ {{SECRET_ENV_LINES}}
++{{GIT_CONFIG_ENV_LINES}}
+     volumes:
+       - workspace:/workspace
+       - cache:/home/agent/.cache
+diff --git a/docs/IMAGES.md b/docs/IMAGES.md
+index 3ef266c..5908b8d 100644
+--- a/docs/IMAGES.md
++++ b/docs/IMAGES.md
+@@ -23,7 +23,8 @@ Built in two stages (`images/base/Dockerfile`).
+ **Stage 1 — `keel-build`**, on `rust:1-slim-bookworm`, exists only to
+ compile two binaries that the runtime stage copies out:
+ 
+-- `keel`, via `cargo install keel-harness --locked` from crates.io.
++- `keel`, via `cargo install keel-harness --version "$KEEL_VERSION" --locked`
++  from crates.io, at the version pinned by `ARG KEEL_VERSION`.
+ - `moor-keel-mcp`, via `cargo install --locked --path /build/mcp` from
+   **this repository's own `mcp/` crate**. Built from source rather than
+   fetched, so the tool surface inside the image can never lag the
+@@ -101,8 +102,15 @@ reached upstream end-of-life in April 2026, so it gets no security
+ patches at all, ever), the npm major (`npm@11`, not `@latest`, which has
+ already moved to requiring Node ≥22.22/24.15 and would break this build
+ the next time npm cuts a major), the Rust toolchain channel (`stable`),
+-`keel-harness` via `--locked`, and `moor-keel-mcp` via `--locked` against
+-`mcp/Cargo.lock`.
++`keel-harness` at an exact version (`ARG KEEL_VERSION` in
++`images/base/Dockerfile`) with `--locked`, and `moor-keel-mcp` via `--locked`
++against `mcp/Cargo.lock`.
++
++**Bumping keel.** Change `ARG KEEL_VERSION`, or run
++`KEEL_VERSION=x.y.z ./images/build.sh` to try a version first. The version
++is part of the `cargo install` layer's cache key, so the rebuild installs the
++new keel. It used to be unpinned, and a cached layer quietly kept the previous
++release twice.
+ 
+ **Not pinned: `@anthropic-ai/claude-code`.** Every image build takes
+ whatever `npm install -g` resolves to. That is a real, named gap, not an
+diff --git a/images/base/Dockerfile b/images/base/Dockerfile
+index e0f87e0..ca239d5 100644
+--- a/images/base/Dockerfile
++++ b/images/base/Dockerfile
+@@ -8,7 +8,11 @@ FROM rust:1-slim-bookworm AS keel-build
+ RUN apt-get update && apt-get install -y --no-install-recommends \
+     pkg-config libssl-dev ca-certificates \
+     && rm -rf /var/lib/apt/lists/*
+-RUN cargo install keel-harness --locked
++# Pinned, so a keel release changes this layer's cache key: an unpinned
++# install was served from cache and kept the previous keel. Bump it here,
++# or pass --build-arg KEEL_VERSION=… (images/build.sh forwards $KEEL_VERSION).
++ARG KEEL_VERSION=0.9.0
++RUN cargo install keel-harness --version "$KEEL_VERSION" --locked
+ 
+ # moor's own MCP server, built from this repo's mcp/ crate — the agent's
+ # only route to keel (see docs/decisions/0008-agent-session-protocol.md).
+diff --git a/images/build.sh b/images/build.sh
+index f3b4dad..9bc137d 100755
+--- a/images/build.sh
++++ b/images/build.sh
+@@ -8,7 +8,8 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
+ # own MCP server from the mcp/ crate, so the context has to include it.
+ # See images/base/Dockerfile and /.dockerignore.
+ echo "==> building moor/base:latest"
+-docker build -t moor/base:latest -f base/Dockerfile ..
++# KEEL_VERSION, when set, overrides the Dockerfile's pinned keel.
++docker build -t moor/base:latest ${KEEL_VERSION:+--build-arg KEEL_VERSION="$KEEL_VERSION"} -f base/Dockerfile ..
+ 
+ for lang in node rust python; do
+   echo "==> building moor/${lang}:latest"
+diff --git a/tests/e2e.sh b/tests/e2e.sh
+index 4d2c3bf..d8d60f6 100755
+--- a/tests/e2e.sh
++++ b/tests/e2e.sh
+@@ -257,6 +257,19 @@ for step_args in "gate g0 e2e-bundle" "approve e2e-bundle --stage spec" "plan e2
+   # shellcheck disable=SC2086 # each entry is a keel argv, split on purpose
+   "$CLI" run "$PROJECT" -- keel $step_args >/dev/null 2>&1 || true
+ done
++# The approval above was made in a project created by `moor new`, whose
++# workspace was not yet a git repository: the approver must still be the
++# host's identity, reaching keel through GIT_CONFIG_* env, not "unknown".
++HOST_NAME=$(git config --get user.name || true)
++APPROVALS=$("$CLI" run "$PROJECT" -- cat .keel/specs/e2e-bundle/approvals.jsonl 2>&1)
++if [ -z "$HOST_NAME" ]; then
++  pass "approver check skipped: this host has no git user.name to compare"
++elif grep -qF "\"by\":\"$HOST_NAME\"" <<<"$APPROVALS"; then
++  pass "the approval names the host's git identity ($HOST_NAME)"
++else
++  fail "the approval does not name '$HOST_NAME'"
++  indent "$APPROVALS"
++fi
+ BUNDLE_DIR="$(mktemp -d)"
+ BUNDLE_OUT=$("$CLI" bundle -p "$PROJECT" --out "$BUNDLE_DIR" 2>&1)
+ BUNDLE_EXIT=$?
+diff --git a/.keel/runs/2026-09-25-003/evidence/build.txt b/.keel/runs/2026-09-25-003/evidence/build.txt
+new file mode 100644
+index 0000000..c078b47
+--- /dev/null
++++ b/.keel/runs/2026-09-25-003/evidence/build.txt
+@@ -0,0 +1,2 @@
++$ cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml
++
+diff --git a/.keel/runs/2026-09-25-003/evidence/diff-stat.txt b/.keel/runs/2026-09-25-003/evidence/diff-stat.txt
+new file mode 100644
+index 0000000..6e64b51
+--- /dev/null
++++ b/.keel/runs/2026-09-25-003/evidence/diff-stat.txt
+@@ -0,0 +1,21 @@
++     6      0  .keel/chain.jsonl
++     2      0  .keel/runs/2026-09-25-003/evidence/build.txt
++     2      0  .keel/runs/2026-09-25-003/evidence/lint.txt
++    39      0  .keel/runs/2026-09-25-003/evidence/oracles.json
++    13      0  .keel/runs/2026-09-25-003/evidence/test.txt
++     9      0  .keel/runs/2026-09-25-003/run.json
++    12      0  .keel/runs/2026-09-25-003/trajectory.jsonl
++     2      0  .keel/specs/moor-papercuts/approvals.jsonl
++    90      0  .keel/specs/moor-papercuts/gates/G0.json
++    95      0  .keel/specs/moor-papercuts/gates/G1.json
++    76      0  .keel/specs/moor-papercuts/plan.md
++    83      0  .keel/specs/moor-papercuts/spec.md
++    26      0  .keel/specs/moor-papercuts/tasks.md
++    84      0  cli/src/compose.rs
++     1      0  cli/templates/project.compose.yml.tmpl
++    11      3  docs/IMAGES.md
++     5      1  images/base/Dockerfile
++     2      1  images/build.sh
++    13      0  tests/e2e.sh
++
++19 file(s), +571 -5 (576 lines of churn) against 462c5dc13e4711e92f42e2f47f8e2f17c7fb5723
+diff --git a/.keel/runs/2026-09-25-003/evidence/diff.patch b/.keel/runs/2026-09-25-003/evidence/diff.patch
+new file mode 100644
+index 0000000..61ca42c
+--- /dev/null
++++ b/.keel/runs/2026-09-25-003/evidence/diff.patch
+@@ -0,0 +1,778 @@
++diff --git a/.keel/chain.jsonl b/.keel/chain.jsonl
++index c049c1d..c7a9f8a 100644
++--- a/.keel/chain.jsonl
+++++ b/.keel/chain.jsonl
++@@ -73,3 +73,9 @@
++ {"schema":"keel.chain/1","seq":73,"ts":"2026-09-25T14:29:24.229849+02:00","kind":"gate","writer":"in-process","data":{"gate":"G2.5","run":"2026-09-25-003","sha256":"49651b27ffa2692dcbd37d2d640e6810b064c00f566c8f9b6bd3a869a44e720e","spec":"moor-bundle","verdict":"pass"},"prev_hash":"752a297ce67a6e772bf16eade8a12daab9528c873a78ea822e34dff86c93add1","hash":"dfecf3a9e281c77c1c8ff5a0ea193551414f6b7cca09aa359f47d2755c867b12"}
++ {"schema":"keel.chain/1","seq":74,"ts":"2026-09-25T14:29:24.245307+02:00","kind":"gate","writer":"in-process","data":{"gate":"G3","run":"2026-09-25-003","sha256":"0da88f9b6c8e1fe35e2c77b5fe9d7924c6b1b597fa927fb3f621c12b9febe0c9","spec":"moor-bundle","verdict":"pass"},"prev_hash":"dfecf3a9e281c77c1c8ff5a0ea193551414f6b7cca09aa359f47d2755c867b12","hash":"b979d714f323c26b8f6bd2f4472f7f8ab3bae45d7eecf1050323cc0f128f5266"}
++ {"schema":"keel.chain/1","seq":75,"ts":"2026-09-25T14:29:24.245454+02:00","kind":"run_end","writer":"in-process","data":{"run":"2026-09-25-002","trajectory_sha256":"eee31a556b5cb41494634b1f3d3ae49feee997d0c268724729676d23b4fe6a8b","verdict":"pass"},"prev_hash":"b979d714f323c26b8f6bd2f4472f7f8ab3bae45d7eecf1050323cc0f128f5266","hash":"5b4d31e023eca13bf124abbb30996476077ea40f262ec4b08411329624980aa9"}
+++{"schema":"keel.chain/1","seq":76,"ts":"2026-09-25T19:16:00.737878+02:00","kind":"gate","writer":"in-process","data":{"gate":"G0","run":"2026-09-25-003","sha256":"dc17fee362832c88125a790b75b3cd4e490b3d78979ab46e6c7efc4b284af7f0","spec":"moor-papercuts","verdict":"fail"},"prev_hash":"5b4d31e023eca13bf124abbb30996476077ea40f262ec4b08411329624980aa9","hash":"132371a36b31e853bf55dff16eedb683209b45db89973c1a1a72c87b05b1603a"}
+++{"schema":"keel.chain/1","seq":77,"ts":"2026-09-25T19:16:17.610420+02:00","kind":"gate","writer":"in-process","data":{"gate":"G0","run":"2026-09-25-003","sha256":"4614ebe09b36cbad778285024614cc58e5bad36303f9a66b70b6180eb03a106c","spec":"moor-papercuts","verdict":"pass"},"prev_hash":"132371a36b31e853bf55dff16eedb683209b45db89973c1a1a72c87b05b1603a","hash":"46ab14c6ef1526670fd98adeac9181ecc51f67403009867ca1204d8d74d0ff48"}
+++{"schema":"keel.chain/1","seq":78,"ts":"2026-09-25T19:39:15.060976+02:00","kind":"approval","writer":"in-process","data":{"artefact_hash":"f91be8c311108ba25b5859a99df12a455e9feca8daccbe0cdb352b6ef56214c0","by":"Dane Balia","decision":"approved","spec":"moor-papercuts","stage":"spec"},"prev_hash":"46ab14c6ef1526670fd98adeac9181ecc51f67403009867ca1204d8d74d0ff48","hash":"bc8239fa2d7567c351571ea4c9acc7a302b0c104a5e4349bb84d54481b354b50"}
+++{"schema":"keel.chain/1","seq":79,"ts":"2026-09-25T19:40:05.438892+02:00","kind":"gate","writer":"in-process","data":{"gate":"G1","run":"2026-09-25-003","sha256":"5b330889849f7a2ff0552fb51cd86f3f0fd412f87820023465268e057a26a3c0","spec":"moor-papercuts","verdict":"pass"},"prev_hash":"bc8239fa2d7567c351571ea4c9acc7a302b0c104a5e4349bb84d54481b354b50","hash":"fcdf7d66566663baa2c6d9ef4109b8e229b15d86a1fc3c71daa1d66444a8f9d1"}
+++{"schema":"keel.chain/1","seq":80,"ts":"2026-09-25T20:05:40.746811+02:00","kind":"approval","writer":"in-process","data":{"artefact_hash":"021a6e5e56f6308539b7ac6e427da21e0684e010af94f60d094e1becb6c85091","by":"Dane Balia","decision":"approved","spec":"moor-papercuts","stage":"plan"},"prev_hash":"fcdf7d66566663baa2c6d9ef4109b8e229b15d86a1fc3c71daa1d66444a8f9d1","hash":"95f05e6b550ce18a6f6197a8df146b6a226a970ee6b40b741a889c9caff4df9f"}
+++{"schema":"keel.chain/1","seq":81,"ts":"2026-09-25T20:09:34.094654+02:00","kind":"run_start","writer":"in-process","data":{"run":"2026-09-25-003","spec":"moor-papercuts","task":null},"prev_hash":"95f05e6b550ce18a6f6197a8df146b6a226a970ee6b40b741a889c9caff4df9f","hash":"9b00181e3231a6644855721603708806d79b71a4152edf1300f72cf21524991f"}
++diff --git a/cli/src/compose.rs b/cli/src/compose.rs
++index 8ea7b30..ae3bd2e 100644
++--- a/cli/src/compose.rs
+++++ b/cli/src/compose.rs
++@@ -10,6 +10,54 @@ const TEMPLATE: &str = include_str!("../templates/project.compose.yml.tmpl");
++ /// `include_str!` can't reach outside the package a published crate
++ /// actually ships.
++ pub fn render(m: &Manifest) -> String {
+++    render_with(m, &host_git_identity())
+++}
+++
+++/// The host's git identity, whichever of `user.name` and `user.email` are set.
+++fn host_git_identity() -> Vec<(&'static str, String)> {
+++    ["user.name", "user.email"]
+++        .into_iter()
+++        .filter_map(|key| {
+++            let (status, out) = crate::proc::run_capture("git", &["config", "--get", key]).ok()?;
+++            let value = out.trim().to_string();
+++            (status.success() && !value.is_empty()).then_some((key, value))
+++        })
+++        .collect()
+++}
+++
+++/// A value inside a double-quoted YAML scalar that compose then interpolates:
+++/// backslash and quote escaped for YAML, `$` doubled so compose keeps it.
+++fn compose_quoted(v: &str) -> String {
+++    format!(
+++        "\"{}\"",
+++        v.replace('\\', "\\\\")
+++            .replace('"', "\\\"")
+++            .replace('$', "$$")
+++    )
+++}
+++
+++/// git reads `GIT_CONFIG_COUNT`/`GIT_CONFIG_KEY_n`/`GIT_CONFIG_VALUE_n` from
+++/// the environment without writing a file, in any directory. The sandbox's
+++/// root filesystem is read-only and a new project's /workspace is not a repo
+++/// yet, so writing git config there fails; this is how keel inside finds who
+++/// is approving.
+++fn git_config_env_lines(identity: &[(&str, String)]) -> String {
+++    if identity.is_empty() {
+++        return String::new();
+++    }
+++    let mut lines = format!("      GIT_CONFIG_COUNT: \"{}\"\n", identity.len());
+++    for (i, (key, value)) in identity.iter().enumerate() {
+++        lines.push_str(&format!("      GIT_CONFIG_KEY_{i}: \"{key}\"\n"));
+++        lines.push_str(&format!(
+++            "      GIT_CONFIG_VALUE_{i}: {}\n",
+++            compose_quoted(value)
+++        ));
+++    }
+++    lines.trim_end_matches('\n').to_string()
+++}
+++
+++/// `render` with the host's git identity supplied, so it can be tested.
+++pub fn render_with(m: &Manifest, identity: &[(&str, String)]) -> String {
++     let secret_env_lines = if m.secrets.is_empty() {
++         String::new()
++     } else {
++@@ -30,6 +78,7 @@ pub fn render(m: &Manifest) -> String {
++         .replace("{{MEM_LIMIT}}", &m.resources.mem)
++         .replace("{{PIDS_LIMIT}}", &m.resources.pids.to_string())
++         .replace("{{SECRET_ENV_LINES}}", &secret_env_lines)
+++        .replace("{{GIT_CONFIG_ENV_LINES}}", &git_config_env_lines(identity))
++         .replace("{{EXTRA_ALLOW_DOMAINS}}", &extra_allow)
++         .replace("{{CANARY_TOKEN}}", &m.canary_token)
++ }
++@@ -53,6 +102,7 @@ mod tests {
++             "{{MEM_LIMIT}}",
++             "{{PIDS_LIMIT}}",
++             "{{SECRET_ENV_LINES}}",
+++            "{{GIT_CONFIG_ENV_LINES}}",
++             "{{EXTRA_ALLOW_DOMAINS}}",
++             "{{CANARY_TOKEN}}",
++         ] {
++@@ -149,6 +199,40 @@ mod tests {
++         }
++     }
++ 
+++    #[test]
+++    fn host_git_identity_is_rendered_as_git_config_env() {
+++        let m = Manifest::new("sample-app", "moor/base:latest");
+++        let identity = [
+++            ("user.name", r#"Dane "D" Balia $HOME\x"#.to_string()),
+++            ("user.email", "dane@example.com".to_string()),
+++        ];
+++        let rendered = render_with(&m, &identity);
+++        let sandbox = rendered.split("\n  egress:").next().unwrap();
+++        assert!(
+++            sandbox.contains("      GIT_CONFIG_COUNT: \"2\""),
+++            "{sandbox}"
+++        );
+++        assert!(sandbox.contains("      GIT_CONFIG_KEY_0: \"user.name\""));
+++        assert!(
+++            sandbox.contains(r#"      GIT_CONFIG_VALUE_0: "Dane \"D\" Balia $$HOME\\x""#),
+++            "quote, $ and backslash not escaped:\n{sandbox}"
+++        );
+++        assert!(sandbox.contains("      GIT_CONFIG_KEY_1: \"user.email\""));
+++        assert!(sandbox.contains("      GIT_CONFIG_VALUE_1: \"dane@example.com\""));
+++        // Still valid YAML, and the value survives the round trip.
+++        let doc: serde_yaml::Value = serde_yaml::from_str(&rendered).unwrap();
+++        let env = &doc["services"]["sandbox"]["environment"];
+++        assert_eq!(env["GIT_CONFIG_VALUE_0"], r#"Dane "D" Balia $$HOME\x"#);
+++    }
+++
+++    #[test]
+++    fn no_host_identity_renders_no_git_config_env() {
+++        let m = Manifest::new("sample-app", "moor/base:latest");
+++        let rendered = render_with(&m, &[]);
+++        assert!(!rendered.contains("GIT_CONFIG_"), "{rendered}");
+++        serde_yaml::from_str::<serde_yaml::Value>(&rendered).unwrap();
+++    }
+++
++     #[test]
++     fn sandbox_network_is_internal_only() {
++         let m = Manifest::new("sample-app", "moor/base:latest");
++diff --git a/cli/templates/project.compose.yml.tmpl b/cli/templates/project.compose.yml.tmpl
++index 475050c..93837a3 100644
++--- a/cli/templates/project.compose.yml.tmpl
+++++ b/cli/templates/project.compose.yml.tmpl
++@@ -42,6 +42,7 @@ services:
++       KEEL_RUNTIME_ATTESTATION: "/run/moor/posture.json"
++       KEEL_CHAIN_SINK: "/run/moor-sink/keel.jsonl"
++ {{SECRET_ENV_LINES}}
+++{{GIT_CONFIG_ENV_LINES}}
++     volumes:
++       - workspace:/workspace
++       - cache:/home/agent/.cache
++diff --git a/docs/IMAGES.md b/docs/IMAGES.md
++index 3ef266c..5908b8d 100644
++--- a/docs/IMAGES.md
+++++ b/docs/IMAGES.md
++@@ -23,7 +23,8 @@ Built in two stages (`images/base/Dockerfile`).
++ **Stage 1 — `keel-build`**, on `rust:1-slim-bookworm`, exists only to
++ compile two binaries that the runtime stage copies out:
++ 
++-- `keel`, via `cargo install keel-harness --locked` from crates.io.
+++- `keel`, via `cargo install keel-harness --version "$KEEL_VERSION" --locked`
+++  from crates.io, at the version pinned by `ARG KEEL_VERSION`.
++ - `moor-keel-mcp`, via `cargo install --locked --path /build/mcp` from
++   **this repository's own `mcp/` crate**. Built from source rather than
++   fetched, so the tool surface inside the image can never lag the
++@@ -101,8 +102,15 @@ reached upstream end-of-life in April 2026, so it gets no security
++ patches at all, ever), the npm major (`npm@11`, not `@latest`, which has
++ already moved to requiring Node ≥22.22/24.15 and would break this build
++ the next time npm cuts a major), the Rust toolchain channel (`stable`),
++-`keel-harness` via `--locked`, and `moor-keel-mcp` via `--locked` against
++-`mcp/Cargo.lock`.
+++`keel-harness` at an exact version (`ARG KEEL_VERSION` in
+++`images/base/Dockerfile`) with `--locked`, and `moor-keel-mcp` via `--locked`
+++against `mcp/Cargo.lock`.
+++
+++**Bumping keel.** Change `ARG KEEL_VERSION`, or run
+++`KEEL_VERSION=x.y.z ./images/build.sh` to try a version first. The version
+++is part of the `cargo install` layer's cache key, so the rebuild installs the
+++new keel. It used to be unpinned, and a cached layer quietly kept the previous
+++release twice.
++ 
++ **Not pinned: `@anthropic-ai/claude-code`.** Every image build takes
++ whatever `npm install -g` resolves to. That is a real, named gap, not an
++diff --git a/images/base/Dockerfile b/images/base/Dockerfile
++index e0f87e0..ca239d5 100644
++--- a/images/base/Dockerfile
+++++ b/images/base/Dockerfile
++@@ -8,7 +8,11 @@ FROM rust:1-slim-bookworm AS keel-build
++ RUN apt-get update && apt-get install -y --no-install-recommends \
++     pkg-config libssl-dev ca-certificates \
++     && rm -rf /var/lib/apt/lists/*
++-RUN cargo install keel-harness --locked
+++# Pinned, so a keel release changes this layer's cache key: an unpinned
+++# install was served from cache and kept the previous keel. Bump it here,
+++# or pass --build-arg KEEL_VERSION=… (images/build.sh forwards $KEEL_VERSION).
+++ARG KEEL_VERSION=0.9.0
+++RUN cargo install keel-harness --version "$KEEL_VERSION" --locked
++ 
++ # moor's own MCP server, built from this repo's mcp/ crate — the agent's
++ # only route to keel (see docs/decisions/0008-agent-session-protocol.md).
++diff --git a/images/build.sh b/images/build.sh
++index f3b4dad..9bc137d 100755
++--- a/images/build.sh
+++++ b/images/build.sh
++@@ -8,7 +8,8 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
++ # own MCP server from the mcp/ crate, so the context has to include it.
++ # See images/base/Dockerfile and /.dockerignore.
++ echo "==> building moor/base:latest"
++-docker build -t moor/base:latest -f base/Dockerfile ..
+++# KEEL_VERSION, when set, overrides the Dockerfile's pinned keel.
+++docker build -t moor/base:latest ${KEEL_VERSION:+--build-arg KEEL_VERSION="$KEEL_VERSION"} -f base/Dockerfile ..
++ 
++ for lang in node rust python; do
++   echo "==> building moor/${lang}:latest"
++diff --git a/tests/e2e.sh b/tests/e2e.sh
++index 4d2c3bf..d8d60f6 100755
++--- a/tests/e2e.sh
+++++ b/tests/e2e.sh
++@@ -257,6 +257,19 @@ for step_args in "gate g0 e2e-bundle" "approve e2e-bundle --stage spec" "plan e2
++   # shellcheck disable=SC2086 # each entry is a keel argv, split on purpose
++   "$CLI" run "$PROJECT" -- keel $step_args >/dev/null 2>&1 || true
++ done
+++# The approval above was made in a project created by `moor new`, whose
+++# workspace was not yet a git repository: the approver must still be the
+++# host's identity, reaching keel through GIT_CONFIG_* env, not "unknown".
+++HOST_NAME=$(git config --get user.name || true)
+++APPROVALS=$("$CLI" run "$PROJECT" -- cat .keel/specs/e2e-bundle/approvals.jsonl 2>&1)
+++if [ -z "$HOST_NAME" ]; then
+++  pass "approver check skipped: this host has no git user.name to compare"
+++elif grep -qF "\"by\":\"$HOST_NAME\"" <<<"$APPROVALS"; then
+++  pass "the approval names the host's git identity ($HOST_NAME)"
+++else
+++  fail "the approval does not name '$HOST_NAME'"
+++  indent "$APPROVALS"
+++fi
++ BUNDLE_DIR="$(mktemp -d)"
++ BUNDLE_OUT=$("$CLI" bundle -p "$PROJECT" --out "$BUNDLE_DIR" 2>&1)
++ BUNDLE_EXIT=$?
++diff --git a/.keel/runs/2026-09-25-003/evidence/build.txt b/.keel/runs/2026-09-25-003/evidence/build.txt
++new file mode 100644
++index 0000000..c078b47
++--- /dev/null
+++++ b/.keel/runs/2026-09-25-003/evidence/build.txt
++@@ -0,0 +1,2 @@
+++$ cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml
+++
++diff --git a/.keel/runs/2026-09-25-003/evidence/diff-stat.txt b/.keel/runs/2026-09-25-003/evidence/diff-stat.txt
++new file mode 100644
++index 0000000..6e64b51
++--- /dev/null
+++++ b/.keel/runs/2026-09-25-003/evidence/diff-stat.txt
++@@ -0,0 +1,21 @@
+++     6      0  .keel/chain.jsonl
+++     2      0  .keel/runs/2026-09-25-003/evidence/build.txt
+++     2      0  .keel/runs/2026-09-25-003/evidence/lint.txt
+++    39      0  .keel/runs/2026-09-25-003/evidence/oracles.json
+++    13      0  .keel/runs/2026-09-25-003/evidence/test.txt
+++     9      0  .keel/runs/2026-09-25-003/run.json
+++    12      0  .keel/runs/2026-09-25-003/trajectory.jsonl
+++     2      0  .keel/specs/moor-papercuts/approvals.jsonl
+++    90      0  .keel/specs/moor-papercuts/gates/G0.json
+++    95      0  .keel/specs/moor-papercuts/gates/G1.json
+++    76      0  .keel/specs/moor-papercuts/plan.md
+++    83      0  .keel/specs/moor-papercuts/spec.md
+++    26      0  .keel/specs/moor-papercuts/tasks.md
+++    84      0  cli/src/compose.rs
+++     1      0  cli/templates/project.compose.yml.tmpl
+++    11      3  docs/IMAGES.md
+++     5      1  images/base/Dockerfile
+++     2      1  images/build.sh
+++    13      0  tests/e2e.sh
+++
+++19 file(s), +571 -5 (576 lines of churn) against 462c5dc13e4711e92f42e2f47f8e2f17c7fb5723
++diff --git a/.keel/runs/2026-09-25-003/evidence/lint.txt b/.keel/runs/2026-09-25-003/evidence/lint.txt
++new file mode 100644
++index 0000000..edb91b9
++--- /dev/null
+++++ b/.keel/runs/2026-09-25-003/evidence/lint.txt
++@@ -0,0 +1,2 @@
+++$ cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml
+++
++diff --git a/.keel/runs/2026-09-25-003/evidence/oracles.json b/.keel/runs/2026-09-25-003/evidence/oracles.json
++new file mode 100644
++index 0000000..ae5981f
++--- /dev/null
+++++ b/.keel/runs/2026-09-25-003/evidence/oracles.json
++@@ -0,0 +1,39 @@
+++{
+++  "runs": [
+++    {
+++      "criterion": "AC-1",
+++      "kind": "cmd",
+++      "oracle": "`cargo test --manifest-path cli/Cargo.toml compose::tests::host_git_identity_is_rendered_as_git_config_env -- --exact 2>&1 | grep -q '1 passed'` exits 0",
+++      "outcome": "pass",
+++      "exit_code": 0
+++    },
+++    {
+++      "criterion": "AC-2",
+++      "kind": "cmd",
+++      "oracle": "`cargo test --manifest-path cli/Cargo.toml compose::tests::no_host_identity_renders_no_git_config_env -- --exact 2>&1 | grep -q '1 passed'` exits 0",
+++      "outcome": "pass",
+++      "exit_code": 0
+++    },
+++    {
+++      "criterion": "AC-3",
+++      "kind": "cmd",
+++      "oracle": "`bash tests/e2e.sh` exits 0",
+++      "outcome": "pass",
+++      "exit_code": 0,
+++      "output": "…\n bundle check 'approvals' passes\n  [PASS] bundle check 'gate-verdicts' passes\n  [PASS] bundle check 'trajectory' passes\n  [PASS] the bundle on the host carries chain.jsonl\n\n== import: an existing local repo (no bind mount, ever) ==\n         ==> importing /private/var/folders/qd/rd_v3fjs0_s5w8n7vwt35f3w0000gn/T/tmp.adeTM0E84w/local-repo as 'e2e-import-4222' (image: moor/node:latest)\n         ==> starting sandbox + egress for 'e2e-import-4222'\n          Network e2e-import-4222-egress-net Creating \n          Network e2e-import-4222-egress-net Created \n          Network e2e-import-4222-internal Creating \n          Network e2e-import-4222-internal Created \n          Volume e2e-import-4222-workspace Creating \n          Volume e2e-import-4222-workspace Created \n          Volume e2e-import-4222-cache Creating \n          Volume e2e-import-4222-cache Created \n          Volume e2e-import-4222-claude-state Creating \n          Volume e2e-import-4222-claude-state Created \n          Container e2e-import-4222-egress Creating \n          Container e2e-import-4222-egress Created \n          Container e2e-import-4222-sandbox Creating \n          Container e2e-import-4222-sandbox Created \n          Container e2e-import-4222-egress Starting \n          Container e2e-import-4222-egress Started \n          Container e2e-import-4222-sandbox Starting \n          Container e2e-import-4222-sandbox Started \n         ==> bundling /private/var/folders/qd/rd_v3fjs0_s5w8n7vwt35f3w0000gn/T/tmp.adeTM0E84w/local-repo (all branches and tags)\n         ==> streaming the bundle into the sandbox and cloning it\n         Cloning into '.'...\n         branch 'a-second-branch' set up to track 'origin/a-second-branch'.\n            no remote configured — set one with `moor run e2e-import-4222 -- git remote add origin <url>` when ready\n         ==> checking for existing keel configuration\n            none found — running `keel init` inside the sandbox\n           created .keel/keel.toml\n           created drivers/_common.sh\n           created drivers/claude-code\n           created drivers/codex\n           added   [[driver]] codex to keel.toml\n           created drivers/copilot\n           added   [[driver]] copilot to keel.toml\n           created drivers/kiro\n           added   [[driver]] kiro to keel.toml\n           created drivers/noop\n           added   [[driver]] noop to keel.toml\n           created sast/semgrep\n           created product.md\n           created tech.md\n           created conventions.md\n           updated .gitignore\n         \n           store seeded at .keel/store\n           detected: Node/TypeScript (npm)\n         \n         Building the first map…\n           0 files · 0 symbols · 0 references · 0 import edges  (50 ms)\n           structure.md 13/400 lines · 0 CODEMAPs\n         \n         Rendering projections…\n           claude   CLAUDE.md — 68/180 lines\n           agents   AGENTS.md — 68/180 lines\n           kiro     .kiro/steering/keel.md — 68/200 lines\n           copilot  .github/copilot-instructions.md — 68/120 lines\n         \n         keel is initialised.\n         \n         Next:\n           1. Correct .keel/store/steering/product.md and .keel/store/steering/tech.md — they are seeded, not right.\n           2. `keel hook install` so a drifted projection cannot be committed.\n           3. `keel status` any time you want to know if the picture is current.\n         \n         \n         'e2e-import-4222' is up, imported from /private/var/folders/qd/rd_v3fjs0_s5w8n7vwt35f3w0000gn/T/tmp.adeTM0E84w/local-repo. Manifest: /Users/danebalia/.moor/projects/e2e-import-4222/moor.yaml\n         Next: moor shell e2e-import-4222\n  [PASS] moor import exits 0\n  [PASS] auto-detected the node image from package.json\n  [PASS] ran keel init (no prior .keel/ in the source)\n  [PASS] imported commit is present in the sandbox\n  [PASS] the second branch came across too (--all bundle)\n  [PASS] imported project passes selftest too\n\ne2e: all checks passed.\n\n== cleanup =="
+++    },
+++    {
+++      "criterion": "AC-4",
+++      "kind": "cmd",
+++      "oracle": "`grep -Eq '^ARG KEEL_VERSION=[0-9]+\\.[0-9]+\\.[0-9]+$' images/base/Dockerfile && grep -q 'cargo install keel-harness --version \"\\$KEEL_VERSION\" --locked' images/base/Dockerfile` exits 0",
+++      "outcome": "pass",
+++      "exit_code": 0
+++    }
+++  ],
+++  "criteria": 4,
+++  "executed": 4,
+++  "passed": 4,
+++  "failed": 0,
+++  "blocked": 0,
+++  "human": 0
+++}
++\ No newline at end of file
++diff --git a/.keel/runs/2026-09-25-003/evidence/test.txt b/.keel/runs/2026-09-25-003/evidence/test.txt
++new file mode 100644
++index 0000000..8dece4f
++--- /dev/null
+++++ b/.keel/runs/2026-09-25-003/evidence/test.txt
++@@ -0,0 +1,13 @@
+++$ cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml
+++
+++
+++running 129 tests
+++....................................................................................... 87/129
+++..........................................
+++test result: ok. 129 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+++
+++
+++running 8 tests
+++........
+++test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+++
++diff --git a/.keel/runs/2026-09-25-003/run.json b/.keel/runs/2026-09-25-003/run.json
++new file mode 100644
++index 0000000..c3c4a46
++--- /dev/null
+++++ b/.keel/runs/2026-09-25-003/run.json
++@@ -0,0 +1,9 @@
+++{
+++  "schema": "keel.run/1",
+++  "id": "2026-09-25-003",
+++  "spec": "moor-papercuts",
+++  "keel_version": "0.9.0",
+++  "store_hash": "4e07f093d6afa16aeb50b4bab14c069797586ba01befb262b14b96bbd0213f0e",
+++  "started_at": "2026-09-25T20:09:34.092825+02:00",
+++  "base_commit": "462c5dc13e4711e92f42e2f47f8e2f17c7fb5723"
+++}
++diff --git a/.keel/runs/2026-09-25-003/trajectory.jsonl b/.keel/runs/2026-09-25-003/trajectory.jsonl
++new file mode 100644
++index 0000000..14b4ad3
++--- /dev/null
+++++ b/.keel/runs/2026-09-25-003/trajectory.jsonl
++@@ -0,0 +1,12 @@
+++{"t":"2026-09-25T20:09:34.093894+02:00","seq":1,"kind":"run_start","spec":"moor-papercuts","keel_version":"0.9.0","store_hash":"4e07f093d6afa16aeb50b4bab14c069797586ba01befb262b14b96bbd0213f0e"}
+++{"t":"2026-09-25T20:09:34.094939+02:00","seq":2,"kind":"inject","source":".keel/store/steering/conventions.md","tokens":177,"bytes":705}
+++{"t":"2026-09-25T20:09:34.094970+02:00","seq":3,"kind":"inject","source":".keel/store/steering/tech.md","tokens":85,"bytes":338}
+++{"t":"2026-09-25T20:09:34.095149+02:00","seq":4,"kind":"inject","source":".keel/store/steering/structure.md","tokens":4230,"bytes":16917}
+++{"t":"2026-09-25T20:09:34.095527+02:00","seq":5,"kind":"inject","source":".keel/specs/moor-papercuts/spec.md","tokens":829,"bytes":3316}
+++{"t":"2026-09-25T20:09:36.196162+02:00","seq":6,"kind":"command","cmd":"cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/build.txt"}
+++{"t":"2026-09-25T20:09:36.326990+02:00","seq":7,"kind":"command","cmd":"cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/test.txt"}
+++{"t":"2026-09-25T20:09:37.328739+02:00","seq":8,"kind":"command","cmd":"cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/lint.txt"}
+++{"t":"2026-09-25T20:10:05.560021+02:00","seq":9,"kind":"oracle","criterion":"AC-1","oracle":"`cargo test --manifest-path cli/Cargo.toml compose::tests::host_git_identity_is_rendered_as_git_config_env -- --exact 2>&1 | grep -q '1 passed'` exits 0","verdict":"pass","exit_code":0}
+++{"t":"2026-09-25T20:10:05.560207+02:00","seq":10,"kind":"oracle","criterion":"AC-2","oracle":"`cargo test --manifest-path cli/Cargo.toml compose::tests::no_host_identity_renders_no_git_config_env -- --exact 2>&1 | grep -q '1 passed'` exits 0","verdict":"pass","exit_code":0}
+++{"t":"2026-09-25T20:10:05.560219+02:00","seq":11,"kind":"oracle","criterion":"AC-3","oracle":"`bash tests/e2e.sh` exits 0","verdict":"pass","exit_code":0}
+++{"t":"2026-09-25T20:10:05.560223+02:00","seq":12,"kind":"oracle","criterion":"AC-4","oracle":"`grep -Eq '^ARG KEEL_VERSION=[0-9]+\\.[0-9]+\\.[0-9]+$' images/base/Dockerfile && grep -q 'cargo install keel-harness --version \"\\$KEEL_VERSION\" --locked' images/base/Dockerfile` exits 0","verdict":"pass","exit_code":0}
++diff --git a/.keel/specs/moor-papercuts/approvals.jsonl b/.keel/specs/moor-papercuts/approvals.jsonl
++new file mode 100644
++index 0000000..090113f
++--- /dev/null
+++++ b/.keel/specs/moor-papercuts/approvals.jsonl
++@@ -0,0 +1,2 @@
+++{"schema":"keel.approval/1","stage":"spec","decision":"approved","artefact_hash":"f91be8c311108ba25b5859a99df12a455e9feca8daccbe0cdb352b6ef56214c0","gate_verdict":"pass","by":"Dane Balia","at":"2026-09-25T19:39:15.058474+02:00"}
+++{"schema":"keel.approval/1","stage":"plan","decision":"approved","artefact_hash":"021a6e5e56f6308539b7ac6e427da21e0684e010af94f60d094e1becb6c85091","gate_verdict":"pass","by":"Dane Balia","at":"2026-09-25T20:05:40.744422+02:00"}
++diff --git a/.keel/specs/moor-papercuts/gates/G0.json b/.keel/specs/moor-papercuts/gates/G0.json
++new file mode 100644
++index 0000000..34b9062
++--- /dev/null
+++++ b/.keel/specs/moor-papercuts/gates/G0.json
++@@ -0,0 +1,90 @@
+++{
+++  "schema": "keel.gate/1",
+++  "gate": "G0",
+++  "run": "2026-09-25-003",
+++  "spec": "moor-papercuts",
+++  "verdict": "pass",
+++  "generated_at": "2026-09-25T19:16:17.610069+02:00",
+++  "checks": [
+++    {
+++      "id": "schema",
+++      "verdict": "pass",
+++      "detail": "SPEC-0007 (keel.spec/1)"
+++    },
+++    {
+++      "id": "criteria-present",
+++      "verdict": "pass",
+++      "detail": "4 criteria"
+++    },
+++    {
+++      "id": "criterion-ids-unique",
+++      "verdict": "pass",
+++      "detail": "no duplicate ids"
+++    },
+++    {
+++      "id": "no-placeholders",
+++      "verdict": "pass",
+++      "detail": "no unfilled scaffold text"
+++    },
+++    {
+++      "id": "ears-conformance",
+++      "verdict": "pass",
+++      "detail": "4/4 conform (event-driven, ubiquitous, unwanted-behaviour)"
+++    },
+++    {
+++      "id": "oracle-presence",
+++      "verdict": "pass",
+++      "detail": "4 oracles across 4 criteria"
+++    },
+++    {
+++      "id": "oracle-wellformed",
+++      "verdict": "pass",
+++      "detail": "all oracles parse"
+++    },
+++    {
+++      "id": "ambiguity",
+++      "verdict": "pass",
+++      "detail": "no ambiguous phrasing in criteria"
+++    },
+++    {
+++      "id": "criterion-budget",
+++      "verdict": "pass",
+++      "detail": "4/6 criteria"
+++    },
+++    {
+++      "id": "spec-length",
+++      "verdict": "pass",
+++      "detail": "83/250 lines"
+++    },
+++    {
+++      "id": "scope-declared",
+++      "verdict": "pass",
+++      "detail": "7 glob(s): cli/src/compose.rs, cli/templates/project.compose.yml.tmpl, cli/src/commands/mod.rs, images/base/Dockerfile, images/build.sh, tests/e2e.sh, docs/**"
+++    },
+++    {
+++      "id": "change-budget",
+++      "verdict": "pass",
+++      "detail": "250 lines of diff budgeted"
+++    },
+++    {
+++      "id": "oracle-mix",
+++      "verdict": "pass",
+++      "detail": "4/4 runnable (4 cmd)"
+++    },
+++    {
+++      "id": "human-cost",
+++      "verdict": "pass",
+++      "detail": "0 human oracle(s), none load-bearing"
+++    },
+++    {
+++      "id": "store-drift",
+++      "verdict": "pass",
+++      "detail": "4 projections current"
+++    },
+++    {
+++      "id": "shared-stores",
+++      "verdict": "pass",
+++      "detail": "none configured"
+++    }
+++  ]
+++}
++diff --git a/.keel/specs/moor-papercuts/gates/G1.json b/.keel/specs/moor-papercuts/gates/G1.json
++new file mode 100644
++index 0000000..244877c
++--- /dev/null
+++++ b/.keel/specs/moor-papercuts/gates/G1.json
++@@ -0,0 +1,95 @@
+++{
+++  "schema": "keel.gate/1",
+++  "gate": "G1",
+++  "run": "2026-09-25-003",
+++  "spec": "moor-papercuts",
+++  "verdict": "pass",
+++  "generated_at": "2026-09-25T19:40:05.438316+02:00",
+++  "checks": [
+++    {
+++      "id": "schema",
+++      "verdict": "pass",
+++      "detail": "PLAN-0007 + TASKS-0007"
+++    },
+++    {
+++      "id": "g0-passed",
+++      "verdict": "pass",
+++      "detail": "G0 passed in run 2026-09-25-003"
+++    },
+++    {
+++      "id": "spec-approved",
+++      "verdict": "pass",
+++      "detail": "approved by Dane Balia"
+++    },
+++    {
+++      "id": "tasks-present",
+++      "verdict": "pass",
+++      "detail": "3/15 tasks"
+++    },
+++    {
+++      "id": "task-ids-unique",
+++      "verdict": "pass",
+++      "detail": "no duplicate task ids"
+++    },
+++    {
+++      "id": "task-fields",
+++      "verdict": "pass",
+++      "detail": "all task fields recognised"
+++    },
+++    {
+++      "id": "task-criterion-traceability",
+++      "verdict": "pass",
+++      "detail": "3 tasks all traced"
+++    },
+++    {
+++      "id": "criteria-covered",
+++      "verdict": "pass",
+++      "detail": "4/4 criteria have a task"
+++    },
+++    {
+++      "id": "task-budgets",
+++      "verdict": "pass",
+++      "detail": "all 3 tasks budgeted, total 150 lines"
+++    },
+++    {
+++      "id": "total-budget",
+++      "verdict": "pass",
+++      "detail": "150/250 lines"
+++    },
+++    {
+++      "id": "task-exit-conditions",
+++      "verdict": "pass",
+++      "detail": "every task states when it is done"
+++    },
+++    {
+++      "id": "task-dependencies",
+++      "verdict": "pass",
+++      "detail": "2 wave(s), widths 2/1"
+++    },
+++    {
+++      "id": "wave-isolation",
+++      "verdict": "pass",
+++      "detail": "2 wave(s), no file claimed twice within one"
+++    },
+++    {
+++      "id": "task-files-in-scope",
+++      "verdict": "pass",
+++      "detail": "all task files inside the declared scope"
+++    },
+++    {
+++      "id": "rollback-stated",
+++      "verdict": "pass",
+++      "detail": "git revert the merge; the compose file loses its GIT_CONFIG…"
+++    },
+++    {
+++      "id": "blast-radius-declared",
+++      "verdict": "pass",
+++      "detail": "5 file(s) at depth 2, 738 lines"
+++    },
+++    {
+++      "id": "blast-radius-current",
+++      "verdict": "pass",
+++      "detail": "5 files, 738 lines — matches a fresh computation — no indexed file matches cli/templates/project.compose.yml.tmpl, images/base/Dockerfile, images/build.sh, tests/e2e.sh (new files, or a typo)"
+++    }
+++  ]
+++}
++diff --git a/.keel/specs/moor-papercuts/plan.md b/.keel/specs/moor-papercuts/plan.md
++new file mode 100644
++index 0000000..53a47a0
++--- /dev/null
+++++ b/.keel/specs/moor-papercuts/plan.md
++@@ -0,0 +1,76 @@
+++---
+++id: PLAN-0007
+++slug: moor-papercuts
+++schema: keel.plan/1
+++blast:
+++  depth: 2
+++  declared:
+++  - cli/src/compose.rs
+++  - cli/templates/project.compose.yml.tmpl
+++  - cli/src/commands/mod.rs
+++  - images/base/Dockerfile
+++  - images/build.sh
+++  - tests/e2e.sh
+++  - docs/**
+++  computed:
+++  - cli/src/commands/mod.rs
+++  - cli/src/compose.rs
+++  - docs/examples/ascii-banner/banner.js
+++  - docs/examples/ascii-banner/test/banner.test.js
+++  - cli/src/main.rs
+++  computed_lines: 738
+++rollback: git revert the merge; the compose file loses its GIT_CONFIG_* lines, and the Dockerfile its KEEL_VERSION argument
+++verified_at: 2026-09-25
+++---
+++
+++# Design — moor-papercuts
+++
+++## Approach
+++
+++**Identity (AC-1, AC-2).** The seam is `compose::render`, which already turns
+++the manifest into the sandbox's environment.
+++- `render_with(m, identity: &[(&str, String)])` is pure. It renders a new
+++  `{{GIT_CONFIG_ENV_LINES}}` placeholder into `GIT_CONFIG_COUNT: "n"` plus a
+++  `GIT_CONFIG_KEY_i` and `GIT_CONFIG_VALUE_i` pair for each entry. Values are
+++  quoted, with `\` and `"` escaped for YAML and `$` doubled for compose.
+++- `render(m)` reads `git config --get user.name` and `user.email` on the host,
+++  keeping whichever are set, and calls `render_with`.
+++- The placeholder goes in the template's sandbox `environment:` block, after
+++  the secrets, and joins the list the existing no-placeholder-survives test
+++  checks.
+++- `sync_git_identity` stays, so `new_cmd.rs` and `import_cmd.rs` stay out of
+++  scope. It is harmless, because environment config takes precedence over the
+++  repo-local config it writes for imports.
+++
+++**e2e (AC-3).** After the existing pipeline approves `e2e-bundle` in a
+++`moor new` project, it reads `.keel/specs/e2e-bundle/approvals.jsonl` inside
+++the sandbox and checks its `by` is the host's `git config user.name`. When the
+++host has no identity, as on CI runners, it passes with a note that there was
+++nothing to compare.
+++
+++**Image (AC-4).** In `images/base/Dockerfile`, the `keel-build` stage gains
+++`ARG KEEL_VERSION=0.9.0` and runs `cargo install keel-harness --version
+++"$KEEL_VERSION" --locked`, which makes the version part of the layer's cache
+++key. `images/build.sh` forwards `KEEL_VERSION` from the environment when it is
+++set. Docs: IMAGES.md says how to bump it.
+++
+++## Blast radius
+++
+++<!-- generated by `keel plan`; edits here are overwritten -->
+++
+++Computed from the import graph at depth 2: **5 files, 738 lines**.
+++
+++| depth | file | lines |
+++| --- | --- | --- |
+++| scope | `cli/src/commands/mod.rs` | 279 |
+++| scope | `cli/src/compose.rs` | 131 |
+++| scope | `docs/examples/ascii-banner/banner.js` | 56 |
+++| scope | `docs/examples/ascii-banner/test/banner.test.js` | 60 |
+++| +1 | `cli/src/main.rs` | 212 |
+++
+++_Scope globs matching no indexed file (new files, or a typo): cli/templates/project.compose.yml.tmpl, images/base/Dockerfile, images/build.sh, tests/e2e.sh_
+++
+++
+++## Rollback
+++
+++`git revert` — replace this if the change needs a different rollback.
++diff --git a/.keel/specs/moor-papercuts/spec.md b/.keel/specs/moor-papercuts/spec.md
++new file mode 100644
++index 0000000..bbd4d38
++--- /dev/null
+++++ b/.keel/specs/moor-papercuts/spec.md
++@@ -0,0 +1,83 @@
+++---
+++id: SPEC-0007
+++slug: moor-papercuts
+++schema: keel.spec/1
+++status: approved
+++scope:
+++- cli/src/compose.rs
+++- cli/templates/project.compose.yml.tmpl
+++- cli/src/commands/mod.rs
+++- images/base/Dockerfile
+++- images/build.sh
+++- tests/e2e.sh
+++- docs/**
+++budget:
+++  criteria: 6
+++  lines: 250
+++verified_at: 2026-09-25
+++---
+++
+++# Moor papercuts: the approver's identity, and keel pinned in the image
+++
+++## Context
+++
+++Two problems found while taking keel runs through Moor end to end:
+++
+++- **In a new project, approvals record `unknown` as the approver.**
+++  `sync_git_identity` runs `git config user.name <host value>` inside the
+++  sandbox. With no `--global`, git writes to the repository in the current
+++  directory, and a new project's `/workspace` isn't a repository yet, so it
+++  fails with "not in a git directory". `--global` fails too, because the home
+++  directory is on the read-only root filesystem. Both errors are discarded.
+++  keel then finds no `user.name`, and every approval in the chain says
+++  `unknown`.
+++- **Rebuilding the image can keep an old keel.** The Dockerfile's `cargo
+++  install keel-harness --locked` layer has no version in it, so Docker reuses
+++  the cached layer after a keel release. Twice, a rebuild quietly shipped the
+++  previous keel.
+++
+++git reads configuration from `GIT_CONFIG_COUNT`, `GIT_CONFIG_KEY_n` and
+++`GIT_CONFIG_VALUE_n` environment variables without writing any file, and every
+++git command honours them in any directory. That's the fix for the first
+++problem. For the second, a pinned `KEEL_VERSION` build argument makes the keel
+++version part of the layer's cache key.
+++
+++## Acceptance criteria
+++
+++### AC-1 The host's identity reaches the sandbox as environment
+++
+++WHEN Moor renders a project's compose file and the host's git config sets
+++`user.name` and `user.email` THE SYSTEM SHALL give the sandbox service
+++`GIT_CONFIG_COUNT`, `GIT_CONFIG_KEY_n` and `GIT_CONFIG_VALUE_n` entries that
+++set both, quoted for compose, with any `$` escaped.
+++
+++oracle: cmd `cargo test --manifest-path cli/Cargo.toml compose::tests::host_git_identity_is_rendered_as_git_config_env -- --exact 2>&1 | grep -q '1 passed'` exit 0
+++
+++### AC-2 No identity, no entries
+++
+++IF the host's git config sets neither `user.name` nor `user.email` THEN THE
+++SYSTEM SHALL render no `GIT_CONFIG_*` entries.
+++
+++oracle: cmd `cargo test --manifest-path cli/Cargo.toml compose::tests::no_host_identity_renders_no_git_config_env -- --exact 2>&1 | grep -q '1 passed'` exit 0
+++
+++### AC-3 An approval in a new project names the approver
+++
+++WHEN the end-to-end suite approves a spec inside a newly created project's
+++sandbox THE SYSTEM SHALL record the host's `user.name` as the approver, not
+++`unknown`.
+++
+++oracle: cmd `bash tests/e2e.sh` exit 0
+++
+++### AC-4 keel's version is pinned in the image build
+++
+++THE SYSTEM SHALL install keel in the base image with `cargo install
+++keel-harness --version "$KEEL_VERSION" --locked`, where `KEEL_VERSION` is a
+++build argument whose default names one exact version.
+++
+++oracle: cmd `grep -Eq '^ARG KEEL_VERSION=[0-9]+\.[0-9]+\.[0-9]+$' images/base/Dockerfile && grep -q 'cargo install keel-harness --version "\$KEEL_VERSION" --locked' images/base/Dockerfile` exit 0
+++
+++## Out of scope
+++
+++- gVisor. That's a separate spike: `runsc` in OrbStack, and a
+++  `kernel.isolated` posture property.
+++- Updating keel driver scripts already copied into repositories.
++diff --git a/.keel/specs/moor-papercuts/tasks.md b/.keel/specs/moor-papercuts/tasks.md
++new file mode 100644
++index 0000000..9dee84a
++--- /dev/null
+++++ b/.keel/specs/moor-papercuts/tasks.md
++@@ -0,0 +1,26 @@
+++---
+++id: TASKS-0007
+++slug: moor-papercuts
+++schema: keel.tasks/1
+++---
+++
+++# Tasks
+++
+++### T-1 Host identity rendered as GIT_CONFIG env
+++- criteria: AC-1, AC-2
+++- files: cli/src/compose.rs, cli/templates/project.compose.yml.tmpl
+++- budget: 90
+++- exit: cmd `cargo test --manifest-path cli/Cargo.toml compose::tests::host_git_identity_is_rendered_as_git_config_env -- --exact 2>&1 | grep -q '1 passed'` exit 0
+++
+++### T-2 keel pinned in the image
+++- criteria: AC-4
+++- files: images/base/Dockerfile, images/build.sh, docs/IMAGES.md
+++- budget: 30
+++- exit: cmd `grep -Eq '^ARG KEEL_VERSION=[0-9]+\.[0-9]+\.[0-9]+$' images/base/Dockerfile` exit 0
+++
+++### T-3 e2e checks the approver in a new project
+++- criteria: AC-3
+++- files: tests/e2e.sh
+++- budget: 30
+++- depends_on: T-1, T-2
+++- exit: cmd `bash tests/e2e.sh` exit 0
+diff --git a/.keel/runs/2026-09-25-003/evidence/lint.txt b/.keel/runs/2026-09-25-003/evidence/lint.txt
+new file mode 100644
+index 0000000..edb91b9
+--- /dev/null
++++ b/.keel/runs/2026-09-25-003/evidence/lint.txt
+@@ -0,0 +1,2 @@
++$ cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml
++
+diff --git a/.keel/runs/2026-09-25-003/evidence/oracles.json b/.keel/runs/2026-09-25-003/evidence/oracles.json
+new file mode 100644
+index 0000000..ae5981f
+--- /dev/null
++++ b/.keel/runs/2026-09-25-003/evidence/oracles.json
+@@ -0,0 +1,39 @@
++{
++  "runs": [
++    {
++      "criterion": "AC-1",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml compose::tests::host_git_identity_is_rendered_as_git_config_env -- --exact 2>&1 | grep -q '1 passed'` exits 0",
++      "outcome": "pass",
++      "exit_code": 0
++    },
++    {
++      "criterion": "AC-2",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml compose::tests::no_host_identity_renders_no_git_config_env -- --exact 2>&1 | grep -q '1 passed'` exits 0",
++      "outcome": "pass",
++      "exit_code": 0
++    },
++    {
++      "criterion": "AC-3",
++      "kind": "cmd",
++      "oracle": "`bash tests/e2e.sh` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "…\n bundle check 'approvals' passes\n  [PASS] bundle check 'gate-verdicts' passes\n  [PASS] bundle check 'trajectory' passes\n  [PASS] the bundle on the host carries chain.jsonl\n\n== import: an existing local repo (no bind mount, ever) ==\n         ==> importing /private/var/folders/qd/rd_v3fjs0_s5w8n7vwt35f3w0000gn/T/tmp.adeTM0E84w/local-repo as 'e2e-import-4222' (image: moor/node:latest)\n         ==> starting sandbox + egress for 'e2e-import-4222'\n          Network e2e-import-4222-egress-net Creating \n          Network e2e-import-4222-egress-net Created \n          Network e2e-import-4222-internal Creating \n          Network e2e-import-4222-internal Created \n          Volume e2e-import-4222-workspace Creating \n          Volume e2e-import-4222-workspace Created \n          Volume e2e-import-4222-cache Creating \n          Volume e2e-import-4222-cache Created \n          Volume e2e-import-4222-claude-state Creating \n          Volume e2e-import-4222-claude-state Created \n          Container e2e-import-4222-egress Creating \n          Container e2e-import-4222-egress Created \n          Container e2e-import-4222-sandbox Creating \n          Container e2e-import-4222-sandbox Created \n          Container e2e-import-4222-egress Starting \n          Container e2e-import-4222-egress Started \n          Container e2e-import-4222-sandbox Starting \n          Container e2e-import-4222-sandbox Started \n         ==> bundling /private/var/folders/qd/rd_v3fjs0_s5w8n7vwt35f3w0000gn/T/tmp.adeTM0E84w/local-repo (all branches and tags)\n         ==> streaming the bundle into the sandbox and cloning it\n         Cloning into '.'...\n         branch 'a-second-branch' set up to track 'origin/a-second-branch'.\n            no remote configured — set one with `moor run e2e-import-4222 -- git remote add origin <url>` when ready\n         ==> checking for existing keel configuration\n            none found — running `keel init` inside the sandbox\n           created .keel/keel.toml\n           created drivers/_common.sh\n           created drivers/claude-code\n           created drivers/codex\n           added   [[driver]] codex to keel.toml\n           created drivers/copilot\n           added   [[driver]] copilot to keel.toml\n           created drivers/kiro\n           added   [[driver]] kiro to keel.toml\n           created drivers/noop\n           added   [[driver]] noop to keel.toml\n           created sast/semgrep\n           created product.md\n           created tech.md\n           created conventions.md\n           updated .gitignore\n         \n           store seeded at .keel/store\n           detected: Node/TypeScript (npm)\n         \n         Building the first map…\n           0 files · 0 symbols · 0 references · 0 import edges  (50 ms)\n           structure.md 13/400 lines · 0 CODEMAPs\n         \n         Rendering projections…\n           claude   CLAUDE.md — 68/180 lines\n           agents   AGENTS.md — 68/180 lines\n           kiro     .kiro/steering/keel.md — 68/200 lines\n           copilot  .github/copilot-instructions.md — 68/120 lines\n         \n         keel is initialised.\n         \n         Next:\n           1. Correct .keel/store/steering/product.md and .keel/store/steering/tech.md — they are seeded, not right.\n           2. `keel hook install` so a drifted projection cannot be committed.\n           3. `keel status` any time you want to know if the picture is current.\n         \n         \n         'e2e-import-4222' is up, imported from /private/var/folders/qd/rd_v3fjs0_s5w8n7vwt35f3w0000gn/T/tmp.adeTM0E84w/local-repo. Manifest: /Users/danebalia/.moor/projects/e2e-import-4222/moor.yaml\n         Next: moor shell e2e-import-4222\n  [PASS] moor import exits 0\n  [PASS] auto-detected the node image from package.json\n  [PASS] ran keel init (no prior .keel/ in the source)\n  [PASS] imported commit is present in the sandbox\n  [PASS] the second branch came across too (--all bundle)\n  [PASS] imported project passes selftest too\n\ne2e: all checks passed.\n\n== cleanup =="
++    },
++    {
++      "criterion": "AC-4",
++      "kind": "cmd",
++      "oracle": "`grep -Eq '^ARG KEEL_VERSION=[0-9]+\\.[0-9]+\\.[0-9]+$' images/base/Dockerfile && grep -q 'cargo install keel-harness --version \"\\$KEEL_VERSION\" --locked' images/base/Dockerfile` exits 0",
++      "outcome": "pass",
++      "exit_code": 0
++    }
++  ],
++  "criteria": 4,
++  "executed": 4,
++  "passed": 4,
++  "failed": 0,
++  "blocked": 0,
++  "human": 0
++}
+\ No newline at end of file
+diff --git a/.keel/runs/2026-09-25-003/evidence/ratchet.json b/.keel/runs/2026-09-25-003/evidence/ratchet.json
+new file mode 100644
+index 0000000..f3b5e43
+--- /dev/null
++++ b/.keel/runs/2026-09-25-003/evidence/ratchet.json
+@@ -0,0 +1,8 @@
++[
++  {
++    "id": "todo-markers",
++    "direction": "down",
++    "value": 1,
++    "baseline": null
++  }
++]
+\ No newline at end of file
+diff --git a/.keel/runs/2026-09-25-003/evidence/review-test-invalidation.txt b/.keel/runs/2026-09-25-003/evidence/review-test-invalidation.txt
+new file mode 100644
+index 0000000..fd66af7
+--- /dev/null
++++ b/.keel/runs/2026-09-25-003/evidence/review-test-invalidation.txt
+@@ -0,0 +1 @@
++no added mocks or weakened assertions
+diff --git a/.keel/runs/2026-09-25-003/evidence/test.txt b/.keel/runs/2026-09-25-003/evidence/test.txt
+new file mode 100644
+index 0000000..8dece4f
+--- /dev/null
++++ b/.keel/runs/2026-09-25-003/evidence/test.txt
+@@ -0,0 +1,13 @@
++$ cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml
++
++
++running 129 tests
++....................................................................................... 87/129
++..........................................
++test result: ok. 129 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
++
++
++running 8 tests
++........
++test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
++
+diff --git a/.keel/runs/2026-09-25-003/evidence/tree.txt b/.keel/runs/2026-09-25-003/evidence/tree.txt
+new file mode 100644
+index 0000000..88af4e5
+--- /dev/null
++++ b/.keel/runs/2026-09-25-003/evidence/tree.txt
+@@ -0,0 +1 @@
++beeb48ef73f21e17a67943bd8ca6f864387178d1739baa0365393d6f52febd40
+diff --git a/.keel/runs/2026-09-25-003/gates/G2.5.json b/.keel/runs/2026-09-25-003/gates/G2.5.json
+new file mode 100644
+index 0000000..69a9d8f
+--- /dev/null
++++ b/.keel/runs/2026-09-25-003/gates/G2.5.json
+@@ -0,0 +1,36 @@
++{
++  "schema": "keel.gate/1",
++  "gate": "G2.5",
++  "run": "2026-09-25-004",
++  "spec": "moor-papercuts",
++  "verdict": "pass",
++  "generated_at": "2026-09-25T20:10:05.752511+02:00",
++  "checks": [
++    {
++      "id": "test-invalidation",
++      "verdict": "pass",
++      "detail": "no mocks or weakened assertions added",
++      "evidence": "evidence/review-test-invalidation.txt"
++    },
++    {
++      "id": "test-movement",
++      "verdict": "pass",
++      "detail": "5 code file(s), 1 test file(s)"
++    },
++    {
++      "id": "conventions",
++      "verdict": "pass",
++      "detail": "3 house rule(s) in force"
++    },
++    {
++      "id": "lessons",
++      "verdict": "pass",
++      "detail": "no lessons in force yet (Phase 3 populates these)"
++    },
++    {
++      "id": "reviewer",
++      "verdict": "pass",
++      "detail": "no adversarial reviewer configured — the heuristics above are the whole pass"
++    }
++  ]
++}
+diff --git a/.keel/runs/2026-09-25-003/gates/G2.json b/.keel/runs/2026-09-25-003/gates/G2.json
+new file mode 100644
+index 0000000..511314d
+--- /dev/null
++++ b/.keel/runs/2026-09-25-003/gates/G2.json
+@@ -0,0 +1,62 @@
++{
++  "schema": "keel.gate/1",
++  "gate": "G2",
++  "run": "2026-09-25-004",
++  "spec": "moor-papercuts",
++  "verdict": "pass",
++  "generated_at": "2026-09-25T20:10:05.722656+02:00",
++  "checks": [
++    {
++      "id": "build",
++      "verdict": "pass",
++      "detail": "`cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml` exited 0",
++      "evidence": "evidence/build.txt"
++    },
++    {
++      "id": "test",
++      "verdict": "pass",
++      "detail": "`cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml` exited 0",
++      "evidence": "evidence/test.txt"
++    },
++    {
++      "id": "lint",
++      "verdict": "pass",
++      "detail": "`cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml` exited 0",
++      "evidence": "evidence/lint.txt"
++    },
++    {
++      "id": "oracle-coverage",
++      "verdict": "pass",
++      "detail": "4/4 oracles pass (0 awaiting human judgement)",
++      "evidence": "evidence/oracles.json"
++    },
++    {
++      "id": "blast-radius",
++      "verdict": "pass",
++      "detail": "6 changed file(s) inside scope, 5 file(s) downstream",
++      "evidence": "evidence/diff-stat.txt"
++    },
++    {
++      "id": "line-budget",
++      "verdict": "pass",
++      "detail": "121/250 lines of churn",
++      "evidence": "evidence/diff-stat.txt"
++    },
++    {
++      "id": "baseline-ratchet",
++      "verdict": "pass",
++      "detail": "1 metric(s) held",
++      "evidence": "evidence/ratchet.json"
++    },
++    {
++      "id": "store-drift",
++      "verdict": "pass",
++      "detail": "4 projections current"
++    },
++    {
++      "id": "shared-stores",
++      "verdict": "pass",
++      "detail": "none configured"
++    }
++  ]
++}
+diff --git a/.keel/runs/2026-09-25-003/gates/G3.json b/.keel/runs/2026-09-25-003/gates/G3.json
+new file mode 100644
+index 0000000..2db0212
+--- /dev/null
++++ b/.keel/runs/2026-09-25-003/gates/G3.json
+@@ -0,0 +1,31 @@
++{
++  "schema": "keel.gate/1",
++  "gate": "G3",
++  "run": "2026-09-25-004",
++  "spec": "moor-papercuts",
++  "verdict": "fail",
++  "generated_at": "2026-09-25T20:10:05.767370+02:00",
++  "checks": [
++    {
++      "id": "earlier-gates",
++      "verdict": "pass",
++      "detail": "G2.5 and G2 passed"
++    },
++    {
++      "id": "reviewable-size",
++      "verdict": "pass",
++      "detail": "121/1100 reviewable lines"
++    },
++    {
++      "id": "evidence-complete",
++      "verdict": "pass",
++      "detail": "trajectory, metadata and gate results present"
++    },
++    {
++      "id": "human-verdict",
++      "verdict": "fail",
++      "expected": "a recorded human decision on the change",
++      "actual": "none — run `keel approve moor-papercuts --stage merge`"
++    }
++  ]
++}
+diff --git a/.keel/runs/2026-09-25-003/run.json b/.keel/runs/2026-09-25-003/run.json
+new file mode 100644
+index 0000000..41b60a4
+--- /dev/null
++++ b/.keel/runs/2026-09-25-003/run.json
+@@ -0,0 +1,11 @@
++{
++  "schema": "keel.run/1",
++  "id": "2026-09-25-003",
++  "spec": "moor-papercuts",
++  "keel_version": "0.9.0",
++  "store_hash": "4e07f093d6afa16aeb50b4bab14c069797586ba01befb262b14b96bbd0213f0e",
++  "started_at": "2026-09-25T20:09:34.092825+02:00",
++  "finished_at": "2026-09-25T20:10:05.767885+02:00",
++  "verdict": "fail",
++  "base_commit": "462c5dc13e4711e92f42e2f47f8e2f17c7fb5723"
++}
+diff --git a/.keel/runs/2026-09-25-003/trajectory.jsonl b/.keel/runs/2026-09-25-003/trajectory.jsonl
+new file mode 100644
+index 0000000..ef4f96d
+--- /dev/null
++++ b/.keel/runs/2026-09-25-003/trajectory.jsonl
+@@ -0,0 +1,17 @@
++{"t":"2026-09-25T20:09:34.093894+02:00","seq":1,"kind":"run_start","spec":"moor-papercuts","keel_version":"0.9.0","store_hash":"4e07f093d6afa16aeb50b4bab14c069797586ba01befb262b14b96bbd0213f0e"}
++{"t":"2026-09-25T20:09:34.094939+02:00","seq":2,"kind":"inject","source":".keel/store/steering/conventions.md","tokens":177,"bytes":705}
++{"t":"2026-09-25T20:09:34.094970+02:00","seq":3,"kind":"inject","source":".keel/store/steering/tech.md","tokens":85,"bytes":338}
++{"t":"2026-09-25T20:09:34.095149+02:00","seq":4,"kind":"inject","source":".keel/store/steering/structure.md","tokens":4230,"bytes":16917}
++{"t":"2026-09-25T20:09:34.095527+02:00","seq":5,"kind":"inject","source":".keel/specs/moor-papercuts/spec.md","tokens":829,"bytes":3316}
++{"t":"2026-09-25T20:09:36.196162+02:00","seq":6,"kind":"command","cmd":"cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/build.txt"}
++{"t":"2026-09-25T20:09:36.326990+02:00","seq":7,"kind":"command","cmd":"cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/test.txt"}
++{"t":"2026-09-25T20:09:37.328739+02:00","seq":8,"kind":"command","cmd":"cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/lint.txt"}
++{"t":"2026-09-25T20:10:05.560021+02:00","seq":9,"kind":"oracle","criterion":"AC-1","oracle":"`cargo test --manifest-path cli/Cargo.toml compose::tests::host_git_identity_is_rendered_as_git_config_env -- --exact 2>&1 | grep -q '1 passed'` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-09-25T20:10:05.560207+02:00","seq":10,"kind":"oracle","criterion":"AC-2","oracle":"`cargo test --manifest-path cli/Cargo.toml compose::tests::no_host_identity_renders_no_git_config_env -- --exact 2>&1 | grep -q '1 passed'` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-09-25T20:10:05.560219+02:00","seq":11,"kind":"oracle","criterion":"AC-3","oracle":"`bash tests/e2e.sh` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-09-25T20:10:05.560223+02:00","seq":12,"kind":"oracle","criterion":"AC-4","oracle":"`grep -Eq '^ARG KEEL_VERSION=[0-9]+\\.[0-9]+\\.[0-9]+$' images/base/Dockerfile && grep -q 'cargo install keel-harness --version \"\\$KEEL_VERSION\" --locked' images/base/Dockerfile` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-09-25T20:10:05.722961+02:00","seq":13,"kind":"gate","gate":"G2","verdict":"pass","result":"gates/G2.json"}
++{"t":"2026-09-25T20:10:05.752795+02:00","seq":14,"kind":"gate","gate":"G2.5","verdict":"pass","result":"gates/G2.5.json"}
++{"t":"2026-09-25T20:10:05.767725+02:00","seq":15,"kind":"gate","gate":"G3","verdict":"fail","result":"gates/G3.json"}
++{"t":"2026-09-25T20:10:05.767741+02:00","seq":16,"kind":"run_end","verdict":"fail","duration_ms":31699}
++{"t":"2026-09-25T20:11:15.334863+02:00","seq":17,"kind":"human","stage":"merge","decision":"approved","by":"Dane Balia"}
+diff --git a/.keel/runs/2026-09-25-004/evidence/build.txt b/.keel/runs/2026-09-25-004/evidence/build.txt
+new file mode 100644
+index 0000000..c078b47
+--- /dev/null
++++ b/.keel/runs/2026-09-25-004/evidence/build.txt
+@@ -0,0 +1,2 @@
++$ cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml
++
+diff --git a/.keel/runs/2026-09-25-004/evidence/diff-stat.txt b/.keel/runs/2026-09-25-004/evidence/diff-stat.txt
+new file mode 100644
+index 0000000..4ef3aba
+--- /dev/null
++++ b/.keel/runs/2026-09-25-004/evidence/diff-stat.txt
+@@ -0,0 +1,36 @@
++    12      0  .keel/chain.jsonl
++     2      0  .keel/runs/2026-09-25-003/evidence/build.txt
++    21      0  .keel/runs/2026-09-25-003/evidence/diff-stat.txt
++   778      0  .keel/runs/2026-09-25-003/evidence/diff.patch
++     2      0  .keel/runs/2026-09-25-003/evidence/lint.txt
++    39      0  .keel/runs/2026-09-25-003/evidence/oracles.json
++     8      0  .keel/runs/2026-09-25-003/evidence/ratchet.json
++     1      0  .keel/runs/2026-09-25-003/evidence/review-test-invalidation.txt
++    13      0  .keel/runs/2026-09-25-003/evidence/test.txt
++     1      0  .keel/runs/2026-09-25-003/evidence/tree.txt
++    36      0  .keel/runs/2026-09-25-003/gates/G2.5.json
++    62      0  .keel/runs/2026-09-25-003/gates/G2.json
++    31      0  .keel/runs/2026-09-25-003/gates/G3.json
++    11      0  .keel/runs/2026-09-25-003/run.json
++    17      0  .keel/runs/2026-09-25-003/trajectory.jsonl
++     2      0  .keel/runs/2026-09-25-004/evidence/build.txt
++     2      0  .keel/runs/2026-09-25-004/evidence/lint.txt
++    39      0  .keel/runs/2026-09-25-004/evidence/oracles.json
++    13      0  .keel/runs/2026-09-25-004/evidence/test.txt
++     9      0  .keel/runs/2026-09-25-004/run.json
++    12      0  .keel/runs/2026-09-25-004/trajectory.jsonl
++     3      0  .keel/specs/moor-papercuts/approvals.jsonl
++    90      0  .keel/specs/moor-papercuts/gates/G0.json
++    95      0  .keel/specs/moor-papercuts/gates/G1.json
++    76      0  .keel/specs/moor-papercuts/plan.md
++     0      0  .keel/specs/moor-papercuts/review-flags.txt
++    83      0  .keel/specs/moor-papercuts/spec.md
++    26      0  .keel/specs/moor-papercuts/tasks.md
++    84      0  cli/src/compose.rs
++     1      0  cli/templates/project.compose.yml.tmpl
++    11      3  docs/IMAGES.md
++     5      1  images/base/Dockerfile
++     2      1  images/build.sh
++    13      0  tests/e2e.sh
++
++34 file(s), +1600 -5 (1605 lines of churn) against 462c5dc13e4711e92f42e2f47f8e2f17c7fb5723
+diff --git a/.keel/runs/2026-09-25-004/evidence/lint.txt b/.keel/runs/2026-09-25-004/evidence/lint.txt
+new file mode 100644
+index 0000000..edb91b9
+--- /dev/null
++++ b/.keel/runs/2026-09-25-004/evidence/lint.txt
+@@ -0,0 +1,2 @@
++$ cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml
++
+diff --git a/.keel/runs/2026-09-25-004/evidence/oracles.json b/.keel/runs/2026-09-25-004/evidence/oracles.json
+new file mode 100644
+index 0000000..b1371f4
+--- /dev/null
++++ b/.keel/runs/2026-09-25-004/evidence/oracles.json
+@@ -0,0 +1,39 @@
++{
++  "runs": [
++    {
++      "criterion": "AC-1",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml compose::tests::host_git_identity_is_rendered_as_git_config_env -- --exact 2>&1 | grep -q '1 passed'` exits 0",
++      "outcome": "pass",
++      "exit_code": 0
++    },
++    {
++      "criterion": "AC-2",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml compose::tests::no_host_identity_renders_no_git_config_env -- --exact 2>&1 | grep -q '1 passed'` exits 0",
++      "outcome": "pass",
++      "exit_code": 0
++    },
++    {
++      "criterion": "AC-3",
++      "kind": "cmd",
++      "oracle": "`bash tests/e2e.sh` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "…\n bundle check 'approvals' passes\n  [PASS] bundle check 'gate-verdicts' passes\n  [PASS] bundle check 'trajectory' passes\n  [PASS] the bundle on the host carries chain.jsonl\n\n== import: an existing local repo (no bind mount, ever) ==\n         ==> importing /private/var/folders/qd/rd_v3fjs0_s5w8n7vwt35f3w0000gn/T/tmp.qHq3lIrNRD/local-repo as 'e2e-import-6833' (image: moor/node:latest)\n         ==> starting sandbox + egress for 'e2e-import-6833'\n          Network e2e-import-6833-egress-net Creating \n          Network e2e-import-6833-egress-net Created \n          Network e2e-import-6833-internal Creating \n          Network e2e-import-6833-internal Created \n          Volume e2e-import-6833-workspace Creating \n          Volume e2e-import-6833-workspace Created \n          Volume e2e-import-6833-cache Creating \n          Volume e2e-import-6833-cache Created \n          Volume e2e-import-6833-claude-state Creating \n          Volume e2e-import-6833-claude-state Created \n          Container e2e-import-6833-egress Creating \n          Container e2e-import-6833-egress Created \n          Container e2e-import-6833-sandbox Creating \n          Container e2e-import-6833-sandbox Created \n          Container e2e-import-6833-egress Starting \n          Container e2e-import-6833-egress Started \n          Container e2e-import-6833-sandbox Starting \n          Container e2e-import-6833-sandbox Started \n         ==> bundling /private/var/folders/qd/rd_v3fjs0_s5w8n7vwt35f3w0000gn/T/tmp.qHq3lIrNRD/local-repo (all branches and tags)\n         ==> streaming the bundle into the sandbox and cloning it\n         Cloning into '.'...\n         branch 'a-second-branch' set up to track 'origin/a-second-branch'.\n            no remote configured — set one with `moor run e2e-import-6833 -- git remote add origin <url>` when ready\n         ==> checking for existing keel configuration\n            none found — running `keel init` inside the sandbox\n           created .keel/keel.toml\n           created drivers/_common.sh\n           created drivers/claude-code\n           created drivers/codex\n           added   [[driver]] codex to keel.toml\n           created drivers/copilot\n           added   [[driver]] copilot to keel.toml\n           created drivers/kiro\n           added   [[driver]] kiro to keel.toml\n           created drivers/noop\n           added   [[driver]] noop to keel.toml\n           created sast/semgrep\n           created product.md\n           created tech.md\n           created conventions.md\n           updated .gitignore\n         \n           store seeded at .keel/store\n           detected: Node/TypeScript (npm)\n         \n         Building the first map…\n           0 files · 0 symbols · 0 references · 0 import edges  (46 ms)\n           structure.md 13/400 lines · 0 CODEMAPs\n         \n         Rendering projections…\n           claude   CLAUDE.md — 68/180 lines\n           agents   AGENTS.md — 68/180 lines\n           kiro     .kiro/steering/keel.md — 68/200 lines\n           copilot  .github/copilot-instructions.md — 68/120 lines\n         \n         keel is initialised.\n         \n         Next:\n           1. Correct .keel/store/steering/product.md and .keel/store/steering/tech.md — they are seeded, not right.\n           2. `keel hook install` so a drifted projection cannot be committed.\n           3. `keel status` any time you want to know if the picture is current.\n         \n         \n         'e2e-import-6833' is up, imported from /private/var/folders/qd/rd_v3fjs0_s5w8n7vwt35f3w0000gn/T/tmp.qHq3lIrNRD/local-repo. Manifest: /Users/danebalia/.moor/projects/e2e-import-6833/moor.yaml\n         Next: moor shell e2e-import-6833\n  [PASS] moor import exits 0\n  [PASS] auto-detected the node image from package.json\n  [PASS] ran keel init (no prior .keel/ in the source)\n  [PASS] imported commit is present in the sandbox\n  [PASS] the second branch came across too (--all bundle)\n  [PASS] imported project passes selftest too\n\ne2e: all checks passed.\n\n== cleanup =="
++    },
++    {
++      "criterion": "AC-4",
++      "kind": "cmd",
++      "oracle": "`grep -Eq '^ARG KEEL_VERSION=[0-9]+\\.[0-9]+\\.[0-9]+$' images/base/Dockerfile && grep -q 'cargo install keel-harness --version \"\\$KEEL_VERSION\" --locked' images/base/Dockerfile` exits 0",
++      "outcome": "pass",
++      "exit_code": 0
++    }
++  ],
++  "criteria": 4,
++  "executed": 4,
++  "passed": 4,
++  "failed": 0,
++  "blocked": 0,
++  "human": 0
++}
+\ No newline at end of file
+diff --git a/.keel/runs/2026-09-25-004/evidence/test.txt b/.keel/runs/2026-09-25-004/evidence/test.txt
+new file mode 100644
+index 0000000..e69bd34
+--- /dev/null
++++ b/.keel/runs/2026-09-25-004/evidence/test.txt
+@@ -0,0 +1,13 @@
++$ cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml
++
++
++running 129 tests
++....................................................................................... 87/129
++..........................................
++test result: ok. 129 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
++
++
++running 8 tests
++........
++test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
++
+diff --git a/.keel/runs/2026-09-25-004/run.json b/.keel/runs/2026-09-25-004/run.json
+new file mode 100644
+index 0000000..96d8a93
+--- /dev/null
++++ b/.keel/runs/2026-09-25-004/run.json
+@@ -0,0 +1,9 @@
++{
++  "schema": "keel.run/1",
++  "id": "2026-09-25-004",
++  "spec": "moor-papercuts",
++  "keel_version": "0.9.0",
++  "store_hash": "4e07f093d6afa16aeb50b4bab14c069797586ba01befb262b14b96bbd0213f0e",
++  "started_at": "2026-09-25T20:11:28.595561+02:00",
++  "base_commit": "462c5dc13e4711e92f42e2f47f8e2f17c7fb5723"
++}
+diff --git a/.keel/runs/2026-09-25-004/trajectory.jsonl b/.keel/runs/2026-09-25-004/trajectory.jsonl
+new file mode 100644
+index 0000000..64fa666
+--- /dev/null
++++ b/.keel/runs/2026-09-25-004/trajectory.jsonl
+@@ -0,0 +1,12 @@
++{"t":"2026-09-25T20:11:28.596620+02:00","seq":1,"kind":"run_start","spec":"moor-papercuts","keel_version":"0.9.0","store_hash":"4e07f093d6afa16aeb50b4bab14c069797586ba01befb262b14b96bbd0213f0e"}
++{"t":"2026-09-25T20:11:28.597300+02:00","seq":2,"kind":"inject","source":".keel/store/steering/conventions.md","tokens":177,"bytes":705}
++{"t":"2026-09-25T20:11:28.597322+02:00","seq":3,"kind":"inject","source":".keel/store/steering/tech.md","tokens":85,"bytes":338}
++{"t":"2026-09-25T20:11:28.597357+02:00","seq":4,"kind":"inject","source":".keel/store/steering/structure.md","tokens":4230,"bytes":16917}
++{"t":"2026-09-25T20:11:28.597520+02:00","seq":5,"kind":"inject","source":".keel/specs/moor-papercuts/spec.md","tokens":829,"bytes":3316}
++{"t":"2026-09-25T20:11:28.851776+02:00","seq":6,"kind":"command","cmd":"cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/build.txt"}
++{"t":"2026-09-25T20:11:28.968337+02:00","seq":7,"kind":"command","cmd":"cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/test.txt"}
++{"t":"2026-09-25T20:11:29.223878+02:00","seq":8,"kind":"command","cmd":"cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/lint.txt"}
++{"t":"2026-09-25T20:11:56.790934+02:00","seq":9,"kind":"oracle","criterion":"AC-1","oracle":"`cargo test --manifest-path cli/Cargo.toml compose::tests::host_git_identity_is_rendered_as_git_config_env -- --exact 2>&1 | grep -q '1 passed'` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-09-25T20:11:56.790992+02:00","seq":10,"kind":"oracle","criterion":"AC-2","oracle":"`cargo test --manifest-path cli/Cargo.toml compose::tests::no_host_identity_renders_no_git_config_env -- --exact 2>&1 | grep -q '1 passed'` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-09-25T20:11:56.791003+02:00","seq":11,"kind":"oracle","criterion":"AC-3","oracle":"`bash tests/e2e.sh` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-09-25T20:11:56.791008+02:00","seq":12,"kind":"oracle","criterion":"AC-4","oracle":"`grep -Eq '^ARG KEEL_VERSION=[0-9]+\\.[0-9]+\\.[0-9]+$' images/base/Dockerfile && grep -q 'cargo install keel-harness --version \"\\$KEEL_VERSION\" --locked' images/base/Dockerfile` exits 0","verdict":"pass","exit_code":0}
+diff --git a/.keel/specs/moor-papercuts/approvals.jsonl b/.keel/specs/moor-papercuts/approvals.jsonl
+new file mode 100644
+index 0000000..7e6910b
+--- /dev/null
++++ b/.keel/specs/moor-papercuts/approvals.jsonl
+@@ -0,0 +1,3 @@
++{"schema":"keel.approval/1","stage":"spec","decision":"approved","artefact_hash":"f91be8c311108ba25b5859a99df12a455e9feca8daccbe0cdb352b6ef56214c0","gate_verdict":"pass","by":"Dane Balia","at":"2026-09-25T19:39:15.058474+02:00"}
++{"schema":"keel.approval/1","stage":"plan","decision":"approved","artefact_hash":"021a6e5e56f6308539b7ac6e427da21e0684e010af94f60d094e1becb6c85091","gate_verdict":"pass","by":"Dane Balia","at":"2026-09-25T20:05:40.744422+02:00"}
++{"schema":"keel.approval/1","stage":"merge","decision":"approved","artefact_hash":"5d595aaeca9ef3e2265ec2123f266af528aa0017395b535d27024d012fe32a31","gate_verdict":"fail","by":"Dane Balia","at":"2026-09-25T20:11:15.331111+02:00"}
+diff --git a/.keel/specs/moor-papercuts/gates/G0.json b/.keel/specs/moor-papercuts/gates/G0.json
+new file mode 100644
+index 0000000..34b9062
+--- /dev/null
++++ b/.keel/specs/moor-papercuts/gates/G0.json
+@@ -0,0 +1,90 @@
++{
++  "schema": "keel.gate/1",
++  "gate": "G0",
++  "run": "2026-09-25-003",
++  "spec": "moor-papercuts",
++  "verdict": "pass",
++  "generated_at": "2026-09-25T19:16:17.610069+02:00",
++  "checks": [
++    {
++      "id": "schema",
++      "verdict": "pass",
++      "detail": "SPEC-0007 (keel.spec/1)"
++    },
++    {
++      "id": "criteria-present",
++      "verdict": "pass",
++      "detail": "4 criteria"
++    },
++    {
++      "id": "criterion-ids-unique",
++      "verdict": "pass",
++      "detail": "no duplicate ids"
++    },
++    {
++      "id": "no-placeholders",
++      "verdict": "pass",
++      "detail": "no unfilled scaffold text"
++    },
++    {
++      "id": "ears-conformance",
++      "verdict": "pass",
++      "detail": "4/4 conform (event-driven, ubiquitous, unwanted-behaviour)"
++    },
++    {
++      "id": "oracle-presence",
++      "verdict": "pass",
++      "detail": "4 oracles across 4 criteria"
++    },
++    {
++      "id": "oracle-wellformed",
++      "verdict": "pass",
++      "detail": "all oracles parse"
++    },
++    {
++      "id": "ambiguity",
++      "verdict": "pass",
++      "detail": "no ambiguous phrasing in criteria"
++    },
++    {
++      "id": "criterion-budget",
++      "verdict": "pass",
++      "detail": "4/6 criteria"
++    },
++    {
++      "id": "spec-length",
++      "verdict": "pass",
++      "detail": "83/250 lines"
++    },
++    {
++      "id": "scope-declared",
++      "verdict": "pass",
++      "detail": "7 glob(s): cli/src/compose.rs, cli/templates/project.compose.yml.tmpl, cli/src/commands/mod.rs, images/base/Dockerfile, images/build.sh, tests/e2e.sh, docs/**"
++    },
++    {
++      "id": "change-budget",
++      "verdict": "pass",
++      "detail": "250 lines of diff budgeted"
++    },
++    {
++      "id": "oracle-mix",
++      "verdict": "pass",
++      "detail": "4/4 runnable (4 cmd)"
++    },
++    {
++      "id": "human-cost",
++      "verdict": "pass",
++      "detail": "0 human oracle(s), none load-bearing"
++    },
++    {
++      "id": "store-drift",
++      "verdict": "pass",
++      "detail": "4 projections current"
++    },
++    {
++      "id": "shared-stores",
++      "verdict": "pass",
++      "detail": "none configured"
++    }
++  ]
++}
+diff --git a/.keel/specs/moor-papercuts/gates/G1.json b/.keel/specs/moor-papercuts/gates/G1.json
+new file mode 100644
+index 0000000..244877c
+--- /dev/null
++++ b/.keel/specs/moor-papercuts/gates/G1.json
+@@ -0,0 +1,95 @@
++{
++  "schema": "keel.gate/1",
++  "gate": "G1",
++  "run": "2026-09-25-003",
++  "spec": "moor-papercuts",
++  "verdict": "pass",
++  "generated_at": "2026-09-25T19:40:05.438316+02:00",
++  "checks": [
++    {
++      "id": "schema",
++      "verdict": "pass",
++      "detail": "PLAN-0007 + TASKS-0007"
++    },
++    {
++      "id": "g0-passed",
++      "verdict": "pass",
++      "detail": "G0 passed in run 2026-09-25-003"
++    },
++    {
++      "id": "spec-approved",
++      "verdict": "pass",
++      "detail": "approved by Dane Balia"
++    },
++    {
++      "id": "tasks-present",
++      "verdict": "pass",
++      "detail": "3/15 tasks"
++    },
++    {
++      "id": "task-ids-unique",
++      "verdict": "pass",
++      "detail": "no duplicate task ids"
++    },
++    {
++      "id": "task-fields",
++      "verdict": "pass",
++      "detail": "all task fields recognised"
++    },
++    {
++      "id": "task-criterion-traceability",
++      "verdict": "pass",
++      "detail": "3 tasks all traced"
++    },
++    {
++      "id": "criteria-covered",
++      "verdict": "pass",
++      "detail": "4/4 criteria have a task"
++    },
++    {
++      "id": "task-budgets",
++      "verdict": "pass",
++      "detail": "all 3 tasks budgeted, total 150 lines"
++    },
++    {
++      "id": "total-budget",
++      "verdict": "pass",
++      "detail": "150/250 lines"
++    },
++    {
++      "id": "task-exit-conditions",
++      "verdict": "pass",
++      "detail": "every task states when it is done"
++    },
++    {
++      "id": "task-dependencies",
++      "verdict": "pass",
++      "detail": "2 wave(s), widths 2/1"
++    },
++    {
++      "id": "wave-isolation",
++      "verdict": "pass",
++      "detail": "2 wave(s), no file claimed twice within one"
++    },
++    {
++      "id": "task-files-in-scope",
++      "verdict": "pass",
++      "detail": "all task files inside the declared scope"
++    },
++    {
++      "id": "rollback-stated",
++      "verdict": "pass",
++      "detail": "git revert the merge; the compose file loses its GIT_CONFIG…"
++    },
++    {
++      "id": "blast-radius-declared",
++      "verdict": "pass",
++      "detail": "5 file(s) at depth 2, 738 lines"
++    },
++    {
++      "id": "blast-radius-current",
++      "verdict": "pass",
++      "detail": "5 files, 738 lines — matches a fresh computation — no indexed file matches cli/templates/project.compose.yml.tmpl, images/base/Dockerfile, images/build.sh, tests/e2e.sh (new files, or a typo)"
++    }
++  ]
++}
+diff --git a/.keel/specs/moor-papercuts/plan.md b/.keel/specs/moor-papercuts/plan.md
+new file mode 100644
+index 0000000..53a47a0
+--- /dev/null
++++ b/.keel/specs/moor-papercuts/plan.md
+@@ -0,0 +1,76 @@
++---
++id: PLAN-0007
++slug: moor-papercuts
++schema: keel.plan/1
++blast:
++  depth: 2
++  declared:
++  - cli/src/compose.rs
++  - cli/templates/project.compose.yml.tmpl
++  - cli/src/commands/mod.rs
++  - images/base/Dockerfile
++  - images/build.sh
++  - tests/e2e.sh
++  - docs/**
++  computed:
++  - cli/src/commands/mod.rs
++  - cli/src/compose.rs
++  - docs/examples/ascii-banner/banner.js
++  - docs/examples/ascii-banner/test/banner.test.js
++  - cli/src/main.rs
++  computed_lines: 738
++rollback: git revert the merge; the compose file loses its GIT_CONFIG_* lines, and the Dockerfile its KEEL_VERSION argument
++verified_at: 2026-09-25
++---
++
++# Design — moor-papercuts
++
++## Approach
++
++**Identity (AC-1, AC-2).** The seam is `compose::render`, which already turns
++the manifest into the sandbox's environment.
++- `render_with(m, identity: &[(&str, String)])` is pure. It renders a new
++  `{{GIT_CONFIG_ENV_LINES}}` placeholder into `GIT_CONFIG_COUNT: "n"` plus a
++  `GIT_CONFIG_KEY_i` and `GIT_CONFIG_VALUE_i` pair for each entry. Values are
++  quoted, with `\` and `"` escaped for YAML and `$` doubled for compose.
++- `render(m)` reads `git config --get user.name` and `user.email` on the host,
++  keeping whichever are set, and calls `render_with`.
++- The placeholder goes in the template's sandbox `environment:` block, after
++  the secrets, and joins the list the existing no-placeholder-survives test
++  checks.
++- `sync_git_identity` stays, so `new_cmd.rs` and `import_cmd.rs` stay out of
++  scope. It is harmless, because environment config takes precedence over the
++  repo-local config it writes for imports.
++
++**e2e (AC-3).** After the existing pipeline approves `e2e-bundle` in a
++`moor new` project, it reads `.keel/specs/e2e-bundle/approvals.jsonl` inside
++the sandbox and checks its `by` is the host's `git config user.name`. When the
++host has no identity, as on CI runners, it passes with a note that there was
++nothing to compare.
++
++**Image (AC-4).** In `images/base/Dockerfile`, the `keel-build` stage gains
++`ARG KEEL_VERSION=0.9.0` and runs `cargo install keel-harness --version
++"$KEEL_VERSION" --locked`, which makes the version part of the layer's cache
++key. `images/build.sh` forwards `KEEL_VERSION` from the environment when it is
++set. Docs: IMAGES.md says how to bump it.
++
++## Blast radius
++
++<!-- generated by `keel plan`; edits here are overwritten -->
++
++Computed from the import graph at depth 2: **5 files, 738 lines**.
++
++| depth | file | lines |
++| --- | --- | --- |
++| scope | `cli/src/commands/mod.rs` | 279 |
++| scope | `cli/src/compose.rs` | 131 |
++| scope | `docs/examples/ascii-banner/banner.js` | 56 |
++| scope | `docs/examples/ascii-banner/test/banner.test.js` | 60 |
++| +1 | `cli/src/main.rs` | 212 |
++
++_Scope globs matching no indexed file (new files, or a typo): cli/templates/project.compose.yml.tmpl, images/base/Dockerfile, images/build.sh, tests/e2e.sh_
++
++
++## Rollback
++
++`git revert` — replace this if the change needs a different rollback.
+diff --git a/.keel/specs/moor-papercuts/review-flags.txt b/.keel/specs/moor-papercuts/review-flags.txt
+new file mode 100644
+index 0000000..e69de29
+diff --git a/.keel/specs/moor-papercuts/spec.md b/.keel/specs/moor-papercuts/spec.md
+new file mode 100644
+index 0000000..bbd4d38
+--- /dev/null
++++ b/.keel/specs/moor-papercuts/spec.md
+@@ -0,0 +1,83 @@
++---
++id: SPEC-0007
++slug: moor-papercuts
++schema: keel.spec/1
++status: approved
++scope:
++- cli/src/compose.rs
++- cli/templates/project.compose.yml.tmpl
++- cli/src/commands/mod.rs
++- images/base/Dockerfile
++- images/build.sh
++- tests/e2e.sh
++- docs/**
++budget:
++  criteria: 6
++  lines: 250
++verified_at: 2026-09-25
++---
++
++# Moor papercuts: the approver's identity, and keel pinned in the image
++
++## Context
++
++Two problems found while taking keel runs through Moor end to end:
++
++- **In a new project, approvals record `unknown` as the approver.**
++  `sync_git_identity` runs `git config user.name <host value>` inside the
++  sandbox. With no `--global`, git writes to the repository in the current
++  directory, and a new project's `/workspace` isn't a repository yet, so it
++  fails with "not in a git directory". `--global` fails too, because the home
++  directory is on the read-only root filesystem. Both errors are discarded.
++  keel then finds no `user.name`, and every approval in the chain says
++  `unknown`.
++- **Rebuilding the image can keep an old keel.** The Dockerfile's `cargo
++  install keel-harness --locked` layer has no version in it, so Docker reuses
++  the cached layer after a keel release. Twice, a rebuild quietly shipped the
++  previous keel.
++
++git reads configuration from `GIT_CONFIG_COUNT`, `GIT_CONFIG_KEY_n` and
++`GIT_CONFIG_VALUE_n` environment variables without writing any file, and every
++git command honours them in any directory. That's the fix for the first
++problem. For the second, a pinned `KEEL_VERSION` build argument makes the keel
++version part of the layer's cache key.
++
++## Acceptance criteria
++
++### AC-1 The host's identity reaches the sandbox as environment
++
++WHEN Moor renders a project's compose file and the host's git config sets
++`user.name` and `user.email` THE SYSTEM SHALL give the sandbox service
++`GIT_CONFIG_COUNT`, `GIT_CONFIG_KEY_n` and `GIT_CONFIG_VALUE_n` entries that
++set both, quoted for compose, with any `$` escaped.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml compose::tests::host_git_identity_is_rendered_as_git_config_env -- --exact 2>&1 | grep -q '1 passed'` exit 0
++
++### AC-2 No identity, no entries
++
++IF the host's git config sets neither `user.name` nor `user.email` THEN THE
++SYSTEM SHALL render no `GIT_CONFIG_*` entries.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml compose::tests::no_host_identity_renders_no_git_config_env -- --exact 2>&1 | grep -q '1 passed'` exit 0
++
++### AC-3 An approval in a new project names the approver
++
++WHEN the end-to-end suite approves a spec inside a newly created project's
++sandbox THE SYSTEM SHALL record the host's `user.name` as the approver, not
++`unknown`.
++
++oracle: cmd `bash tests/e2e.sh` exit 0
++
++### AC-4 keel's version is pinned in the image build
++
++THE SYSTEM SHALL install keel in the base image with `cargo install
++keel-harness --version "$KEEL_VERSION" --locked`, where `KEEL_VERSION` is a
++build argument whose default names one exact version.
++
++oracle: cmd `grep -Eq '^ARG KEEL_VERSION=[0-9]+\.[0-9]+\.[0-9]+$' images/base/Dockerfile && grep -q 'cargo install keel-harness --version "\$KEEL_VERSION" --locked' images/base/Dockerfile` exit 0
++
++## Out of scope
++
++- gVisor. That's a separate spike: `runsc` in OrbStack, and a
++  `kernel.isolated` posture property.
++- Updating keel driver scripts already copied into repositories.
+diff --git a/.keel/specs/moor-papercuts/tasks.md b/.keel/specs/moor-papercuts/tasks.md
+new file mode 100644
+index 0000000..9dee84a
+--- /dev/null
++++ b/.keel/specs/moor-papercuts/tasks.md
+@@ -0,0 +1,26 @@
++---
++id: TASKS-0007
++slug: moor-papercuts
++schema: keel.tasks/1
++---
++
++# Tasks
++
++### T-1 Host identity rendered as GIT_CONFIG env
++- criteria: AC-1, AC-2
++- files: cli/src/compose.rs, cli/templates/project.compose.yml.tmpl
++- budget: 90
++- exit: cmd `cargo test --manifest-path cli/Cargo.toml compose::tests::host_git_identity_is_rendered_as_git_config_env -- --exact 2>&1 | grep -q '1 passed'` exit 0
++
++### T-2 keel pinned in the image
++- criteria: AC-4
++- files: images/base/Dockerfile, images/build.sh, docs/IMAGES.md
++- budget: 30
++- exit: cmd `grep -Eq '^ARG KEEL_VERSION=[0-9]+\.[0-9]+\.[0-9]+$' images/base/Dockerfile` exit 0
++
++### T-3 e2e checks the approver in a new project
++- criteria: AC-3
++- files: tests/e2e.sh
++- budget: 30
++- depends_on: T-1, T-2
++- exit: cmd `bash tests/e2e.sh` exit 0

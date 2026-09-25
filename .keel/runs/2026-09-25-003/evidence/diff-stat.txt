@@ -1,0 +1,21 @@
+     6      0  .keel/chain.jsonl
+     2      0  .keel/runs/2026-09-25-003/evidence/build.txt
+     2      0  .keel/runs/2026-09-25-003/evidence/lint.txt
+    39      0  .keel/runs/2026-09-25-003/evidence/oracles.json
+    13      0  .keel/runs/2026-09-25-003/evidence/test.txt
+     9      0  .keel/runs/2026-09-25-003/run.json
+    12      0  .keel/runs/2026-09-25-003/trajectory.jsonl
+     2      0  .keel/specs/moor-papercuts/approvals.jsonl
+    90      0  .keel/specs/moor-papercuts/gates/G0.json
+    95      0  .keel/specs/moor-papercuts/gates/G1.json
+    76      0  .keel/specs/moor-papercuts/plan.md
+    83      0  .keel/specs/moor-papercuts/spec.md
+    26      0  .keel/specs/moor-papercuts/tasks.md
+    84      0  cli/src/compose.rs
+     1      0  cli/templates/project.compose.yml.tmpl
+    11      3  docs/IMAGES.md
+     5      1  images/base/Dockerfile
+     2      1  images/build.sh
+    13      0  tests/e2e.sh
+
+19 file(s), +571 -5 (576 lines of churn) against 462c5dc13e4711e92f42e2f47f8e2f17c7fb5723

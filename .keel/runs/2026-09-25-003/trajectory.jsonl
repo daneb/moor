@@ -1,0 +1,17 @@
+{"t":"2026-09-25T20:09:34.093894+02:00","seq":1,"kind":"run_start","spec":"moor-papercuts","keel_version":"0.9.0","store_hash":"4e07f093d6afa16aeb50b4bab14c069797586ba01befb262b14b96bbd0213f0e"}
+{"t":"2026-09-25T20:09:34.094939+02:00","seq":2,"kind":"inject","source":".keel/store/steering/conventions.md","tokens":177,"bytes":705}
+{"t":"2026-09-25T20:09:34.094970+02:00","seq":3,"kind":"inject","source":".keel/store/steering/tech.md","tokens":85,"bytes":338}
+{"t":"2026-09-25T20:09:34.095149+02:00","seq":4,"kind":"inject","source":".keel/store/steering/structure.md","tokens":4230,"bytes":16917}
+{"t":"2026-09-25T20:09:34.095527+02:00","seq":5,"kind":"inject","source":".keel/specs/moor-papercuts/spec.md","tokens":829,"bytes":3316}
+{"t":"2026-09-25T20:09:36.196162+02:00","seq":6,"kind":"command","cmd":"cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/build.txt"}
+{"t":"2026-09-25T20:09:36.326990+02:00","seq":7,"kind":"command","cmd":"cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/test.txt"}
+{"t":"2026-09-25T20:09:37.328739+02:00","seq":8,"kind":"command","cmd":"cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/lint.txt"}
+{"t":"2026-09-25T20:10:05.560021+02:00","seq":9,"kind":"oracle","criterion":"AC-1","oracle":"`cargo test --manifest-path cli/Cargo.toml compose::tests::host_git_identity_is_rendered_as_git_config_env -- --exact 2>&1 | grep -q '1 passed'` exits 0","verdict":"pass","exit_code":0}
+{"t":"2026-09-25T20:10:05.560207+02:00","seq":10,"kind":"oracle","criterion":"AC-2","oracle":"`cargo test --manifest-path cli/Cargo.toml compose::tests::no_host_identity_renders_no_git_config_env -- --exact 2>&1 | grep -q '1 passed'` exits 0","verdict":"pass","exit_code":0}
+{"t":"2026-09-25T20:10:05.560219+02:00","seq":11,"kind":"oracle","criterion":"AC-3","oracle":"`bash tests/e2e.sh` exits 0","verdict":"pass","exit_code":0}
+{"t":"2026-09-25T20:10:05.560223+02:00","seq":12,"kind":"oracle","criterion":"AC-4","oracle":"`grep -Eq '^ARG KEEL_VERSION=[0-9]+\\.[0-9]+\\.[0-9]+$' images/base/Dockerfile && grep -q 'cargo install keel-harness --version \"\\$KEEL_VERSION\" --locked' images/base/Dockerfile` exits 0","verdict":"pass","exit_code":0}
+{"t":"2026-09-25T20:10:05.722961+02:00","seq":13,"kind":"gate","gate":"G2","verdict":"pass","result":"gates/G2.json"}
+{"t":"2026-09-25T20:10:05.752795+02:00","seq":14,"kind":"gate","gate":"G2.5","verdict":"pass","result":"gates/G2.5.json"}
+{"t":"2026-09-25T20:10:05.767725+02:00","seq":15,"kind":"gate","gate":"G3","verdict":"fail","result":"gates/G3.json"}
+{"t":"2026-09-25T20:10:05.767741+02:00","seq":16,"kind":"run_end","verdict":"fail","duration_ms":31699}
+{"t":"2026-09-25T20:11:15.334863+02:00","seq":17,"kind":"human","stage":"merge","decision":"approved","by":"Dane Balia"}
