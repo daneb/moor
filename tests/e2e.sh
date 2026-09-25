@@ -272,7 +272,11 @@ done
 shopt -s nullglob
 BUNDLE_FILES=("$BUNDLE_DIR"/keel-"$PROJECT"-*.tar.gz)
 shopt -u nullglob
-if [ "${#BUNDLE_FILES[@]}" -eq 1 ] && tar -tzf "${BUNDLE_FILES[0]}" | grep -q "chain.jsonl"; then
+# Listed first, then searched: `tar | grep -q` under pipefail fails on GNU
+# tar, which gets SIGPIPE when grep stops reading at an early match.
+BUNDLE_LIST=""
+[ "${#BUNDLE_FILES[@]}" -eq 1 ] && BUNDLE_LIST=$(tar -tzf "${BUNDLE_FILES[0]}")
+if [ "${#BUNDLE_FILES[@]}" -eq 1 ] && grep -q "chain.jsonl" <<<"$BUNDLE_LIST"; then
   pass "the bundle on the host carries chain.jsonl"
 else
   fail "no single bundle with chain.jsonl in $BUNDLE_DIR"

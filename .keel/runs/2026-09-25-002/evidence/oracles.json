@@ -1,0 +1,53 @@
+{
+  "runs": [
+    {
+      "criterion": "AC-1",
+      "kind": "cmd",
+      "oracle": "`cargo test --manifest-path cli/Cargo.toml commands::bundle_cmd::tests::export_runs_in_a_throwaway_container_with_no_network -- --exact 2>&1 | grep -q '1 passed'` exits 0",
+      "outcome": "pass",
+      "exit_code": 0
+    },
+    {
+      "criterion": "AC-2",
+      "kind": "cmd",
+      "oracle": "`cargo test --manifest-path cli/Cargo.toml commands::bundle_cmd::tests::export_hands_keel_the_host_chain -- --exact 2>&1 | grep -q '1 passed'` exits 0",
+      "outcome": "pass",
+      "exit_code": 0
+    },
+    {
+      "criterion": "AC-3",
+      "kind": "cmd",
+      "oracle": "`cargo test --manifest-path cli/Cargo.toml proc::tests::stdout_to_file_keeps_binary_bytes -- --exact 2>&1 | grep -q '1 passed'` exits 0",
+      "outcome": "pass",
+      "exit_code": 0
+    },
+    {
+      "criterion": "AC-4",
+      "kind": "cmd",
+      "oracle": "`cargo test --manifest-path cli/Cargo.toml commands::bundle_cmd::tests::a_failed_export_removes_the_partial_archive -- --exact 2>&1 | grep -q '1 passed'` exits 0",
+      "outcome": "pass",
+      "exit_code": 0
+    },
+    {
+      "criterion": "AC-5",
+      "kind": "cmd",
+      "oracle": "`cargo test --manifest-path cli/Cargo.toml commands::bundle_cmd::tests::verify_runs_in_a_throwaway_container_with_no_network -- --exact 2>&1 | grep -q '1 passed'` exits 0",
+      "outcome": "pass",
+      "exit_code": 0
+    },
+    {
+      "criterion": "AC-6",
+      "kind": "cmd",
+      "oracle": "`bash tests/e2e.sh` exits 0",
+      "outcome": "pass",
+      "exit_code": 0,
+      "output": "…\n' passes\n  [PASS] bundle check 'gate-verdicts' passes\n  [PASS] bundle check 'trajectory' passes\n  [PASS] the bundle on the host carries chain.jsonl\n\n== import: an existing local repo (no bind mount, ever) ==\n         ==> importing /private/var/folders/qd/rd_v3fjs0_s5w8n7vwt35f3w0000gn/T/tmp.Cp0yunOWcf/local-repo as 'e2e-import-69737' (image: moor/node:latest)\n         ==> starting sandbox + egress for 'e2e-import-69737'\n          Network e2e-import-69737-egress-net Creating \n          Network e2e-import-69737-egress-net Created \n          Network e2e-import-69737-internal Creating \n          Network e2e-import-69737-internal Created \n          Volume e2e-import-69737-cache Creating \n          Volume e2e-import-69737-cache Created \n          Volume e2e-import-69737-claude-state Creating \n          Volume e2e-import-69737-claude-state Created \n          Volume e2e-import-69737-workspace Creating \n          Volume e2e-import-69737-workspace Created \n          Container e2e-import-69737-egress Creating \n          Container e2e-import-69737-egress Created \n          Container e2e-import-69737-sandbox Creating \n          Container e2e-import-69737-sandbox Created \n          Container e2e-import-69737-egress Starting \n          Container e2e-import-69737-egress Started \n          Container e2e-import-69737-sandbox Starting \n          Container e2e-import-69737-sandbox Started \n         ==> bundling /private/var/folders/qd/rd_v3fjs0_s5w8n7vwt35f3w0000gn/T/tmp.Cp0yunOWcf/local-repo (all branches and tags)\n         ==> streaming the bundle into the sandbox and cloning it\n         Cloning into '.'...\n         branch 'a-second-branch' set up to track 'origin/a-second-branch'.\n            no remote configured — set one with `moor run e2e-import-69737 -- git remote add origin <url>` when ready\n         ==> checking for existing keel configuration\n            none found — running `keel init` inside the sandbox\n           created .keel/keel.toml\n           created drivers/_common.sh\n           created drivers/claude-code\n           created drivers/codex\n           added   [[driver]] codex to keel.toml\n           created drivers/copilot\n           added   [[driver]] copilot to keel.toml\n           created drivers/kiro\n           added   [[driver]] kiro to keel.toml\n           created drivers/noop\n           added   [[driver]] noop to keel.toml\n           created sast/semgrep\n           created product.md\n           created tech.md\n           created conventions.md\n           updated .gitignore\n         \n           store seeded at .keel/store\n           detected: Node/TypeScript (npm)\n         \n         Building the first map…\n           0 files · 0 symbols · 0 references · 0 import edges  (43 ms)\n           structure.md 13/400 lines · 0 CODEMAPs\n         \n         Rendering projections…\n           claude   CLAUDE.md — 68/180 lines\n           agents   AGENTS.md — 68/180 lines\n           kiro     .kiro/steering/keel.md — 68/200 lines\n           copilot  .github/copilot-instructions.md — 68/120 lines\n         \n         keel is initialised.\n         \n         Next:\n           1. Correct .keel/store/steering/product.md and .keel/store/steering/tech.md — they are seeded, not right.\n           2. `keel hook install` so a drifted projection cannot be committed.\n           3. `keel status` any time you want to know if the picture is current.\n         \n         \n         'e2e-import-69737' is up, imported from /private/var/folders/qd/rd_v3fjs0_s5w8n7vwt35f3w0000gn/T/tmp.Cp0yunOWcf/local-repo. Manifest: /Users/danebalia/.moor/projects/e2e-import-69737/moor.yaml\n         Next: moor shell e2e-import-69737\n  [PASS] moor import exits 0\n  [PASS] auto-detected the node image from package.json\n  [PASS] ran keel init (no prior .keel/ in the source)\n  [PASS] imported commit is present in the sandbox\n  [PASS] the second branch came across too (--all bundle)\n  [PASS] imported project passes selftest too\n\ne2e: all checks passed.\n\n== cleanup =="
+    }
+  ],
+  "criteria": 6,
+  "executed": 6,
+  "passed": 6,
+  "failed": 0,
+  "blocked": 0,
+  "human": 0
+}
