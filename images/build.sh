@@ -8,7 +8,8 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 # own MCP server from the mcp/ crate, so the context has to include it.
 # See images/base/Dockerfile and /.dockerignore.
 echo "==> building moor/base:latest"
-docker build -t moor/base:latest -f base/Dockerfile ..
+# KEEL_VERSION, when set, overrides the Dockerfile's pinned keel.
+docker build -t moor/base:latest ${KEEL_VERSION:+--build-arg KEEL_VERSION="$KEEL_VERSION"} -f base/Dockerfile ..
 
 for lang in node rust python; do
   echo "==> building moor/${lang}:latest"

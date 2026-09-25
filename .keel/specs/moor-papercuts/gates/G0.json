@@ -1,0 +1,90 @@
+{
+  "schema": "keel.gate/1",
+  "gate": "G0",
+  "run": "2026-09-25-003",
+  "spec": "moor-papercuts",
+  "verdict": "pass",
+  "generated_at": "2026-09-25T19:16:17.610069+02:00",
+  "checks": [
+    {
+      "id": "schema",
+      "verdict": "pass",
+      "detail": "SPEC-0007 (keel.spec/1)"
+    },
+    {
+      "id": "criteria-present",
+      "verdict": "pass",
+      "detail": "4 criteria"
+    },
+    {
+      "id": "criterion-ids-unique",
+      "verdict": "pass",
+      "detail": "no duplicate ids"
+    },
+    {
+      "id": "no-placeholders",
+      "verdict": "pass",
+      "detail": "no unfilled scaffold text"
+    },
+    {
+      "id": "ears-conformance",
+      "verdict": "pass",
+      "detail": "4/4 conform (event-driven, ubiquitous, unwanted-behaviour)"
+    },
+    {
+      "id": "oracle-presence",
+      "verdict": "pass",
+      "detail": "4 oracles across 4 criteria"
+    },
+    {
+      "id": "oracle-wellformed",
+      "verdict": "pass",
+      "detail": "all oracles parse"
+    },
+    {
+      "id": "ambiguity",
+      "verdict": "pass",
+      "detail": "no ambiguous phrasing in criteria"
+    },
+    {
+      "id": "criterion-budget",
+      "verdict": "pass",
+      "detail": "4/6 criteria"
+    },
+    {
+      "id": "spec-length",
+      "verdict": "pass",
+      "detail": "83/250 lines"
+    },
+    {
+      "id": "scope-declared",
+      "verdict": "pass",
+      "detail": "7 glob(s): cli/src/compose.rs, cli/templates/project.compose.yml.tmpl, cli/src/commands/mod.rs, images/base/Dockerfile, images/build.sh, tests/e2e.sh, docs/**"
+    },
+    {
+      "id": "change-budget",
+      "verdict": "pass",
+      "detail": "250 lines of diff budgeted"
+    },
+    {
+      "id": "oracle-mix",
+      "verdict": "pass",
+      "detail": "4/4 runnable (4 cmd)"
+    },
+    {
+      "id": "human-cost",
+      "verdict": "pass",
+      "detail": "0 human oracle(s), none load-bearing"
+    },
+    {
+      "id": "store-drift",
+      "verdict": "pass",
+      "detail": "4 projections current"
+    },
+    {
+      "id": "shared-stores",
+      "verdict": "pass",
+      "detail": "none configured"
+    }
+  ]
+}

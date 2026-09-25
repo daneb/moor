@@ -23,7 +23,8 @@ Built in two stages (`images/base/Dockerfile`).
 **Stage 1 — `keel-build`**, on `rust:1-slim-bookworm`, exists only to
 compile two binaries that the runtime stage copies out:
 
-- `keel`, via `cargo install keel-harness --locked` from crates.io.
+- `keel`, via `cargo install keel-harness --version "$KEEL_VERSION" --locked`
+  from crates.io, at the version pinned by `ARG KEEL_VERSION`.
 - `moor-keel-mcp`, via `cargo install --locked --path /build/mcp` from
   **this repository's own `mcp/` crate**. Built from source rather than
   fetched, so the tool surface inside the image can never lag the
@@ -101,8 +102,15 @@ reached upstream end-of-life in April 2026, so it gets no security
 patches at all, ever), the npm major (`npm@11`, not `@latest`, which has
 already moved to requiring Node ≥22.22/24.15 and would break this build
 the next time npm cuts a major), the Rust toolchain channel (`stable`),
-`keel-harness` via `--locked`, and `moor-keel-mcp` via `--locked` against
-`mcp/Cargo.lock`.
+`keel-harness` at an exact version (`ARG KEEL_VERSION` in
+`images/base/Dockerfile`) with `--locked`, and `moor-keel-mcp` via `--locked`
+against `mcp/Cargo.lock`.
+
+**Bumping keel.** Change `ARG KEEL_VERSION`, or run
+`KEEL_VERSION=x.y.z ./images/build.sh` to try a version first. The version
+is part of the `cargo install` layer's cache key, so the rebuild installs the
+new keel. It used to be unpinned, and a cached layer quietly kept the previous
+release twice.
 
 **Not pinned: `@anthropic-ai/claude-code`.** Every image build takes
 whatever `npm install -g` resolves to. That is a real, named gap, not an

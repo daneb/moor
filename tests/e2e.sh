@@ -257,6 +257,19 @@ for step_args in "gate g0 e2e-bundle" "approve e2e-bundle --stage spec" "plan e2
   # shellcheck disable=SC2086 # each entry is a keel argv, split on purpose
   "$CLI" run "$PROJECT" -- keel $step_args >/dev/null 2>&1 || true
 done
+# The approval above was made in a project created by `moor new`, whose
+# workspace was not yet a git repository: the approver must still be the
+# host's identity, reaching keel through GIT_CONFIG_* env, not "unknown".
+HOST_NAME=$(git config --get user.name || true)
+APPROVALS=$("$CLI" run "$PROJECT" -- cat .keel/specs/e2e-bundle/approvals.jsonl 2>&1)
+if [ -z "$HOST_NAME" ]; then
+  pass "approver check skipped: this host has no git user.name to compare"
+elif grep -qF "\"by\":\"$HOST_NAME\"" <<<"$APPROVALS"; then
+  pass "the approval names the host's git identity ($HOST_NAME)"
+else
+  fail "the approval does not name '$HOST_NAME'"
+  indent "$APPROVALS"
+fi
 BUNDLE_DIR="$(mktemp -d)"
 BUNDLE_OUT=$("$CLI" bundle -p "$PROJECT" --out "$BUNDLE_DIR" 2>&1)
 BUNDLE_EXIT=$?

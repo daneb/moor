@@ -8,7 +8,11 @@ FROM rust:1-slim-bookworm AS keel-build
 RUN apt-get update && apt-get install -y --no-install-recommends \
     pkg-config libssl-dev ca-certificates \
     && rm -rf /var/lib/apt/lists/*
-RUN cargo install keel-harness --locked
+# Pinned, so a keel release changes this layer's cache key: an unpinned
+# install was served from cache and kept the previous keel. Bump it here,
+# or pass --build-arg KEEL_VERSION=… (images/build.sh forwards $KEEL_VERSION).
+ARG KEEL_VERSION=0.9.0
+RUN cargo install keel-harness --version "$KEEL_VERSION" --locked
 
 # moor's own MCP server, built from this repo's mcp/ crate — the agent's
 # only route to keel (see docs/decisions/0008-agent-session-protocol.md).
