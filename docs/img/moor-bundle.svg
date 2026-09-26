@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 220" role="img" aria-label="moor bundle: moor passes its host chain to keel in a throwaway container with no network, gets the bundle back, verifies it in a second throwaway container, and exits with keel's verdict">
+  <style>
+    .bg { fill: #ffffff; }
+    .t { font: 600 14px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #1f2328; }
+    .s { font: 12.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #59636e; }
+    .m { font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #1f2328; }
+    .ok { font: 600 14px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #1a7f37; }
+    .box { fill: #f6f8fa; stroke: #d0d7de; stroke-width: 1.5; }
+    .tmp { fill: #ffffff; stroke: #8250df; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .end { fill: #dafbe1; stroke: #1a7f37; stroke-width: 1.5; }
+    .line { stroke: #59636e; stroke-width: 1.8; fill: none; }
+    .head { fill: #59636e; }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #0d1117; }
+      .t, .m { fill: #e6edf3; } .s { fill: #9198a1; } .ok { fill: #3fb950; }
+      .box { fill: #151b23; stroke: #3d444d; } .tmp { fill: #0d1117; stroke: #ab7df8; }
+      .end { fill: #0f2a19; stroke: #3fb950; }
+      .line { stroke: #9198a1; } .head { fill: #9198a1; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" class="head"/>
+    </marker>
+  </defs>
+  <rect class="bg" x="0" y="0" width="960" height="220" rx="14"/>
+
+  <text class="m" x="20" y="34">$ moor bundle -p my-app --out /tmp</text>
+
+  <rect class="box" x="20" y="60" width="180" height="84" rx="10"/>
+  <text class="t" x="110" y="90" text-anchor="middle">moor (host)</text>
+  <text class="s" x="110" y="112" text-anchor="middle">folds keel's records,</text>
+  <text class="s" x="110" y="130" text-anchor="middle">hands over the chain</text>
+
+  <rect class="tmp" x="250" y="60" width="210" height="84" rx="10"/>
+  <text class="t" x="355" y="90" text-anchor="middle">Throwaway container</text>
+  <text class="s" x="355" y="112" text-anchor="middle">keel export --chain</text>
+  <text class="s" x="355" y="130" text-anchor="middle">no network · not the sandbox</text>
+
+  <rect class="tmp" x="510" y="60" width="210" height="84" rx="10"/>
+  <text class="t" x="615" y="90" text-anchor="middle">Throwaway container</text>
+  <text class="s" x="615" y="112" text-anchor="middle">keel bundle verify</text>
+  <text class="s" x="615" y="130" text-anchor="middle">nothing but the bundle</text>
+
+  <rect class="end" x="770" y="60" width="170" height="84" rx="10"/>
+  <text class="ok" x="855" y="94" text-anchor="middle">✓ bundle pass</text>
+  <text class="s" x="855" y="118" text-anchor="middle">keel-my-app-….tar.gz</text>
+
+  <line class="line" x1="200" y1="102" x2="246" y2="102" marker-end="url(#a)"/>
+  <line class="line" x1="460" y1="102" x2="506" y2="102" marker-end="url(#a)"/>
+  <line class="line" x1="720" y1="102" x2="766" y2="102" marker-end="url(#a)"/>
+  <text class="s" x="480" y="186" text-anchor="middle">the agent never touches the chain the bundle carries, and anyone can re-check the bundle offline</text>
+</svg>

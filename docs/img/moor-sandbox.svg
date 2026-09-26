@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" role="img" aria-label="moor on your Mac holds the audit chain; the agent and keel run in a sealed sandbox with no host mounts; the only way out is an egress proxy with an allowlist; moor attests the sandbox and folds keel's records into the chain from outside">
+  <style>
+    .bg { fill: #ffffff; }
+    .t { font: 600 14px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #1f2328; }
+    .s { font: 12.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #59636e; }
+    .k { font: 600 12.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #8250df; }
+    .ok { font: 600 12.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #1a7f37; }
+    .no { font: 600 12.5px -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; fill: #cf222e; }
+    .host { fill: #f6f8fa; stroke: #d0d7de; stroke-width: 1.5; }
+    .box { fill: #ffffff; stroke: #d0d7de; stroke-width: 1.5; }
+    .cage { fill: #fbefff; stroke: #8250df; stroke-width: 2; }
+    .net { fill: #ffffff; stroke: #d0d7de; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .line { stroke: #59636e; stroke-width: 1.8; fill: none; }
+    .head { fill: #59636e; }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #0d1117; }
+      .t { fill: #e6edf3; } .s { fill: #9198a1; } .k { fill: #ab7df8; }
+      .ok { fill: #3fb950; } .no { fill: #f85149; }
+      .host { fill: #151b23; stroke: #3d444d; } .box { fill: #0d1117; stroke: #3d444d; }
+      .cage { fill: #1f1233; stroke: #ab7df8; } .net { fill: #0d1117; stroke: #3d444d; }
+      .line { stroke: #9198a1; } .head { fill: #9198a1; }
+    }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" class="head"/>
+    </marker>
+  </defs>
+  <rect class="bg" x="0" y="0" width="960" height="400" rx="14"/>
+
+  <!-- Mac -->
+  <rect class="host" x="20" y="20" width="720" height="360" rx="12"/>
+  <text class="t" x="40" y="46">Your Mac — moor runs here, the agent never does</text>
+
+  <rect class="box" x="40" y="66" width="190" height="112" rx="8"/>
+  <text class="t" x="135" y="94" text-anchor="middle">Audit chain</text>
+  <text class="s" x="135" y="116" text-anchor="middle">every command, egress,</text>
+  <text class="s" x="135" y="134" text-anchor="middle">push, keel verdict</text>
+  <text class="s" x="135" y="152" text-anchor="middle">host-only · hash-linked</text>
+
+  <rect class="box" x="40" y="206" width="190" height="112" rx="8"/>
+  <text class="t" x="135" y="234" text-anchor="middle">Attest from outside</text>
+  <text class="s" x="135" y="256" text-anchor="middle">docker inspect →</text>
+  <text class="s" x="135" y="274" text-anchor="middle">read-only, non-root,</text>
+  <text class="s" x="135" y="292" text-anchor="middle">no caps, no mounts</text>
+
+  <!-- sandbox -->
+  <rect class="cage" x="360" y="66" width="360" height="218" rx="12"/>
+  <text class="k" x="380" y="92">Sandbox container, one per project</text>
+  <rect class="box" x="380" y="108" width="150" height="62" rx="8"/>
+  <text class="t" x="455" y="134" text-anchor="middle">Agent</text>
+  <text class="s" x="455" y="154" text-anchor="middle">Claude Code</text>
+  <rect class="box" x="550" y="108" width="150" height="62" rx="8"/>
+  <text class="t" x="625" y="134" text-anchor="middle">keel</text>
+  <text class="s" x="625" y="154" text-anchor="middle">gates the work</text>
+  <text class="s" x="380" y="202">workspace: a Docker volume, not your disk</text>
+  <text class="s" x="380" y="224">read-only root · all capabilities dropped</text>
+  <text class="s" x="380" y="246">non-root user · no docker.sock</text>
+  <text class="s" x="380" y="268">no route out except the proxy</text>
+
+  <line class="line" x1="230" y1="262" x2="356" y2="262" marker-end="url(#a)"/>
+  <text class="s" x="293" y="238" text-anchor="middle">attestation</text>
+  <text class="s" x="293" y="254" text-anchor="middle">(read-only)</text>
+  <line class="line" x1="380" y1="140" x2="234" y2="140" marker-end="url(#a)"/>
+  <text class="s" x="300" y="116" text-anchor="middle">keel's records,</text>
+  <text class="s" x="300" y="132" text-anchor="middle">folded in</text>
+
+  <!-- proxy + internet -->
+  <line class="line" x1="540" y1="284" x2="540" y2="306" marker-end="url(#a)"/>
+  <rect class="box" x="400" y="310" width="280" height="52" rx="8"/>
+  <text class="t" x="540" y="332" text-anchor="middle">Egress proxy — its own container</text>
+  <text class="s" x="540" y="352" text-anchor="middle">allowlist · logs every request</text>
+  <line class="line" x1="680" y1="336" x2="776" y2="336" marker-end="url(#a)"/>
+
+  <rect class="net" x="780" y="236" width="160" height="126" rx="10"/>
+  <text class="t" x="860" y="262" text-anchor="middle">Internet</text>
+  <text class="ok" x="860" y="290" text-anchor="middle">✓ github.com</text>
+  <text class="ok" x="860" y="312" text-anchor="middle">✓ registries you allow</text>
+  <text class="no" x="860" y="340" text-anchor="middle">✗ everything else</text>
+</svg>
