@@ -1,5 +1,73 @@
 # moor
 
+**moor runs AI coding agents in a sealed box on your Mac.**
+
+Each project gets its own Docker sandbox. The agent (Claude Code) and
+[keel](https://github.com/daneb/keel) work inside it, with no access to your
+disk and no way onto the internet except through an allowlist. moor watches
+from outside and keeps a tamper-evident record of what happened.
+
+<p align="center"><img src="docs/img/moor-sandbox.svg" alt="moor on your Mac holds the audit chain; the agent and keel run in a sealed sandbox with no host mounts; the only way out is an egress proxy with an allowlist; moor attests the sandbox and folds keel's records in from outside." width="900"></p>
+
+## What you can do with it
+
+**Let an agent loose without risking your machine.** A misbehaving agent, or a
+malicious repo it clones, can wreck at most one throwaway container, never your
+Mac or its other projects.
+
+```bash
+moor new my-app --image moor/node:latest
+moor shell my-app                 # or: moor ask my-app "add rate limiting"
+```
+
+**Stop code or secrets leaking out.** Everything leaving the sandbox goes
+through a proxy with an allowlist (GitHub, the registries you name). Every
+request is logged, including the blocked ones.
+
+**See exactly what the agent did.** Every command, every connection, every push
+(with the commit it pushed), and every keel verdict lands in one hash-linked
+record on your Mac, where the sandbox can't touch it.
+
+```bash
+moor audit my-app                 # the trail
+moor audit my-app --verify        # has anyone edited it?
+```
+
+**Hand over proof, not a story.** `moor bundle` packs a keel run and moor's
+record into one file, and checks it with keel's verifier before you send it.
+
+```bash
+moor bundle -p my-app --out /tmp  # ✓ bundle pass → keel-my-app-….tar.gz
+```
+
+<p align="center"><img src="docs/img/moor-bundle.svg" alt="moor bundle: the host chain goes to keel export in a throwaway container with no network; the bundle is verified in a second throwaway container; moor exits with keel's verdict." width="900"></p>
+
+**Drive a whole feature from one description.** `moor recipe` takes a loose
+description, and runs keel's spec → plan → build pipeline inside the sandbox.
+It stops for your approval at every checkpoint keel defines.
+
+## What's new
+
+| | What you get |
+| --- | --- |
+| **One record, keel's format** | moor writes its audit trail in keel's `keel.chain/1`, so keel's own verifier checks it. Old trails are sealed, not rewritten. |
+| **Sandbox attestation** | On `moor up`, moor inspects the running container and writes keel a checked list: read-only, non-root, no capabilities, no mounts. keel can refuse to run an agent without it. |
+| **keel's verdicts in the record** | keel inside the sandbox never writes the record itself; moor collects keel's entries and appends them from outside. |
+| **Pushes you can trace** | `git push` via `moor run` records the branch and the exact commit. |
+| **`moor bundle`** | A verified keel bundle carrying moor's record, built outside the sandbox. |
+| **Real names on approvals** | Approvals made inside the sandbox record your git identity, not "unknown". |
+| **keel pinned in the image** | Rebuilding images installs exactly the keel version you pin. |
+
+## moor and keel, in one line each
+
+- **moor** decides *where* the agent runs: a sealed sandbox, with the record
+  kept outside it.
+- **keel** decides what's allowed, checks the work, and keeps the record honest.
+
+---
+
+## In depth
+
 Containerized, [keel](https://github.com/daneb/keel)-driven sandboxes for
 AI coding agents. Every project gets its own Docker sandbox with no host
 bind mount, no `docker.sock`, and a default-deny egress proxy — the agent
@@ -379,7 +447,7 @@ not separate from it:
 
 ## Testing
 
-- `cd cli && cargo test` — 122 unit tests: selftest's hardening evaluator
+- `cd cli && cargo test` — 129 unit tests: selftest's hardening evaluator
   (fed synthetic `docker inspect` JSON, including fail-safe-on-missing-data
   cases), manifest validation and round-tripping, compose template
   rendering, the tinyproxy access-log parser, the audit hash chain
