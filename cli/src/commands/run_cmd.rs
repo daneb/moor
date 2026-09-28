@@ -191,7 +191,10 @@ mod tests {
 
         let logged = std::fs::read_to_string(&chain_path).unwrap();
         assert!(logged.contains("\"kind\":\"decision\""), "{logged}");
-        assert!(logged.contains("\"rule_id\":\"credential_access\""), "{logged}");
+        assert!(
+            logged.contains("\"rule_id\":\"credential_access\""),
+            "{logged}"
+        );
         std::fs::remove_file(&chain_path).ok();
     }
 

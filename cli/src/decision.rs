@@ -7,7 +7,10 @@
 #[derive(Debug)]
 pub enum Verdict {
     Allow,
-    Deny { rule_id: &'static str, reason: String },
+    Deny {
+        rule_id: &'static str,
+        reason: String,
+    },
 }
 
 const CREDENTIAL_MARKERS: &[&str] = &[".ssh", ".aws", ".netrc", "id_rsa", ".pem"];
@@ -124,7 +127,12 @@ mod tests {
 
     #[test]
     fn denies_recursive_wipe_of_workspace_or_home() {
-        for cmd in ["rm -rf /workspace", "rm -fr ~", "rm -rf /", "rm --recursive --force /"] {
+        for cmd in [
+            "rm -rf /workspace",
+            "rm -fr ~",
+            "rm -rf /",
+            "rm --recursive --force /",
+        ] {
             match evaluate(&argv(cmd)) {
                 Verdict::Deny { rule_id, .. } => assert_eq!(rule_id, "destructive"),
                 Verdict::Allow => panic!("expected deny for `{cmd}`"),
