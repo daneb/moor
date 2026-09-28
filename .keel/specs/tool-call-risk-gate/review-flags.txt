@@ -1,0 +1,1 @@
+test-movement: no test changed with cli/src/audit.rs, cli/src/commands/run_cmd.rs, cli/src/decision.rs, cli/src/main.rs, docs/adr/0001-tool-call-risk-gating.md

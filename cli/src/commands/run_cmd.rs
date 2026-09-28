@@ -1,5 +1,6 @@
-use crate::{audit, manifest::Manifest, paths, proc};
+use crate::{audit, decision, manifest::Manifest, paths, proc};
 use anyhow::Result;
+use std::path::Path;
 
 /// True if the invoked command looks like a `git push` — the one channel
 /// through which code actually leaves the sandbox for real (as opposed
@@ -14,6 +15,20 @@ fn looks_like_git_push(cmd: &[String]) -> bool {
     cmd.first().map(|s| s == "git").unwrap_or(false) && cmd.iter().any(|a| a == "push")
 }
 
+/// The host-side enforcement point for `decision::evaluate` — see
+/// docs/adr/0001-tool-call-risk-gating.md. A `Deny` verdict is logged and
+/// returned as the error `run` propagates *before* it builds any `docker
+/// exec` argv, so a denied command never reaches Docker. Takes the chain
+/// path explicitly, like `audit::log_decision` does, so it needs no
+/// `$HOME` or running container to test.
+fn gate(chain_path: &Path, name: &str, secrets: &[String], cmd: &[String]) -> Result<()> {
+    if let decision::Verdict::Deny { rule_id, reason } = decision::evaluate(cmd) {
+        audit::log_decision(chain_path, name, cmd, secrets, rule_id)?;
+        anyhow::bail!("moor run: blocked by rule `{rule_id}`: {reason}");
+    }
+    Ok(())
+}
+
 pub fn run(name: &str, cmd: &[String]) -> Result<()> {
     if cmd.is_empty() {
         anyhow::bail!("usage: moor run <project> -- <command...>");
@@ -22,6 +37,7 @@ pub fn run(name: &str, cmd: &[String]) -> Result<()> {
     // So audit::redact below can scrub a secret's value even when it was
     // only ever set via Keychain, never exported into this shell.
     crate::secrets::resolve_into_env(name, &m.secrets);
+    gate(&paths::chain_log_path(name)?, name, &m.secrets, cmd)?;
     let container = m.sandbox_container();
 
     // What a push sends is resolved before it runs: afterwards the ref may
@@ -147,6 +163,45 @@ mod tests {
 
     fn argv(s: &str) -> Vec<String> {
         s.split_whitespace().map(String::from).collect()
+    }
+
+    /// A fresh, never-before-used chain path under the OS temp dir —
+    /// independent of `$HOME`, so this stays a real unit test.
+    fn temp_chain_path(label: &str) -> std::path::PathBuf {
+        std::env::temp_dir().join(format!(
+            "moor-run-cmd-test-{label}-{}-{}.jsonl",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ))
+    }
+
+    #[test]
+    fn deny_verdict_blocks_docker_exec() {
+        let chain_path = temp_chain_path("deny");
+        let cmd = argv("cat /home/agent/.ssh/id_rsa");
+
+        let result = gate(&chain_path, "test-project", &[], &cmd);
+
+        assert!(result.is_err());
+        let msg = result.unwrap_err().to_string();
+        assert!(msg.contains("credential_access"), "{msg}");
+
+        let logged = std::fs::read_to_string(&chain_path).unwrap();
+        assert!(logged.contains("\"kind\":\"decision\""), "{logged}");
+        assert!(logged.contains("\"rule_id\":\"credential_access\""), "{logged}");
+        std::fs::remove_file(&chain_path).ok();
+    }
+
+    #[test]
+    fn allow_verdict_is_a_no_op() {
+        let chain_path = temp_chain_path("allow");
+        let cmd = argv("git status");
+
+        assert!(gate(&chain_path, "test-project", &[], &cmd).is_ok());
+        assert!(!chain_path.exists());
     }
 
     #[test]
