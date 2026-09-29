@@ -55,6 +55,14 @@ Written to `~/.moor/sessions/<session_id>/context.json` at session start.
 
 Option keeps existing callers backward-compatible (pass None).
 
+### Loading the context in `moor run`
+
+`moor run` looks up the project's current `moor ask` session id (`~/.moor/projects/<name>/session`) and loads `~/.moor/sessions/<session_id>/context.json`. Both paths are host-side, so the agent cannot choose or widen its own scope.
+
+- No session id, or no context file for it: `ctx` is `None`, and only the context-free rules apply.
+- A context file that is unreadable, malformed, or stamped with a different `session_id`: `moor run` fails before `docker exec`. Treating it as absent would silently switch off `out_of_scope` and `path_escape`.
+- An `out_of_scope` or `path_escape` match goes through the same Ask resolution as any other rule (ADR-0002).
+
 ## Consequences
 
 - out_of_scope and path_escape are now implementable as deterministic rules
@@ -67,7 +75,7 @@ Option keeps existing callers backward-compatible (pass None).
 1. TaskContext struct + serde ✓
 2. evaluate signature update ✓
 3. out_of_scope + path_escape rules ✓
-4. run_cmd::gate loads context file from disk
+4. run_cmd::gate loads context file from disk ✓
 5. moor keel stamp sub-command
 6. blast_radius logging (strict gate)
 7. (Later) Jev model training data

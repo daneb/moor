@@ -4,7 +4,9 @@
 //! rules run first and settle what they can, a model would only ever see
 //! what these rules don't.
 
+use anyhow::{Context, Result};
 use serde::Deserialize;
+use std::path::Path;
 
 #[derive(Debug)]
 pub enum Verdict {
@@ -29,8 +31,8 @@ pub enum GateLevel {
 
 /// What the agent was approved to do this session, stamped at session
 /// start to `~/.moor/sessions/<session_id>/context.json`.
-// `load` and the audit-only fields go unread until `run_cmd::gate` loads
-// the context from disk (ADR-0003, implementation step 4).
+// `spec_title` and `started_at` go unread until the audit chain records
+// them (ADR-0003, Consequences).
 #[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 pub struct TaskContext {
@@ -50,14 +52,27 @@ fn default_workspace() -> Vec<String> {
 }
 
 impl TaskContext {
-    #[allow(dead_code)]
-    pub fn load(session_id: &str) -> Option<Self> {
-        let path = crate::paths::moor_home()
-            .ok()?
-            .join("sessions")
-            .join(session_id)
-            .join("context.json");
-        serde_json::from_str(&std::fs::read_to_string(path).ok()?).ok()
+    /// No file means no session was stamped, so there is nothing to
+    /// enforce beyond the context-free rules. A file that is there but
+    /// unreadable, malformed, or stamped for another session is an error
+    /// instead: treating it as absent would silently switch off
+    /// `out_of_scope` and `path_escape`.
+    pub fn load(path: &Path, session_id: &str) -> Result<Option<Self>> {
+        let raw = match std::fs::read_to_string(path) {
+            Ok(raw) => raw,
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(None),
+            Err(e) => return Err(e).with_context(|| format!("reading {}", path.display())),
+        };
+        let ctx: TaskContext = serde_json::from_str(&raw)
+            .with_context(|| format!("parsing task context {}", path.display()))?;
+        if ctx.session_id != session_id {
+            anyhow::bail!(
+                "task context {} is stamped for session `{}`, not `{session_id}`",
+                path.display(),
+                ctx.session_id
+            );
+        }
+        Ok(Some(ctx))
     }
 }
 
@@ -257,6 +272,70 @@ mod tests {
             forbidden_paths: vec![],
             started_at: "2026-09-29T10:00:00Z".to_string(),
         }
+    }
+
+    const SESSION: &str = "11111111-2222-3333-4444-555555555555";
+
+    /// A fresh path under the OS temp dir, independent of `$HOME`.
+    fn temp_context_path(label: &str) -> std::path::PathBuf {
+        std::env::temp_dir().join(format!(
+            "moor-decision-test-{label}-{}-{}.json",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ))
+    }
+
+    fn load_str(label: &str, contents: &str) -> Result<Option<TaskContext>> {
+        let path = temp_context_path(label);
+        std::fs::write(&path, contents).unwrap();
+        let loaded = TaskContext::load(&path, SESSION);
+        std::fs::remove_file(&path).ok();
+        loaded
+    }
+
+    #[test]
+    fn missing_context_is_no_context() {
+        let loaded = TaskContext::load(&temp_context_path("missing"), SESSION).unwrap();
+        assert!(loaded.is_none());
+    }
+
+    #[test]
+    fn loads_context_with_defaults() {
+        let ctx = load_str(
+            "valid",
+            &format!(
+                r#"{{"session_id":"{SESSION}","spec_title":"t","gate":"strict",
+                    "expected_verbs":["cargo_test"],"started_at":"2026-09-29T10:00:00Z"}}"#
+            ),
+        )
+        .unwrap()
+        .expect("context should load");
+        assert_eq!(ctx.gate, GateLevel::Strict);
+        assert_eq!(ctx.allowed_paths, vec!["/workspace".to_string()]);
+        assert!(ctx.forbidden_paths.is_empty());
+    }
+
+    #[test]
+    fn malformed_context_is_an_error_not_absent() {
+        assert!(load_str("malformed", "{not json").is_err());
+        assert!(load_str(
+            "bad-gate",
+            &format!(
+                r#"{{"session_id":"{SESSION}","spec_title":"t","gate":"lenient",
+                "expected_verbs":[],"started_at":"2026-09-29T10:00:00Z"}}"#
+            )
+        )
+        .is_err());
+    }
+
+    #[test]
+    fn context_stamped_for_another_session_is_rejected() {
+        let other = r#"{"session_id":"99999999-2222-3333-4444-555555555555","spec_title":"t",
+            "gate":"standard","expected_verbs":[],"started_at":"2026-09-29T10:00:00Z"}"#;
+        assert!(load_str("mismatch", other).is_err());
     }
 
     #[test]

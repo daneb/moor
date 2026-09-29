@@ -1,4 +1,4 @@
-use crate::{audit, decision, manifest::Manifest, paths, proc};
+use crate::{audit, decision, manifest::Manifest, paths, proc, session};
 use anyhow::Result;
 use std::io::{BufRead, IsTerminal, Write};
 use std::path::Path;
@@ -62,20 +62,22 @@ fn operator_identity() -> String {
 /// prompting `reader`/`writer` when `interactive`, else denied without
 /// reading them at all; either way the resolution is logged before `run`
 /// propagates an error, so a denied command never reaches `docker exec`.
-/// IO and identity are parameters, not read directly, so this is testable
-/// without a real terminal, `$HOME`, or a running container.
+/// IO, identity and task context are parameters, not read directly, so
+/// this is testable without a real terminal, `$HOME`, or a running
+/// container.
 #[allow(clippy::too_many_arguments)]
 fn gate(
     chain_path: &Path,
     name: &str,
     secrets: &[String],
     cmd: &[String],
+    ctx: Option<&decision::TaskContext>,
     interactive: bool,
     reader: &mut impl BufRead,
     writer: &mut impl Write,
     operator: &str,
 ) -> Result<()> {
-    let decision::Verdict::Deny { rule_id, reason } = decision::evaluate(cmd, None) else {
+    let decision::Verdict::Deny { rule_id, reason } = decision::evaluate(cmd, ctx) else {
         return Ok(());
     };
     let allowed = interactive && confirm(reader, writer, rule_id, &reason);
@@ -86,6 +88,17 @@ fn gate(
     anyhow::bail!("moor run: blocked by rule `{rule_id}`: {reason}");
 }
 
+/// The task context stamped for the project's current `moor ask`
+/// session, if there is one. No session, or no context stamped for it,
+/// leaves only the context-free rules in force; a context that exists but
+/// can't be trusted is an error, not a silent downgrade.
+fn task_context(name: &str) -> Result<Option<decision::TaskContext>> {
+    let Some(session_id) = session::read_session_id(&paths::session_path(name)?) else {
+        return Ok(None);
+    };
+    decision::TaskContext::load(&paths::task_context_path(&session_id)?, &session_id)
+}
+
 pub fn run(name: &str, cmd: &[String]) -> Result<()> {
     if cmd.is_empty() {
         anyhow::bail!("usage: moor run <project> -- <command...>");
@@ -94,11 +107,13 @@ pub fn run(name: &str, cmd: &[String]) -> Result<()> {
     // So audit::redact below can scrub a secret's value even when it was
     // only ever set via Keychain, never exported into this shell.
     crate::secrets::resolve_into_env(name, &m.secrets);
+    let ctx = task_context(name)?;
     gate(
         &paths::chain_log_path(name)?,
         name,
         &m.secrets,
         cmd,
+        ctx.as_ref(),
         stdin_is_tty(),
         &mut std::io::stdin().lock(),
         &mut std::io::stderr(),
@@ -247,6 +262,15 @@ mod tests {
     /// Runs `gate` against a throwaway chain path with the given stdin
     /// content and interactivity, and returns (result, chain contents).
     fn run_gate(interactive: bool, stdin: &str, cmd: &[String]) -> (Result<()>, String) {
+        run_gate_with(None, interactive, stdin, cmd)
+    }
+
+    fn run_gate_with(
+        ctx: Option<&decision::TaskContext>,
+        interactive: bool,
+        stdin: &str,
+        cmd: &[String],
+    ) -> (Result<()>, String) {
         let chain_path = temp_chain_path("gate");
         let mut reader = std::io::Cursor::new(stdin.as_bytes());
         let mut writer = Vec::new();
@@ -255,6 +279,7 @@ mod tests {
             "test-project",
             &[],
             cmd,
+            ctx,
             interactive,
             &mut reader,
             &mut writer,
@@ -290,6 +315,7 @@ mod tests {
             "test-project",
             &[],
             &argv("git status"),
+            None,
             true,
             &mut reader,
             &mut writer,
@@ -337,6 +363,30 @@ mod tests {
         );
         assert!(logged.contains("\"resolution\":\"allow\""), "{logged}");
         assert!(logged.contains("\"by\":\"test-operator\""), "{logged}");
+    }
+
+    fn standard_ctx(expected_verbs: &[&str]) -> decision::TaskContext {
+        decision::TaskContext {
+            session_id: "11111111-2222-3333-4444-555555555555".to_string(),
+            spec_title: "test spec".to_string(),
+            gate: decision::GateLevel::Standard,
+            expected_verbs: expected_verbs.iter().map(|v| v.to_string()).collect(),
+            allowed_paths: vec!["/workspace".to_string()],
+            forbidden_paths: vec![],
+            started_at: "2026-09-29T10:00:00Z".to_string(),
+        }
+    }
+
+    #[test]
+    fn task_context_reaches_the_rules() {
+        let ctx = standard_ctx(&["cargo_test"]);
+
+        let (result, logged) = run_gate_with(Some(&ctx), false, "", &argv("git status"));
+        assert!(result.is_err());
+        assert!(logged.contains("\"rule_id\":\"out_of_scope\""), "{logged}");
+
+        let (result, _) = run_gate_with(Some(&ctx), false, "", &argv("cargo test"));
+        assert!(result.is_ok(), "an expected verb must still run");
     }
 
     #[test]

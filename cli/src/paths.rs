@@ -54,6 +54,16 @@ pub fn session_path(name: &str) -> Result<PathBuf> {
     Ok(project_dir(name)?.join("session"))
 }
 
+/// What that session was approved to do — see
+/// docs/adr/ADR-0003-task-context-wire-format.md. Host-side, like
+/// `session_path`, so the agent cannot widen its own scope.
+pub fn task_context_path(session_id: &str) -> Result<PathBuf> {
+    Ok(moor_home()?
+        .join("sessions")
+        .join(session_id)
+        .join("context.json"))
+}
+
 /// The full, redacted text of every `moor ask` turn. Separate from
 /// chain.jsonl on purpose: the chain carries hashes and is exported by
 /// `moor audit --export`, this carries conversation.

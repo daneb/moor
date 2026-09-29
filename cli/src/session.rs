@@ -190,7 +190,7 @@ fn store_session_id(path: &Path, id: &str) -> Result<()> {
     std::fs::write(path, id).with_context(|| format!("writing {}", path.display()))
 }
 
-fn read_session_id(path: &Path) -> Option<String> {
+pub fn read_session_id(path: &Path) -> Option<String> {
     let raw = std::fs::read_to_string(path).ok()?;
     let id = raw.trim();
     // Re-validated on the way out as well as in: a hand-edited file is
