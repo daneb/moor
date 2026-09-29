@@ -1,5 +1,5 @@
 use crate::{manifest::Manifest, paths, proc};
-use anyhow::Result;
+use anyhow::{Context, Result};
 
 /// The three keel-produced artifacts `moor view` knows how to find,
 /// mapped to their filename under `.keel/specs/<slug>/`.
@@ -8,7 +8,9 @@ fn artifact_filename(artifact: &str) -> Result<&'static str> {
         "spec" => Ok("spec.md"),
         "plan" => Ok("plan.md"),
         "tasks" => Ok("tasks.md"),
-        other => anyhow::bail!("unknown artifact '{other}' — expected spec, plan, or tasks"),
+        other => {
+            anyhow::bail!("unknown artifact '{other}' — expected spec, plan, tasks, or report")
+        }
     }
 }
 
@@ -54,6 +56,11 @@ fn highlight(markdown: &str) -> String {
 }
 
 pub fn run(project: &str, slug: &str, artifact: &str) -> Result<()> {
+    if artifact == "report" {
+        // Built by the pipeline from every run's gate results, not a file.
+        crate::manifest::validate_name(slug).context("spec name")?;
+        return super::keel_cmd::run(project, &["report".to_string(), slug.to_string()]);
+    }
     let filename = artifact_filename(artifact)?;
     let m = Manifest::load(&paths::manifest_path(project)?)?;
     let container = m.sandbox_container();

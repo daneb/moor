@@ -92,6 +92,10 @@ enum Command {
     Go {
         #[arg(short = 'p', long = "project")]
         project: Option<String>,
+        /// Check the build step without the agent: re-check the work already
+        /// in the sandbox, after fixing it by hand or with `moor ask`.
+        #[arg(long)]
+        check: bool,
     },
     /// Approve what the active spec is waiting on (shows it first, then asks).
     Approve {
@@ -115,13 +119,13 @@ enum Command {
         #[arg(long, value_name = "SLUG")]
         spec: Option<String>,
     },
-    /// Print a spec, or its plan or tasks.
+    /// Print a spec, its plan or tasks, or the report of its checks.
     View {
         #[arg(short = 'p', long = "project")]
         project: Option<String>,
         /// The spec's name, e.g. `blast-radius`.
         slug: String,
-        /// spec | plan | tasks
+        /// spec | plan | tasks | report (every check each run passed or failed)
         artifact: String,
     },
     /// Ask the project's agent something, or have it make a change.
@@ -319,7 +323,7 @@ fn main() {
         Command::Next { project, all } => commands::next_cmd::run(project, all),
         Command::Approve { project, yes } => commands::flow_cmd::approve(project, yes),
         Command::Reject { project, why } => commands::flow_cmd::reject(project, &why),
-        Command::Go { project } => commands::flow_cmd::go(project),
+        Command::Go { project, check } => commands::flow_cmd::go(project, check),
         Command::Use { name, spec } => commands::use_cmd::run(&name, spec.as_deref()),
         Command::Status => commands::status::run(),
         Command::Audit {

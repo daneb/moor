@@ -87,15 +87,69 @@ pub fn run(name: &str, image: &str, github: bool) -> Result<()> {
         Err(e) => println!("note: could not set the workspace up automatically: {e}"),
     }
 
-    // The container's git config was still unset when `compose_up`
-    // tried this earlier (no repo existed yet) — the clone/`keel init`
-    // above made one, so it's worth retrying now.
+    // A build is judged by its diff against a commit, so the workspace has
+    // to be a git repository with at least one commit before the first
+    // build. Neither setup step guarantees that: without --github nothing
+    // runs `git init`, and a new GitHub repo clones empty.
+    ensure_repo(name, &m)?;
+    // Identity first, so the first commit is attributed to the operator.
     super::sync_git_identity(&m);
+    ensure_first_commit(name, &m)?;
 
     println!(
         "\n'{name}' is up. Manifest: {}\n\n{}",
         paths::manifest_path(name)?.display(),
         super::next_cmd::next_hint(name)
     );
+    Ok(())
+}
+
+/// Runs `argv` in the sandbox, quietly, logged like any exec.
+fn exec_quiet(name: &str, m: &Manifest, argv: &[&str]) -> Result<bool> {
+    let container = m.sandbox_container();
+    let mut args = vec!["exec", container.as_str()];
+    args.extend_from_slice(argv);
+    let (status, _) = proc::run_capture_combined("docker", &args)?;
+    let logged: Vec<String> = argv.iter().map(|a| a.to_string()).collect();
+    audit::log_exec(name, m, "exec", &logged, status.code())?;
+    Ok(status.success())
+}
+
+fn ensure_repo(name: &str, m: &Manifest) -> Result<()> {
+    if !exec_quiet(name, m, &["git", "rev-parse", "--git-dir"])? {
+        println!("==> making the workspace a git repository");
+        if !exec_quiet(name, m, &["git", "init", "-q", "-b", "main"])? {
+            println!("note: `git init` failed in the workspace — check with `moor shell {name}`");
+        }
+    }
+    Ok(())
+}
+
+fn ensure_first_commit(name: &str, m: &Manifest) -> Result<()> {
+    if exec_quiet(
+        name,
+        m,
+        &["git", "rev-parse", "--verify", "--quiet", "HEAD"],
+    )? {
+        return Ok(());
+    }
+    println!("==> committing the starting point, so the first build has a base");
+    let committed = exec_quiet(name, m, &["git", "add", "-A"])?
+        && exec_quiet(
+            name,
+            m,
+            &[
+                "git",
+                "commit",
+                "-q",
+                "-m",
+                "Set up the workspace for specs",
+            ],
+        )?;
+    if !committed {
+        println!(
+            "note: could not make the first commit (is `git config user.name`/`user.email` set on this Mac?) — builds need one; make it with `moor shell {name}`"
+        );
+    }
     Ok(())
 }

@@ -163,6 +163,7 @@ moor use my-app --spec greet-name  # pin which spec `moor next` follows
 
 # the commands it points you at, which always act on that spec
 moor go                            # take the next steps until one needs you
+moor go --check                    # re-check a build you fixed, without the agent
 moor approve                       # shows the spec/plan/run first, then asks
 moor reject "needs a rollback plan"
 
