@@ -115,27 +115,17 @@ pub fn run(name: &str, from: &Path, image: Option<String>, github: bool) -> Resu
         ],
     )?;
     if status.success() {
-        println!("   already set up — leaving it as-is");
-        let status = proc::run_inherit(
-            "docker",
-            &["exec", &m.sandbox_container(), "keel", "status"],
-        );
-        if let Ok(s) = status {
-            audit::log_exec(
-                name,
-                &m,
-                "exec",
-                &["keel".into(), "status".into()],
-                s.code(),
-            )?;
-        }
+        println!("   already set up — leaving it as-is (`moor next` shows where its specs stand)");
     } else {
         println!("   not yet — setting it up inside the sandbox");
-        let status = proc::run_inherit("docker", &["exec", &m.sandbox_container(), "keel", "init"]);
+        // Captured for the same reason as in `moor new`: shown only on failure.
+        let status =
+            proc::run_capture_combined("docker", &["exec", &m.sandbox_container(), "keel", "init"]);
         match status {
-            Ok(s) => {
+            Ok((s, out)) => {
                 audit::log_exec(name, &m, "exec", &["keel".into(), "init".into()], s.code())?;
                 if !s.success() {
+                    println!("{out}");
                     println!("   note: workspace setup did not exit cleanly — check with `moor shell {name}`");
                 }
             }

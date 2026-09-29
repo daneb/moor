@@ -13,10 +13,12 @@ watches from outside and keeps a tamper-evident record of what happened.
 
 **Always know the next step.** A feature moves through seven steps: write
 the spec, check it, approve it, plan it, check the plan, approve it, build
-it. `moor next` tells you where you are and the one command that moves you
-on, and those commands never need a spec name.
+it. You write the spec on your Mac, with whatever help you like; after that,
+`moor next` tells you where you are and the one command that moves you on,
+and those commands never need a spec name.
 
 ```bash
+moor spec new login && moor spec push login.spec.md
 moor next      # my-app · login · step 5 of 7: approve the plan
 moor approve   # shows the plan, then asks y/N
 moor go        # runs the next steps until one needs you
@@ -149,6 +151,10 @@ moor import my-service --from ~/Repos/my-service
 
 # make it the default, so later commands don't need its name
 moor use my-app
+
+# write a spec on this Mac (by hand or with your AI assistant), then send it in
+moor spec new greet-name           # writes ./greet-name.spec.md, rules at the top
+moor spec push greet-name.spec.md  # sends it in, checks it, makes it the active spec
 
 # where does the active spec stand, and what's the one command for it?
 moor next
