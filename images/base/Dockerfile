@@ -5,11 +5,8 @@
 
 # --- stage 1: build keel from crates.io -------------------------------
 FROM rust:1-slim-bookworm AS keel-build
-# Same reason as the runtime stage below: a failed download in a pipe must
-# fail the build, not produce an image without the tool.
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    pkg-config libssl-dev ca-certificates curl \
+    pkg-config libssl-dev ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 # Pinned, so a keel release changes this layer's cache key: an unpinned
 # install was served from cache and kept the previous keel. Bump it here,
@@ -24,24 +21,6 @@ RUN cargo install keel-harness --version "$KEEL_VERSION" --locked
 ARG CARGO_AUDIT_VERSION=0.22.2
 RUN cargo install cargo-audit --version "$CARGO_AUDIT_VERSION" --locked
 
-# gitleaks is a Go binary: fetched from its release, verified against the
-# release's own checksum file before it is installed.
-ARG GITLEAKS_VERSION=8.30.1
-ARG TARGETARCH
-WORKDIR /tmp/gitleaks
-RUN case "$TARGETARCH" in \
-        arm64) arch=arm64 ;; \
-        amd64) arch=x64 ;; \
-        *) echo "no gitleaks build for $TARGETARCH" >&2; exit 1 ;; \
-    esac \
-    && url="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}" \
-    && tarball="gitleaks_${GITLEAKS_VERSION}_linux_${arch}.tar.gz" \
-    && curl -fsSLO "$url/$tarball" \
-    && curl -fsSLO "$url/gitleaks_${GITLEAKS_VERSION}_checksums.txt" \
-    && grep " ${tarball}\$" "gitleaks_${GITLEAKS_VERSION}_checksums.txt" | sha256sum -c - \
-    && tar -xzf "$tarball" gitleaks \
-    && install -m 0755 gitleaks /usr/local/bin/gitleaks
-WORKDIR /
 
 # moor's own MCP server, built from this repo's mcp/ crate — the agent's
 # only route to keel (see docs/decisions/0008-agent-session-protocol.md).
@@ -51,6 +30,27 @@ WORKDIR /
 # root — see images/build.sh.
 COPY mcp /build/mcp
 RUN cargo install --locked --path /build/mcp --root /usr/local
+
+# --- stage 1b: build gitleaks from source ----------------------------------
+# Built rather than downloaded: the release binary is compiled with an older
+# Go and older golang.org/x/crypto and x/text, and the image scan in CI
+# fails on their fixed HIGH/CRITICAL CVEs. Same source (the tag, checked
+# against its commit), a current toolchain, and those two modules raised
+# to fixed versions. Bump the pins here when the scan asks for it.
+FROM golang:1.27-bookworm AS gitleaks-build
+ARG GITLEAKS_VERSION=8.30.1
+ARG GITLEAKS_COMMIT=83d9cd684c87d95d656c1458ef04895a7f1cbd8e
+ARG X_CRYPTO_VERSION=v0.57.0
+ARG X_TEXT_VERSION=v0.42.0
+WORKDIR /src
+RUN git clone --quiet --depth 1 --branch "v${GITLEAKS_VERSION}" \
+        https://github.com/gitleaks/gitleaks.git . \
+    && test "$(git rev-parse HEAD)" = "$GITLEAKS_COMMIT" \
+    && go get "golang.org/x/crypto@${X_CRYPTO_VERSION}" "golang.org/x/text@${X_TEXT_VERSION}" \
+    && go mod tidy \
+    && CGO_ENABLED=0 go build -trimpath \
+        -ldflags "-s -w -X=github.com/zricethezav/gitleaks/v8/version.Version=v${GITLEAKS_VERSION}" \
+        -o /usr/local/bin/gitleaks .
 
 # --- stage 2: runtime image ---------------------------------------------
 FROM debian:bookworm-slim AS runtime
@@ -95,7 +95,7 @@ RUN npm install -g @anthropic-ai/claude-code && npm cache clean --force
 COPY --from=keel-build /usr/local/cargo/bin/keel /usr/local/bin/keel
 COPY --from=keel-build /usr/local/bin/moor-keel-mcp /usr/local/bin/moor-keel-mcp
 COPY --from=keel-build /usr/local/cargo/bin/cargo-audit /usr/local/bin/cargo-audit
-COPY --from=keel-build /usr/local/bin/gitleaks /usr/local/bin/gitleaks
+COPY --from=gitleaks-build /usr/local/bin/gitleaks /usr/local/bin/gitleaks
 
 # How `claude` finds that server. Read-only, root-owned, outside any
 # volume and outside /workspace: the agent can read this file but has no
