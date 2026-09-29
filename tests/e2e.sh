@@ -306,7 +306,13 @@ IMPORT_EXIT=$?
 indent "$IMPORT_OUT"
 if [ "$IMPORT_EXIT" -eq 0 ]; then pass "moor import exits 0"; else fail "moor import exits 0"; fi
 assert_contains "auto-detected the node image from package.json" "$IMPORT_OUT" "moor/node:latest"
-assert_contains "ran keel init (no prior .keel/ in the source)" "$IMPORT_OUT" "keel is initialised"
+assert_contains "set the workspace up (no prior .keel/ in the source)" "$IMPORT_OUT" "setting it up inside the sandbox"
+# The effect, not the wording: moor hides the pipeline's own setup output.
+if "$CLI" run "$IMPORT_PROJECT" -- test -f .keel/keel.toml >/dev/null 2>&1; then
+  pass "the imported workspace really is set up (.keel/keel.toml exists)"
+else
+  fail "the imported workspace really is set up (.keel/keel.toml exists)"
+fi
 
 IMPORT_LOG=$("$CLI" run "$IMPORT_PROJECT" -- git log --oneline 2>&1)
 assert_contains "imported commit is present in the sandbox" "$IMPORT_LOG" "init"
