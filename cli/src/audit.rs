@@ -302,6 +302,29 @@ fn redact_argv(argv: &[String], secret_names: &[String]) -> Vec<String> {
     argv.iter().map(|a| redact(a, secret_names)).collect()
 }
 
+/// Log a `Deny` verdict from `decision::evaluate` for a command that never
+/// ran — see docs/adr/0001-tool-call-risk-gating.md. Takes the chain path
+/// directly, like `append_chained`/`verify_chain` do, rather than a
+/// project name: a command that was blocked before `docker exec` has no
+/// keel sink to fold and no project directory to lazily create, so this
+/// has no reason to depend on `paths::*` at all.
+pub fn log_decision(
+    path: &Path,
+    project: &str,
+    cmd: &[String],
+    secret_names: &[String],
+    rule_id: &str,
+) -> Result<()> {
+    let data = json!({
+        "project": project,
+        "argv": redact_argv(cmd, secret_names),
+        "verdict": "deny",
+        "rule_id": rule_id,
+    });
+    append_chained(path, "decision", data)?;
+    Ok(())
+}
+
 /// Log one `moor run`/`shell`/`new`-driven command. `kind` lets
 /// callers flag a command as something more specific than a routine
 /// exec — e.g. `run_cmd` tags anything that looks like `git push` as

@@ -2,6 +2,7 @@ mod audit;
 mod canary;
 mod commands;
 mod compose;
+mod decision;
 mod egress_log;
 mod manifest;
 mod paths;

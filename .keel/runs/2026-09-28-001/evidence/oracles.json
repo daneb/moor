@@ -1,0 +1,53 @@
+{
+  "runs": [
+    {
+      "criterion": "AC-1",
+      "kind": "cmd",
+      "oracle": "`test -f docs/adr/0001-tool-call-risk-gating.md && grep -q 'docker exec' docs/adr/0001-tool-call-risk-gating.md && grep -qi 'in-sandbox' docs/adr/0001-tool-call-risk-gating.md` exits 0",
+      "outcome": "pass",
+      "exit_code": 0
+    },
+    {
+      "criterion": "AC-2",
+      "kind": "cmd",
+      "oracle": "`cargo test --manifest-path cli/Cargo.toml decision::tests::denies_known_credential_paths -- --exact 2>&1 | grep -q '1 passed'` exits 0",
+      "outcome": "pass",
+      "exit_code": 0
+    },
+    {
+      "criterion": "AC-3",
+      "kind": "cmd",
+      "oracle": "`cargo test --manifest-path cli/Cargo.toml decision::tests::denies_docker_socket_and_sudo -- --exact 2>&1 | grep -q '1 passed'` exits 0",
+      "outcome": "pass",
+      "exit_code": 0
+    },
+    {
+      "criterion": "AC-4",
+      "kind": "cmd",
+      "oracle": "`cargo test --manifest-path cli/Cargo.toml decision::tests::denies_recursive_wipe_of_workspace_or_home -- --exact 2>&1 | grep -q '1 passed'` exits 0",
+      "outcome": "pass",
+      "exit_code": 0
+    },
+    {
+      "criterion": "AC-5",
+      "kind": "cmd",
+      "oracle": "`cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::deny_verdict_blocks_docker_exec -- --exact 2>&1 | grep -q '1 passed'` exits 0",
+      "outcome": "pass",
+      "exit_code": 0
+    },
+    {
+      "criterion": "AC-6",
+      "kind": "cmd",
+      "oracle": "`cargo test --manifest-path cli/Cargo.toml --quiet` exits 0",
+      "outcome": "pass",
+      "exit_code": 0,
+      "output": "\nrunning 135 tests\n....................................................................................... 87/135\n................................................\ntest result: ok. 135 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s"
+    }
+  ],
+  "criteria": 6,
+  "executed": 6,
+  "passed": 6,
+  "failed": 0,
+  "blocked": 0,
+  "human": 0
+}

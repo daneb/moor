@@ -1,0 +1,19 @@
+{"t":"2026-09-27T18:04:15.034951+02:00","seq":1,"kind":"run_start","spec":"tool-call-risk-gate","keel_version":"0.10.0","store_hash":"4e07f093d6afa16aeb50b4bab14c069797586ba01befb262b14b96bbd0213f0e"}
+{"t":"2026-09-27T18:04:15.035539+02:00","seq":2,"kind":"inject","source":".keel/store/steering/conventions.md","tokens":177,"bytes":705}
+{"t":"2026-09-27T18:04:15.035567+02:00","seq":3,"kind":"inject","source":".keel/store/steering/tech.md","tokens":85,"bytes":338}
+{"t":"2026-09-27T18:04:15.035601+02:00","seq":4,"kind":"inject","source":".keel/store/steering/structure.md","tokens":4230,"bytes":16917}
+{"t":"2026-09-27T18:04:15.035805+02:00","seq":5,"kind":"inject","source":".keel/specs/tool-call-risk-gate/spec.md","tokens":1089,"bytes":4354}
+{"t":"2026-09-27T18:04:15.111863+02:00","seq":6,"kind":"command","cmd":"cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/build.txt"}
+{"t":"2026-09-27T18:04:15.249148+02:00","seq":7,"kind":"command","cmd":"cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/test.txt"}
+{"t":"2026-09-27T18:04:15.458172+02:00","seq":8,"kind":"command","cmd":"cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/lint.txt"}
+{"t":"2026-09-27T18:04:15.767085+02:00","seq":9,"kind":"oracle","criterion":"AC-1","oracle":"`test -f docs/adr/0001-tool-call-risk-gating.md && grep -q 'docker exec' docs/adr/0001-tool-call-risk-gating.md && grep -qi 'in-sandbox' docs/adr/0001-tool-call-risk-gating.md` exits 0","verdict":"pass","exit_code":0}
+{"t":"2026-09-27T18:04:15.767105+02:00","seq":10,"kind":"oracle","criterion":"AC-2","oracle":"`cargo test --manifest-path cli/Cargo.toml decision::tests::denies_known_credential_paths -- --exact 2>&1 | grep -q '1 passed'` exits 0","verdict":"pass","exit_code":0}
+{"t":"2026-09-27T18:04:15.767111+02:00","seq":11,"kind":"oracle","criterion":"AC-3","oracle":"`cargo test --manifest-path cli/Cargo.toml decision::tests::denies_docker_socket_and_sudo -- --exact 2>&1 | grep -q '1 passed'` exits 0","verdict":"pass","exit_code":0}
+{"t":"2026-09-27T18:04:15.767114+02:00","seq":12,"kind":"oracle","criterion":"AC-4","oracle":"`cargo test --manifest-path cli/Cargo.toml decision::tests::denies_recursive_wipe_of_workspace_or_home -- --exact 2>&1 | grep -q '1 passed'` exits 0","verdict":"pass","exit_code":0}
+{"t":"2026-09-27T18:04:15.767116+02:00","seq":13,"kind":"oracle","criterion":"AC-5","oracle":"`cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::deny_verdict_blocks_docker_exec -- --exact 2>&1 | grep -q '1 passed'` exits 0","verdict":"pass","exit_code":0}
+{"t":"2026-09-27T18:04:15.767119+02:00","seq":14,"kind":"oracle","criterion":"AC-6","oracle":"`cargo test --manifest-path cli/Cargo.toml --quiet` exits 0","verdict":"pass","exit_code":0}
+{"t":"2026-09-27T18:04:15.933027+02:00","seq":15,"kind":"gate","gate":"G2","verdict":"fail","result":"gates/G2.json"}
+{"t":"2026-09-27T18:04:15.933066+02:00","seq":16,"kind":"run_end","verdict":"fail","duration_ms":950}
+{"t":"2026-09-27T19:49:48.379348+02:00","seq":17,"kind":"human","stage":"spec","decision":"approved","by":"Dane Balia"}
+{"t":"2026-09-27T21:54:00.203451+02:00","seq":18,"kind":"human","stage":"spec","decision":"approved","by":"Dane Balia"}
+{"t":"2026-09-27T21:54:00.215752+02:00","seq":19,"kind":"human","stage":"plan","decision":"approved","by":"Dane Balia"}
