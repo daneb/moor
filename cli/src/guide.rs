@@ -36,6 +36,44 @@ pub struct NextSpec {
     pub command: String,
     #[serde(default)]
     pub complete: bool,
+    /// Present at an approval stage (keel 0.11+).
+    #[serde(default)]
+    pub approval: Option<Approval>,
+}
+
+/// Where a pending approval stands: `absent` (never decided), `rejected`, or
+/// `superseded` (the artefact changed after it was approved).
+#[derive(Debug, Deserialize)]
+pub struct Approval {
+    pub stage: String,
+    pub standing: String,
+    #[serde(default)]
+    pub by: Option<String>,
+    #[serde(default)]
+    pub note: Option<String>,
+    /// The command that re-checks the artefact once it has been revised.
+    #[serde(default)]
+    pub recheck: Option<String>,
+}
+
+/// The approval if it was rejected or went stale, i.e. the artefact needs
+/// revising or re-checking before it can be approved.
+fn revising(spec: &NextSpec) -> Option<&Approval> {
+    spec.approval
+        .as_ref()
+        .filter(|a| a.standing == "rejected" || a.standing == "superseded")
+}
+
+/// The command `moor go` runs to re-check a rejected or stale approval's
+/// artefact, taken from keel like every other step's command.
+pub fn recheck(spec: &NextSpec) -> Option<&str> {
+    revising(spec).and_then(|a| a.recheck.as_deref())
+}
+
+/// Text that came out of the sandbox, made safe to print: control
+/// characters (terminal escape sequences among them) are dropped.
+fn printable(text: &str) -> String {
+    text.chars().filter(|c| !c.is_control()).collect()
 }
 
 /// keel's pipeline has seven steps before `complete` (keel
@@ -215,7 +253,8 @@ pub fn artifact_to_read(spec: &NextSpec) -> Option<&'static str> {
 /// True for a step `moor go` can take without the operator: a known,
 /// unfinished stage that isn't an approval.
 pub fn is_automatic(spec: &NextSpec) -> bool {
-    !spec.complete && step(&spec.stage).is_some_and(|s| s.decides.is_none())
+    !spec.complete
+        && (recheck(spec).is_some() || step(&spec.stage).is_some_and(|s| s.decides.is_none()))
 }
 
 /// keel's own command, made runnable from the host: `keel <args>` becomes
@@ -238,7 +277,14 @@ fn read_command(slug: &str, artifact: &str, explicit: Option<&str>) -> String {
 pub fn step_label(spec: &NextSpec) -> String {
     match (spec.complete, step(&spec.stage)) {
         (true, _) => "done".to_string(),
-        (false, Some(s)) => format!("step {} of {TOTAL_STEPS}: {}", s.n, s.title),
+        (false, Some(s)) => {
+            let status = match revising(spec).map(|a| a.standing.as_str()) {
+                Some("rejected") => " (rejected)",
+                Some(_) => " (changed since it was approved)",
+                None => "",
+            };
+            format!("step {} of {TOTAL_STEPS}: {}{status}", s.n, s.title)
+        }
         (false, None) => format!("at `{}`", spec.stage),
     }
 }
@@ -300,6 +346,9 @@ pub fn render(
     out.push(String::new());
 
     match step(&spec.stage) {
+        Some(_) if revising(spec).is_some() => {
+            out.extend(revise_lines(spec, revising(spec).unwrap(), &flag));
+        }
         Some(s) => {
             out.push(format!("  {}", s.what));
             out.push(String::new());
@@ -361,6 +410,65 @@ pub fn render(
     out
 }
 
+/// What to do about a rejected or stale approval: who rejected it and why,
+/// then revise, check again, approve. The note and name are shown but never
+/// put into a suggested command, since both come from files the agent can
+/// write; the only thing embedded is the slug, and only if it has a slug's
+/// shape.
+fn revise_lines(spec: &NextSpec, a: &Approval, flag: &str) -> Vec<String> {
+    let what = match a.stage.as_str() {
+        "merge" => "The build",
+        "plan" => "The plan",
+        _ => "The spec",
+    };
+    let mut out = vec![];
+    if a.standing == "rejected" {
+        let by =
+            a.by.as_deref()
+                .map(printable)
+                .unwrap_or_else(|| "someone".into());
+        match a
+            .note
+            .as_deref()
+            .map(printable)
+            .filter(|n| !n.trim().is_empty())
+        {
+            Some(note) => out.push(format!("  {what} was rejected by {by}: \"{note}\"")),
+            None => out.push(format!(
+                "  {what} was rejected by {by}, with no reason given."
+            )),
+        }
+        out.push("  Revise it, check it again, then approve it.".to_string());
+    } else {
+        out.push(format!(
+            "  {what} changed after it was approved, so check it again, then approve it."
+        ));
+    }
+    out.push(String::new());
+    let slug = if crate::manifest::validate_name(&spec.slug).is_ok() {
+        spec.slug.as_str()
+    } else {
+        "<spec>"
+    };
+    if a.standing == "rejected" {
+        let revise = match a.stage.as_str() {
+            "spec" => format!("moor spec push{flag} <file>   (after revising your copy)"),
+            "plan" => format!(
+                "moor ask{flag} --role build \"Revise the plan and tasks for {slug} to address its latest rejection in .keel/specs/{slug}/approvals.jsonl\""
+            ),
+            _ => format!(
+                "moor ask{flag} --role build \"Change {slug}'s work to address its latest merge rejection in .keel/specs/{slug}/approvals.jsonl\""
+            ),
+        };
+        out.push(format!("  Revise:  {revise}"));
+        out.push(format!("  Then:    moor go{flag}        (checks it again)"));
+    } else {
+        out.push(format!("  Next:    moor go{flag}        (checks it again)"));
+    }
+    out.push(format!("  Then:    moor approve{flag}"));
+    out
+}
+
 /// Every spec and its step, the active one marked.
 pub fn render_all(report: &NextReport, active: Option<&Active>) -> Vec<String> {
     let width = report.specs.iter().map(|s| s.slug.len()).max().unwrap_or(0);
@@ -395,6 +503,115 @@ mod tests {
             stage: stage.to_string(),
             command,
             complete: stage == "complete",
+            approval: None,
+        }
+    }
+
+    fn with_approval(mut s: NextSpec, stage: &str, standing: &str, note: Option<&str>) -> NextSpec {
+        let recheck = match stage {
+            "spec" => format!("keel gate g0 {}", s.slug),
+            "plan" => format!("keel gate g1 {}", s.slug),
+            _ => format!("keel run {}", s.slug),
+        };
+        s.approval = Some(Approval {
+            stage: stage.to_string(),
+            standing: standing.to_string(),
+            by: (standing == "rejected").then(|| "Dane Balia".to_string()),
+            note: note.map(String::from),
+            recheck: (standing != "absent").then_some(recheck),
+        });
+        s
+    }
+
+    #[test]
+    fn parses_the_approval_object() {
+        let r: NextReport = serde_json::from_str(
+            r#"{"specs":[{"slug":"a","stage":"plan_approval","command":"keel approve a --stage plan","complete":false,
+                "approval":{"stage":"plan","standing":"rejected","by":"D","note":null,"recheck":"keel gate g1 a"}}]}"#,
+        )
+        .unwrap();
+        let a = r.specs[0].approval.as_ref().unwrap();
+        assert_eq!((a.standing.as_str(), a.note.as_deref()), ("rejected", None));
+        assert_eq!(recheck(&r.specs[0]), Some("keel gate g1 a"));
+    }
+
+    #[test]
+    fn a_waiting_approval_is_unchanged() {
+        let s = with_approval(spec("login", "plan_approval"), "plan", "absent", None);
+        assert_eq!(recheck(&s), None);
+        assert!(!is_automatic(&s));
+        let r = report(vec![s]);
+        let a = pick_active(&r, None, &[]).unwrap();
+        let text = render("p", None, &r, Some(&a)).join("\n");
+        assert!(text.contains("Next:  moor approve"), "{text}");
+    }
+
+    #[test]
+    fn a_rejected_plan_says_who_why_and_how_to_revise() {
+        let s = with_approval(
+            spec("login", "plan_approval"),
+            "plan",
+            "rejected",
+            Some("needs a test task"),
+        );
+        assert!(is_automatic(&s), "moor go runs the re-check");
+        let r = report(vec![s]);
+        let a = pick_active(&r, None, &[]).unwrap();
+        let text = render("p", None, &r, Some(&a)).join("\n");
+        assert!(
+            text.contains("step 5 of 7: approve the plan (rejected)"),
+            "{text}"
+        );
+        assert!(
+            text.contains("The plan was rejected by Dane Balia: \"needs a test task\""),
+            "{text}"
+        );
+        assert!(text.contains("Revise:  moor ask --role build"), "{text}");
+        assert!(text.contains("Then:    moor go"), "{text}");
+        assert!(text.contains("Then:    moor approve"), "{text}");
+        assert!(!text.contains("moor reject"), "{text}");
+    }
+
+    #[test]
+    fn a_rejected_spec_is_revised_by_pushing_it_again() {
+        let s = with_approval(spec("login", "spec_approval"), "spec", "rejected", None);
+        let r = report(vec![s]);
+        let a = pick_active(&r, None, &[]).unwrap();
+        let text = render("p", None, &r, Some(&a)).join("\n");
+        assert!(text.contains("with no reason given"), "{text}");
+        assert!(text.contains("Revise:  moor spec push <file>"), "{text}");
+    }
+
+    #[test]
+    fn a_stale_approval_is_checked_again_then_approved() {
+        let s = with_approval(spec("login", "plan_approval"), "plan", "superseded", None);
+        let r = report(vec![s]);
+        let a = pick_active(&r, None, &[]).unwrap();
+        let text = render("p", None, &r, Some(&a)).join("\n");
+        assert!(text.contains("(changed since it was approved)"), "{text}");
+        assert!(text.contains("Next:    moor go"), "{text}");
+        assert!(!text.contains("Revise:"), "{text}");
+    }
+
+    #[test]
+    fn sandbox_text_never_reaches_a_suggested_command() {
+        let evil = "x\" ; rm -rf ~ ; echo \"\u{1b}[2J";
+        let s = with_approval(
+            spec("login", "plan_approval"),
+            "plan",
+            "rejected",
+            Some(evil),
+        );
+        let r = report(vec![s]);
+        let a = pick_active(&r, None, &[]).unwrap();
+        for line in render("p", None, &r, Some(&a)) {
+            assert!(!line.contains('\u{1b}'), "escape code printed: {line:?}");
+            if line.contains("moor ") {
+                assert!(
+                    !line.contains("rm -rf"),
+                    "note leaked into a command: {line}"
+                );
+            }
         }
     }
 
