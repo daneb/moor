@@ -148,6 +148,11 @@ moor next
 moor next --all                    # every spec and its step
 moor use my-app --spec greet-name  # pin which spec `moor next` follows
 
+# ...and the commands it points you at, which always act on that spec
+moor go                            # take the next steps until one needs you
+moor approve                       # shows the spec/plan/run first, then asks
+moor reject "needs a rollback plan"
+
 # keel ships in every sandbox, so once a project is up, `moor keel <args>`
 # runs it there directly — no need to name the project again
 moor keel status

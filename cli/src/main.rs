@@ -112,6 +112,28 @@ enum Command {
         #[arg(long)]
         all: bool,
     },
+    /// Approve what the active spec is waiting on: shows the spec, plan or
+    /// run first, then asks.
+    Approve {
+        #[arg(short = 'p', long = "project")]
+        project: Option<String>,
+        /// Approve without asking (for when there's no terminal).
+        #[arg(long)]
+        yes: bool,
+    },
+    /// Reject what the active spec is waiting on, saying why.
+    Reject {
+        #[arg(short = 'p', long = "project")]
+        project: Option<String>,
+        /// Why, so the next attempt can address it.
+        why: String,
+    },
+    /// Take the active spec's next steps (checks, planning, building) until
+    /// something needs you.
+    Go {
+        #[arg(short = 'p', long = "project")]
+        project: Option<String>,
+    },
     /// Set the default project `moor keel`/`moor view`/`moor next` (and
     /// their `--project`-taking siblings) use when it's omitted.
     Use {
@@ -248,6 +270,9 @@ fn main() {
         } => commands::resolve_project_announced(project)
             .and_then(|name| commands::view::run(&name, &slug, &artifact)),
         Command::Next { project, all } => commands::next_cmd::run(project, all),
+        Command::Approve { project, yes } => commands::flow_cmd::approve(project, yes),
+        Command::Reject { project, why } => commands::flow_cmd::reject(project, &why),
+        Command::Go { project } => commands::flow_cmd::go(project),
         Command::Use { name, spec } => commands::use_cmd::run(&name, spec.as_deref()),
         Command::Status => commands::status::run(),
         Command::Audit {

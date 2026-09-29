@@ -86,8 +86,9 @@ pub fn run(name: &str, image: &str, github: bool) -> Result<()> {
     super::sync_git_identity(&m);
 
     println!(
-        "\n'{name}' is up. Manifest: {}\nNext: moor shell {name}",
-        paths::manifest_path(name)?.display()
+        "\n'{name}' is up. Manifest: {}\n\n{}",
+        paths::manifest_path(name)?.display(),
+        super::next_cmd::next_hint(name)
     );
     Ok(())
 }

@@ -2,6 +2,71 @@ use crate::guide;
 use crate::{audit, manifest, manifest::Manifest, paths, proc};
 use anyhow::{Context, Result};
 
+/// The project a guided command acts on, resolved once and shared by
+/// `moor next` and the commands that move a spec on (`flow_cmd`).
+pub struct Target {
+    pub name: String,
+    pub m: Manifest,
+    /// `--project` for printed commands: only when they'd otherwise resolve
+    /// to a different project, since naming the sticky default is redundant.
+    pub flag: Option<String>,
+}
+
+impl Target {
+    /// Resolves the project and checks its sandbox is up — every guided
+    /// command needs to ask the sandbox where things stand.
+    pub fn resolve(explicit: Option<String>) -> Result<Self> {
+        let (name, _) = super::resolve_project(explicit.clone())?;
+        let m = Manifest::load(&paths::manifest_path(&name)?)?;
+        if super::running_projects(std::slice::from_ref(&name))?.is_empty() {
+            anyhow::bail!(
+                "{name} isn't running, so moor can't say where things stand.\n\n  Next:  moor up {name}"
+            );
+        }
+        let flag =
+            explicit.filter(|p| paths::read_current_project().ok().flatten().as_ref() != Some(p));
+        Ok(Target { name, m, flag })
+    }
+
+    /// Where every spec stands, from the sandbox. Logged like any exec.
+    pub fn report(&self) -> Result<guide::NextReport> {
+        let argv: Vec<String> = ["keel", "next", "--json"].map(String::from).to_vec();
+        let container = self.m.sandbox_container();
+        let mut args: Vec<&str> = vec!["exec", &container];
+        args.extend(argv.iter().map(String::as_str));
+        let (status, out) = proc::run_capture("docker", &args)?;
+        audit::log_exec(&self.name, &self.m, "next", &argv, status.code())?;
+        proc::require_success(&format!("asking {container} where things stand"), status)?;
+        serde_json::from_str(out.trim()).context("parsing the sandbox's pipeline status")
+    }
+
+    /// The spec guidance is about — see `guide::pick_active`.
+    pub fn active<'a>(&self, report: &'a guide::NextReport) -> Option<guide::Active<'a>> {
+        let chain: Vec<String> = paths::chain_log_path(&self.name)
+            .and_then(|p| Ok(std::fs::read_to_string(p)?))
+            .map(|s| s.lines().map(String::from).collect())
+            .unwrap_or_default();
+        guide::pick_active(report, read_pin(&self.name).as_deref(), &chain)
+    }
+
+    /// The guidance block, ending on its "Next:" line (plus a tip when
+    /// the printed commands carry `--project`).
+    pub fn print_guidance(&self, report: &guide::NextReport) {
+        let active = self.active(report);
+        let mut lines = guide::render(&self.name, self.flag.as_deref(), report, active.as_ref());
+        if self.flag.is_some() {
+            lines.push(String::new());
+            lines.push(format!(
+                "  Tip: `moor use {}` drops --project from these commands.",
+                self.name
+            ));
+        }
+        for line in lines {
+            println!("{line}");
+        }
+    }
+}
+
 /// The pinned spec, if one is set and still a well-formed slug. A
 /// hand-edited file that isn't one is treated as no pin, not an error.
 fn read_pin(name: &str) -> Option<String> {
@@ -11,53 +76,30 @@ fn read_pin(name: &str) -> Option<String> {
     Some(slug.to_string())
 }
 
+/// The closing line for a command that isn't itself guided: how to ask
+/// where `name` stands, with `--project` only if it isn't the default.
+pub fn next_hint(name: &str) -> String {
+    let sticky = paths::read_current_project().ok().flatten();
+    if sticky.as_deref() == Some(name) {
+        "  Next:  moor next".to_string()
+    } else {
+        format!("  Next:  moor next --project {name}")
+    }
+}
+
 /// `moor next`: where the project's active spec stands and the one
 /// command that moves it on — see `guide`. `--all` lists every spec.
 pub fn run(explicit: Option<String>, all: bool) -> Result<()> {
-    let (name, _) = super::resolve_project(explicit.clone())?;
-    let m = Manifest::load(&paths::manifest_path(&name)?)?;
-    if super::running_projects(std::slice::from_ref(&name))?.is_empty() {
-        anyhow::bail!(
-            "{name} isn't running, so keel can't say where things stand.\n\n  Next:  moor up {name}"
-        );
-    }
-
-    let argv: Vec<String> = ["keel", "next", "--json"].map(String::from).to_vec();
-    let container = m.sandbox_container();
-    let mut args: Vec<&str> = vec!["exec", &container];
-    args.extend(argv.iter().map(String::as_str));
-    let (status, out) = proc::run_capture("docker", &args)?;
-    audit::log_exec(&name, &m, "next", &argv, status.code())?;
-    proc::require_success(&format!("`keel next` in {container}"), status)?;
-    let report: guide::NextReport =
-        serde_json::from_str(out.trim()).context("parsing `keel next --json`")?;
-
-    let chain: Vec<String> = std::fs::read_to_string(paths::chain_log_path(&name)?)
-        .map(|s| s.lines().map(String::from).collect())
-        .unwrap_or_default();
-    let pin = read_pin(&name);
-    let active = guide::pick_active(&report, pin.as_deref(), &chain);
-
-    // Printed commands carry `--project` only when they'd otherwise resolve
-    // to a different project; naming the sticky default is redundant.
-    let flag =
-        explicit.filter(|p| paths::read_current_project().ok().flatten().as_ref() != Some(p));
-    let lines = if all {
-        let mut lines = vec![format!("{name} specs:")];
-        lines.extend(guide::render_all(&report, active.as_ref()));
-        lines
-    } else {
-        let mut lines = guide::render(&name, flag.as_deref(), &report, active.as_ref());
-        if flag.is_some() {
-            lines.push(String::new());
-            lines.push(format!(
-                "  Tip: `moor use {name}` drops --project from these commands."
-            ));
+    let t = Target::resolve(explicit)?;
+    let report = t.report()?;
+    if all {
+        let active = t.active(&report);
+        println!("{} specs:", t.name);
+        for line in guide::render_all(&report, active.as_ref()) {
+            println!("{line}");
         }
-        lines
-    };
-    for line in lines {
-        println!("{line}");
+    } else {
+        t.print_guidance(&report);
     }
     Ok(())
 }

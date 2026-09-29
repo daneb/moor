@@ -146,9 +146,10 @@ pub fn run(name: &str, from: &Path, image: Option<String>, github: bool) -> Resu
     }
 
     println!(
-        "\n'{name}' is up, imported from {}. Manifest: {}\nNext: moor shell {name}",
+        "\n'{name}' is up, imported from {}. Manifest: {}\n\n{}",
         from.display(),
-        paths::manifest_path(name)?.display()
+        paths::manifest_path(name)?.display(),
+        super::next_cmd::next_hint(name)
     );
     Ok(())
 }

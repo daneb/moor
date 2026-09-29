@@ -47,9 +47,11 @@ struct Step {
     n: u8,
     title: &'static str,
     what: &'static str,
-    /// The keel artifact worth reading before acting, if any.
+    /// The artifact to read before deciding, or to look at when the step's
+    /// checks fail: `spec`, `plan`, or `report` (what a run did).
     read: Option<&'static str>,
-    /// The approval stage this step decides, so a reject can be offered.
+    /// The approval this step asks the operator for. `None` means the step
+    /// is one `moor go` can take on its own.
     decides: Option<&'static str>,
 }
 
@@ -65,42 +67,42 @@ fn step(stage: &str) -> Option<Step> {
         "spec" => s(
             1,
             "check the spec",
-            "G0 hasn't passed yet. Run it; if it fails, fix the spec and run it again.",
+            "The spec hasn't passed its checks yet. Run them; if they fail, fix the spec and run them again.",
             Some("spec"),
             None,
         ),
         "spec_approval" => s(
             2,
             "approve the spec",
-            "The spec passed G0. Read it, then approve or reject it.",
+            "The spec passed its checks. Read it, then approve or reject it.",
             Some("spec"),
             Some("spec"),
         ),
         "plan" => s(
             3,
             "plan the work",
-            "The spec is approved. keel drafts a plan and its tasks next.",
+            "The spec is approved. Next, a plan and its tasks are drafted from it.",
             None,
             None,
         ),
         "plan_gate" => s(
             4,
             "check the plan",
-            "A plan exists but G1 isn't passing. Run it; if it fails, read the plan to see why.",
+            "A plan exists but hasn't passed its checks. Run them; if they fail, read the plan to see why.",
             Some("plan"),
             None,
         ),
         "plan_approval" => s(
             5,
             "approve the plan",
-            "The plan passed G1. Read it, then approve or reject it.",
+            "The plan passed its checks. Read it, then approve or reject it.",
             Some("plan"),
             Some("plan"),
         ),
         "run" => s(
             6,
             "build it",
-            "The plan is approved. keel runs the tasks through the agent and checks the result.",
+            "The plan is approved. The agent works through the tasks, and the result is checked.",
             None,
             None,
         ),
@@ -199,6 +201,23 @@ fn project_flag(explicit: Option<&str>) -> String {
         .unwrap_or_default()
 }
 
+/// The approval a spec's current stage is waiting on (`spec`, `plan` or
+/// `merge`), or `None` if nothing needs the operator's decision.
+pub fn pending_decision(spec: &NextSpec) -> Option<&'static str> {
+    step(&spec.stage).and_then(|s| s.decides)
+}
+
+/// What to show before an approval: `spec`, `plan`, or `report`.
+pub fn artifact_to_read(spec: &NextSpec) -> Option<&'static str> {
+    step(&spec.stage).and_then(|s| s.read)
+}
+
+/// True for a step `moor go` can take without the operator: a known,
+/// unfinished stage that isn't an approval.
+pub fn is_automatic(spec: &NextSpec) -> bool {
+    !spec.complete && step(&spec.stage).is_some_and(|s| s.decides.is_none())
+}
+
 /// keel's own command, made runnable from the host: `keel <args>` becomes
 /// `moor keel <args>`. Taken from keel rather than rebuilt here, so moor
 /// follows keel if keel changes what a stage's next command is.
@@ -280,22 +299,20 @@ pub fn render(
         Some(s) => {
             out.push(format!("  {}", s.what));
             out.push(String::new());
-            if let (Some(artifact), Some(_)) = (s.read, s.decides) {
+            if s.decides.is_some() {
+                let shown = match s.read {
+                    Some("report") => "what the run did".to_string(),
+                    Some(artifact) => format!("the {artifact}"),
+                    None => "it".to_string(),
+                };
                 out.push(format!(
-                    "  Read:  {}",
-                    read_command(&spec.slug, artifact, explicit)
+                    "  Next:  moor approve{flag}      (shows {shown} first, then asks)"
                 ));
+                out.push(format!("  Or:    moor reject{flag} \"why\""));
+            } else {
+                out.push(format!("  Next:  moor go{flag}"));
             }
-            out.push(format!(
-                "  Next:  {}",
-                host_command(&spec.command, explicit)
-            ));
-            if let Some(stage) = s.decides {
-                out.push(format!(
-                    "  Or:    moor keel{flag} approve {} --stage {stage} --reject --note \"why\"",
-                    spec.slug
-                ));
-            } else if let Some(artifact) = s.read {
+            if let (Some(artifact), None) = (s.read, s.decides) {
                 out.push(format!(
                     "  If it fails:  {}",
                     read_command(&spec.slug, artifact, explicit)
@@ -305,7 +322,10 @@ pub fn render(
         None => {
             // A stage this moor doesn't know yet: still point at keel's
             // own next command rather than guessing.
-            out.push(format!("  keel says this spec is at `{}`.", spec.stage));
+            out.push(format!(
+                "  This spec is at `{}`, a step this version of moor doesn't know.",
+                spec.stage
+            ));
             out.push(String::new());
             out.push(format!(
                 "  Next:  {}",
@@ -444,9 +464,9 @@ mod tests {
         let a = pick_active(&r, None, &[]).unwrap();
         let text = render("myapp", None, &r, Some(&a)).join("\n");
         assert!(text.contains("myapp · login · step 5 of 7: approve the plan"));
-        assert!(text.contains("Read:  moor view login plan"));
-        assert!(text.contains("Next:  moor keel approve login --stage plan"));
-        assert!(text.contains("--stage plan --reject --note"));
+        assert!(text.contains("Next:  moor approve      (shows the plan first, then asks)"));
+        assert!(text.contains("Or:    moor reject \"why\""));
+        assert!(!text.contains("keel"), "{text}");
     }
 
     #[test]
@@ -454,9 +474,9 @@ mod tests {
         let r = report(vec![spec("login", "plan_gate")]);
         let a = pick_active(&r, None, &[]).unwrap();
         let text = render("myapp", None, &r, Some(&a)).join("\n");
-        assert!(text.contains("Next:  moor keel gate g1 login"));
+        assert!(text.contains("Next:  moor go"));
         assert!(text.contains("If it fails:  moor view login plan"));
-        assert!(!text.contains("--reject"));
+        assert!(!text.contains("reject"));
     }
 
     #[test]
