@@ -17,7 +17,10 @@ services:
     container_name: {{PROJECT_NAME}}-sandbox
     read_only: true
     tmpfs:
-      - /tmp
+      # `exec`, overriding Docker's default `noexec` for tmpfs: test suites
+      # routinely write a script to a temp dir and run it, and /workspace is
+      # executable anyway, so noexec here protected nothing on the host.
+      - /tmp:exec,mode=1777
       # keel's evidence chain (keel ADR-0001), without a host bind mount.
       # /run/moor holds the posture attestation moor writes as root after
       # `up`; 0755 and root-owned, so the agent can read it but not
