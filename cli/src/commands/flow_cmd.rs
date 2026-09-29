@@ -145,8 +145,13 @@ pub fn go(explicit: Option<String>) -> Result<()> {
             println!("\n{slug} didn't move on from {}.", guide::step_label(spec));
             break;
         }
-        let Some(("keel", args)) = spec.command.split_once(' ') else {
-            anyhow::bail!("don't know how to run `{}`", spec.command);
+        // A rejected or stale approval is re-checked once, then left for the
+        // operator: keel keeps reporting the rejection until someone
+        // approves, so looping would re-check the same thing forever.
+        let rechecking = guide::recheck(spec).is_some();
+        let command = guide::recheck(spec).unwrap_or(&spec.command).to_string();
+        let Some(("keel", args)) = command.split_once(' ') else {
+            anyhow::bail!("don't know how to run `{command}`");
         };
         let args: Vec<String> = args.split_whitespace().map(String::from).collect();
         println!("==> {slug} · {}", guide::step_label(spec));
@@ -159,6 +164,12 @@ pub fn go(explicit: Option<String>) -> Result<()> {
             println!();
             t.print_guidance(&report);
             return Err(e);
+        }
+        if rechecking {
+            println!(
+                "\nIt passed its checks again. The earlier decision stays on record until you approve the revision."
+            );
+            break;
         }
     }
 

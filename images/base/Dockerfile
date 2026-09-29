@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Pinned, so a keel release changes this layer's cache key: an unpinned
 # install was served from cache and kept the previous keel. Bump it here,
 # or pass --build-arg KEEL_VERSION=… (images/build.sh forwards $KEEL_VERSION).
-ARG KEEL_VERSION=0.10.1
+ARG KEEL_VERSION=0.11.0
 RUN cargo install keel-harness --version "$KEEL_VERSION" --locked
 
 # The scanners a project's gates call for advisories and leaked secrets.
