@@ -1,0 +1,2241 @@
+diff --git a/.keel/chain.jsonl b/.keel/chain.jsonl
+index b3bd760..1692075 100644
+--- a/.keel/chain.jsonl
++++ b/.keel/chain.jsonl
+@@ -129,3 +129,18 @@
+ {"schema":"keel.chain/1","seq":129,"ts":"2026-09-28T08:24:35.891804+02:00","kind":"gate","writer":"in-process","data":{"gate":"G2.5","run":"2026-09-28-002","sha256":"19692bd084854e1716cf179ff8b71e2cfd75fcf0bd09386cbd02f861ea863262","spec":"tool-call-risk-gate","verdict":"pass"},"prev_hash":"16b8167413e1d54bf19ad00fd9ff88c74d2c9ba4ee83d855ecec0bf132239517","hash":"42ad7ee0438173180b48c0c58c06f102bff18d511f1e4c7c98db664d4e9bcdc3"}
+ {"schema":"keel.chain/1","seq":130,"ts":"2026-09-28T08:24:35.908318+02:00","kind":"gate","writer":"in-process","data":{"gate":"G3","run":"2026-09-28-002","sha256":"f276710cf75f63be1e8284bb8c651ae73308b01dab2e9f90509d20741e5bbb24","spec":"tool-call-risk-gate","verdict":"pass"},"prev_hash":"42ad7ee0438173180b48c0c58c06f102bff18d511f1e4c7c98db664d4e9bcdc3","hash":"56735036d4e556938788a0c33fab3f3a825593b9daeeaf36e0105db976d670b6"}
+ {"schema":"keel.chain/1","seq":131,"ts":"2026-09-28T08:24:35.908516+02:00","kind":"run_end","writer":"in-process","data":{"run":"2026-09-28-001","trajectory_sha256":"9fcc230f0327b6877620833c88d96f19dd08a6f53f21f66cf4ad97642c3104fe","verdict":"pass"},"prev_hash":"56735036d4e556938788a0c33fab3f3a825593b9daeeaf36e0105db976d670b6","hash":"4ceb9271ccb9e7d9f4fbe6483c24165bdb208b2feb7316169fabb7ff53a1fd20"}
++{"schema":"keel.chain/1","seq":132,"ts":"2026-09-28T20:14:21.251316+02:00","kind":"gate","writer":"in-process","data":{"gate":"G0","run":"2026-09-28-002","sha256":"b7e29294736a300f2e86314043bc764dd7752634aebf54651d2823c2febcb361","spec":"tool-call-ask-verdict","verdict":"fail"},"prev_hash":"4ceb9271ccb9e7d9f4fbe6483c24165bdb208b2feb7316169fabb7ff53a1fd20","hash":"c152d61830f9c9c6a7592c377213b03e1c9820acb4cf969ec74a3c9fcb53e892"}
++{"schema":"keel.chain/1","seq":133,"ts":"2026-09-28T20:14:42.370682+02:00","kind":"gate","writer":"in-process","data":{"gate":"G0","run":"2026-09-28-002","sha256":"9ca5173beea5f8ea4179f82662ddf766da0f8fa6398c7cda7bb36532a4674b12","spec":"tool-call-ask-verdict","verdict":"pass"},"prev_hash":"c152d61830f9c9c6a7592c377213b03e1c9820acb4cf969ec74a3c9fcb53e892","hash":"38c43b1b76288c83a8abf52ebbc120c5707b8db836832db809d7c359df91a0cb"}
++{"schema":"keel.chain/1","seq":134,"ts":"2026-09-28T20:16:31.814332+02:00","kind":"gate","writer":"in-process","data":{"gate":"G1","run":"2026-09-28-002","sha256":"39daeeab585355a037fdcac4abbc88a2780adfcb4cd434189451c48a2f875ae2","spec":"tool-call-ask-verdict","verdict":"fail"},"prev_hash":"38c43b1b76288c83a8abf52ebbc120c5707b8db836832db809d7c359df91a0cb","hash":"08670bbebfd4139a4bd35c87fd4bb43b3b97cc74a4841447498c821650291e20"}
++{"schema":"keel.chain/1","seq":135,"ts":"2026-09-28T20:16:35.116085+02:00","kind":"gate","writer":"in-process","data":{"gate":"G1","run":"2026-09-28-002","sha256":"5cd7784f0e4544dac402e97ac841ad467f534ee865c8fbe06722bf0773b7c8f8","spec":"tool-call-ask-verdict","verdict":"fail"},"prev_hash":"08670bbebfd4139a4bd35c87fd4bb43b3b97cc74a4841447498c821650291e20","hash":"b716493e931b5d5606aa2b358dc20d7b8290cb298abdbcb3b92660c978d029d0"}
++{"schema":"keel.chain/1","seq":136,"ts":"2026-09-28T20:17:14.838473+02:00","kind":"approval","writer":"in-process","data":{"artefact_hash":"c93af2788214176acf25692dff880d45bdb348adea828ea6ab9c94ada3ef32be","by":"Dane Balia","decision":"approved","spec":"tool-call-ask-verdict","stage":"spec"},"prev_hash":"b716493e931b5d5606aa2b358dc20d7b8290cb298abdbcb3b92660c978d029d0","hash":"a5ef1c551410dd047eecc1c912621b4a304f5f1ee9f5a2a838b05ba0f6f2d48d"}
++{"schema":"keel.chain/1","seq":137,"ts":"2026-09-28T20:17:14.849916+02:00","kind":"approval","writer":"in-process","data":{"artefact_hash":"527ff5ce625851f90dae6fb2d9ef4b0aaf6475661689633f8f6ad4e84fec235f","by":"Dane Balia","decision":"approved","spec":"tool-call-ask-verdict","stage":"plan"},"prev_hash":"a5ef1c551410dd047eecc1c912621b4a304f5f1ee9f5a2a838b05ba0f6f2d48d","hash":"beac05d82b9b17d3e38cd1908f65410257e287714036c4252f6825ac021f35e2"}
++{"schema":"keel.chain/1","seq":138,"ts":"2026-09-28T20:17:36.351994+02:00","kind":"gate","writer":"in-process","data":{"gate":"G1","run":"2026-09-28-002","sha256":"d59377ad3a1adb3c4506e15975038c9f2ccf73be43259b423f6c8e4f205b0193","spec":"tool-call-ask-verdict","verdict":"pass"},"prev_hash":"beac05d82b9b17d3e38cd1908f65410257e287714036c4252f6825ac021f35e2","hash":"f9495835b2b0f3aa0dffb5da81c77d6e87a0a13d757eaf6834dd6abb326c15c1"}
++{"schema":"keel.chain/1","seq":139,"ts":"2026-09-28T20:17:39.317949+02:00","kind":"run_start","writer":"in-process","data":{"run":"2026-09-28-002","spec":"tool-call-ask-verdict","task":null},"prev_hash":"f9495835b2b0f3aa0dffb5da81c77d6e87a0a13d757eaf6834dd6abb326c15c1","hash":"7b90c55fc5b2b0d385ba2502bc43fa9773da56cc14e706644bb5b82ca2667103"}
++{"schema":"keel.chain/1","seq":140,"ts":"2026-09-28T20:17:41.486934+02:00","kind":"gate","writer":"in-process","data":{"gate":"G2","run":"2026-09-28-003","sha256":"dee582915ea2fdcbaff280a79c47501179c1bf645856c7b40a0261becc36d5a9","spec":"tool-call-ask-verdict","verdict":"pass"},"prev_hash":"7b90c55fc5b2b0d385ba2502bc43fa9773da56cc14e706644bb5b82ca2667103","hash":"f8587e33b76156a08cc475cbcc28657ff034ac00df3d3ae7e748d8271f04059a"}
++{"schema":"keel.chain/1","seq":141,"ts":"2026-09-28T20:17:41.518299+02:00","kind":"gate","writer":"in-process","data":{"gate":"G2.5","run":"2026-09-28-003","sha256":"3201039e159075460bdcafde31d3afe920b1abe822ed2c57923984045acdc874","spec":"tool-call-ask-verdict","verdict":"blocked"},"prev_hash":"f8587e33b76156a08cc475cbcc28657ff034ac00df3d3ae7e748d8271f04059a","hash":"485f0277c249ee5aeb86825175ac5fe9f9198d8a2a28eabccb767ba6501579e7"}
++{"schema":"keel.chain/1","seq":142,"ts":"2026-09-28T20:17:41.532697+02:00","kind":"gate","writer":"in-process","data":{"gate":"G3","run":"2026-09-28-003","sha256":"4c3ddda37fd4ca0b1dd97d2cacc68f7d3a07bf97fa8ac345afe30b26b4366363","spec":"tool-call-ask-verdict","verdict":"fail"},"prev_hash":"485f0277c249ee5aeb86825175ac5fe9f9198d8a2a28eabccb767ba6501579e7","hash":"4ea74ca7f3d8f97546bbb6791cba8334312de110b469ed7afda5d423c390bba9"}
++{"schema":"keel.chain/1","seq":143,"ts":"2026-09-28T20:17:41.532902+02:00","kind":"run_end","writer":"in-process","data":{"run":"2026-09-28-002","trajectory_sha256":"484edcf25afd739f54ff3164f62c9a5bce945dac267b175fd5e73c409cde2458","verdict":"fail"},"prev_hash":"4ea74ca7f3d8f97546bbb6791cba8334312de110b469ed7afda5d423c390bba9","hash":"9f5e5225610a7f4292a14bcd6eccc027974bfbaa614fe55f823a2e2114b928c6"}
++{"schema":"keel.chain/1","seq":144,"ts":"2026-09-28T20:17:50.834328+02:00","kind":"approval","writer":"in-process","data":{"artefact_hash":"33f3333616c292624d089cc3ba1034a66c8548727cd2722e0a52e119462eeb14","by":"Dane Balia","decision":"approved","spec":"tool-call-ask-verdict","stage":"review"},"prev_hash":"9f5e5225610a7f4292a14bcd6eccc027974bfbaa614fe55f823a2e2114b928c6","hash":"0fcbd4c758c57463518ac7ee913132fdce0636d8159abed13f6bc0bf7ba305ab"}
++{"schema":"keel.chain/1","seq":145,"ts":"2026-09-28T20:17:50.847838+02:00","kind":"approval","writer":"in-process","data":{"artefact_hash":"e522a48b9dd851238978a29761b20300636dad0899bf5eb7fa86701058e6e68d","by":"Dane Balia","decision":"approved","spec":"tool-call-ask-verdict","stage":"merge"},"prev_hash":"0fcbd4c758c57463518ac7ee913132fdce0636d8159abed13f6bc0bf7ba305ab","hash":"cc609b683b68ed51bca1d9bef5792baed8ec56917cf65c4e87b249ef9fe8b3a3"}
++{"schema":"keel.chain/1","seq":146,"ts":"2026-09-28T20:18:01.653562+02:00","kind":"run_start","writer":"in-process","data":{"run":"2026-09-28-003","spec":"tool-call-ask-verdict","task":null},"prev_hash":"cc609b683b68ed51bca1d9bef5792baed8ec56917cf65c4e87b249ef9fe8b3a3","hash":"3f56afef03bd82923251413fd78f6667ed58ac322c05af9ff26cece1ef045b4e"}
+diff --git a/cli/src/audit.rs b/cli/src/audit.rs
+index f88e0c7..2a1e36b 100644
+--- a/cli/src/audit.rs
++++ b/cli/src/audit.rs
+@@ -302,24 +302,31 @@ fn redact_argv(argv: &[String], secret_names: &[String]) -> Vec<String> {
+     argv.iter().map(|a| redact(a, secret_names)).collect()
+ }
+ 
+-/// Log a `Deny` verdict from `decision::evaluate` for a command that never
+-/// ran — see docs/adr/0001-tool-call-risk-gating.md. Takes the chain path
++/// Log the resolution of a `decision::evaluate` rule match — allowed by
++/// an operator's interactive override, or denied (by decline or because
++/// no one was there to ask) — see docs/adr/0001-tool-call-risk-gating.md
++/// and docs/adr/0002-tool-call-ask-verdict.md. Takes the chain path
+ /// directly, like `append_chained`/`verify_chain` do, rather than a
+-/// project name: a command that was blocked before `docker exec` has no
+-/// keel sink to fold and no project directory to lazily create, so this
+-/// has no reason to depend on `paths::*` at all.
++/// project name: a command that never reached `docker exec` has no keel
++/// sink to fold and no project directory to lazily create, so this has
++/// no reason to depend on `paths::*` at all.
++#[allow(clippy::too_many_arguments)]
+ pub fn log_decision(
+     path: &Path,
+     project: &str,
+     cmd: &[String],
+     secret_names: &[String],
+     rule_id: &str,
++    allowed: bool,
++    operator: &str,
+ ) -> Result<()> {
+     let data = json!({
+         "project": project,
+         "argv": redact_argv(cmd, secret_names),
+-        "verdict": "deny",
++        "verdict": "ask",
+         "rule_id": rule_id,
++        "resolution": if allowed { "allow" } else { "deny" },
++        "by": operator,
+     });
+     append_chained(path, "decision", data)?;
+     Ok(())
+diff --git a/cli/src/commands/run_cmd.rs b/cli/src/commands/run_cmd.rs
+index 501eb38..5a29ea3 100644
+--- a/cli/src/commands/run_cmd.rs
++++ b/cli/src/commands/run_cmd.rs
+@@ -1,5 +1,6 @@
+ use crate::{audit, decision, manifest::Manifest, paths, proc};
+ use anyhow::Result;
++use std::io::{BufRead, IsTerminal, Write};
+ use std::path::Path;
+ 
+ /// True if the invoked command looks like a `git push` — the one channel
+@@ -15,18 +16,74 @@ fn looks_like_git_push(cmd: &[String]) -> bool {
+     cmd.first().map(|s| s == "git").unwrap_or(false) && cmd.iter().any(|a| a == "push")
+ }
+ 
++/// Prints the rule that fired and asks whether to run the command
++/// anyway. Only an explicit `y`/`yes` (trimmed, case-insensitive) is a
++/// yes; a read error is treated the same as a decline, not a crash.
++fn confirm(
++    reader: &mut impl BufRead,
++    writer: &mut impl Write,
++    rule_id: &str,
++    reason: &str,
++) -> bool {
++    let _ = writeln!(
++        writer,
++        "moor run: rule `{rule_id}` flagged this command: {reason}"
++    );
++    let _ = write!(writer, "Run it anyway? [y/N] ");
++    let _ = writer.flush();
++    let mut line = String::new();
++    if reader.read_line(&mut line).is_err() {
++        return false;
++    }
++    matches!(line.trim().to_ascii_lowercase().as_str(), "y" | "yes")
++}
++
++/// `moor run`'s stdin — an interactive confirm only makes sense when a
++/// human is actually there to answer it, not when `moor run` is driven
++/// by a script or keel's own driver.
++fn stdin_is_tty() -> bool {
++    std::io::stdin().is_terminal()
++}
++
++/// Who to attribute an override to. Best-effort, same fallback as keel's
++/// own approval records when the host has no git identity configured.
++fn operator_identity() -> String {
++    proc::run_capture("git", &["config", "--get", "user.name"])
++        .ok()
++        .filter(|(status, _)| status.success())
++        .map(|(_, out)| out.trim().to_string())
++        .filter(|s| !s.is_empty())
++        .unwrap_or_else(|| "unknown".to_string())
++}
++
+ /// The host-side enforcement point for `decision::evaluate` — see
+-/// docs/adr/0001-tool-call-risk-gating.md. A `Deny` verdict is logged and
+-/// returned as the error `run` propagates *before* it builds any `docker
+-/// exec` argv, so a denied command never reaches Docker. Takes the chain
+-/// path explicitly, like `audit::log_decision` does, so it needs no
+-/// `$HOME` or running container to test.
+-fn gate(chain_path: &Path, name: &str, secrets: &[String], cmd: &[String]) -> Result<()> {
+-    if let decision::Verdict::Deny { rule_id, reason } = decision::evaluate(cmd) {
+-        audit::log_decision(chain_path, name, cmd, secrets, rule_id)?;
+-        anyhow::bail!("moor run: blocked by rule `{rule_id}`: {reason}");
++/// docs/adr/0001-tool-call-risk-gating.md and
++/// docs/adr/0002-tool-call-ask-verdict.md. A rule match is resolved by
++/// prompting `reader`/`writer` when `interactive`, else denied without
++/// reading them at all; either way the resolution is logged before `run`
++/// propagates an error, so a denied command never reaches `docker exec`.
++/// IO and identity are parameters, not read directly, so this is testable
++/// without a real terminal, `$HOME`, or a running container.
++#[allow(clippy::too_many_arguments)]
++fn gate(
++    chain_path: &Path,
++    name: &str,
++    secrets: &[String],
++    cmd: &[String],
++    interactive: bool,
++    reader: &mut impl BufRead,
++    writer: &mut impl Write,
++    operator: &str,
++) -> Result<()> {
++    let decision::Verdict::Deny { rule_id, reason } = decision::evaluate(cmd) else {
++        return Ok(());
++    };
++    let allowed = interactive && confirm(reader, writer, rule_id, &reason);
++    audit::log_decision(chain_path, name, cmd, secrets, rule_id, allowed, operator)?;
++    if allowed {
++        return Ok(());
+     }
+-    Ok(())
++    anyhow::bail!("moor run: blocked by rule `{rule_id}`: {reason}");
+ }
+ 
+ pub fn run(name: &str, cmd: &[String]) -> Result<()> {
+@@ -37,7 +94,16 @@ pub fn run(name: &str, cmd: &[String]) -> Result<()> {
+     // So audit::redact below can scrub a secret's value even when it was
+     // only ever set via Keychain, never exported into this shell.
+     crate::secrets::resolve_into_env(name, &m.secrets);
+-    gate(&paths::chain_log_path(name)?, name, &m.secrets, cmd)?;
++    gate(
++        &paths::chain_log_path(name)?,
++        name,
++        &m.secrets,
++        cmd,
++        stdin_is_tty(),
++        &mut std::io::stdin().lock(),
++        &mut std::io::stderr(),
++        &operator_identity(),
++    )?;
+     let container = m.sandbox_container();
+ 
+     // What a push sends is resolved before it runs: afterwards the ref may
+@@ -178,33 +244,109 @@ mod tests {
+         ))
+     }
+ 
++    /// Runs `gate` against a throwaway chain path with the given stdin
++    /// content and interactivity, and returns (result, chain contents).
++    fn run_gate(interactive: bool, stdin: &str, cmd: &[String]) -> (Result<()>, String) {
++        let chain_path = temp_chain_path("gate");
++        let mut reader = std::io::Cursor::new(stdin.as_bytes());
++        let mut writer = Vec::new();
++        let result = gate(
++            &chain_path,
++            "test-project",
++            &[],
++            cmd,
++            interactive,
++            &mut reader,
++            &mut writer,
++            "test-operator",
++        );
++        let logged = std::fs::read_to_string(&chain_path).unwrap_or_default();
++        std::fs::remove_file(&chain_path).ok();
++        (result, logged)
++    }
++
+     #[test]
+     fn deny_verdict_blocks_docker_exec() {
+-        let chain_path = temp_chain_path("deny");
+-        let cmd = argv("cat /home/agent/.ssh/id_rsa");
+-
+-        let result = gate(&chain_path, "test-project", &[], &cmd);
++        let (result, logged) = run_gate(false, "", &argv("cat /home/agent/.ssh/id_rsa"));
+ 
+         assert!(result.is_err());
+         let msg = result.unwrap_err().to_string();
+         assert!(msg.contains("credential_access"), "{msg}");
+-
+-        let logged = std::fs::read_to_string(&chain_path).unwrap();
+         assert!(logged.contains("\"kind\":\"decision\""), "{logged}");
+         assert!(
+             logged.contains("\"rule_id\":\"credential_access\""),
+             "{logged}"
+         );
+-        std::fs::remove_file(&chain_path).ok();
+     }
+ 
+     #[test]
+     fn allow_verdict_is_a_no_op() {
+         let chain_path = temp_chain_path("allow");
+-        let cmd = argv("git status");
++        let mut reader = std::io::Cursor::new(&b""[..]);
++        let mut writer = Vec::new();
+ 
+-        assert!(gate(&chain_path, "test-project", &[], &cmd).is_ok());
++        assert!(gate(
++            &chain_path,
++            "test-project",
++            &[],
++            &argv("git status"),
++            true,
++            &mut reader,
++            &mut writer,
++            "test-operator"
++        )
++        .is_ok());
+         assert!(!chain_path.exists());
++        assert!(writer.is_empty(), "Allow must never prompt");
++    }
++
++    #[test]
++    fn interactive_yes_allows() {
++        for answer in ["y\n", "Y\n", "yes\n", "YES\n"] {
++            let (result, logged) = run_gate(true, answer, &argv("sudo ls"));
++            assert!(result.is_ok(), "answer `{answer:?}` should allow");
++            assert!(logged.contains("\"resolution\":\"allow\""), "{logged}");
++            assert!(logged.contains("\"by\":\"test-operator\""), "{logged}");
++        }
++    }
++
++    #[test]
++    fn interactive_no_denies() {
++        for answer in ["n\n", "no\n", "\n", "whatever\n"] {
++            let (result, logged) = run_gate(true, answer, &argv("sudo ls"));
++            assert!(result.is_err(), "answer `{answer:?}` should deny");
++            assert!(logged.contains("\"resolution\":\"deny\""), "{logged}");
++        }
++    }
++
++    #[test]
++    fn non_interactive_denies_without_reading_stdin() {
++        // stdin contains "y\n" but interactive is false: it must never be
++        // consulted, so the answer it would give is irrelevant.
++        let (result, logged) = run_gate(false, "y\n", &argv("sudo ls"));
++        assert!(result.is_err());
++        assert!(logged.contains("\"resolution\":\"deny\""), "{logged}");
++    }
++
++    #[test]
++    fn decision_entry_records_resolution_and_operator() {
++        let (_, logged) = run_gate(true, "y\n", &argv("sudo ls"));
++        assert!(
++            logged.contains("\"rule_id\":\"boundary_escape\""),
++            "{logged}"
++        );
++        assert!(logged.contains("\"resolution\":\"allow\""), "{logged}");
++        assert!(logged.contains("\"by\":\"test-operator\""), "{logged}");
++    }
++
++    #[test]
++    fn confirm_prompts_with_rule_and_reason() {
++        let mut reader = std::io::Cursor::new(&b"y\n"[..]);
++        let mut writer = Vec::new();
++        assert!(confirm(&mut reader, &mut writer, "destructive", "wipes /"));
++        let printed = String::from_utf8(writer).unwrap();
++        assert!(printed.contains("destructive"), "{printed}");
++        assert!(printed.contains("wipes /"), "{printed}");
+     }
+ 
+     #[test]
+diff --git a/.keel/runs/2026-09-28-002/evidence/build.txt b/.keel/runs/2026-09-28-002/evidence/build.txt
+new file mode 100644
+index 0000000..c078b47
+--- /dev/null
++++ b/.keel/runs/2026-09-28-002/evidence/build.txt
+@@ -0,0 +1,2 @@
++$ cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml
++
+diff --git a/.keel/runs/2026-09-28-002/evidence/diff-stat.txt b/.keel/runs/2026-09-28-002/evidence/diff-stat.txt
+new file mode 100644
+index 0000000..5532103
+--- /dev/null
++++ b/.keel/runs/2026-09-28-002/evidence/diff-stat.txt
+@@ -0,0 +1,18 @@
++     8      0  .keel/chain.jsonl
++     2      0  .keel/runs/2026-09-28-002/evidence/build.txt
++     2      0  .keel/runs/2026-09-28-002/evidence/lint.txt
++    46      0  .keel/runs/2026-09-28-002/evidence/oracles.json
++    13      0  .keel/runs/2026-09-28-002/evidence/test.txt
++     9      0  .keel/runs/2026-09-28-002/run.json
++    13      0  .keel/runs/2026-09-28-002/trajectory.jsonl
++     2      0  .keel/specs/tool-call-ask-verdict/approvals.jsonl
++    90      0  .keel/specs/tool-call-ask-verdict/gates/G0.json
++    95      0  .keel/specs/tool-call-ask-verdict/gates/G1.json
++    74      0  .keel/specs/tool-call-ask-verdict/plan.md
++    91      0  .keel/specs/tool-call-ask-verdict/spec.md
++    45      0  .keel/specs/tool-call-ask-verdict/tasks.md
++    13      6  cli/src/audit.rs
++   162     20  cli/src/commands/run_cmd.rs
++    61      0  docs/adr/0002-tool-call-ask-verdict.md
++
++16 file(s), +726 -26 (752 lines of churn) against 99ba32f36ddde59421c98e6e496871a31de52473
+diff --git a/.keel/runs/2026-09-28-002/evidence/diff.patch b/.keel/runs/2026-09-28-002/evidence/diff.patch
+new file mode 100644
+index 0000000..3ce227b
+--- /dev/null
++++ b/.keel/runs/2026-09-28-002/evidence/diff.patch
+@@ -0,0 +1,937 @@
++diff --git a/.keel/chain.jsonl b/.keel/chain.jsonl
++index b3bd760..ca1f343 100644
++--- a/.keel/chain.jsonl
+++++ b/.keel/chain.jsonl
++@@ -129,3 +129,11 @@
++ {"schema":"keel.chain/1","seq":129,"ts":"2026-09-28T08:24:35.891804+02:00","kind":"gate","writer":"in-process","data":{"gate":"G2.5","run":"2026-09-28-002","sha256":"19692bd084854e1716cf179ff8b71e2cfd75fcf0bd09386cbd02f861ea863262","spec":"tool-call-risk-gate","verdict":"pass"},"prev_hash":"16b8167413e1d54bf19ad00fd9ff88c74d2c9ba4ee83d855ecec0bf132239517","hash":"42ad7ee0438173180b48c0c58c06f102bff18d511f1e4c7c98db664d4e9bcdc3"}
++ {"schema":"keel.chain/1","seq":130,"ts":"2026-09-28T08:24:35.908318+02:00","kind":"gate","writer":"in-process","data":{"gate":"G3","run":"2026-09-28-002","sha256":"f276710cf75f63be1e8284bb8c651ae73308b01dab2e9f90509d20741e5bbb24","spec":"tool-call-risk-gate","verdict":"pass"},"prev_hash":"42ad7ee0438173180b48c0c58c06f102bff18d511f1e4c7c98db664d4e9bcdc3","hash":"56735036d4e556938788a0c33fab3f3a825593b9daeeaf36e0105db976d670b6"}
++ {"schema":"keel.chain/1","seq":131,"ts":"2026-09-28T08:24:35.908516+02:00","kind":"run_end","writer":"in-process","data":{"run":"2026-09-28-001","trajectory_sha256":"9fcc230f0327b6877620833c88d96f19dd08a6f53f21f66cf4ad97642c3104fe","verdict":"pass"},"prev_hash":"56735036d4e556938788a0c33fab3f3a825593b9daeeaf36e0105db976d670b6","hash":"4ceb9271ccb9e7d9f4fbe6483c24165bdb208b2feb7316169fabb7ff53a1fd20"}
+++{"schema":"keel.chain/1","seq":132,"ts":"2026-09-28T20:14:21.251316+02:00","kind":"gate","writer":"in-process","data":{"gate":"G0","run":"2026-09-28-002","sha256":"b7e29294736a300f2e86314043bc764dd7752634aebf54651d2823c2febcb361","spec":"tool-call-ask-verdict","verdict":"fail"},"prev_hash":"4ceb9271ccb9e7d9f4fbe6483c24165bdb208b2feb7316169fabb7ff53a1fd20","hash":"c152d61830f9c9c6a7592c377213b03e1c9820acb4cf969ec74a3c9fcb53e892"}
+++{"schema":"keel.chain/1","seq":133,"ts":"2026-09-28T20:14:42.370682+02:00","kind":"gate","writer":"in-process","data":{"gate":"G0","run":"2026-09-28-002","sha256":"9ca5173beea5f8ea4179f82662ddf766da0f8fa6398c7cda7bb36532a4674b12","spec":"tool-call-ask-verdict","verdict":"pass"},"prev_hash":"c152d61830f9c9c6a7592c377213b03e1c9820acb4cf969ec74a3c9fcb53e892","hash":"38c43b1b76288c83a8abf52ebbc120c5707b8db836832db809d7c359df91a0cb"}
+++{"schema":"keel.chain/1","seq":134,"ts":"2026-09-28T20:16:31.814332+02:00","kind":"gate","writer":"in-process","data":{"gate":"G1","run":"2026-09-28-002","sha256":"39daeeab585355a037fdcac4abbc88a2780adfcb4cd434189451c48a2f875ae2","spec":"tool-call-ask-verdict","verdict":"fail"},"prev_hash":"38c43b1b76288c83a8abf52ebbc120c5707b8db836832db809d7c359df91a0cb","hash":"08670bbebfd4139a4bd35c87fd4bb43b3b97cc74a4841447498c821650291e20"}
+++{"schema":"keel.chain/1","seq":135,"ts":"2026-09-28T20:16:35.116085+02:00","kind":"gate","writer":"in-process","data":{"gate":"G1","run":"2026-09-28-002","sha256":"5cd7784f0e4544dac402e97ac841ad467f534ee865c8fbe06722bf0773b7c8f8","spec":"tool-call-ask-verdict","verdict":"fail"},"prev_hash":"08670bbebfd4139a4bd35c87fd4bb43b3b97cc74a4841447498c821650291e20","hash":"b716493e931b5d5606aa2b358dc20d7b8290cb298abdbcb3b92660c978d029d0"}
+++{"schema":"keel.chain/1","seq":136,"ts":"2026-09-28T20:17:14.838473+02:00","kind":"approval","writer":"in-process","data":{"artefact_hash":"c93af2788214176acf25692dff880d45bdb348adea828ea6ab9c94ada3ef32be","by":"Dane Balia","decision":"approved","spec":"tool-call-ask-verdict","stage":"spec"},"prev_hash":"b716493e931b5d5606aa2b358dc20d7b8290cb298abdbcb3b92660c978d029d0","hash":"a5ef1c551410dd047eecc1c912621b4a304f5f1ee9f5a2a838b05ba0f6f2d48d"}
+++{"schema":"keel.chain/1","seq":137,"ts":"2026-09-28T20:17:14.849916+02:00","kind":"approval","writer":"in-process","data":{"artefact_hash":"527ff5ce625851f90dae6fb2d9ef4b0aaf6475661689633f8f6ad4e84fec235f","by":"Dane Balia","decision":"approved","spec":"tool-call-ask-verdict","stage":"plan"},"prev_hash":"a5ef1c551410dd047eecc1c912621b4a304f5f1ee9f5a2a838b05ba0f6f2d48d","hash":"beac05d82b9b17d3e38cd1908f65410257e287714036c4252f6825ac021f35e2"}
+++{"schema":"keel.chain/1","seq":138,"ts":"2026-09-28T20:17:36.351994+02:00","kind":"gate","writer":"in-process","data":{"gate":"G1","run":"2026-09-28-002","sha256":"d59377ad3a1adb3c4506e15975038c9f2ccf73be43259b423f6c8e4f205b0193","spec":"tool-call-ask-verdict","verdict":"pass"},"prev_hash":"beac05d82b9b17d3e38cd1908f65410257e287714036c4252f6825ac021f35e2","hash":"f9495835b2b0f3aa0dffb5da81c77d6e87a0a13d757eaf6834dd6abb326c15c1"}
+++{"schema":"keel.chain/1","seq":139,"ts":"2026-09-28T20:17:39.317949+02:00","kind":"run_start","writer":"in-process","data":{"run":"2026-09-28-002","spec":"tool-call-ask-verdict","task":null},"prev_hash":"f9495835b2b0f3aa0dffb5da81c77d6e87a0a13d757eaf6834dd6abb326c15c1","hash":"7b90c55fc5b2b0d385ba2502bc43fa9773da56cc14e706644bb5b82ca2667103"}
++diff --git a/cli/src/audit.rs b/cli/src/audit.rs
++index f88e0c7..2a1e36b 100644
++--- a/cli/src/audit.rs
+++++ b/cli/src/audit.rs
++@@ -302,24 +302,31 @@ fn redact_argv(argv: &[String], secret_names: &[String]) -> Vec<String> {
++     argv.iter().map(|a| redact(a, secret_names)).collect()
++ }
++ 
++-/// Log a `Deny` verdict from `decision::evaluate` for a command that never
++-/// ran — see docs/adr/0001-tool-call-risk-gating.md. Takes the chain path
+++/// Log the resolution of a `decision::evaluate` rule match — allowed by
+++/// an operator's interactive override, or denied (by decline or because
+++/// no one was there to ask) — see docs/adr/0001-tool-call-risk-gating.md
+++/// and docs/adr/0002-tool-call-ask-verdict.md. Takes the chain path
++ /// directly, like `append_chained`/`verify_chain` do, rather than a
++-/// project name: a command that was blocked before `docker exec` has no
++-/// keel sink to fold and no project directory to lazily create, so this
++-/// has no reason to depend on `paths::*` at all.
+++/// project name: a command that never reached `docker exec` has no keel
+++/// sink to fold and no project directory to lazily create, so this has
+++/// no reason to depend on `paths::*` at all.
+++#[allow(clippy::too_many_arguments)]
++ pub fn log_decision(
++     path: &Path,
++     project: &str,
++     cmd: &[String],
++     secret_names: &[String],
++     rule_id: &str,
+++    allowed: bool,
+++    operator: &str,
++ ) -> Result<()> {
++     let data = json!({
++         "project": project,
++         "argv": redact_argv(cmd, secret_names),
++-        "verdict": "deny",
+++        "verdict": "ask",
++         "rule_id": rule_id,
+++        "resolution": if allowed { "allow" } else { "deny" },
+++        "by": operator,
++     });
++     append_chained(path, "decision", data)?;
++     Ok(())
++diff --git a/cli/src/commands/run_cmd.rs b/cli/src/commands/run_cmd.rs
++index 501eb38..5a29ea3 100644
++--- a/cli/src/commands/run_cmd.rs
+++++ b/cli/src/commands/run_cmd.rs
++@@ -1,5 +1,6 @@
++ use crate::{audit, decision, manifest::Manifest, paths, proc};
++ use anyhow::Result;
+++use std::io::{BufRead, IsTerminal, Write};
++ use std::path::Path;
++ 
++ /// True if the invoked command looks like a `git push` — the one channel
++@@ -15,18 +16,74 @@ fn looks_like_git_push(cmd: &[String]) -> bool {
++     cmd.first().map(|s| s == "git").unwrap_or(false) && cmd.iter().any(|a| a == "push")
++ }
++ 
+++/// Prints the rule that fired and asks whether to run the command
+++/// anyway. Only an explicit `y`/`yes` (trimmed, case-insensitive) is a
+++/// yes; a read error is treated the same as a decline, not a crash.
+++fn confirm(
+++    reader: &mut impl BufRead,
+++    writer: &mut impl Write,
+++    rule_id: &str,
+++    reason: &str,
+++) -> bool {
+++    let _ = writeln!(
+++        writer,
+++        "moor run: rule `{rule_id}` flagged this command: {reason}"
+++    );
+++    let _ = write!(writer, "Run it anyway? [y/N] ");
+++    let _ = writer.flush();
+++    let mut line = String::new();
+++    if reader.read_line(&mut line).is_err() {
+++        return false;
+++    }
+++    matches!(line.trim().to_ascii_lowercase().as_str(), "y" | "yes")
+++}
+++
+++/// `moor run`'s stdin — an interactive confirm only makes sense when a
+++/// human is actually there to answer it, not when `moor run` is driven
+++/// by a script or keel's own driver.
+++fn stdin_is_tty() -> bool {
+++    std::io::stdin().is_terminal()
+++}
+++
+++/// Who to attribute an override to. Best-effort, same fallback as keel's
+++/// own approval records when the host has no git identity configured.
+++fn operator_identity() -> String {
+++    proc::run_capture("git", &["config", "--get", "user.name"])
+++        .ok()
+++        .filter(|(status, _)| status.success())
+++        .map(|(_, out)| out.trim().to_string())
+++        .filter(|s| !s.is_empty())
+++        .unwrap_or_else(|| "unknown".to_string())
+++}
+++
++ /// The host-side enforcement point for `decision::evaluate` — see
++-/// docs/adr/0001-tool-call-risk-gating.md. A `Deny` verdict is logged and
++-/// returned as the error `run` propagates *before* it builds any `docker
++-/// exec` argv, so a denied command never reaches Docker. Takes the chain
++-/// path explicitly, like `audit::log_decision` does, so it needs no
++-/// `$HOME` or running container to test.
++-fn gate(chain_path: &Path, name: &str, secrets: &[String], cmd: &[String]) -> Result<()> {
++-    if let decision::Verdict::Deny { rule_id, reason } = decision::evaluate(cmd) {
++-        audit::log_decision(chain_path, name, cmd, secrets, rule_id)?;
++-        anyhow::bail!("moor run: blocked by rule `{rule_id}`: {reason}");
+++/// docs/adr/0001-tool-call-risk-gating.md and
+++/// docs/adr/0002-tool-call-ask-verdict.md. A rule match is resolved by
+++/// prompting `reader`/`writer` when `interactive`, else denied without
+++/// reading them at all; either way the resolution is logged before `run`
+++/// propagates an error, so a denied command never reaches `docker exec`.
+++/// IO and identity are parameters, not read directly, so this is testable
+++/// without a real terminal, `$HOME`, or a running container.
+++#[allow(clippy::too_many_arguments)]
+++fn gate(
+++    chain_path: &Path,
+++    name: &str,
+++    secrets: &[String],
+++    cmd: &[String],
+++    interactive: bool,
+++    reader: &mut impl BufRead,
+++    writer: &mut impl Write,
+++    operator: &str,
+++) -> Result<()> {
+++    let decision::Verdict::Deny { rule_id, reason } = decision::evaluate(cmd) else {
+++        return Ok(());
+++    };
+++    let allowed = interactive && confirm(reader, writer, rule_id, &reason);
+++    audit::log_decision(chain_path, name, cmd, secrets, rule_id, allowed, operator)?;
+++    if allowed {
+++        return Ok(());
++     }
++-    Ok(())
+++    anyhow::bail!("moor run: blocked by rule `{rule_id}`: {reason}");
++ }
++ 
++ pub fn run(name: &str, cmd: &[String]) -> Result<()> {
++@@ -37,7 +94,16 @@ pub fn run(name: &str, cmd: &[String]) -> Result<()> {
++     // So audit::redact below can scrub a secret's value even when it was
++     // only ever set via Keychain, never exported into this shell.
++     crate::secrets::resolve_into_env(name, &m.secrets);
++-    gate(&paths::chain_log_path(name)?, name, &m.secrets, cmd)?;
+++    gate(
+++        &paths::chain_log_path(name)?,
+++        name,
+++        &m.secrets,
+++        cmd,
+++        stdin_is_tty(),
+++        &mut std::io::stdin().lock(),
+++        &mut std::io::stderr(),
+++        &operator_identity(),
+++    )?;
++     let container = m.sandbox_container();
++ 
++     // What a push sends is resolved before it runs: afterwards the ref may
++@@ -178,33 +244,109 @@ mod tests {
++         ))
++     }
++ 
+++    /// Runs `gate` against a throwaway chain path with the given stdin
+++    /// content and interactivity, and returns (result, chain contents).
+++    fn run_gate(interactive: bool, stdin: &str, cmd: &[String]) -> (Result<()>, String) {
+++        let chain_path = temp_chain_path("gate");
+++        let mut reader = std::io::Cursor::new(stdin.as_bytes());
+++        let mut writer = Vec::new();
+++        let result = gate(
+++            &chain_path,
+++            "test-project",
+++            &[],
+++            cmd,
+++            interactive,
+++            &mut reader,
+++            &mut writer,
+++            "test-operator",
+++        );
+++        let logged = std::fs::read_to_string(&chain_path).unwrap_or_default();
+++        std::fs::remove_file(&chain_path).ok();
+++        (result, logged)
+++    }
+++
++     #[test]
++     fn deny_verdict_blocks_docker_exec() {
++-        let chain_path = temp_chain_path("deny");
++-        let cmd = argv("cat /home/agent/.ssh/id_rsa");
++-
++-        let result = gate(&chain_path, "test-project", &[], &cmd);
+++        let (result, logged) = run_gate(false, "", &argv("cat /home/agent/.ssh/id_rsa"));
++ 
++         assert!(result.is_err());
++         let msg = result.unwrap_err().to_string();
++         assert!(msg.contains("credential_access"), "{msg}");
++-
++-        let logged = std::fs::read_to_string(&chain_path).unwrap();
++         assert!(logged.contains("\"kind\":\"decision\""), "{logged}");
++         assert!(
++             logged.contains("\"rule_id\":\"credential_access\""),
++             "{logged}"
++         );
++-        std::fs::remove_file(&chain_path).ok();
++     }
++ 
++     #[test]
++     fn allow_verdict_is_a_no_op() {
++         let chain_path = temp_chain_path("allow");
++-        let cmd = argv("git status");
+++        let mut reader = std::io::Cursor::new(&b""[..]);
+++        let mut writer = Vec::new();
++ 
++-        assert!(gate(&chain_path, "test-project", &[], &cmd).is_ok());
+++        assert!(gate(
+++            &chain_path,
+++            "test-project",
+++            &[],
+++            &argv("git status"),
+++            true,
+++            &mut reader,
+++            &mut writer,
+++            "test-operator"
+++        )
+++        .is_ok());
++         assert!(!chain_path.exists());
+++        assert!(writer.is_empty(), "Allow must never prompt");
+++    }
+++
+++    #[test]
+++    fn interactive_yes_allows() {
+++        for answer in ["y\n", "Y\n", "yes\n", "YES\n"] {
+++            let (result, logged) = run_gate(true, answer, &argv("sudo ls"));
+++            assert!(result.is_ok(), "answer `{answer:?}` should allow");
+++            assert!(logged.contains("\"resolution\":\"allow\""), "{logged}");
+++            assert!(logged.contains("\"by\":\"test-operator\""), "{logged}");
+++        }
+++    }
+++
+++    #[test]
+++    fn interactive_no_denies() {
+++        for answer in ["n\n", "no\n", "\n", "whatever\n"] {
+++            let (result, logged) = run_gate(true, answer, &argv("sudo ls"));
+++            assert!(result.is_err(), "answer `{answer:?}` should deny");
+++            assert!(logged.contains("\"resolution\":\"deny\""), "{logged}");
+++        }
+++    }
+++
+++    #[test]
+++    fn non_interactive_denies_without_reading_stdin() {
+++        // stdin contains "y\n" but interactive is false: it must never be
+++        // consulted, so the answer it would give is irrelevant.
+++        let (result, logged) = run_gate(false, "y\n", &argv("sudo ls"));
+++        assert!(result.is_err());
+++        assert!(logged.contains("\"resolution\":\"deny\""), "{logged}");
+++    }
+++
+++    #[test]
+++    fn decision_entry_records_resolution_and_operator() {
+++        let (_, logged) = run_gate(true, "y\n", &argv("sudo ls"));
+++        assert!(
+++            logged.contains("\"rule_id\":\"boundary_escape\""),
+++            "{logged}"
+++        );
+++        assert!(logged.contains("\"resolution\":\"allow\""), "{logged}");
+++        assert!(logged.contains("\"by\":\"test-operator\""), "{logged}");
+++    }
+++
+++    #[test]
+++    fn confirm_prompts_with_rule_and_reason() {
+++        let mut reader = std::io::Cursor::new(&b"y\n"[..]);
+++        let mut writer = Vec::new();
+++        assert!(confirm(&mut reader, &mut writer, "destructive", "wipes /"));
+++        let printed = String::from_utf8(writer).unwrap();
+++        assert!(printed.contains("destructive"), "{printed}");
+++        assert!(printed.contains("wipes /"), "{printed}");
++     }
++ 
++     #[test]
++diff --git a/.keel/runs/2026-09-28-002/evidence/build.txt b/.keel/runs/2026-09-28-002/evidence/build.txt
++new file mode 100644
++index 0000000..c078b47
++--- /dev/null
+++++ b/.keel/runs/2026-09-28-002/evidence/build.txt
++@@ -0,0 +1,2 @@
+++$ cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml
+++
++diff --git a/.keel/runs/2026-09-28-002/evidence/diff-stat.txt b/.keel/runs/2026-09-28-002/evidence/diff-stat.txt
++new file mode 100644
++index 0000000..5532103
++--- /dev/null
+++++ b/.keel/runs/2026-09-28-002/evidence/diff-stat.txt
++@@ -0,0 +1,18 @@
+++     8      0  .keel/chain.jsonl
+++     2      0  .keel/runs/2026-09-28-002/evidence/build.txt
+++     2      0  .keel/runs/2026-09-28-002/evidence/lint.txt
+++    46      0  .keel/runs/2026-09-28-002/evidence/oracles.json
+++    13      0  .keel/runs/2026-09-28-002/evidence/test.txt
+++     9      0  .keel/runs/2026-09-28-002/run.json
+++    13      0  .keel/runs/2026-09-28-002/trajectory.jsonl
+++     2      0  .keel/specs/tool-call-ask-verdict/approvals.jsonl
+++    90      0  .keel/specs/tool-call-ask-verdict/gates/G0.json
+++    95      0  .keel/specs/tool-call-ask-verdict/gates/G1.json
+++    74      0  .keel/specs/tool-call-ask-verdict/plan.md
+++    91      0  .keel/specs/tool-call-ask-verdict/spec.md
+++    45      0  .keel/specs/tool-call-ask-verdict/tasks.md
+++    13      6  cli/src/audit.rs
+++   162     20  cli/src/commands/run_cmd.rs
+++    61      0  docs/adr/0002-tool-call-ask-verdict.md
+++
+++16 file(s), +726 -26 (752 lines of churn) against 99ba32f36ddde59421c98e6e496871a31de52473
++diff --git a/.keel/runs/2026-09-28-002/evidence/lint.txt b/.keel/runs/2026-09-28-002/evidence/lint.txt
++new file mode 100644
++index 0000000..edb91b9
++--- /dev/null
+++++ b/.keel/runs/2026-09-28-002/evidence/lint.txt
++@@ -0,0 +1,2 @@
+++$ cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml
+++
++diff --git a/.keel/runs/2026-09-28-002/evidence/oracles.json b/.keel/runs/2026-09-28-002/evidence/oracles.json
++new file mode 100644
++index 0000000..f42e911
++--- /dev/null
+++++ b/.keel/runs/2026-09-28-002/evidence/oracles.json
++@@ -0,0 +1,46 @@
+++{
+++  "runs": [
+++    {
+++      "criterion": "AC-1",
+++      "kind": "cmd",
+++      "oracle": "`cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::interactive_yes_allows -- --exact 2>&1 | grep -q '1 passed'` exits 0",
+++      "outcome": "pass",
+++      "exit_code": 0
+++    },
+++    {
+++      "criterion": "AC-2",
+++      "kind": "cmd",
+++      "oracle": "`cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::interactive_no_denies -- --exact 2>&1 | grep -q '1 passed'` exits 0",
+++      "outcome": "pass",
+++      "exit_code": 0
+++    },
+++    {
+++      "criterion": "AC-3",
+++      "kind": "cmd",
+++      "oracle": "`cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::non_interactive_denies_without_reading_stdin -- --exact 2>&1 | grep -q '1 passed'` exits 0",
+++      "outcome": "pass",
+++      "exit_code": 0
+++    },
+++    {
+++      "criterion": "AC-4",
+++      "kind": "cmd",
+++      "oracle": "`cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::decision_entry_records_resolution_and_operator -- --exact 2>&1 | grep -q '1 passed'` exits 0",
+++      "outcome": "pass",
+++      "exit_code": 0
+++    },
+++    {
+++      "criterion": "AC-5",
+++      "kind": "cmd",
+++      "oracle": "`cargo test --manifest-path cli/Cargo.toml --quiet` exits 0",
+++      "outcome": "pass",
+++      "exit_code": 0,
+++      "output": "\nrunning 140 tests\n....................................................................................... 87/140\n.....................................................\ntest result: ok. 140 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s"
+++    }
+++  ],
+++  "criteria": 5,
+++  "executed": 5,
+++  "passed": 5,
+++  "failed": 0,
+++  "blocked": 0,
+++  "human": 0
+++}
++\ No newline at end of file
++diff --git a/.keel/runs/2026-09-28-002/evidence/test.txt b/.keel/runs/2026-09-28-002/evidence/test.txt
++new file mode 100644
++index 0000000..bc21160
++--- /dev/null
+++++ b/.keel/runs/2026-09-28-002/evidence/test.txt
++@@ -0,0 +1,13 @@
+++$ cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml
+++
+++
+++running 140 tests
+++....................................................................................... 87/140
+++.....................................................
+++test result: ok. 140 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+++
+++
+++running 8 tests
+++........
+++test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+++
++diff --git a/.keel/runs/2026-09-28-002/run.json b/.keel/runs/2026-09-28-002/run.json
++new file mode 100644
++index 0000000..9fe438c
++--- /dev/null
+++++ b/.keel/runs/2026-09-28-002/run.json
++@@ -0,0 +1,9 @@
+++{
+++  "schema": "keel.run/1",
+++  "id": "2026-09-28-002",
+++  "spec": "tool-call-ask-verdict",
+++  "keel_version": "0.10.0",
+++  "store_hash": "4e07f093d6afa16aeb50b4bab14c069797586ba01befb262b14b96bbd0213f0e",
+++  "started_at": "2026-09-28T20:17:39.317284+02:00",
+++  "base_commit": "99ba32f36ddde59421c98e6e496871a31de52473"
+++}
++diff --git a/.keel/runs/2026-09-28-002/trajectory.jsonl b/.keel/runs/2026-09-28-002/trajectory.jsonl
++new file mode 100644
++index 0000000..e9cbb80
++--- /dev/null
+++++ b/.keel/runs/2026-09-28-002/trajectory.jsonl
++@@ -0,0 +1,13 @@
+++{"t":"2026-09-28T20:17:39.317501+02:00","seq":1,"kind":"run_start","spec":"tool-call-ask-verdict","keel_version":"0.10.0","store_hash":"4e07f093d6afa16aeb50b4bab14c069797586ba01befb262b14b96bbd0213f0e"}
+++{"t":"2026-09-28T20:17:39.318161+02:00","seq":2,"kind":"inject","source":".keel/store/steering/conventions.md","tokens":177,"bytes":705}
+++{"t":"2026-09-28T20:17:39.318187+02:00","seq":3,"kind":"inject","source":".keel/store/steering/tech.md","tokens":85,"bytes":338}
+++{"t":"2026-09-28T20:17:39.318222+02:00","seq":4,"kind":"inject","source":".keel/store/steering/structure.md","tokens":4230,"bytes":16917}
+++{"t":"2026-09-28T20:17:39.318914+02:00","seq":5,"kind":"inject","source":".keel/specs/tool-call-ask-verdict/spec.md","tokens":995,"bytes":3979}
+++{"t":"2026-09-28T20:17:40.728985+02:00","seq":6,"kind":"command","cmd":"cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/build.txt"}
+++{"t":"2026-09-28T20:17:40.843254+02:00","seq":7,"kind":"command","cmd":"cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/test.txt"}
+++{"t":"2026-09-28T20:17:41.045845+02:00","seq":8,"kind":"command","cmd":"cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/lint.txt"}
+++{"t":"2026-09-28T20:17:41.336735+02:00","seq":9,"kind":"oracle","criterion":"AC-1","oracle":"`cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::interactive_yes_allows -- --exact 2>&1 | grep -q '1 passed'` exits 0","verdict":"pass","exit_code":0}
+++{"t":"2026-09-28T20:17:41.336757+02:00","seq":10,"kind":"oracle","criterion":"AC-2","oracle":"`cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::interactive_no_denies -- --exact 2>&1 | grep -q '1 passed'` exits 0","verdict":"pass","exit_code":0}
+++{"t":"2026-09-28T20:17:41.336762+02:00","seq":11,"kind":"oracle","criterion":"AC-3","oracle":"`cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::non_interactive_denies_without_reading_stdin -- --exact 2>&1 | grep -q '1 passed'` exits 0","verdict":"pass","exit_code":0}
+++{"t":"2026-09-28T20:17:41.336765+02:00","seq":12,"kind":"oracle","criterion":"AC-4","oracle":"`cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::decision_entry_records_resolution_and_operator -- --exact 2>&1 | grep -q '1 passed'` exits 0","verdict":"pass","exit_code":0}
+++{"t":"2026-09-28T20:17:41.336771+02:00","seq":13,"kind":"oracle","criterion":"AC-5","oracle":"`cargo test --manifest-path cli/Cargo.toml --quiet` exits 0","verdict":"pass","exit_code":0}
++diff --git a/.keel/specs/tool-call-ask-verdict/approvals.jsonl b/.keel/specs/tool-call-ask-verdict/approvals.jsonl
++new file mode 100644
++index 0000000..3c22764
++--- /dev/null
+++++ b/.keel/specs/tool-call-ask-verdict/approvals.jsonl
++@@ -0,0 +1,2 @@
+++{"schema":"keel.approval/1","stage":"spec","decision":"approved","artefact_hash":"c93af2788214176acf25692dff880d45bdb348adea828ea6ab9c94ada3ef32be","gate_verdict":"pass","by":"Dane Balia","at":"2026-09-28T20:17:14.837595+02:00"}
+++{"schema":"keel.approval/1","stage":"plan","decision":"approved","artefact_hash":"527ff5ce625851f90dae6fb2d9ef4b0aaf6475661689633f8f6ad4e84fec235f","gate_verdict":"fail","by":"Dane Balia","at":"2026-09-28T20:17:14.849556+02:00"}
++diff --git a/.keel/specs/tool-call-ask-verdict/gates/G0.json b/.keel/specs/tool-call-ask-verdict/gates/G0.json
++new file mode 100644
++index 0000000..469053a
++--- /dev/null
+++++ b/.keel/specs/tool-call-ask-verdict/gates/G0.json
++@@ -0,0 +1,90 @@
+++{
+++  "schema": "keel.gate/1",
+++  "gate": "G0",
+++  "run": "2026-09-28-002",
+++  "spec": "tool-call-ask-verdict",
+++  "verdict": "pass",
+++  "generated_at": "2026-09-28T20:14:42.369637+02:00",
+++  "checks": [
+++    {
+++      "id": "schema",
+++      "verdict": "pass",
+++      "detail": "SPEC-0009 (keel.spec/1)"
+++    },
+++    {
+++      "id": "criteria-present",
+++      "verdict": "pass",
+++      "detail": "5 criteria"
+++    },
+++    {
+++      "id": "criterion-ids-unique",
+++      "verdict": "pass",
+++      "detail": "no duplicate ids"
+++    },
+++    {
+++      "id": "no-placeholders",
+++      "verdict": "pass",
+++      "detail": "no unfilled scaffold text"
+++    },
+++    {
+++      "id": "ears-conformance",
+++      "verdict": "pass",
+++      "detail": "5/5 conform (event-driven, unwanted-behaviour)"
+++    },
+++    {
+++      "id": "oracle-presence",
+++      "verdict": "pass",
+++      "detail": "5 oracles across 5 criteria"
+++    },
+++    {
+++      "id": "oracle-wellformed",
+++      "verdict": "pass",
+++      "detail": "all oracles parse"
+++    },
+++    {
+++      "id": "ambiguity",
+++      "verdict": "pass",
+++      "detail": "no ambiguous phrasing in criteria"
+++    },
+++    {
+++      "id": "criterion-budget",
+++      "verdict": "pass",
+++      "detail": "5/8 criteria"
+++    },
+++    {
+++      "id": "spec-length",
+++      "verdict": "pass",
+++      "detail": "91/250 lines"
+++    },
+++    {
+++      "id": "scope-declared",
+++      "verdict": "pass",
+++      "detail": "3 glob(s): docs/adr/0002-tool-call-ask-verdict.md, cli/src/commands/run_cmd.rs, cli/src/audit.rs"
+++    },
+++    {
+++      "id": "change-budget",
+++      "verdict": "pass",
+++      "detail": "300 lines of diff budgeted"
+++    },
+++    {
+++      "id": "oracle-mix",
+++      "verdict": "pass",
+++      "detail": "5/5 runnable (5 cmd)"
+++    },
+++    {
+++      "id": "human-cost",
+++      "verdict": "pass",
+++      "detail": "0 human oracle(s), none load-bearing"
+++    },
+++    {
+++      "id": "store-drift",
+++      "verdict": "pass",
+++      "detail": "4 projections current"
+++    },
+++    {
+++      "id": "shared-stores",
+++      "verdict": "pass",
+++      "detail": "none configured"
+++    }
+++  ]
+++}
++diff --git a/.keel/specs/tool-call-ask-verdict/gates/G1.json b/.keel/specs/tool-call-ask-verdict/gates/G1.json
++new file mode 100644
++index 0000000..027a84f
++--- /dev/null
+++++ b/.keel/specs/tool-call-ask-verdict/gates/G1.json
++@@ -0,0 +1,95 @@
+++{
+++  "schema": "keel.gate/1",
+++  "gate": "G1",
+++  "run": "2026-09-28-002",
+++  "spec": "tool-call-ask-verdict",
+++  "verdict": "pass",
+++  "generated_at": "2026-09-28T20:17:36.351072+02:00",
+++  "checks": [
+++    {
+++      "id": "schema",
+++      "verdict": "pass",
+++      "detail": "PLAN-0009 + TASKS-0009"
+++    },
+++    {
+++      "id": "g0-passed",
+++      "verdict": "pass",
+++      "detail": "G0 passed in run 2026-09-28-002"
+++    },
+++    {
+++      "id": "spec-approved",
+++      "verdict": "pass",
+++      "detail": "approved by Dane Balia"
+++    },
+++    {
+++      "id": "tasks-present",
+++      "verdict": "pass",
+++      "detail": "5/15 tasks"
+++    },
+++    {
+++      "id": "task-ids-unique",
+++      "verdict": "pass",
+++      "detail": "no duplicate task ids"
+++    },
+++    {
+++      "id": "task-fields",
+++      "verdict": "pass",
+++      "detail": "all task fields recognised"
+++    },
+++    {
+++      "id": "task-criterion-traceability",
+++      "verdict": "pass",
+++      "detail": "5 tasks all traced"
+++    },
+++    {
+++      "id": "criteria-covered",
+++      "verdict": "pass",
+++      "detail": "5/5 criteria have a task"
+++    },
+++    {
+++      "id": "task-budgets",
+++      "verdict": "pass",
+++      "detail": "all 5 tasks budgeted, total 300 lines"
+++    },
+++    {
+++      "id": "total-budget",
+++      "verdict": "pass",
+++      "detail": "300/300 lines"
+++    },
+++    {
+++      "id": "task-exit-conditions",
+++      "verdict": "pass",
+++      "detail": "every task states when it is done"
+++    },
+++    {
+++      "id": "task-dependencies",
+++      "verdict": "pass",
+++      "detail": "1 wave(s), widths 5"
+++    },
+++    {
+++      "id": "wave-isolation",
+++      "verdict": "pass",
+++      "detail": "1 wave(s), no file claimed twice within one"
+++    },
+++    {
+++      "id": "task-files-in-scope",
+++      "verdict": "pass",
+++      "detail": "all task files inside the declared scope"
+++    },
+++    {
+++      "id": "rollback-stated",
+++      "verdict": "pass",
+++      "detail": "git revert"
+++    },
+++    {
+++      "id": "blast-radius-declared",
+++      "verdict": "pass",
+++      "detail": "5 file(s) at depth 2, 1086 lines"
+++    },
+++    {
+++      "id": "blast-radius-current",
+++      "verdict": "pass",
+++      "detail": "5 files, 1086 lines — matches a fresh computation — no indexed file matches docs/adr/0002-tool-call-ask-verdict.md (new files, or a typo)"
+++    }
+++  ]
+++}
++diff --git a/.keel/specs/tool-call-ask-verdict/plan.md b/.keel/specs/tool-call-ask-verdict/plan.md
++new file mode 100644
++index 0000000..d5178a1
++--- /dev/null
+++++ b/.keel/specs/tool-call-ask-verdict/plan.md
++@@ -0,0 +1,74 @@
+++---
+++id: PLAN-0009
+++slug: tool-call-ask-verdict
+++schema: keel.plan/1
+++blast:
+++  depth: 2
+++  declared:
+++  - docs/adr/0002-tool-call-ask-verdict.md
+++  - cli/src/commands/run_cmd.rs
+++  - cli/src/audit.rs
+++  computed:
+++  - cli/src/commands/run_cmd.rs
+++  - cli/src/audit.rs
+++  - cli/src/commands/mod.rs
+++  - cli/src/main.rs
+++  - cli/src/commands/keel_cmd.rs
+++  computed_lines: 1086
+++rollback: git revert
+++verified_at: 2026-09-28
+++---
+++
+++# Design — tool-call-ask-verdict
+++
+++## Approach
+++
+++The seam is still `run_cmd::gate`, the function ADR-0001/SPEC-0008 added.
+++It changes what happens on a `Deny` from `decision::evaluate`, not
+++whether one fires:
+++
+++1. `cli/src/commands/run_cmd.rs` — three new small functions: `confirm`
+++   (prints the rule id/reason, reads one line, true only for `y`/`yes`),
+++   `stdin_is_tty` (`std::io::IsTerminal`), and `operator_identity` (`git
+++   config user.name`, falling back to `unknown`). `gate` grows an
+++   `interactive: bool` plus a `reader`/`writer`/`operator` it is handed
+++   rather than reads itself — the same dependency-injection shape
+++   `chain_path` already used, so the confirm/decline/non-interactive
+++   paths are unit-tested with a `Cursor` instead of a real terminal.
+++   `allowed = interactive && confirm(...)` — the `&&` short-circuit is
+++   what makes a non-interactive invocation never touch stdin at all,
+++   satisfying AC-3 by construction, not by a separate check.
+++2. `cli/src/audit.rs` — `log_decision` gains `allowed: bool` and
+++   `operator: &str`, and the entry's `verdict` field changes from
+++   `"deny"` to `"ask"` with a new `resolution` field (`"allow"`/`"deny"`)
+++   and `"by"`. Same function, same call site, more fields — no new
+++   function.
+++3. `docs/adr/0002-tool-call-ask-verdict.md` — records the decision and,
+++   explicitly, the `moor recipe` gap found while scoping this (Docker
+++   called directly, bypassing `gate` entirely) as still open.
+++
+++`run()`'s call site changes only in what it passes to `gate`: real stdin,
+++real stderr, the real TTY check, the real operator identity. Everything
+++after the `gate(...)?` call — building the `docker exec` argv, the
+++push/exec audit entry — is untouched.
+++
+++## Blast radius
+++
+++<!-- generated by `keel plan`; edits here are overwritten -->
+++
+++Computed from the import graph at depth 2: **5 files, 1086 lines**.
+++
+++| depth | file | lines |
+++| --- | --- | --- |
+++| scope | `cli/src/commands/run_cmd.rs` | 81 |
+++| scope | `cli/src/audit.rs` | 458 |
+++| +1 | `cli/src/commands/mod.rs` | 279 |
+++| +1 | `cli/src/main.rs` | 212 |
+++| +1 | `cli/src/commands/keel_cmd.rs` | 56 |
+++
+++_Scope globs matching no indexed file (new files, or a typo): docs/adr/0002-tool-call-ask-verdict.md_
+++
+++
+++## Rollback
+++
+++`git revert` — replace this if the change needs a different rollback.
++diff --git a/.keel/specs/tool-call-ask-verdict/spec.md b/.keel/specs/tool-call-ask-verdict/spec.md
++new file mode 100644
++index 0000000..5d710a4
++--- /dev/null
+++++ b/.keel/specs/tool-call-ask-verdict/spec.md
++@@ -0,0 +1,91 @@
+++---
+++id: SPEC-0009
+++slug: tool-call-ask-verdict
+++schema: keel.spec/1
+++status: approved
+++scope:
+++- docs/adr/0002-tool-call-ask-verdict.md
+++- cli/src/commands/run_cmd.rs
+++- cli/src/audit.rs
+++budget:
+++  criteria: 8
+++  lines: 300
+++verified_at: 2026-09-28
+++---
+++
+++# Tool-call risk gate: interactive Ask verdict
+++
+++## Context
+++
+++SPEC-0008 (ADR-0001) made every rule match in `decision::evaluate` a hard
+++`Deny`: no override, ever. That is correct for a fully unattended path,
+++but `moor run`/`moor keel` are typed by the operator at their own
+++terminal — the one place moor's threat model already trusts a human
+++decision (`keel approve`, "the human checkpoints keel defines"). A false
+++positive today (a `.pem` file that is a public cert, not a private key)
+++has no escape hatch but editing the rule table.
+++
+++This spec turns that hard `Deny` into the spike's `Ask`: prompt the
+++operator, with the rule id and reason, only when `moor run`'s stdin is a
+++real terminal. Any other input, or no input at all, denies exactly as
+++before — the fail-closed behavior automated and headless invocations
+++already depend on is unchanged. Every prompted decision, allowed or
+++declined, is logged to the audit chain with its resolution and the
+++operator's git identity, so an override is never silent.
+++
+++## Acceptance criteria
+++
+++### AC-1 An interactive operator can override a flagged command
+++
+++WHEN `moor run`'s stdin is a terminal and a command matches a rule THE
+++SYSTEM SHALL print the rule id and reason and prompt the operator, then
+++proceed to `docker exec` only if the operator answers `y` or `yes`
+++(case-insensitive).
+++
+++oracle: cmd `cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::interactive_yes_allows -- --exact 2>&1 | grep -q '1 passed'` exit 0
+++
+++### AC-2 A decline denies exactly as an unprompted Deny does
+++
+++WHEN the operator answers anything other than `y`/`yes`, including empty
+++input, THE SYSTEM SHALL deny the command with no `docker exec` invoked.
+++
+++oracle: cmd `cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::interactive_no_denies -- --exact 2>&1 | grep -q '1 passed'` exit 0
+++
+++### AC-3 A non-interactive invocation is never prompted
+++
+++IF `moor run`'s stdin is not a terminal THEN THE SYSTEM SHALL deny a
+++flagged command without reading stdin or printing a prompt, regardless of
+++what stdin contains.
+++
+++oracle: cmd `cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::non_interactive_denies_without_reading_stdin -- --exact 2>&1 | grep -q '1 passed'` exit 0
+++
+++### AC-4 Every prompted decision is attributed in the audit chain
+++
+++WHEN a rule match is resolved, by prompt or by fail-closed denial, THE
+++SYSTEM SHALL append a `decision` audit entry recording `rule_id`,
+++`resolution` (`allow` or `deny`), and the operator identity from `git
+++config user.name` (`unknown` when unset).
+++
+++oracle: cmd `cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::decision_entry_records_resolution_and_operator -- --exact 2>&1 | grep -q '1 passed'` exit 0
+++
+++### AC-5 An Allow verdict is still a no-op
+++
+++WHEN `decision::evaluate` returns `Allow` THE SYSTEM SHALL run the
+++command exactly as before this change: no prompt, no new audit entry
+++kind, unchanged existing behavior.
+++
+++oracle: cmd `cargo test --manifest-path cli/Cargo.toml --quiet` exit 0
+++
+++## Out of scope
+++
+++- `moor recipe`'s unattended agent-step execution, which calls Docker
+++  directly and does not pass through `run_cmd::gate` at all — discovered
+++  while scoping this spec, and left open deliberately: an unattended flow
+++  cannot show a TTY prompt, so closing that gap needs either an async
+++  decision path or the model, not this interactive confirm.
+++- Any change to `decision::evaluate`'s rule table (credential_access,
+++  boundary_escape, destructive) — same three rules, now with an override
+++  path instead of none.
+++- The local decision model, ONNX, and the `ort`-backed daemon.
+++- Remembering a decision across invocations (e.g. "always allow this
+++  rule for this project") — every match prompts again.
++diff --git a/.keel/specs/tool-call-ask-verdict/tasks.md b/.keel/specs/tool-call-ask-verdict/tasks.md
++new file mode 100644
++index 0000000..ab4afb4
++--- /dev/null
+++++ b/.keel/specs/tool-call-ask-verdict/tasks.md
++@@ -0,0 +1,45 @@
+++---
+++id: TASKS-0009
+++slug: tool-call-ask-verdict
+++schema: keel.tasks/1
+++---
+++
+++# Tasks
+++
+++Each task must name the criteria it satisfies, the files it touches, a line
+++budget and an exit condition. G1 checks all four, and checks that every
+++criterion in the spec is covered by at least one task.
+++
+++Add `- depends_on: T-1` where order matters. Tasks with no dependency on
+++each other form a wave; `keel tasks` shows them.
+++
+++### T-1 An interactive operator can override a flagged command
+++- criteria: AC-1
+++- files: scope
+++- budget: 60
+++- exit: `cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::interactive_yes_allows -- --exact 2>&1 | grep -q '1 passed'` exits 0
+++
+++### T-2 A decline denies exactly as an unprompted Deny does
+++- criteria: AC-2
+++- files: scope
+++- budget: 60
+++- exit: `cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::interactive_no_denies -- --exact 2>&1 | grep -q '1 passed'` exits 0
+++
+++### T-3 A non-interactive invocation is never prompted
+++- criteria: AC-3
+++- files: scope
+++- budget: 60
+++- exit: `cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::non_interactive_denies_without_reading_stdin -- --exact 2>&1 | grep -q '1 passed'` exits 0
+++
+++### T-4 Every prompted decision is attributed in the audit chain
+++- criteria: AC-4
+++- files: scope
+++- budget: 60
+++- exit: `cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::decision_entry_records_resolution_and_operator -- --exact 2>&1 | grep -q '1 passed'` exits 0
+++
+++### T-5 An Allow verdict is still a no-op
+++- criteria: AC-5
+++- files: scope
+++- budget: 60
+++- exit: `cargo test --manifest-path cli/Cargo.toml --quiet` exits 0
+++
++diff --git a/docs/adr/0002-tool-call-ask-verdict.md b/docs/adr/0002-tool-call-ask-verdict.md
++new file mode 100644
++index 0000000..539ff94
++--- /dev/null
+++++ b/docs/adr/0002-tool-call-ask-verdict.md
++@@ -0,0 +1,61 @@
+++# ADR-0002: Ask is an interactive operator confirm, fail-closed when unattended
+++
+++## Status
+++
+++Accepted. Implemented by keel spec `tool-call-ask-verdict`.
+++
+++## Context
+++
+++ADR-0001 made every `decision::evaluate` rule match a hard `Deny`: no
+++override, by design, because nothing sat on the other end of an
+++in-sandbox agent to ask. But `moor run <project> -- <cmd>` and `moor keel
+++<verb>` are typed by the operator at their own terminal — the same human
+++`keel approve` already trusts with every checkpoint in this pipeline. A
+++false positive (a `.pem` file that happens to be a public cert, not a
+++private key) had no way through but editing the rule table by hand.
+++
+++The spike's `Ask` verdict is "a human decides." For `moor run`'s actual
+++callers, the human is already present when the command is typed — this
+++does not need a daemon, a socket, or an approval queue to be real.
+++
+++While scoping this, `cli/src/commands/recipe.rs`'s unattended agent-step
+++execution turned out to call Docker directly, not through
+++`run_cmd::gate` — so it isn't covered by ADR-0001's gate at all today,
+++let alone by this one. Left open deliberately (see "Deferred" in
+++ADR-0001 and this ADR's own scope): an unattended flow has no terminal to
+++prompt, so closing that gap is an async-decision or model problem, not
+++an extension of the confirm this ADR adds.
+++
+++## Decision
+++
+++A rule match calls `confirm`, which prints the rule id and reason and
+++reads one line from stdin, but only when `moor run`'s stdin is a real
+++terminal (`std::io::IsTerminal`). Only `y`/`yes` (trimmed,
+++case-insensitive) is a yes; anything else — a decline, empty input, a
+++read error, or a non-interactive invocation that never reads stdin at
+++all — denies exactly as ADR-0001 already did. Every resolution, allowed
+++or denied, is logged to the audit chain (`audit::log_decision`) with the
+++rule id, the resolution, and the operator's identity from `git config
+++user.name` (`unknown` when unset) — the same fallback keel's own approval
+++records use.
+++
+++## Consequences
+++
+++- An operator can now get past a false-positive rule match without
+++  editing `decision.rs`, at the cost of one explicit, logged confirm.
+++- Nothing about a scripted or headless `moor run` changes: no prompt is
+++  ever shown, and stdin content is never consulted, when stdin isn't a
+++  terminal. `moor recipe` and keel's own driver are exactly as
+++  fail-closed as before this ADR.
+++- A rule match still denies by default in every case where no one
+++  answers `y` — declining, timing out at an empty line, or running
+++  unattended all resolve the same way.
+++
+++## Deferred
+++
+++- `moor recipe`'s unattended agent steps, which don't pass through this
+++  gate at all yet.
+++- Remembering a decision across invocations; every match prompts again.
+++- The local decision model, ONNX, and the `ort`-backed daemon — this ADR
+++  changes nothing about what triggers a match, only what happens once one
+++  does.
+diff --git a/.keel/runs/2026-09-28-002/evidence/lint.txt b/.keel/runs/2026-09-28-002/evidence/lint.txt
+new file mode 100644
+index 0000000..edb91b9
+--- /dev/null
++++ b/.keel/runs/2026-09-28-002/evidence/lint.txt
+@@ -0,0 +1,2 @@
++$ cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml
++
+diff --git a/.keel/runs/2026-09-28-002/evidence/oracles.json b/.keel/runs/2026-09-28-002/evidence/oracles.json
+new file mode 100644
+index 0000000..f42e911
+--- /dev/null
++++ b/.keel/runs/2026-09-28-002/evidence/oracles.json
+@@ -0,0 +1,46 @@
++{
++  "runs": [
++    {
++      "criterion": "AC-1",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::interactive_yes_allows -- --exact 2>&1 | grep -q '1 passed'` exits 0",
++      "outcome": "pass",
++      "exit_code": 0
++    },
++    {
++      "criterion": "AC-2",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::interactive_no_denies -- --exact 2>&1 | grep -q '1 passed'` exits 0",
++      "outcome": "pass",
++      "exit_code": 0
++    },
++    {
++      "criterion": "AC-3",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::non_interactive_denies_without_reading_stdin -- --exact 2>&1 | grep -q '1 passed'` exits 0",
++      "outcome": "pass",
++      "exit_code": 0
++    },
++    {
++      "criterion": "AC-4",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::decision_entry_records_resolution_and_operator -- --exact 2>&1 | grep -q '1 passed'` exits 0",
++      "outcome": "pass",
++      "exit_code": 0
++    },
++    {
++      "criterion": "AC-5",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml --quiet` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "\nrunning 140 tests\n....................................................................................... 87/140\n.....................................................\ntest result: ok. 140 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s"
++    }
++  ],
++  "criteria": 5,
++  "executed": 5,
++  "passed": 5,
++  "failed": 0,
++  "blocked": 0,
++  "human": 0
++}
+\ No newline at end of file
+diff --git a/.keel/runs/2026-09-28-002/evidence/ratchet.json b/.keel/runs/2026-09-28-002/evidence/ratchet.json
+new file mode 100644
+index 0000000..f3b5e43
+--- /dev/null
++++ b/.keel/runs/2026-09-28-002/evidence/ratchet.json
+@@ -0,0 +1,8 @@
++[
++  {
++    "id": "todo-markers",
++    "direction": "down",
++    "value": 1,
++    "baseline": null
++  }
++]
+\ No newline at end of file
+diff --git a/.keel/runs/2026-09-28-002/evidence/review-test-invalidation.txt b/.keel/runs/2026-09-28-002/evidence/review-test-invalidation.txt
+new file mode 100644
+index 0000000..fd66af7
+--- /dev/null
++++ b/.keel/runs/2026-09-28-002/evidence/review-test-invalidation.txt
+@@ -0,0 +1 @@
++no added mocks or weakened assertions
+diff --git a/.keel/runs/2026-09-28-002/evidence/test.txt b/.keel/runs/2026-09-28-002/evidence/test.txt
+new file mode 100644
+index 0000000..bc21160
+--- /dev/null
++++ b/.keel/runs/2026-09-28-002/evidence/test.txt
+@@ -0,0 +1,13 @@
++$ cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml
++
++
++running 140 tests
++....................................................................................... 87/140
++.....................................................
++test result: ok. 140 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
++
++
++running 8 tests
++........
++test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
++
+diff --git a/.keel/runs/2026-09-28-002/evidence/tree.txt b/.keel/runs/2026-09-28-002/evidence/tree.txt
+new file mode 100644
+index 0000000..b72ce5d
+--- /dev/null
++++ b/.keel/runs/2026-09-28-002/evidence/tree.txt
+@@ -0,0 +1 @@
++c1c4558cbe42be036dc19587e784be00f0a68bfafd98a9db09dd447d964293f9
+diff --git a/.keel/runs/2026-09-28-002/gates/G2.5.json b/.keel/runs/2026-09-28-002/gates/G2.5.json
+new file mode 100644
+index 0000000..86024c3
+--- /dev/null
++++ b/.keel/runs/2026-09-28-002/gates/G2.5.json
+@@ -0,0 +1,36 @@
++{
++  "schema": "keel.gate/1",
++  "gate": "G2.5",
++  "run": "2026-09-28-003",
++  "spec": "tool-call-ask-verdict",
++  "verdict": "blocked",
++  "generated_at": "2026-09-28T20:17:41.518007+02:00",
++  "checks": [
++    {
++      "id": "test-invalidation",
++      "verdict": "pass",
++      "detail": "no mocks or weakened assertions added",
++      "evidence": "evidence/review-test-invalidation.txt"
++    },
++    {
++      "id": "test-movement",
++      "verdict": "blocked",
++      "detail": "3 code file(s) changed and no test file did — confirm the criteria's oracles exercise this, then `keel approve --stage review tool-call-ask-verdict`"
++    },
++    {
++      "id": "conventions",
++      "verdict": "pass",
++      "detail": "3 house rule(s) in force"
++    },
++    {
++      "id": "lessons",
++      "verdict": "pass",
++      "detail": "no lessons in force yet (Phase 3 populates these)"
++    },
++    {
++      "id": "reviewer",
++      "verdict": "pass",
++      "detail": "no adversarial reviewer configured — the heuristics above are the whole pass"
++    }
++  ]
++}
+diff --git a/.keel/runs/2026-09-28-002/gates/G2.json b/.keel/runs/2026-09-28-002/gates/G2.json
+new file mode 100644
+index 0000000..3d455d6
+--- /dev/null
++++ b/.keel/runs/2026-09-28-002/gates/G2.json
+@@ -0,0 +1,62 @@
++{
++  "schema": "keel.gate/1",
++  "gate": "G2",
++  "run": "2026-09-28-003",
++  "spec": "tool-call-ask-verdict",
++  "verdict": "pass",
++  "generated_at": "2026-09-28T20:17:41.486546+02:00",
++  "checks": [
++    {
++      "id": "build",
++      "verdict": "pass",
++      "detail": "`cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml` exited 0",
++      "evidence": "evidence/build.txt"
++    },
++    {
++      "id": "test",
++      "verdict": "pass",
++      "detail": "`cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml` exited 0",
++      "evidence": "evidence/test.txt"
++    },
++    {
++      "id": "lint",
++      "verdict": "pass",
++      "detail": "`cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml` exited 0",
++      "evidence": "evidence/lint.txt"
++    },
++    {
++      "id": "oracle-coverage",
++      "verdict": "pass",
++      "detail": "5/5 oracles pass (0 awaiting human judgement)",
++      "evidence": "evidence/oracles.json"
++    },
++    {
++      "id": "blast-radius",
++      "verdict": "pass",
++      "detail": "3 changed file(s) inside scope, 5 file(s) downstream",
++      "evidence": "evidence/diff-stat.txt"
++    },
++    {
++      "id": "line-budget",
++      "verdict": "pass",
++      "detail": "262/300 lines of churn",
++      "evidence": "evidence/diff-stat.txt"
++    },
++    {
++      "id": "baseline-ratchet",
++      "verdict": "pass",
++      "detail": "1 metric(s) held",
++      "evidence": "evidence/ratchet.json"
++    },
++    {
++      "id": "store-drift",
++      "verdict": "pass",
++      "detail": "4 projections current"
++    },
++    {
++      "id": "shared-stores",
++      "verdict": "pass",
++      "detail": "none configured"
++    }
++  ]
++}
+diff --git a/.keel/runs/2026-09-28-002/gates/G3.json b/.keel/runs/2026-09-28-002/gates/G3.json
+new file mode 100644
+index 0000000..772b99c
+--- /dev/null
++++ b/.keel/runs/2026-09-28-002/gates/G3.json
+@@ -0,0 +1,31 @@
++{
++  "schema": "keel.gate/1",
++  "gate": "G3",
++  "run": "2026-09-28-003",
++  "spec": "tool-call-ask-verdict",
++  "verdict": "fail",
++  "generated_at": "2026-09-28T20:17:41.532405+02:00",
++  "checks": [
++    {
++      "id": "earlier-gates",
++      "verdict": "blocked",
++      "detail": "G2.5 could not complete — G3 has nothing to ratify"
++    },
++    {
++      "id": "reviewable-size",
++      "verdict": "pass",
++      "detail": "262/1100 reviewable lines"
++    },
++    {
++      "id": "evidence-complete",
++      "verdict": "pass",
++      "detail": "trajectory, metadata and gate results present"
++    },
++    {
++      "id": "human-verdict",
++      "verdict": "fail",
++      "expected": "a recorded human decision on the change",
++      "actual": "none — run `keel approve tool-call-ask-verdict --stage merge`"
++    }
++  ]
++}
+diff --git a/.keel/runs/2026-09-28-002/run.json b/.keel/runs/2026-09-28-002/run.json
+new file mode 100644
+index 0000000..8fed425
+--- /dev/null
++++ b/.keel/runs/2026-09-28-002/run.json
+@@ -0,0 +1,11 @@
++{
++  "schema": "keel.run/1",
++  "id": "2026-09-28-002",
++  "spec": "tool-call-ask-verdict",
++  "keel_version": "0.10.0",
++  "store_hash": "4e07f093d6afa16aeb50b4bab14c069797586ba01befb262b14b96bbd0213f0e",
++  "started_at": "2026-09-28T20:17:39.317284+02:00",
++  "finished_at": "2026-09-28T20:17:41.532923+02:00",
++  "verdict": "fail",
++  "base_commit": "99ba32f36ddde59421c98e6e496871a31de52473"
++}
+diff --git a/.keel/runs/2026-09-28-002/trajectory.jsonl b/.keel/runs/2026-09-28-002/trajectory.jsonl
+new file mode 100644
+index 0000000..287cfd6
+--- /dev/null
++++ b/.keel/runs/2026-09-28-002/trajectory.jsonl
+@@ -0,0 +1,19 @@
++{"t":"2026-09-28T20:17:39.317501+02:00","seq":1,"kind":"run_start","spec":"tool-call-ask-verdict","keel_version":"0.10.0","store_hash":"4e07f093d6afa16aeb50b4bab14c069797586ba01befb262b14b96bbd0213f0e"}
++{"t":"2026-09-28T20:17:39.318161+02:00","seq":2,"kind":"inject","source":".keel/store/steering/conventions.md","tokens":177,"bytes":705}
++{"t":"2026-09-28T20:17:39.318187+02:00","seq":3,"kind":"inject","source":".keel/store/steering/tech.md","tokens":85,"bytes":338}
++{"t":"2026-09-28T20:17:39.318222+02:00","seq":4,"kind":"inject","source":".keel/store/steering/structure.md","tokens":4230,"bytes":16917}
++{"t":"2026-09-28T20:17:39.318914+02:00","seq":5,"kind":"inject","source":".keel/specs/tool-call-ask-verdict/spec.md","tokens":995,"bytes":3979}
++{"t":"2026-09-28T20:17:40.728985+02:00","seq":6,"kind":"command","cmd":"cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/build.txt"}
++{"t":"2026-09-28T20:17:40.843254+02:00","seq":7,"kind":"command","cmd":"cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/test.txt"}
++{"t":"2026-09-28T20:17:41.045845+02:00","seq":8,"kind":"command","cmd":"cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/lint.txt"}
++{"t":"2026-09-28T20:17:41.336735+02:00","seq":9,"kind":"oracle","criterion":"AC-1","oracle":"`cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::interactive_yes_allows -- --exact 2>&1 | grep -q '1 passed'` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-09-28T20:17:41.336757+02:00","seq":10,"kind":"oracle","criterion":"AC-2","oracle":"`cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::interactive_no_denies -- --exact 2>&1 | grep -q '1 passed'` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-09-28T20:17:41.336762+02:00","seq":11,"kind":"oracle","criterion":"AC-3","oracle":"`cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::non_interactive_denies_without_reading_stdin -- --exact 2>&1 | grep -q '1 passed'` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-09-28T20:17:41.336765+02:00","seq":12,"kind":"oracle","criterion":"AC-4","oracle":"`cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::decision_entry_records_resolution_and_operator -- --exact 2>&1 | grep -q '1 passed'` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-09-28T20:17:41.336771+02:00","seq":13,"kind":"oracle","criterion":"AC-5","oracle":"`cargo test --manifest-path cli/Cargo.toml --quiet` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-09-28T20:17:41.486965+02:00","seq":14,"kind":"gate","gate":"G2","verdict":"pass","result":"gates/G2.json"}
++{"t":"2026-09-28T20:17:41.518338+02:00","seq":15,"kind":"gate","gate":"G2.5","verdict":"blocked","result":"gates/G2.5.json"}
++{"t":"2026-09-28T20:17:41.532731+02:00","seq":16,"kind":"gate","gate":"G3","verdict":"fail","result":"gates/G3.json"}
++{"t":"2026-09-28T20:17:41.532758+02:00","seq":17,"kind":"run_end","verdict":"fail","duration_ms":2276}
++{"t":"2026-09-28T20:17:50.834816+02:00","seq":18,"kind":"human","stage":"review","decision":"approved","by":"Dane Balia"}
++{"t":"2026-09-28T20:17:50.848085+02:00","seq":19,"kind":"human","stage":"merge","decision":"approved","by":"Dane Balia"}
+diff --git a/.keel/runs/2026-09-28-003/evidence/build.txt b/.keel/runs/2026-09-28-003/evidence/build.txt
+new file mode 100644
+index 0000000..c078b47
+--- /dev/null
++++ b/.keel/runs/2026-09-28-003/evidence/build.txt
+@@ -0,0 +1,2 @@
++$ cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml
++
+diff --git a/.keel/runs/2026-09-28-003/evidence/diff-stat.txt b/.keel/runs/2026-09-28-003/evidence/diff-stat.txt
+new file mode 100644
+index 0000000..301e46b
+--- /dev/null
++++ b/.keel/runs/2026-09-28-003/evidence/diff-stat.txt
+@@ -0,0 +1,33 @@
++    15      0  .keel/chain.jsonl
++     2      0  .keel/runs/2026-09-28-002/evidence/build.txt
++    18      0  .keel/runs/2026-09-28-002/evidence/diff-stat.txt
++   937      0  .keel/runs/2026-09-28-002/evidence/diff.patch
++     2      0  .keel/runs/2026-09-28-002/evidence/lint.txt
++    46      0  .keel/runs/2026-09-28-002/evidence/oracles.json
++     8      0  .keel/runs/2026-09-28-002/evidence/ratchet.json
++     1      0  .keel/runs/2026-09-28-002/evidence/review-test-invalidation.txt
++    13      0  .keel/runs/2026-09-28-002/evidence/test.txt
++     1      0  .keel/runs/2026-09-28-002/evidence/tree.txt
++    36      0  .keel/runs/2026-09-28-002/gates/G2.5.json
++    62      0  .keel/runs/2026-09-28-002/gates/G2.json
++    31      0  .keel/runs/2026-09-28-002/gates/G3.json
++    11      0  .keel/runs/2026-09-28-002/run.json
++    19      0  .keel/runs/2026-09-28-002/trajectory.jsonl
++     2      0  .keel/runs/2026-09-28-003/evidence/build.txt
++     2      0  .keel/runs/2026-09-28-003/evidence/lint.txt
++    46      0  .keel/runs/2026-09-28-003/evidence/oracles.json
++    13      0  .keel/runs/2026-09-28-003/evidence/test.txt
++     9      0  .keel/runs/2026-09-28-003/run.json
++    13      0  .keel/runs/2026-09-28-003/trajectory.jsonl
++     4      0  .keel/specs/tool-call-ask-verdict/approvals.jsonl
++    90      0  .keel/specs/tool-call-ask-verdict/gates/G0.json
++    95      0  .keel/specs/tool-call-ask-verdict/gates/G1.json
++    74      0  .keel/specs/tool-call-ask-verdict/plan.md
++     1      0  .keel/specs/tool-call-ask-verdict/review-flags.txt
++    91      0  .keel/specs/tool-call-ask-verdict/spec.md
++    45      0  .keel/specs/tool-call-ask-verdict/tasks.md
++    13      6  cli/src/audit.rs
++   162     20  cli/src/commands/run_cmd.rs
++    61      0  docs/adr/0002-tool-call-ask-verdict.md
++
++31 file(s), +1923 -26 (1949 lines of churn) against 99ba32f36ddde59421c98e6e496871a31de52473
+diff --git a/.keel/runs/2026-09-28-003/evidence/lint.txt b/.keel/runs/2026-09-28-003/evidence/lint.txt
+new file mode 100644
+index 0000000..edb91b9
+--- /dev/null
++++ b/.keel/runs/2026-09-28-003/evidence/lint.txt
+@@ -0,0 +1,2 @@
++$ cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml
++
+diff --git a/.keel/runs/2026-09-28-003/evidence/oracles.json b/.keel/runs/2026-09-28-003/evidence/oracles.json
+new file mode 100644
+index 0000000..f42e911
+--- /dev/null
++++ b/.keel/runs/2026-09-28-003/evidence/oracles.json
+@@ -0,0 +1,46 @@
++{
++  "runs": [
++    {
++      "criterion": "AC-1",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::interactive_yes_allows -- --exact 2>&1 | grep -q '1 passed'` exits 0",
++      "outcome": "pass",
++      "exit_code": 0
++    },
++    {
++      "criterion": "AC-2",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::interactive_no_denies -- --exact 2>&1 | grep -q '1 passed'` exits 0",
++      "outcome": "pass",
++      "exit_code": 0
++    },
++    {
++      "criterion": "AC-3",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::non_interactive_denies_without_reading_stdin -- --exact 2>&1 | grep -q '1 passed'` exits 0",
++      "outcome": "pass",
++      "exit_code": 0
++    },
++    {
++      "criterion": "AC-4",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::decision_entry_records_resolution_and_operator -- --exact 2>&1 | grep -q '1 passed'` exits 0",
++      "outcome": "pass",
++      "exit_code": 0
++    },
++    {
++      "criterion": "AC-5",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml --quiet` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "\nrunning 140 tests\n....................................................................................... 87/140\n.....................................................\ntest result: ok. 140 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s"
++    }
++  ],
++  "criteria": 5,
++  "executed": 5,
++  "passed": 5,
++  "failed": 0,
++  "blocked": 0,
++  "human": 0
++}
+\ No newline at end of file
+diff --git a/.keel/runs/2026-09-28-003/evidence/test.txt b/.keel/runs/2026-09-28-003/evidence/test.txt
+new file mode 100644
+index 0000000..bc21160
+--- /dev/null
++++ b/.keel/runs/2026-09-28-003/evidence/test.txt
+@@ -0,0 +1,13 @@
++$ cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml
++
++
++running 140 tests
++....................................................................................... 87/140
++.....................................................
++test result: ok. 140 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
++
++
++running 8 tests
++........
++test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
++
+diff --git a/.keel/runs/2026-09-28-003/run.json b/.keel/runs/2026-09-28-003/run.json
+new file mode 100644
+index 0000000..9b3aedf
+--- /dev/null
++++ b/.keel/runs/2026-09-28-003/run.json
+@@ -0,0 +1,9 @@
++{
++  "schema": "keel.run/1",
++  "id": "2026-09-28-003",
++  "spec": "tool-call-ask-verdict",
++  "keel_version": "0.10.0",
++  "store_hash": "4e07f093d6afa16aeb50b4bab14c069797586ba01befb262b14b96bbd0213f0e",
++  "started_at": "2026-09-28T20:18:01.652777+02:00",
++  "base_commit": "99ba32f36ddde59421c98e6e496871a31de52473"
++}
+diff --git a/.keel/runs/2026-09-28-003/trajectory.jsonl b/.keel/runs/2026-09-28-003/trajectory.jsonl
+new file mode 100644
+index 0000000..8a8c502
+--- /dev/null
++++ b/.keel/runs/2026-09-28-003/trajectory.jsonl
+@@ -0,0 +1,13 @@
++{"t":"2026-09-28T20:18:01.653044+02:00","seq":1,"kind":"run_start","spec":"tool-call-ask-verdict","keel_version":"0.10.0","store_hash":"4e07f093d6afa16aeb50b4bab14c069797586ba01befb262b14b96bbd0213f0e"}
++{"t":"2026-09-28T20:18:01.653661+02:00","seq":2,"kind":"inject","source":".keel/store/steering/conventions.md","tokens":177,"bytes":705}
++{"t":"2026-09-28T20:18:01.653688+02:00","seq":3,"kind":"inject","source":".keel/store/steering/tech.md","tokens":85,"bytes":338}
++{"t":"2026-09-28T20:18:01.653722+02:00","seq":4,"kind":"inject","source":".keel/store/steering/structure.md","tokens":4230,"bytes":16917}
++{"t":"2026-09-28T20:18:01.653945+02:00","seq":5,"kind":"inject","source":".keel/specs/tool-call-ask-verdict/spec.md","tokens":995,"bytes":3979}
++{"t":"2026-09-28T20:18:01.907314+02:00","seq":6,"kind":"command","cmd":"cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/build.txt"}
++{"t":"2026-09-28T20:18:02.013580+02:00","seq":7,"kind":"command","cmd":"cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/test.txt"}
++{"t":"2026-09-28T20:18:02.211447+02:00","seq":8,"kind":"command","cmd":"cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/lint.txt"}
++{"t":"2026-09-28T20:18:02.494919+02:00","seq":9,"kind":"oracle","criterion":"AC-1","oracle":"`cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::interactive_yes_allows -- --exact 2>&1 | grep -q '1 passed'` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-09-28T20:18:02.494940+02:00","seq":10,"kind":"oracle","criterion":"AC-2","oracle":"`cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::interactive_no_denies -- --exact 2>&1 | grep -q '1 passed'` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-09-28T20:18:02.494943+02:00","seq":11,"kind":"oracle","criterion":"AC-3","oracle":"`cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::non_interactive_denies_without_reading_stdin -- --exact 2>&1 | grep -q '1 passed'` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-09-28T20:18:02.494946+02:00","seq":12,"kind":"oracle","criterion":"AC-4","oracle":"`cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::decision_entry_records_resolution_and_operator -- --exact 2>&1 | grep -q '1 passed'` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-09-28T20:18:02.494949+02:00","seq":13,"kind":"oracle","criterion":"AC-5","oracle":"`cargo test --manifest-path cli/Cargo.toml --quiet` exits 0","verdict":"pass","exit_code":0}
+diff --git a/.keel/specs/tool-call-ask-verdict/approvals.jsonl b/.keel/specs/tool-call-ask-verdict/approvals.jsonl
+new file mode 100644
+index 0000000..296b833
+--- /dev/null
++++ b/.keel/specs/tool-call-ask-verdict/approvals.jsonl
+@@ -0,0 +1,4 @@
++{"schema":"keel.approval/1","stage":"spec","decision":"approved","artefact_hash":"c93af2788214176acf25692dff880d45bdb348adea828ea6ab9c94ada3ef32be","gate_verdict":"pass","by":"Dane Balia","at":"2026-09-28T20:17:14.837595+02:00"}
++{"schema":"keel.approval/1","stage":"plan","decision":"approved","artefact_hash":"527ff5ce625851f90dae6fb2d9ef4b0aaf6475661689633f8f6ad4e84fec235f","gate_verdict":"fail","by":"Dane Balia","at":"2026-09-28T20:17:14.849556+02:00"}
++{"schema":"keel.approval/1","stage":"review","decision":"approved","artefact_hash":"33f3333616c292624d089cc3ba1034a66c8548727cd2722e0a52e119462eeb14","gate_verdict":"fail","by":"Dane Balia","at":"2026-09-28T20:17:50.833809+02:00"}
++{"schema":"keel.approval/1","stage":"merge","decision":"approved","artefact_hash":"e522a48b9dd851238978a29761b20300636dad0899bf5eb7fa86701058e6e68d","gate_verdict":"fail","by":"Dane Balia","at":"2026-09-28T20:17:50.847413+02:00"}
+diff --git a/.keel/specs/tool-call-ask-verdict/gates/G0.json b/.keel/specs/tool-call-ask-verdict/gates/G0.json
+new file mode 100644
+index 0000000..469053a
+--- /dev/null
++++ b/.keel/specs/tool-call-ask-verdict/gates/G0.json
+@@ -0,0 +1,90 @@
++{
++  "schema": "keel.gate/1",
++  "gate": "G0",
++  "run": "2026-09-28-002",
++  "spec": "tool-call-ask-verdict",
++  "verdict": "pass",
++  "generated_at": "2026-09-28T20:14:42.369637+02:00",
++  "checks": [
++    {
++      "id": "schema",
++      "verdict": "pass",
++      "detail": "SPEC-0009 (keel.spec/1)"
++    },
++    {
++      "id": "criteria-present",
++      "verdict": "pass",
++      "detail": "5 criteria"
++    },
++    {
++      "id": "criterion-ids-unique",
++      "verdict": "pass",
++      "detail": "no duplicate ids"
++    },
++    {
++      "id": "no-placeholders",
++      "verdict": "pass",
++      "detail": "no unfilled scaffold text"
++    },
++    {
++      "id": "ears-conformance",
++      "verdict": "pass",
++      "detail": "5/5 conform (event-driven, unwanted-behaviour)"
++    },
++    {
++      "id": "oracle-presence",
++      "verdict": "pass",
++      "detail": "5 oracles across 5 criteria"
++    },
++    {
++      "id": "oracle-wellformed",
++      "verdict": "pass",
++      "detail": "all oracles parse"
++    },
++    {
++      "id": "ambiguity",
++      "verdict": "pass",
++      "detail": "no ambiguous phrasing in criteria"
++    },
++    {
++      "id": "criterion-budget",
++      "verdict": "pass",
++      "detail": "5/8 criteria"
++    },
++    {
++      "id": "spec-length",
++      "verdict": "pass",
++      "detail": "91/250 lines"
++    },
++    {
++      "id": "scope-declared",
++      "verdict": "pass",
++      "detail": "3 glob(s): docs/adr/0002-tool-call-ask-verdict.md, cli/src/commands/run_cmd.rs, cli/src/audit.rs"
++    },
++    {
++      "id": "change-budget",
++      "verdict": "pass",
++      "detail": "300 lines of diff budgeted"
++    },
++    {
++      "id": "oracle-mix",
++      "verdict": "pass",
++      "detail": "5/5 runnable (5 cmd)"
++    },
++    {
++      "id": "human-cost",
++      "verdict": "pass",
++      "detail": "0 human oracle(s), none load-bearing"
++    },
++    {
++      "id": "store-drift",
++      "verdict": "pass",
++      "detail": "4 projections current"
++    },
++    {
++      "id": "shared-stores",
++      "verdict": "pass",
++      "detail": "none configured"
++    }
++  ]
++}
+diff --git a/.keel/specs/tool-call-ask-verdict/gates/G1.json b/.keel/specs/tool-call-ask-verdict/gates/G1.json
+new file mode 100644
+index 0000000..027a84f
+--- /dev/null
++++ b/.keel/specs/tool-call-ask-verdict/gates/G1.json
+@@ -0,0 +1,95 @@
++{
++  "schema": "keel.gate/1",
++  "gate": "G1",
++  "run": "2026-09-28-002",
++  "spec": "tool-call-ask-verdict",
++  "verdict": "pass",
++  "generated_at": "2026-09-28T20:17:36.351072+02:00",
++  "checks": [
++    {
++      "id": "schema",
++      "verdict": "pass",
++      "detail": "PLAN-0009 + TASKS-0009"
++    },
++    {
++      "id": "g0-passed",
++      "verdict": "pass",
++      "detail": "G0 passed in run 2026-09-28-002"
++    },
++    {
++      "id": "spec-approved",
++      "verdict": "pass",
++      "detail": "approved by Dane Balia"
++    },
++    {
++      "id": "tasks-present",
++      "verdict": "pass",
++      "detail": "5/15 tasks"
++    },
++    {
++      "id": "task-ids-unique",
++      "verdict": "pass",
++      "detail": "no duplicate task ids"
++    },
++    {
++      "id": "task-fields",
++      "verdict": "pass",
++      "detail": "all task fields recognised"
++    },
++    {
++      "id": "task-criterion-traceability",
++      "verdict": "pass",
++      "detail": "5 tasks all traced"
++    },
++    {
++      "id": "criteria-covered",
++      "verdict": "pass",
++      "detail": "5/5 criteria have a task"
++    },
++    {
++      "id": "task-budgets",
++      "verdict": "pass",
++      "detail": "all 5 tasks budgeted, total 300 lines"
++    },
++    {
++      "id": "total-budget",
++      "verdict": "pass",
++      "detail": "300/300 lines"
++    },
++    {
++      "id": "task-exit-conditions",
++      "verdict": "pass",
++      "detail": "every task states when it is done"
++    },
++    {
++      "id": "task-dependencies",
++      "verdict": "pass",
++      "detail": "1 wave(s), widths 5"
++    },
++    {
++      "id": "wave-isolation",
++      "verdict": "pass",
++      "detail": "1 wave(s), no file claimed twice within one"
++    },
++    {
++      "id": "task-files-in-scope",
++      "verdict": "pass",
++      "detail": "all task files inside the declared scope"
++    },
++    {
++      "id": "rollback-stated",
++      "verdict": "pass",
++      "detail": "git revert"
++    },
++    {
++      "id": "blast-radius-declared",
++      "verdict": "pass",
++      "detail": "5 file(s) at depth 2, 1086 lines"
++    },
++    {
++      "id": "blast-radius-current",
++      "verdict": "pass",
++      "detail": "5 files, 1086 lines — matches a fresh computation — no indexed file matches docs/adr/0002-tool-call-ask-verdict.md (new files, or a typo)"
++    }
++  ]
++}
+diff --git a/.keel/specs/tool-call-ask-verdict/plan.md b/.keel/specs/tool-call-ask-verdict/plan.md
+new file mode 100644
+index 0000000..d5178a1
+--- /dev/null
++++ b/.keel/specs/tool-call-ask-verdict/plan.md
+@@ -0,0 +1,74 @@
++---
++id: PLAN-0009
++slug: tool-call-ask-verdict
++schema: keel.plan/1
++blast:
++  depth: 2
++  declared:
++  - docs/adr/0002-tool-call-ask-verdict.md
++  - cli/src/commands/run_cmd.rs
++  - cli/src/audit.rs
++  computed:
++  - cli/src/commands/run_cmd.rs
++  - cli/src/audit.rs
++  - cli/src/commands/mod.rs
++  - cli/src/main.rs
++  - cli/src/commands/keel_cmd.rs
++  computed_lines: 1086
++rollback: git revert
++verified_at: 2026-09-28
++---
++
++# Design — tool-call-ask-verdict
++
++## Approach
++
++The seam is still `run_cmd::gate`, the function ADR-0001/SPEC-0008 added.
++It changes what happens on a `Deny` from `decision::evaluate`, not
++whether one fires:
++
++1. `cli/src/commands/run_cmd.rs` — three new small functions: `confirm`
++   (prints the rule id/reason, reads one line, true only for `y`/`yes`),
++   `stdin_is_tty` (`std::io::IsTerminal`), and `operator_identity` (`git
++   config user.name`, falling back to `unknown`). `gate` grows an
++   `interactive: bool` plus a `reader`/`writer`/`operator` it is handed
++   rather than reads itself — the same dependency-injection shape
++   `chain_path` already used, so the confirm/decline/non-interactive
++   paths are unit-tested with a `Cursor` instead of a real terminal.
++   `allowed = interactive && confirm(...)` — the `&&` short-circuit is
++   what makes a non-interactive invocation never touch stdin at all,
++   satisfying AC-3 by construction, not by a separate check.
++2. `cli/src/audit.rs` — `log_decision` gains `allowed: bool` and
++   `operator: &str`, and the entry's `verdict` field changes from
++   `"deny"` to `"ask"` with a new `resolution` field (`"allow"`/`"deny"`)
++   and `"by"`. Same function, same call site, more fields — no new
++   function.
++3. `docs/adr/0002-tool-call-ask-verdict.md` — records the decision and,
++   explicitly, the `moor recipe` gap found while scoping this (Docker
++   called directly, bypassing `gate` entirely) as still open.
++
++`run()`'s call site changes only in what it passes to `gate`: real stdin,
++real stderr, the real TTY check, the real operator identity. Everything
++after the `gate(...)?` call — building the `docker exec` argv, the
++push/exec audit entry — is untouched.
++
++## Blast radius
++
++<!-- generated by `keel plan`; edits here are overwritten -->
++
++Computed from the import graph at depth 2: **5 files, 1086 lines**.
++
++| depth | file | lines |
++| --- | --- | --- |
++| scope | `cli/src/commands/run_cmd.rs` | 81 |
++| scope | `cli/src/audit.rs` | 458 |
++| +1 | `cli/src/commands/mod.rs` | 279 |
++| +1 | `cli/src/main.rs` | 212 |
++| +1 | `cli/src/commands/keel_cmd.rs` | 56 |
++
++_Scope globs matching no indexed file (new files, or a typo): docs/adr/0002-tool-call-ask-verdict.md_
++
++
++## Rollback
++
++`git revert` — replace this if the change needs a different rollback.
+diff --git a/.keel/specs/tool-call-ask-verdict/review-flags.txt b/.keel/specs/tool-call-ask-verdict/review-flags.txt
+new file mode 100644
+index 0000000..9a5b275
+--- /dev/null
++++ b/.keel/specs/tool-call-ask-verdict/review-flags.txt
+@@ -0,0 +1 @@
++test-movement: no test changed with cli/src/audit.rs, cli/src/commands/run_cmd.rs, docs/adr/0002-tool-call-ask-verdict.md
+diff --git a/.keel/specs/tool-call-ask-verdict/spec.md b/.keel/specs/tool-call-ask-verdict/spec.md
+new file mode 100644
+index 0000000..5d710a4
+--- /dev/null
++++ b/.keel/specs/tool-call-ask-verdict/spec.md
+@@ -0,0 +1,91 @@
++---
++id: SPEC-0009
++slug: tool-call-ask-verdict
++schema: keel.spec/1
++status: approved
++scope:
++- docs/adr/0002-tool-call-ask-verdict.md
++- cli/src/commands/run_cmd.rs
++- cli/src/audit.rs
++budget:
++  criteria: 8
++  lines: 300
++verified_at: 2026-09-28
++---
++
++# Tool-call risk gate: interactive Ask verdict
++
++## Context
++
++SPEC-0008 (ADR-0001) made every rule match in `decision::evaluate` a hard
++`Deny`: no override, ever. That is correct for a fully unattended path,
++but `moor run`/`moor keel` are typed by the operator at their own
++terminal — the one place moor's threat model already trusts a human
++decision (`keel approve`, "the human checkpoints keel defines"). A false
++positive today (a `.pem` file that is a public cert, not a private key)
++has no escape hatch but editing the rule table.
++
++This spec turns that hard `Deny` into the spike's `Ask`: prompt the
++operator, with the rule id and reason, only when `moor run`'s stdin is a
++real terminal. Any other input, or no input at all, denies exactly as
++before — the fail-closed behavior automated and headless invocations
++already depend on is unchanged. Every prompted decision, allowed or
++declined, is logged to the audit chain with its resolution and the
++operator's git identity, so an override is never silent.
++
++## Acceptance criteria
++
++### AC-1 An interactive operator can override a flagged command
++
++WHEN `moor run`'s stdin is a terminal and a command matches a rule THE
++SYSTEM SHALL print the rule id and reason and prompt the operator, then
++proceed to `docker exec` only if the operator answers `y` or `yes`
++(case-insensitive).
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::interactive_yes_allows -- --exact 2>&1 | grep -q '1 passed'` exit 0
++
++### AC-2 A decline denies exactly as an unprompted Deny does
++
++WHEN the operator answers anything other than `y`/`yes`, including empty
++input, THE SYSTEM SHALL deny the command with no `docker exec` invoked.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::interactive_no_denies -- --exact 2>&1 | grep -q '1 passed'` exit 0
++
++### AC-3 A non-interactive invocation is never prompted
++
++IF `moor run`'s stdin is not a terminal THEN THE SYSTEM SHALL deny a
++flagged command without reading stdin or printing a prompt, regardless of
++what stdin contains.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::non_interactive_denies_without_reading_stdin -- --exact 2>&1 | grep -q '1 passed'` exit 0
++
++### AC-4 Every prompted decision is attributed in the audit chain
++
++WHEN a rule match is resolved, by prompt or by fail-closed denial, THE
++SYSTEM SHALL append a `decision` audit entry recording `rule_id`,
++`resolution` (`allow` or `deny`), and the operator identity from `git
++config user.name` (`unknown` when unset).
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::decision_entry_records_resolution_and_operator -- --exact 2>&1 | grep -q '1 passed'` exit 0
++
++### AC-5 An Allow verdict is still a no-op
++
++WHEN `decision::evaluate` returns `Allow` THE SYSTEM SHALL run the
++command exactly as before this change: no prompt, no new audit entry
++kind, unchanged existing behavior.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml --quiet` exit 0
++
++## Out of scope
++
++- `moor recipe`'s unattended agent-step execution, which calls Docker
++  directly and does not pass through `run_cmd::gate` at all — discovered
++  while scoping this spec, and left open deliberately: an unattended flow
++  cannot show a TTY prompt, so closing that gap needs either an async
++  decision path or the model, not this interactive confirm.
++- Any change to `decision::evaluate`'s rule table (credential_access,
++  boundary_escape, destructive) — same three rules, now with an override
++  path instead of none.
++- The local decision model, ONNX, and the `ort`-backed daemon.
++- Remembering a decision across invocations (e.g. "always allow this
++  rule for this project") — every match prompts again.
+diff --git a/.keel/specs/tool-call-ask-verdict/tasks.md b/.keel/specs/tool-call-ask-verdict/tasks.md
+new file mode 100644
+index 0000000..ab4afb4
+--- /dev/null
++++ b/.keel/specs/tool-call-ask-verdict/tasks.md
+@@ -0,0 +1,45 @@
++---
++id: TASKS-0009
++slug: tool-call-ask-verdict
++schema: keel.tasks/1
++---
++
++# Tasks
++
++Each task must name the criteria it satisfies, the files it touches, a line
++budget and an exit condition. G1 checks all four, and checks that every
++criterion in the spec is covered by at least one task.
++
++Add `- depends_on: T-1` where order matters. Tasks with no dependency on
++each other form a wave; `keel tasks` shows them.
++
++### T-1 An interactive operator can override a flagged command
++- criteria: AC-1
++- files: scope
++- budget: 60
++- exit: `cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::interactive_yes_allows -- --exact 2>&1 | grep -q '1 passed'` exits 0
++
++### T-2 A decline denies exactly as an unprompted Deny does
++- criteria: AC-2
++- files: scope
++- budget: 60
++- exit: `cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::interactive_no_denies -- --exact 2>&1 | grep -q '1 passed'` exits 0
++
++### T-3 A non-interactive invocation is never prompted
++- criteria: AC-3
++- files: scope
++- budget: 60
++- exit: `cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::non_interactive_denies_without_reading_stdin -- --exact 2>&1 | grep -q '1 passed'` exits 0
++
++### T-4 Every prompted decision is attributed in the audit chain
++- criteria: AC-4
++- files: scope
++- budget: 60
++- exit: `cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::decision_entry_records_resolution_and_operator -- --exact 2>&1 | grep -q '1 passed'` exits 0
++
++### T-5 An Allow verdict is still a no-op
++- criteria: AC-5
++- files: scope
++- budget: 60
++- exit: `cargo test --manifest-path cli/Cargo.toml --quiet` exits 0
++
+diff --git a/docs/adr/0002-tool-call-ask-verdict.md b/docs/adr/0002-tool-call-ask-verdict.md
+new file mode 100644
+index 0000000..539ff94
+--- /dev/null
++++ b/docs/adr/0002-tool-call-ask-verdict.md
+@@ -0,0 +1,61 @@
++# ADR-0002: Ask is an interactive operator confirm, fail-closed when unattended
++
++## Status
++
++Accepted. Implemented by keel spec `tool-call-ask-verdict`.
++
++## Context
++
++ADR-0001 made every `decision::evaluate` rule match a hard `Deny`: no
++override, by design, because nothing sat on the other end of an
++in-sandbox agent to ask. But `moor run <project> -- <cmd>` and `moor keel
++<verb>` are typed by the operator at their own terminal — the same human
++`keel approve` already trusts with every checkpoint in this pipeline. A
++false positive (a `.pem` file that happens to be a public cert, not a
++private key) had no way through but editing the rule table by hand.
++
++The spike's `Ask` verdict is "a human decides." For `moor run`'s actual
++callers, the human is already present when the command is typed — this
++does not need a daemon, a socket, or an approval queue to be real.
++
++While scoping this, `cli/src/commands/recipe.rs`'s unattended agent-step
++execution turned out to call Docker directly, not through
++`run_cmd::gate` — so it isn't covered by ADR-0001's gate at all today,
++let alone by this one. Left open deliberately (see "Deferred" in
++ADR-0001 and this ADR's own scope): an unattended flow has no terminal to
++prompt, so closing that gap is an async-decision or model problem, not
++an extension of the confirm this ADR adds.
++
++## Decision
++
++A rule match calls `confirm`, which prints the rule id and reason and
++reads one line from stdin, but only when `moor run`'s stdin is a real
++terminal (`std::io::IsTerminal`). Only `y`/`yes` (trimmed,
++case-insensitive) is a yes; anything else — a decline, empty input, a
++read error, or a non-interactive invocation that never reads stdin at
++all — denies exactly as ADR-0001 already did. Every resolution, allowed
++or denied, is logged to the audit chain (`audit::log_decision`) with the
++rule id, the resolution, and the operator's identity from `git config
++user.name` (`unknown` when unset) — the same fallback keel's own approval
++records use.
++
++## Consequences
++
++- An operator can now get past a false-positive rule match without
++  editing `decision.rs`, at the cost of one explicit, logged confirm.
++- Nothing about a scripted or headless `moor run` changes: no prompt is
++  ever shown, and stdin content is never consulted, when stdin isn't a
++  terminal. `moor recipe` and keel's own driver are exactly as
++  fail-closed as before this ADR.
++- A rule match still denies by default in every case where no one
++  answers `y` — declining, timing out at an empty line, or running
++  unattended all resolve the same way.
++
++## Deferred
++
++- `moor recipe`'s unattended agent steps, which don't pass through this
++  gate at all yet.
++- Remembering a decision across invocations; every match prompts again.
++- The local decision model, ONNX, and the `ort`-backed daemon — this ADR
++  changes nothing about what triggers a match, only what happens once one
++  does.

@@ -1,5 +1,6 @@
 use crate::{audit, decision, manifest::Manifest, paths, proc};
 use anyhow::Result;
+use std::io::{BufRead, IsTerminal, Write};
 use std::path::Path;
 
 /// True if the invoked command looks like a `git push` — the one channel
@@ -15,18 +16,74 @@ fn looks_like_git_push(cmd: &[String]) -> bool {
     cmd.first().map(|s| s == "git").unwrap_or(false) && cmd.iter().any(|a| a == "push")
 }
 
-/// The host-side enforcement point for `decision::evaluate` — see
-/// docs/adr/0001-tool-call-risk-gating.md. A `Deny` verdict is logged and
-/// returned as the error `run` propagates *before* it builds any `docker
-/// exec` argv, so a denied command never reaches Docker. Takes the chain
-/// path explicitly, like `audit::log_decision` does, so it needs no
-/// `$HOME` or running container to test.
-fn gate(chain_path: &Path, name: &str, secrets: &[String], cmd: &[String]) -> Result<()> {
-    if let decision::Verdict::Deny { rule_id, reason } = decision::evaluate(cmd) {
-        audit::log_decision(chain_path, name, cmd, secrets, rule_id)?;
-        anyhow::bail!("moor run: blocked by rule `{rule_id}`: {reason}");
+/// Prints the rule that fired and asks whether to run the command
+/// anyway. Only an explicit `y`/`yes` (trimmed, case-insensitive) is a
+/// yes; a read error is treated the same as a decline, not a crash.
+fn confirm(
+    reader: &mut impl BufRead,
+    writer: &mut impl Write,
+    rule_id: &str,
+    reason: &str,
+) -> bool {
+    let _ = writeln!(
+        writer,
+        "moor run: rule `{rule_id}` flagged this command: {reason}"
+    );
+    let _ = write!(writer, "Run it anyway? [y/N] ");
+    let _ = writer.flush();
+    let mut line = String::new();
+    if reader.read_line(&mut line).is_err() {
+        return false;
     }
-    Ok(())
+    matches!(line.trim().to_ascii_lowercase().as_str(), "y" | "yes")
+}
+
+/// `moor run`'s stdin — an interactive confirm only makes sense when a
+/// human is actually there to answer it, not when `moor run` is driven
+/// by a script or keel's own driver.
+fn stdin_is_tty() -> bool {
+    std::io::stdin().is_terminal()
+}
+
+/// Who to attribute an override to. Best-effort, same fallback as keel's
+/// own approval records when the host has no git identity configured.
+fn operator_identity() -> String {
+    proc::run_capture("git", &["config", "--get", "user.name"])
+        .ok()
+        .filter(|(status, _)| status.success())
+        .map(|(_, out)| out.trim().to_string())
+        .filter(|s| !s.is_empty())
+        .unwrap_or_else(|| "unknown".to_string())
+}
+
+/// The host-side enforcement point for `decision::evaluate` — see
+/// docs/adr/0001-tool-call-risk-gating.md and
+/// docs/adr/0002-tool-call-ask-verdict.md. A rule match is resolved by
+/// prompting `reader`/`writer` when `interactive`, else denied without
+/// reading them at all; either way the resolution is logged before `run`
+/// propagates an error, so a denied command never reaches `docker exec`.
+/// IO and identity are parameters, not read directly, so this is testable
+/// without a real terminal, `$HOME`, or a running container.
+#[allow(clippy::too_many_arguments)]
+fn gate(
+    chain_path: &Path,
+    name: &str,
+    secrets: &[String],
+    cmd: &[String],
+    interactive: bool,
+    reader: &mut impl BufRead,
+    writer: &mut impl Write,
+    operator: &str,
+) -> Result<()> {
+    let decision::Verdict::Deny { rule_id, reason } = decision::evaluate(cmd, None) else {
+        return Ok(());
+    };
+    let allowed = interactive && confirm(reader, writer, rule_id, &reason);
+    audit::log_decision(chain_path, name, cmd, secrets, rule_id, allowed, operator)?;
+    if allowed {
+        return Ok(());
+    }
+    anyhow::bail!("moor run: blocked by rule `{rule_id}`: {reason}");
 }
 
 pub fn run(name: &str, cmd: &[String]) -> Result<()> {
@@ -37,7 +94,16 @@ pub fn run(name: &str, cmd: &[String]) -> Result<()> {
     // So audit::redact below can scrub a secret's value even when it was
     // only ever set via Keychain, never exported into this shell.
     crate::secrets::resolve_into_env(name, &m.secrets);
-    gate(&paths::chain_log_path(name)?, name, &m.secrets, cmd)?;
+    gate(
+        &paths::chain_log_path(name)?,
+        name,
+        &m.secrets,
+        cmd,
+        stdin_is_tty(),
+        &mut std::io::stdin().lock(),
+        &mut std::io::stderr(),
+        &operator_identity(),
+    )?;
     let container = m.sandbox_container();
 
     // What a push sends is resolved before it runs: afterwards the ref may
@@ -178,33 +244,109 @@ mod tests {
         ))
     }
 
+    /// Runs `gate` against a throwaway chain path with the given stdin
+    /// content and interactivity, and returns (result, chain contents).
+    fn run_gate(interactive: bool, stdin: &str, cmd: &[String]) -> (Result<()>, String) {
+        let chain_path = temp_chain_path("gate");
+        let mut reader = std::io::Cursor::new(stdin.as_bytes());
+        let mut writer = Vec::new();
+        let result = gate(
+            &chain_path,
+            "test-project",
+            &[],
+            cmd,
+            interactive,
+            &mut reader,
+            &mut writer,
+            "test-operator",
+        );
+        let logged = std::fs::read_to_string(&chain_path).unwrap_or_default();
+        std::fs::remove_file(&chain_path).ok();
+        (result, logged)
+    }
+
     #[test]
     fn deny_verdict_blocks_docker_exec() {
-        let chain_path = temp_chain_path("deny");
-        let cmd = argv("cat /home/agent/.ssh/id_rsa");
-
-        let result = gate(&chain_path, "test-project", &[], &cmd);
+        let (result, logged) = run_gate(false, "", &argv("cat /home/agent/.ssh/id_rsa"));
 
         assert!(result.is_err());
         let msg = result.unwrap_err().to_string();
         assert!(msg.contains("credential_access"), "{msg}");
-
-        let logged = std::fs::read_to_string(&chain_path).unwrap();
         assert!(logged.contains("\"kind\":\"decision\""), "{logged}");
         assert!(
             logged.contains("\"rule_id\":\"credential_access\""),
             "{logged}"
         );
-        std::fs::remove_file(&chain_path).ok();
     }
 
     #[test]
     fn allow_verdict_is_a_no_op() {
         let chain_path = temp_chain_path("allow");
-        let cmd = argv("git status");
+        let mut reader = std::io::Cursor::new(&b""[..]);
+        let mut writer = Vec::new();
 
-        assert!(gate(&chain_path, "test-project", &[], &cmd).is_ok());
+        assert!(gate(
+            &chain_path,
+            "test-project",
+            &[],
+            &argv("git status"),
+            true,
+            &mut reader,
+            &mut writer,
+            "test-operator"
+        )
+        .is_ok());
         assert!(!chain_path.exists());
+        assert!(writer.is_empty(), "Allow must never prompt");
+    }
+
+    #[test]
+    fn interactive_yes_allows() {
+        for answer in ["y\n", "Y\n", "yes\n", "YES\n"] {
+            let (result, logged) = run_gate(true, answer, &argv("sudo ls"));
+            assert!(result.is_ok(), "answer `{answer:?}` should allow");
+            assert!(logged.contains("\"resolution\":\"allow\""), "{logged}");
+            assert!(logged.contains("\"by\":\"test-operator\""), "{logged}");
+        }
+    }
+
+    #[test]
+    fn interactive_no_denies() {
+        for answer in ["n\n", "no\n", "\n", "whatever\n"] {
+            let (result, logged) = run_gate(true, answer, &argv("sudo ls"));
+            assert!(result.is_err(), "answer `{answer:?}` should deny");
+            assert!(logged.contains("\"resolution\":\"deny\""), "{logged}");
+        }
+    }
+
+    #[test]
+    fn non_interactive_denies_without_reading_stdin() {
+        // stdin contains "y\n" but interactive is false: it must never be
+        // consulted, so the answer it would give is irrelevant.
+        let (result, logged) = run_gate(false, "y\n", &argv("sudo ls"));
+        assert!(result.is_err());
+        assert!(logged.contains("\"resolution\":\"deny\""), "{logged}");
+    }
+
+    #[test]
+    fn decision_entry_records_resolution_and_operator() {
+        let (_, logged) = run_gate(true, "y\n", &argv("sudo ls"));
+        assert!(
+            logged.contains("\"rule_id\":\"boundary_escape\""),
+            "{logged}"
+        );
+        assert!(logged.contains("\"resolution\":\"allow\""), "{logged}");
+        assert!(logged.contains("\"by\":\"test-operator\""), "{logged}");
+    }
+
+    #[test]
+    fn confirm_prompts_with_rule_and_reason() {
+        let mut reader = std::io::Cursor::new(&b"y\n"[..]);
+        let mut writer = Vec::new();
+        assert!(confirm(&mut reader, &mut writer, "destructive", "wipes /"));
+        let printed = String::from_utf8(writer).unwrap();
+        assert!(printed.contains("destructive"), "{printed}");
+        assert!(printed.contains("wipes /"), "{printed}");
     }
 
     #[test]

@@ -1,0 +1,46 @@
+{
+  "runs": [
+    {
+      "criterion": "AC-1",
+      "kind": "cmd",
+      "oracle": "`cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::interactive_yes_allows -- --exact 2>&1 | grep -q '1 passed'` exits 0",
+      "outcome": "pass",
+      "exit_code": 0
+    },
+    {
+      "criterion": "AC-2",
+      "kind": "cmd",
+      "oracle": "`cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::interactive_no_denies -- --exact 2>&1 | grep -q '1 passed'` exits 0",
+      "outcome": "pass",
+      "exit_code": 0
+    },
+    {
+      "criterion": "AC-3",
+      "kind": "cmd",
+      "oracle": "`cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::non_interactive_denies_without_reading_stdin -- --exact 2>&1 | grep -q '1 passed'` exits 0",
+      "outcome": "pass",
+      "exit_code": 0
+    },
+    {
+      "criterion": "AC-4",
+      "kind": "cmd",
+      "oracle": "`cargo test --manifest-path cli/Cargo.toml commands::run_cmd::tests::decision_entry_records_resolution_and_operator -- --exact 2>&1 | grep -q '1 passed'` exits 0",
+      "outcome": "pass",
+      "exit_code": 0
+    },
+    {
+      "criterion": "AC-5",
+      "kind": "cmd",
+      "oracle": "`cargo test --manifest-path cli/Cargo.toml --quiet` exits 0",
+      "outcome": "pass",
+      "exit_code": 0,
+      "output": "\nrunning 140 tests\n....................................................................................... 87/140\n.....................................................\ntest result: ok. 140 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s"
+    }
+  ],
+  "criteria": 5,
+  "executed": 5,
+  "passed": 5,
+  "failed": 0,
+  "blocked": 0,
+  "human": 0
+}
