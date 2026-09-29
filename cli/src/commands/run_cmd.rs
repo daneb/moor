@@ -11,7 +11,38 @@ use anyhow::Result;
 /// stronger alternative (it runs inside the untrusted sandbox and the
 /// agent can simply reconfigure or bypass it).
 fn looks_like_git_push(cmd: &[String]) -> bool {
-    cmd.first().map(|s| s == "git").unwrap_or(false) && cmd.iter().any(|a| a == "push")
+    git_subcommand(cmd).is_some_and(|i| cmd[i] == "push")
+}
+
+/// Where git's subcommand sits in `cmd`: the first argument that isn't one
+/// of git's own global options (or the value such an option takes). So
+/// `git -c credential.helper=... push` is a push, and `git stash push` is a
+/// stash, not a push: only the subcommand says what git does.
+fn git_subcommand(cmd: &[String]) -> Option<usize> {
+    const TAKES_VALUE: &[&str] = &[
+        "-C",
+        "-c",
+        "--git-dir",
+        "--work-tree",
+        "--namespace",
+        "--config-env",
+        "--super-prefix",
+    ];
+    if cmd.first().map(String::as_str) != Some("git") {
+        return None;
+    }
+    let mut i = 1;
+    while i < cmd.len() {
+        let a = cmd[i].as_str();
+        if TAKES_VALUE.contains(&a) {
+            i += 2;
+        } else if a.starts_with('-') {
+            i += 1;
+        } else {
+            return Some(i);
+        }
+    }
+    None
 }
 
 pub fn run(name: &str, cmd: &[String]) -> Result<()> {
@@ -47,20 +78,18 @@ pub fn run(name: &str, cmd: &[String]) -> Result<()> {
 /// The repository a `git push` runs in (`-C <dir>`, else `/workspace`) and
 /// the ref it sends: the source side of an explicit refspec, else `HEAD`.
 fn push_target(cmd: &[String]) -> (String, String) {
+    let sub = git_subcommand(cmd).unwrap_or(cmd.len());
     let mut dir = "/workspace".to_string();
-    let mut args = cmd.iter().skip(1);
-    while let Some(a) = args.next() {
-        match a.as_str() {
-            "-C" => {
-                if let Some(d) = args.next() {
-                    dir = d.clone();
-                }
+    let mut globals = cmd[1..sub].iter();
+    while let Some(a) = globals.next() {
+        if a == "-C" {
+            if let Some(d) = globals.next() {
+                dir = d.clone();
             }
-            "push" => break,
-            _ => {}
         }
     }
     // After `push`: options, then [<remote> [<refspec>...]].
+    let args = cmd.iter().skip(sub + 1);
     let positional: Vec<&String> = args.filter(|a| !a.starts_with('-')).collect();
     let git_ref = positional
         .get(1)
@@ -128,6 +157,34 @@ mod tests {
         ]));
         assert!(!looks_like_git_push(&["git".into(), "fetch".into()]));
         assert!(!looks_like_git_push(&["git".into(), "status".into()]));
+    }
+
+    #[test]
+    fn a_push_after_global_options_is_a_push() {
+        let argv = |s: &str| s.split_whitespace().map(String::from).collect::<Vec<_>>();
+        assert!(looks_like_git_push(&argv(
+            "git -C /workspace push origin main"
+        )));
+        assert!(looks_like_git_push(&argv(
+            "git -c credential.helper=!f push -u origin feature"
+        )));
+        assert_eq!(
+            push_target(&argv("git -c x=y -C /repo push origin feature")),
+            ("/repo".to_string(), "feature".to_string())
+        );
+    }
+
+    #[test]
+    fn a_push_word_after_another_subcommand_is_not_a_push() {
+        let argv = |s: &str| s.split_whitespace().map(String::from).collect::<Vec<_>>();
+        for cmd in [
+            "git stash push -m wip -- src/a.rs",
+            "git commit -m push",
+            "git log --grep push",
+            "git -C push status",
+        ] {
+            assert!(!looks_like_git_push(&argv(cmd)), "{cmd}");
+        }
     }
 
     #[test]

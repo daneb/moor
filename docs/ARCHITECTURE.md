@@ -43,7 +43,8 @@ How moor's commands map onto keel, for when you need to look underneath:
 | `moor next` | `keel next --json`, turned into one step and one command |
 | `moor go` | whichever of `keel gate g0`, `keel plan`, `keel gate g1` and `keel run` the spec is waiting on; for a rejected or stale approval, the `approval.recheck` command `keel next --json` names (keel 0.11+), run once |
 | `moor approve` / `moor reject "why"` | `keel approve <spec> --stage <stage>` (with `--reject --note` for a rejection) |
-| `moor view <spec> <artifact>` | reads `.keel/specs/<spec>/{spec,plan,tasks}.md` |
+| `moor go --check` | at the build step, `keel run <spec> --no-driver`: re-checks the work already in the sandbox without the agent |
+| `moor view <spec> <artifact>` | reads `.keel/specs/<spec>/{spec,plan,tasks}.md`; `report` runs `keel report <spec>` |
 | `moor new` / `moor import` | `keel init` in the new workspace |
 | `moor bundle` | `keel export --chain` and `keel bundle verify`, in throwaway containers |
 | `moor recipe` | the whole pipeline, as ADR-0005 describes |

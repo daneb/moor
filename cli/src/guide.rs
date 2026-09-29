@@ -461,12 +461,44 @@ fn revise_lines(spec: &NextSpec, a: &Approval, flag: &str) -> Vec<String> {
             ),
         };
         out.push(format!("  Revise:  {revise}"));
-        out.push(format!("  Then:    moor go{flag}        (checks it again)"));
+        if a.stage == "merge" {
+            // The revision is already in the sandbox; rebuilding from the
+            // spec would throw it away.
+            out.push(format!(
+                "  Then:    moor go{flag} --check   (checks it again without rebuilding)"
+            ));
+        } else {
+            out.push(format!("  Then:    moor go{flag}        (checks it again)"));
+        }
     } else {
         out.push(format!("  Next:    moor go{flag}        (checks it again)"));
     }
     out.push(format!("  Then:    moor approve{flag}"));
     out
+}
+
+/// What to do after a build that didn't pass its checks, which keel has
+/// just listed. Retrying with `moor go` alone repeats the whole build from
+/// the spec, without the agent ever being told what failed, so the first
+/// suggestion is to fix the named failures and re-check without rebuilding.
+pub fn build_failed(slug: &str, explicit: Option<&str>) -> String {
+    let flag = project_flag(explicit);
+    let slug = if crate::manifest::validate_name(slug).is_ok() {
+        slug
+    } else {
+        "<spec>"
+    };
+    [
+        format!("{slug}'s build didn't pass its checks; the output above says why."),
+        String::new(),
+        format!(
+            "  Next:  moor ask{flag} --role build \"Fix what the latest build of {slug} failed on; its failed checks are in its newest run under .keel/runs/\""
+        ),
+        format!("  Then:  moor go{flag} --check      (checks the fix without rebuilding)"),
+        format!("  Or:    moor go{flag}              (the agent builds it again from the spec)"),
+        format!("  See:   moor view{flag} {slug} report"),
+    ]
+    .join("\n")
 }
 
 /// Every spec and its step, the active one marked.
@@ -521,6 +553,19 @@ mod tests {
             recheck: (standing != "absent").then_some(recheck),
         });
         s
+    }
+
+    #[test]
+    fn a_failed_build_points_at_fixing_then_checking() {
+        let text = build_failed("login", Some("p"));
+        assert!(text.contains("the output above says why"), "{text}");
+        assert!(text.contains("moor ask --project p --role build"), "{text}");
+        assert!(text.contains("moor go --project p --check"), "{text}");
+        assert!(
+            text.contains("moor view --project p login report"),
+            "{text}"
+        );
+        assert!(!text.contains("keel "), "{text}");
     }
 
     #[test]

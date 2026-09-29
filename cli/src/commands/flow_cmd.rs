@@ -127,7 +127,9 @@ pub fn reject(explicit: Option<String>, why: &str) -> Result<()> {
 /// `moor go`: take the active spec's automatic steps (checks, planning,
 /// the build run) one after another, stopping at the first thing that
 /// needs the operator, a failure, or a step that didn't move it on.
-pub fn go(explicit: Option<String>) -> Result<()> {
+/// `check`: take the build step without the agent, re-checking the work
+/// already in the sandbox (after fixing it by hand or with `moor ask`).
+pub fn go(explicit: Option<String>, check: bool) -> Result<()> {
     let t = Target::resolve(explicit)?;
     let mut report = t.report()?;
     let Some(slug) = t.active(&report).map(|a| a.spec.slug.clone()) else {
@@ -153,7 +155,11 @@ pub fn go(explicit: Option<String>) -> Result<()> {
         let Some(("keel", args)) = command.split_once(' ') else {
             anyhow::bail!("don't know how to run `{command}`");
         };
-        let args: Vec<String> = args.split_whitespace().map(String::from).collect();
+        let mut args: Vec<String> = args.split_whitespace().map(String::from).collect();
+        let building = args.first().map(String::as_str) == Some("run");
+        if building && check {
+            args.push("--no-driver".to_string());
+        }
         println!("==> {slug} · {}", guide::step_label(spec));
         last_stage = Some(spec.stage.clone());
         ran += 1;
@@ -161,14 +167,26 @@ pub fn go(explicit: Option<String>) -> Result<()> {
         let result = super::keel_cmd::run(&t.name, &args);
         report = t.report()?;
         if let Err(e) = result {
+            // A build that passed still makes keel exit non-zero: its last
+            // check is the merge approval, which is still open. Whether the
+            // build passed is its G2 verdict, which is keel's own rule for a
+            // passing run.
+            if building && build_passed(&t, &slug)? {
+                if rechecking {
+                    println!("\n{RECHECKED}");
+                    break;
+                }
+                continue;
+            }
             println!();
+            if building {
+                anyhow::bail!("{}", guide::build_failed(&slug, t.flag.as_deref()));
+            }
             t.print_guidance(&report);
             return Err(e);
         }
         if rechecking {
-            println!(
-                "\nIt passed its checks again. The earlier decision stays on record until you approve the revision."
-            );
+            println!("\n{RECHECKED}");
             break;
         }
     }
@@ -180,6 +198,45 @@ pub fn go(explicit: Option<String>) -> Result<()> {
     }
     t.print_guidance(&report);
     Ok(())
+}
+
+const RECHECKED: &str =
+    "It passed its checks again. The earlier decision stays on record until you approve the revision.";
+
+/// Whether `slug`'s newest build passed its G2 checks. Reads two things
+/// from the sandbox, the run list and that run's G2 result, and uses only
+/// the verdict: nothing from either is printed or put into a command.
+fn build_passed(t: &Target, slug: &str) -> Result<bool> {
+    let container = t.m.sandbox_container();
+    let (status, out) =
+        crate::proc::run_capture("docker", &["exec", &container, "keel", "runs", "--json"])?;
+    if !status.success() {
+        return Ok(false);
+    }
+    let runs: serde_json::Value = serde_json::from_str(out.trim()).unwrap_or_default();
+    let Some(id) = newest_run(&runs, slug) else {
+        return Ok(false);
+    };
+    let path = format!(".keel/runs/{id}/gates/G2.json");
+    let (status, out) = crate::proc::run_capture("docker", &["exec", &container, "cat", &path])?;
+    Ok(status.success() && gate_passed(&out))
+}
+
+/// The id of `slug`'s newest run, if it has the shape of a run id.
+fn newest_run(runs: &serde_json::Value, slug: &str) -> Option<String> {
+    runs["runs"]
+        .as_array()?
+        .iter()
+        .filter(|r| r["spec"] == slug)
+        .filter_map(|r| r["id"].as_str())
+        .next_back()
+        .filter(|id| !id.is_empty() && id.bytes().all(|b| b.is_ascii_digit() || b == b'-'))
+        .map(str::to_string)
+}
+
+fn gate_passed(gate_json: &str) -> bool {
+    serde_json::from_str::<serde_json::Value>(gate_json.trim())
+        .is_ok_and(|g| g["verdict"] == "pass")
 }
 
 #[cfg(test)]
@@ -200,6 +257,34 @@ mod tests {
             assert_eq!(got, expected, "{input:?}");
             assert!(String::from_utf8(out).unwrap().contains("Approve? [y/N]"));
         }
+    }
+
+    #[test]
+    fn the_newest_run_for_the_spec_is_found() {
+        let runs = serde_json::json!({"runs": [
+            {"id": "2026-09-29-000", "spec": "greet"},
+            {"id": "2026-09-29-001", "spec": "other"},
+            {"id": "2026-09-29-002", "spec": "greet"},
+            {"id": "../../etc", "spec": "evil"},
+        ]});
+        assert_eq!(
+            newest_run(&runs, "greet").as_deref(),
+            Some("2026-09-29-002")
+        );
+        assert_eq!(
+            newest_run(&runs, "evil"),
+            None,
+            "a path-shaped id is refused"
+        );
+        assert_eq!(newest_run(&runs, "missing"), None);
+    }
+
+    #[test]
+    fn only_a_pass_verdict_counts() {
+        assert!(gate_passed(r#"{"gate":"G2","verdict":"pass"}"#));
+        assert!(!gate_passed(r#"{"gate":"G2","verdict":"fail"}"#));
+        assert!(!gate_passed(r#"{"gate":"G2","verdict":"blocked"}"#));
+        assert!(!gate_passed("not json"));
     }
 
     #[test]

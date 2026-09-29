@@ -4,6 +4,29 @@ Notable changes to moor. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and moor uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **`moor go --check`** re-checks the build step without the agent, for
+  work you fixed by hand or with `moor ask`. After a merge rejection, the
+  guidance points at it instead of a full rebuild.
+- `moor view <spec> report` shows every check each of the spec's runs
+  passed or failed.
+
+### Fixed
+
+- A failed build now ends with what to do: fix what failed (a `moor ask`
+  pointed at the run's evidence), re-check with `moor go --check`, or let
+  the agent rebuild, instead of only "Next: moor go".
+- A build that passes and reaches the merge approval is no longer reported
+  as an error with a failing exit code.
+- `moor new` makes the workspace a git repository with a first commit. A
+  new project had neither, so its first build could never run.
+- `git stash push` (and any command with "push" after another git
+  subcommand) is no longer recorded in the audit trail as code leaving the
+  sandbox; only git's actual subcommand counts, after its global options.
+
 ## [0.3.0] - 2026-09-29
 
 The first release with a guided workflow: at every step, moor says where
