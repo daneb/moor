@@ -501,6 +501,33 @@ pub fn build_failed(slug: &str, explicit: Option<&str>) -> String {
     .join("\n")
 }
 
+/// Guidance for a spec whose merge is approved but whose work hasn't been
+/// shipped: it is still uncommitted in the sandbox.
+pub fn render_ship(
+    project: &str,
+    explicit: Option<&str>,
+    slug: &str,
+    waiting: usize,
+) -> Vec<String> {
+    let flag = project_flag(explicit);
+    let mut out = vec![
+        format!("{project} · {slug} · approved, not shipped yet"),
+        String::new(),
+        "  The merge is approved. Ship it: commit it on its own branch, push it,".to_string(),
+        "  and open a pull request.".to_string(),
+        String::new(),
+        format!("  Next:  moor ship{flag}"),
+    ];
+    if waiting > 1 {
+        out.push(String::new());
+        out.push(format!(
+            "  {} more approved spec(s) waiting to ship.",
+            waiting - 1
+        ));
+    }
+    out
+}
+
 /// Every spec and its step, the active one marked.
 pub fn render_all(report: &NextReport, active: Option<&Active>) -> Vec<String> {
     let width = report.specs.iter().map(|s| s.slug.len()).max().unwrap_or(0);

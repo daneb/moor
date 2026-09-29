@@ -9,7 +9,9 @@ fn artifact_filename(artifact: &str) -> Result<&'static str> {
         "plan" => Ok("plan.md"),
         "tasks" => Ok("tasks.md"),
         other => {
-            anyhow::bail!("unknown artifact '{other}' — expected spec, plan, tasks, or report")
+            anyhow::bail!(
+                "unknown artifact '{other}' — expected spec, plan, tasks, report, or diff"
+            )
         }
     }
 }
@@ -56,6 +58,46 @@ fn highlight(markdown: &str) -> String {
 }
 
 pub fn run(project: &str, slug: &str, artifact: &str) -> Result<()> {
+    if artifact == "diff" {
+        // The spec's change as it stands in the working tree, leaving out
+        // the pipeline's own records under .keel/.
+        crate::manifest::validate_name(slug).context("spec name")?;
+        let m = Manifest::load(&paths::manifest_path(project)?)?;
+        let container = m.sandbox_container();
+        let status = proc::run_inherit(
+            "docker",
+            &[
+                "exec",
+                &container,
+                "git",
+                "--no-pager",
+                "diff",
+                "HEAD",
+                "--",
+                ".",
+                ":(exclude).keel",
+            ],
+        )?;
+        let (_, new_files) = proc::run_capture(
+            "docker",
+            &[
+                "exec",
+                &container,
+                "git",
+                "ls-files",
+                "--others",
+                "--exclude-standard",
+                "--",
+                ".",
+                ":(exclude).keel",
+            ],
+        )?;
+        for f in new_files.lines().filter(|l| !l.trim().is_empty()) {
+            let f: String = f.chars().filter(|c| !c.is_control()).collect();
+            println!("new file (not shown above): {f}");
+        }
+        return proc::require_success("showing the diff", status);
+    }
     if artifact == "report" {
         // Built by the pipeline from every run's gate results, not a file.
         crate::manifest::validate_name(slug).context("spec name")?;

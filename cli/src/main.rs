@@ -112,6 +112,20 @@ enum Command {
         /// Why, so the next attempt can address it.
         why: String,
     },
+    /// Ship an approved spec: commit it on its own branch, push it, open a PR.
+    ///
+    /// Shows exactly which files it will commit (the spec's change, its
+    /// folder and its runs, nothing of other specs) and asks first. Returns
+    /// the sandbox to its trunk branch afterwards.
+    Ship {
+        #[arg(short = 'p', long = "project")]
+        project: Option<String>,
+        /// The spec to ship, if more than one is waiting.
+        spec: Option<String>,
+        /// Ship without asking (for when there's no terminal).
+        #[arg(long)]
+        yes: bool,
+    },
     /// Set the default project, and optionally pin its active spec.
     Use {
         name: String,
@@ -125,7 +139,7 @@ enum Command {
         project: Option<String>,
         /// The spec's name, e.g. `blast-radius`.
         slug: String,
-        /// spec | plan | tasks | report (every check each run passed or failed)
+        /// spec | plan | tasks | report (every run's checks) | diff (the change)
         artifact: String,
     },
     /// Ask the project's agent something, or have it make a change.
@@ -324,6 +338,7 @@ fn main() {
         Command::Approve { project, yes } => commands::flow_cmd::approve(project, yes),
         Command::Reject { project, why } => commands::flow_cmd::reject(project, &why),
         Command::Go { project, check } => commands::flow_cmd::go(project, check),
+        Command::Ship { project, spec, yes } => commands::ship_cmd::run(project, spec, yes),
         Command::Use { name, spec } => commands::use_cmd::run(&name, spec.as_deref()),
         Command::Status => commands::status::run(),
         Command::Audit {

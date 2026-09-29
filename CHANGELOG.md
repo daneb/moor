@@ -8,6 +8,16 @@ Notable changes to moor. The format follows
 
 ### Added
 
+- **`moor ship`** takes a spec whose merge you approved to GitHub: it shows
+  the files it will commit (the change, the spec's folder and its runs,
+  nothing of other specs), asks, commits them on `moor/<spec>` in the
+  sandbox, pushes from the sandbox, opens the pull request from your Mac
+  with `gh`, and returns the sandbox to its trunk branch for the next spec.
+  `moor next` says when approved work is waiting to ship.
+- At the merge step, `moor approve` shows what the build changes and the
+  checks its run passed, instead of every run's history; `moor view <spec>
+  diff` shows the full change.
+
 - **`moor go --check`** re-checks the build step without the agent, for
   work you fixed by hand or with `moor ask`. After a merge rejection, the
   guidance points at it instead of a full rebuild.
