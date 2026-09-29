@@ -1,5 +1,5 @@
 use crate::paths;
-use anyhow::Result;
+use anyhow::{Context, Result};
 
 /// Rejects a name that isn't among the known projects, listing what is
 /// known so the operator can correct a typo immediately. Split out from
@@ -21,11 +21,22 @@ fn check_known(name: &str, names: &[String]) -> Result<()> {
 /// Set the sticky default project that `moor keel`/`moor view` (and any
 /// other command taking an optional `--project`) fall back to when it's
 /// omitted, so switching your working project doesn't mean typing its
-/// name on every subsequent command.
-pub fn run(name: &str) -> Result<()> {
+/// name on every subsequent command. `spec` also pins the spec `moor
+/// next` guides this project through; the slug is checked for shape only,
+/// since whether keel knows it is `moor next`'s to report.
+pub fn run(name: &str, spec: Option<&str>) -> Result<()> {
     check_known(name, &paths::all_project_names()?)?;
+    if let Some(slug) = spec {
+        crate::manifest::validate_name(slug).context("spec name")?;
+    }
     paths::write_current_project(name)?;
     println!("default project set to '{name}'");
+    if let Some(slug) = spec {
+        let path = paths::active_spec_path(name)?;
+        std::fs::write(&path, slug).with_context(|| format!("writing {}", path.display()))?;
+        println!("active spec set to '{slug}'");
+    }
+    println!("\n  Next:  moor next");
     Ok(())
 }
 

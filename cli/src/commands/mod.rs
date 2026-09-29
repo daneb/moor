@@ -6,6 +6,7 @@ pub mod import_cmd;
 pub mod keel_cmd;
 pub mod logs;
 pub mod new_cmd;
+pub mod next_cmd;
 pub mod recipe;
 pub mod run_cmd;
 pub mod secrets_status;
