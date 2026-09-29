@@ -52,8 +52,9 @@ fn default_workspace() -> Vec<String> {
 impl TaskContext {
     #[allow(dead_code)]
     pub fn load(session_id: &str) -> Option<Self> {
-        let path = dirs::home_dir()?
-            .join(".moor/sessions")
+        let path = crate::paths::moor_home()
+            .ok()?
+            .join("sessions")
             .join(session_id)
             .join("context.json");
         serde_json::from_str(&std::fs::read_to_string(path).ok()?).ok()
