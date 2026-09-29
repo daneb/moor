@@ -45,7 +45,7 @@ fn describe(data: &Value) -> String {
         ),
         "paused-for-approval" => format!("[{slug}] PAUSED — waiting on: {}", str_field("stage")),
         "run-attempt" => format!(
-            "[{slug}] keel run attempt {}/{}",
+            "[{slug}] build attempt {}/{}",
             num_field("attempt"),
             num_field("max")
         ),

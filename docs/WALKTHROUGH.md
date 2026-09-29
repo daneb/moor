@@ -10,6 +10,13 @@ below, fixed in the same commit as this doc. The commands below still
 show `isolator-sample-app` as the *local* project name, since that
 wasn't renamed — only the GitHub repository it points at was.
 
+> **This run predates moor's guided commands.** It drives the pipeline
+> with its underlying `keel` commands, because that's what was typed at the
+> time. Today `moor next` shows the step you're on and `moor go`,
+> `moor approve` and `moor reject` take it; see
+> [ARCHITECTURE.md](ARCHITECTURE.md#what-moor-is-built-from) for how each
+> maps to the commands below.
+
 ## 0. Before you start
 
 ```bash

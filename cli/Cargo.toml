@@ -2,7 +2,7 @@
 name = "moor"
 version = "0.2.1"
 edition = "2021"
-description = "Control CLI for containerized, keel-driven AI development sandboxes"
+description = "Build software with an AI agent inside a locked-down container"
 license = "MIT"
 repository = "https://github.com/daneb/moor"
 

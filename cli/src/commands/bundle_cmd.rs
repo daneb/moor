@@ -71,7 +71,9 @@ fn export_to(program: &str, args: &[String], chain: &Path, archive: &Path) -> Re
         other => {
             let _ = std::fs::remove_file(archive);
             match other {
-                Ok(s) => anyhow::bail!("keel export failed ({s}) — see its output above"),
+                Ok(s) => anyhow::bail!(
+                    "exporting the run's evidence failed ({s}) — see the output above"
+                ),
                 Err(e) => Err(e),
             }
         }
@@ -81,7 +83,7 @@ fn export_to(program: &str, args: &[String], chain: &Path, archive: &Path) -> Re
 pub fn run(name: &str, run: Option<&str>, out: Option<PathBuf>) -> Result<()> {
     let m = Manifest::load(&paths::manifest_path(name)?)?;
     // keel's latest run_end has to be in the chain before the chain ships.
-    audit::fold_sink(name, &m).context("folding keel's sink before bundling")?;
+    audit::fold_sink(name, &m).context("folding the sandbox's workflow log before bundling")?;
     let chain = paths::chain_log_path(name)?;
     if !chain.exists() {
         anyhow::bail!("'{name}' has no audit chain yet — nothing to bundle");
@@ -90,7 +92,7 @@ pub fn run(name: &str, run: Option<&str>, out: Option<PathBuf>) -> Result<()> {
     let out = out.unwrap_or(std::env::current_dir()?);
     std::fs::create_dir_all(&out)?;
     let archive = out.join(format!(
-        "keel-{name}-{}.tar.gz",
+        "moor-{name}-{}.tar.gz",
         chrono::Utc::now().format("%Y%m%dT%H%M%SZ")
     ));
     export_to("docker", &export_args(&m, run), &chain, &archive)?;

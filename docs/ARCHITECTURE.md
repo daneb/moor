@@ -21,6 +21,38 @@ Host (Mac Mini, OrbStack/Docker)
                logs every request, holds the canary token watch
 ```
 
+## What moor is built from
+
+moor's own commands are all you need day to day. Underneath, it puts
+together a handful of tools, and this is where they are named:
+
+| Piece | What it does | Where it runs |
+| --- | --- | --- |
+| **Docker** (via OrbStack on macOS) | Runs each project's sandbox and egress containers, via `docker compose`. | Host |
+| **Claude Code** (`claude`) | The coding agent. | Sandbox |
+| **[keel](https://github.com/daneb/keel)** | The spec → plan → build pipeline: specs, the checks on them (G0 for a spec, G1 for a plan, G2/G2.5/G3 after a build), approvals, build runs, and the evidence of all of it. | Sandbox |
+| **`moor-keel-mcp`** | The MCP server that is the agent's only route to keel: it can run checks and ask what's next, but cannot approve. See below and [MCP.md](MCP.md). | Sandbox |
+| **tinyproxy** | The egress proxy: a domain allowlist, and a log of every request. | Egress container |
+
+How moor's commands map onto keel, for when you need to look underneath:
+
+| moor | keel, inside the sandbox |
+| --- | --- |
+| `moor next` | `keel next --json`, turned into one step and one command |
+| `moor go` | whichever of `keel gate g0`, `keel plan`, `keel gate g1` and `keel run` the spec is waiting on |
+| `moor approve` / `moor reject "why"` | `keel approve <spec> --stage <stage>` (with `--reject --note` for a rejection) |
+| `moor view <spec> <artifact>` | reads `.keel/specs/<spec>/{spec,plan,tasks}.md` |
+| `moor new` / `moor import` | `keel init` in the new workspace |
+| `moor bundle` | `keel export --chain` and `keel bundle verify`, in throwaway containers |
+| `moor recipe` | the whole pipeline, as ADR-0005 describes |
+
+For anything the guided commands don't cover, `moor keel <args>` runs
+`keel <args>` in the project's sandbox, logged like any `moor run`. It is
+left out of `moor --help` on purpose: it's an escape hatch, not the way to
+work. keel's own documentation covers its commands and its credential
+check (which decides whether `keel run` drives the agent or falls back to
+`--no-driver` mode).
+
 ## Components
 
 ### `moor` (host, trusted)

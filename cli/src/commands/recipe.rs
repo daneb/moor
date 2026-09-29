@@ -114,7 +114,7 @@ fn next_report(name: &str, m: &Manifest, slug: &str) -> Result<NextReport> {
         &["keel".into(), "next".into(), "--json".into(), slug.into()],
     )?;
     serde_json::from_str(&out)
-        .with_context(|| format!("parsing `keel next --json {slug}` output:\n{out}"))
+        .with_context(|| format!("parsing the pipeline status for {slug}:\n{out}"))
 }
 
 /// Ask an agent to author `.keel/specs/<slug>/spec.md` from the recipe's
@@ -222,6 +222,12 @@ pub fn run(name: &str, recipe_path: &Path) -> Result<()> {
 
     println!("==> recipe '{slug}' for project '{name}'");
     log_event(name, "recipe-start", json!({"slug": slug}))?;
+    // The recipe's spec becomes the active one, so the `moor approve` it
+    // pauses for acts on this spec, not whichever was pinned before.
+    if crate::manifest::validate_name(&slug).is_ok() {
+        std::fs::write(paths::active_spec_path(name)?, &slug)?;
+        println!("==> '{slug}' is now the active spec");
+    }
 
     let mut new_argv = vec![
         "keel".into(),
@@ -247,10 +253,10 @@ pub fn run(name: &str, recipe_path: &Path) -> Result<()> {
     let freshly_created = out.contains("created .keel/specs/");
     if !already_existed && !freshly_created {
         println!("{out}");
-        anyhow::bail!("`keel spec new` failed — see output above");
+        anyhow::bail!("creating the spec failed — see the output above");
     }
     if freshly_created {
-        println!("==> scaffolded .keel/specs/{slug}/ — authoring the spec now");
+        println!("==> created spec '{slug}' — writing it now");
         log_event(name, "spec-scaffolded", json!({"slug": slug}))?;
         author_spec(name, &m, &slug, &recipe.description)?;
         log_event(name, "spec-authored", json!({"slug": slug}))?;
@@ -262,7 +268,7 @@ pub fn run(name: &str, recipe_path: &Path) -> Result<()> {
     loop {
         let report = next_report(name, &m, &slug)?;
         let Some(spec) = report.specs.iter().find(|s| s.slug == slug) else {
-            println!("keel no longer lists '{slug}' — nothing left to drive.");
+            println!("'{slug}' is no longer in the pipeline — nothing left to drive.");
             return Ok(());
         };
         if spec.complete {
@@ -279,9 +285,13 @@ pub fn run(name: &str, recipe_path: &Path) -> Result<()> {
         )?;
 
         if spec.stage.contains("approval") {
+            let project = if paths::read_current_project().ok().flatten().as_deref() == Some(name) {
+                String::new()
+            } else {
+                format!(" --project {name}")
+            };
             println!(
-                "\nPAUSED for human approval. Review the change, then run:\n\n    moor run {name} -- {}\n\n...and re-run this recipe to continue.",
-                spec.command
+                "\nPAUSED for your approval. Review it and decide:\n\n    moor approve{project}      (shows it first, then asks)\n    moor reject{project} \"why\"\n\n...then re-run this recipe to continue."
             );
             log_event(
                 name,
@@ -306,7 +316,7 @@ pub fn run(name: &str, recipe_path: &Path) -> Result<()> {
                         json!({"slug": slug, "reason": "gate kept failing"}),
                     )?;
                     anyhow::bail!(
-                        "gate kept failing after {} attempt(s) — see .keel/specs/{slug}/gates/ for evidence; fix by hand, then re-run this recipe",
+                        "a check kept failing after {} attempt(s) — see .keel/specs/{slug}/gates/ for evidence; fix it by hand, then re-run this recipe",
                         recipe.front.max_gate_retries + 1
                     );
                 }
@@ -325,7 +335,7 @@ pub fn run(name: &str, recipe_path: &Path) -> Result<()> {
                         json!({"slug": slug, "reason": "keel run attempt cap reached"}),
                     )?;
                     anyhow::bail!(
-                        "`keel run` still hasn't reached a human checkpoint after {} attempt(s) — see .keel/runs/ for evidence; drive it by hand, then re-run this recipe",
+                        "the build still hasn't reached a point that needs you after {} attempt(s) — see .keel/runs/ for evidence; continue with `moor go`, then re-run this recipe",
                         recipe.front.max_run_attempts
                     );
                 }

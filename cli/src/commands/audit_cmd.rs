@@ -50,7 +50,7 @@ pub fn run(name: &str, verify: bool, export: Option<PathBuf>) -> Result<()> {
     }
 
     if folded > 0 {
-        println!("(folded in {folded} new egress-log and keel-sink entries)\n");
+        println!("(folded in {folded} new egress-log and workflow entries)\n");
     }
 
     println!("== audit chain: {} ==", path.display());
@@ -66,10 +66,9 @@ pub fn run(name: &str, verify: bool, export: Option<PathBuf>) -> Result<()> {
     }
 
     println!(
-        "\nkeel's own exported run bundles (.keel/bundles/, from `keel export`)\n\
-         live inside the workspace volume, not here — use `moor audit\n\
-         {name} --export` to pull everything (this chain + keel's bundles)\n\
-         into one archive."
+        "\nEach run's exported evidence lives inside the workspace volume,\n\
+         not here — use `moor audit {name} --export` to pull everything\n\
+         (this trail plus the runs' evidence) into one archive."
     );
     if tripwires > 0 {
         println!(

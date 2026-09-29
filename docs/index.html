@@ -264,10 +264,10 @@
 
 <main>
   <section class="hero wrap">
-    <div class="eyebrow">● keel-driven · container-isolated · macOS · v0.2.1</div>
+    <div class="eyebrow">● spec-driven · container-isolated · macOS · v0.2.1</div>
     <h1 class="headline">Let AI agents build freely.<br>Never let them touch your <span class="y">Mac</span>.</h1>
     <p class="sub">moor gives every project its own sealed sandbox. The agent —
-      Claude Code today — and <a href="https://daneb.github.io/keel/">keel</a> work
+      Claude Code today — and the pipeline that checks its work run
       inside it with <b>no access to your disk</b> and <b>no way onto the internet
       except an allowlist</b>. moor watches from outside and keeps a
       <b>tamper-evident record</b> of everything that happened — where the agent
@@ -281,7 +281,7 @@
       <div class="term-body">
         <div class="l"><span class="prompt">$</span> moor new my-app --github --image moor/node:latest</div>
         <div class="l out">==&gt; starting sandbox + egress for 'my-app'</div>
-        <div class="l out">==&gt; running `keel init` inside the sandbox</div>
+        <div class="l out">==&gt; setting the workspace up for specs</div>
         <div class="l"><span class="prompt">$</span> moor selftest my-app</div>
         <div class="l ok">[PASS] read-only root filesystem</div>
         <div class="l ok">[PASS] no host bind mounts</div>
@@ -321,10 +321,10 @@
       <div class="step"><b>2 · Fence it</b><span>Its only route out is a proxy with an
         allowlist. Every request is logged — the blocked ones too.</span></div>
       <div class="step"><b>3 · Watch it</b><span>moor attests the box from outside and
-        writes every command, push and keel verdict into a hash-linked record.</span></div>
+        writes every command, push, check result and approval into a hash-linked record.</span></div>
     </div>
     <figure class="shot">
-      <img src="img/moor-sandbox.svg" alt="moor on your Mac holds the audit chain; the agent and keel run in a sealed sandbox with no host mounts; the only way out is an egress proxy with an allowlist; moor attests the sandbox and folds keel's records in from outside.">
+      <img src="img/moor-sandbox.svg" alt="moor on your Mac holds the audit trail; the agent and its pipeline run in a sealed sandbox with no host mounts; the only way out is an egress proxy with an allowlist; moor attests the sandbox and folds the pipeline's records in from outside.">
       <figcaption>The sandbox, its only exit, and the record that lives outside both.</figcaption>
     </figure>
   </section>
@@ -333,24 +333,24 @@
     <p class="kicker">Why trust it</p>
     <h2>Value, quality, security, reliability — each one checkable</h2>
     <p class="lede">Nothing below is a promise about intent. Every line is something a
-      test, a real container, or keel's own verifier confirms.</p>
+      test, a real container, or the record's own verifier confirms.</p>
     <div class="pillars">
       <div class="pillar"><div class="k">VALUE</div><h3>Let the agent actually work</h3>
         <ul>
           <li><b>Real builds, real tests, real pushes</b> — the agent installs packages
             and ships to GitHub, inside the box.</li>
-          <li><b>One command per project</b>: <code>moor new</code>, and it's up with keel
-            ready inside.</li>
+          <li><b>One command per project</b>: <code>moor new</code>, and it's up and
+            ready for its first spec.</li>
           <li><b>Describe an outcome, get a gated feature</b>: <code>moor recipe</code>
             runs the pipeline and stops only where you should decide.</li>
         </ul></div>
-      <div class="pillar"><div class="k">QUALITY</div><h3>Gated by keel, every time</h3>
+      <div class="pillar"><div class="k">QUALITY</div><h3>Checked at every step</h3>
         <ul>
           <li><b>Spec → plan → build → gates → sign-off</b>, with a test behind every
             acceptance criterion.</li>
           <li><b>Real names on every approval</b> — your git identity, carried into the
             sandbox without writing a file.</li>
-          <li><b>129 unit tests</b>, clippy clean, and a real-container end-to-end run on
+          <li><b>144 unit tests</b>, clippy clean, and a real-container end-to-end run on
             every pull request.</li>
         </ul></div>
       <div class="pillar"><div class="k">SECURITY</div><h3>Your Mac stays yours</h3>
@@ -360,7 +360,7 @@
           <li><b>Default-deny network</b>: an internal-only network plus an allowlisting
             proxy. No bypass route exists.</li>
           <li><b>The agent can't rewrite the record</b>: moor holds the pen, from outside
-            the box, and keel's verifier checks every link.</li>
+            the box, and a verifier checks every link.</li>
         </ul></div>
       <div class="pillar"><div class="k">RELIABILITY</div><h3>Checked, not claimed</h3>
         <ul>
@@ -368,7 +368,7 @@
             capabilities, no mounts — or marked unproven, never assumed.</li>
           <li><b>Breakout probes that must fail</b>: canary domain, root-fs write,
             docker.sock — every selftest.</li>
-          <li><b>keel pinned in the image</b>: a rebuild installs exactly the version you
+          <li><b>Pinned tooling in the image</b>: a rebuild installs exactly the version you
             chose, never a stale cache.</li>
         </ul></div>
     </div>
@@ -377,23 +377,23 @@
   <section id="recipes" class="wrap">
     <p class="kicker">The big value add</p>
     <h2>Write down what you want. The agent loop runs — until it needs you.</h2>
-    <p class="lede">Driving keel by hand means typing a long, exact sequence
-      every time: <code>spec new</code> → author it → <code>gate g0</code> →
-      <code>approve</code> → <code>plan</code> → author it →
-      <code>gate g1</code> → <code>approve</code> → <code>run</code> →
-      <code>approve --stage merge</code>. <code>moor recipe</code> takes one
-      loosely-worded description of the outcome and drives that whole
-      sequence itself — including fixing its own failing gates — stopping
-      only at the points a human should actually decide something.</p>
+    <p class="lede">Taking a feature through by hand means the same sequence
+      every time: write the spec → check it → approve it → plan it → check
+      the plan → approve it → build → approve the merge. <code>moor next</code>
+      always tells you the one command for the step you're on; <code>moor
+      recipe</code> goes further, taking one loosely-worded description of the
+      outcome and driving that whole sequence itself — including fixing its
+      own failing checks — stopping only at the points you should actually
+      decide something.</p>
     <div class="term qs-term">
       <div class="term-bar"><span class="term-dot"></span><span class="term-dot"></span><span class="term-dot"></span></div>
       <div class="term-body">
         <div class="l"><span class="prompt">$</span> moor recipe my-app greet-function.recipe.md</div>
-        <div class="l out">==&gt; scaffolded .keel/specs/greet-function/ — authoring the spec now</div>
+        <div class="l out">==&gt; created spec 'greet-function' — writing it now</div>
         <div class="l ok">G0 pass — 16 passed, 0 failed, 0 blocked</div>
         <div class="l out">==&gt; stage: spec_approval — PAUSED for human approval</div>
         <div class="l out"></div>
-        <div class="l out"># ...approve, then re-run the exact same command...</div>
+        <div class="l out"># ...moor approve, then re-run the exact same command...</div>
         <div class="l"><span class="prompt">$</span> moor recipe my-app greet-function.recipe.md</div>
         <div class="l out">FAIL task-files-in-scope — asking the agent to fix exactly that</div>
         <div class="l out">FAIL wave-isolation — asking the agent to fix exactly that</div>
@@ -404,8 +404,8 @@
     <p class="arch-note">Autonomous, not unchecked: a failing spec/plan gate
       gets a bounded self-correction loop restricted to <code>Write</code>/
       <code>Edit</code> only — the agent can fix exactly what the gate named,
-      never run arbitrary commands to do it. The real build step
-      (<code>keel run</code>) gets no auto-retry beyond a small attempt cap —
+      never run arbitrary commands to do it. The real build step gets no
+      auto-retry beyond a small attempt cap —
       that step has full tool access, so it stops and hands a human the
       evidence instead of iterating unattended. See
       <a href="https://github.com/daneb/moor/blob/master/docs/decisions/0005-recipe.md">ADR-0005</a>
@@ -436,9 +436,9 @@
       <div class="card">
         <div class="icon">⛓️</div>
         <h3>One tamper-evident record</h3>
-        <p>Every command, egress verdict, keel verdict and <code>git push</code> — with
-          the exact commit it pushed — in one hash chain, in keel's own format, so
-          <code>keel chain verify</code> checks it too.</p>
+        <p>Every command, egress verdict, check result and <code>git push</code> — with
+          the exact commit it pushed — in one hash chain, in the same format the
+          pipeline uses, so one verifier checks both.</p>
       </div>
       <div class="card">
         <div class="icon">🐤</div>
@@ -449,7 +449,7 @@
       </div>
       <div class="card">
         <div class="icon">🚦</div>
-        <h3>Gated delivery via keel</h3>
+        <h3>Gated delivery</h3>
         <p>Spec → plan → build → gate → merge, with a runnable oracle behind
           every acceptance criterion. Real build/test/lint commands, executed
           inside the sandbox, not simulated.</p>
@@ -478,14 +478,14 @@
       <div class="card">
         <div class="icon">📋</div>
         <h3><code>moor bundle</code>: proof, not a story</h3>
-        <p>Builds keel's evidence bundle with moor's record inside — in a throwaway
+        <p>Builds a run's evidence bundle with moor's record inside — in a throwaway
           container, never the sandbox — and verifies it before you send it.</p>
       </div>
       <div class="card">
         <div class="icon">🛰️</div>
         <h3>Attested from outside</h3>
         <p>On every <code>moor up</code>, moor reads the running container with
-          <code>docker inspect</code> and hands keel what it proved. A repo can refuse
+          <code>docker inspect</code> and hands the pipeline what it proved. A repo can refuse
           to run an agent without it.</p>
       </div>
       <div class="card">
@@ -497,12 +497,12 @@
       </div>
       <div class="card">
         <div class="icon">⚡</div>
-        <h3>Keel shortcuts, no boilerplate</h3>
-        <p><code>moor keel &lt;args&gt;</code> and <code>moor view &lt;slug&gt;
-          spec|plan|tasks</code> drop the <code>run &lt;project&gt; --</code>
-          you'd otherwise repeat on every call. Project is inferred from
-          whichever sandbox is actually up, and the CLI always prints which
-          one it picked before it runs anything.</p>
+        <h3>Always know the next step</h3>
+        <p><code>moor next</code> shows where the active spec stands —
+          <em>step 5 of 7: approve the plan</em> — and the one command that
+          moves it on. <code>moor go</code>, <code>moor approve</code> and
+          <code>moor reject</code> act on that spec, so you never type a spec
+          name or a stage.</p>
       </div>
     </div>
   </section>
@@ -510,9 +510,9 @@
   <section id="architecture" class="wrap">
     <p class="kicker">Architecture</p>
     <h2>One shared boundary, not one shared kernel of trust</h2>
-    <p class="lede">keel — the gated orchestrator that drives the agent — runs
-      <em>inside</em> the sandbox, because keel itself does no isolation. The
-      isolation is built entirely at the container layer, underneath it.</p>
+    <p class="lede">The pipeline that drives the agent runs <em>inside</em> the
+      sandbox too, because it does no isolation of its own. The isolation is
+      built entirely at the container layer, underneath it.</p>
     <div class="arch">
       <div class="arch-row">
         <div class="arch-box host">
@@ -527,7 +527,7 @@
         <div class="arch-box sandbox">
           <b>Sandbox container</b>
           <ul>
-            <li>keel + agent CLI + toolchain</li>
+            <li>agent CLI + pipeline + toolchain</li>
             <li>workspace = named volume only</li>
             <li>non-root, read-only rootfs</li>
           </ul>
@@ -556,7 +556,7 @@
     <div class="cases">
       <div class="case">
         <h3>Running Claude Code against a repo you haven't fully vetted</h3>
-        <p>A cloned repo's <code>.keel/keel.toml</code>, or the agent's own output, is
+        <p>A cloned repo's config files, or the agent's own output, are
           untrusted input the moment it exists. moor makes the blast
           radius one throwaway container, never the machine underneath it.</p>
       </div>
@@ -585,20 +585,20 @@
     <p class="kicker">Proof, not vibes</p>
     <h2>Every claim on this page was tested against a real container</h2>
     <div class="proof-grid">
-      <div class="stat"><div class="n">129</div><div class="d">unit tests — hardening logic, redaction, the hash chain, name validation</div></div>
+      <div class="stat"><div class="n">144</div><div class="d">unit tests — hardening logic, redaction, the hash chain, name validation</div></div>
       <div class="stat"><div class="n">8/8</div><div class="d">static hardening checks pass on a live container, every run</div></div>
       <div class="stat"><div class="n">3/3</div><div class="d">active breakout probes fail the way they're supposed to</div></div>
       <div class="stat"><div class="n">1</div><div class="d">real private GitHub repo, shipped end-to-end through the pipeline</div></div>
     </div>
     <ul class="proof-list">
       <li><span class="tag">e2e</span> <span><b>tests/e2e.sh</b> live-tampers with a real project's audit chain file and confirms <code>--verify</code> catches it — not a mocked test.</span></li>
-      <li><span class="tag">keel</span> <span><b>keel's own verifier accepts moor's record</b>, and a real keel run inside a real sandbox bundles to <code>bundle pass</code> on every check — in the same end-to-end suite.</span></li>
-      <li><span class="tag">walkthrough</span> <span><b>A real project run</b> found two genuine keel gate violations (an under-scoped test file, an under-scoped lockfile) and three real moor bugs — all fixed and documented, not hidden.</span></li>
+      <li><span class="tag">verifier</span> <span><b>The pipeline's own verifier accepts moor's record</b>, and a real run inside a real sandbox bundles to <code>bundle pass</code> on every check — in the same end-to-end suite.</span></li>
+      <li><span class="tag">walkthrough</span> <span><b>A real project run</b> found two genuine check failures (an under-scoped test file, an under-scoped lockfile) and three real moor bugs — all fixed and documented, not hidden.</span></li>
       <li><span class="tag">decision record</span> <span><b>Runtime choice</b> is a sourced ADR, not a guess: gVisor and Apple's native <code>container</code> tool were both investigated and rejected with cited evidence, including a confirmed open security hole in the alternative.</span></li>
       <li><span class="tag">CI</span> <span><b>cargo audit/deny, shellcheck, hadolint, gitleaks, and a Trivy CVE scan of every built image</b> run on every push — verified by actually watching the real GitHub Actions run to completion, not just written and assumed to work.</span></li>
     </ul>
     <figure class="shot" style="margin-top:36px">
-      <img src="img/moor-bundle.svg" alt="moor bundle: the host chain goes to keel export in a throwaway container with no network; the bundle is verified in a second throwaway container; moor exits with keel's verdict.">
+      <img src="img/moor-bundle.svg" alt="moor bundle: the host audit trail is exported with the run's evidence in a throwaway container with no network; the bundle is verified in a second throwaway container; moor exits with the verifier's result.">
       <figcaption><code>moor bundle</code> — built and verified outside the sandbox.</figcaption>
     </figure>
   </section>
@@ -616,9 +616,10 @@
         <div class="l out"># per project</div>
         <div class="l"><span class="prompt">$</span> moor new my-app --github --image moor/node:latest</div>
         <div class="l"><span class="prompt">$</span> moor secrets set my-app ANTHROPIC_API_KEY</div>
-        <div class="l"><span class="prompt">$</span> moor shell my-app</div>
-        <div class="l"><span class="prompt">$</span> moor keel run my-spec</div>
-        <div class="l out">==&gt; project: my-app (only sandbox currently up)</div>
+        <div class="l"><span class="prompt">$</span> moor use my-app</div>
+        <div class="l"><span class="prompt">$</span> moor next</div>
+        <div class="l out">my-app · my-spec · step 6 of 7: build it</div>
+        <div class="l"><span class="prompt">$</span> moor go</div>
         <div class="l"><span class="prompt">$</span> moor audit my-app --verify</div>
         <div class="l ok">chain OK — no tampering detected.</div>
         <div class="l"><span class="prompt">$</span> moor bundle -p my-app --out /tmp</div>
@@ -638,9 +639,8 @@
       <a href="https://github.com/daneb/moor/blob/master/docs/IMAGES.md">Images</a>
       <a href="https://github.com/daneb/moor/blob/master/docs/WALKTHROUGH.md">Walkthrough</a>
       <a href="https://github.com/daneb/moor/blob/master/docs/decisions/0005-recipe.md">Recipes</a>
-      <a href="https://github.com/daneb/keel">keel</a>
     </div>
-    <div class="copyright">moor — AI coding agents in a sealed box. Pairs with <a href="https://daneb.github.io/keel/">keel</a>.</div>
+    <div class="copyright">moor — AI coding agents in a sealed box.</div>
   </div>
 </footer>
 

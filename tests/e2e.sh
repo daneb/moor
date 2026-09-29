@@ -283,7 +283,7 @@ for check in chain approvals gate-verdicts trajectory; do
   fi
 done
 shopt -s nullglob
-BUNDLE_FILES=("$BUNDLE_DIR"/keel-"$PROJECT"-*.tar.gz)
+BUNDLE_FILES=("$BUNDLE_DIR"/moor-"$PROJECT"-*.tar.gz)
 shopt -u nullglob
 # Listed first, then searched: `tar | grep -q` under pipefail fails on GNU
 # tar, which gets SIGPIPE when grep stops reading at an early match.

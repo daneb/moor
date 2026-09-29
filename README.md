@@ -2,14 +2,25 @@
 
 **moor runs AI coding agents in a sealed box on your Mac.**
 
-Each project gets its own Docker sandbox. The agent (Claude Code) and
-[keel](https://github.com/daneb/keel) work inside it, with no access to your
-disk and no way onto the internet except through an allowlist. moor watches
-from outside and keeps a tamper-evident record of what happened.
+Each project gets its own Docker sandbox. The agent (Claude Code) and the
+pipeline that plans and checks its work run inside it, with no access to
+your disk and no way onto the internet except through an allowlist. moor
+watches from outside and keeps a tamper-evident record of what happened.
 
-<p align="center"><img src="docs/img/moor-sandbox.svg" alt="moor on your Mac holds the audit chain; the agent and keel run in a sealed sandbox with no host mounts; the only way out is an egress proxy with an allowlist; moor attests the sandbox and folds keel's records in from outside." width="900"></p>
+<p align="center"><img src="docs/img/moor-sandbox.svg" alt="moor on your Mac holds the audit trail; the agent and its pipeline run in a sealed sandbox with no host mounts; the only way out is an egress proxy with an allowlist; moor attests the sandbox and folds the pipeline's records in from outside." width="900"></p>
 
 ## What you can do with it
+
+**Always know the next step.** A feature moves through seven steps: write
+the spec, check it, approve it, plan it, check the plan, approve it, build
+it. `moor next` tells you where you are and the one command that moves you
+on, and those commands never need a spec name.
+
+```bash
+moor next      # my-app · login · step 5 of 7: approve the plan
+moor approve   # shows the plan, then asks y/N
+moor go        # runs the next steps until one needs you
+```
 
 **Let an agent loose without risking your machine.** A misbehaving agent, or a
 malicious repo it clones, can wreck at most one throwaway container, never your
@@ -17,7 +28,7 @@ Mac or its other projects.
 
 ```bash
 moor new my-app --image moor/node:latest
-moor shell my-app                 # or: moor ask my-app "add rate limiting"
+moor ask -p my-app "add rate limiting"
 ```
 
 **Stop code or secrets leaking out.** Everything leaving the sandbox goes
@@ -25,67 +36,66 @@ through a proxy with an allowlist (GitHub, the registries you name). Every
 request is logged, including the blocked ones.
 
 **See exactly what the agent did.** Every command, every connection, every push
-(with the commit it pushed), and every keel verdict lands in one hash-linked
-record on your Mac, where the sandbox can't touch it.
+(with the commit it pushed), and every check result and approval lands in one
+hash-linked record on your Mac, where the sandbox can't touch it.
 
 ```bash
 moor audit my-app                 # the trail
 moor audit my-app --verify        # has anyone edited it?
 ```
 
-**Hand over proof, not a story.** `moor bundle` packs a keel run and moor's
-record into one file, and checks it with keel's verifier before you send it.
+**Hand over proof, not a story.** `moor bundle` packs a run's evidence and
+moor's record into one file, and verifies it before you send it.
 
 ```bash
-moor bundle -p my-app --out /tmp  # ✓ bundle pass → keel-my-app-….tar.gz
+moor bundle -p my-app --out /tmp  # ✓ bundle pass → moor-my-app-….tar.gz
 ```
 
-<p align="center"><img src="docs/img/moor-bundle.svg" alt="moor bundle: the host chain goes to keel export in a throwaway container with no network; the bundle is verified in a second throwaway container; moor exits with keel's verdict." width="900"></p>
+<p align="center"><img src="docs/img/moor-bundle.svg" alt="moor bundle: the host audit trail is exported with the run's evidence in a throwaway container with no network; the bundle is verified in a second throwaway container; moor exits with the verifier's result." width="900"></p>
 
 **Drive a whole feature from one description.** `moor recipe` takes a loose
-description, and runs keel's spec → plan → build pipeline inside the sandbox.
-It stops for your approval at every checkpoint keel defines.
+description and runs the spec → plan → build pipeline inside the sandbox,
+stopping for your approval at every checkpoint.
 
 ## What's new
 
 | | What you get |
 | --- | --- |
-| **One record, keel's format** | moor writes its audit trail in keel's `keel.chain/1`, so keel's own verifier checks it. Old trails are sealed, not rewritten. |
-| **Sandbox attestation** | On `moor up`, moor inspects the running container and writes keel a checked list: read-only, non-root, no capabilities, no mounts. keel can refuse to run an agent without it. |
-| **keel's verdicts in the record** | keel inside the sandbox never writes the record itself; moor collects keel's entries and appends them from outside. |
+| **Guided workflow** | `moor next` shows the step you're on and the command for it; `moor go`, `moor approve` and `moor reject` act on the active spec, so you never type a spec name or stage. |
+| **One record, one format** | moor writes its audit trail in the same hash-chained format the pipeline uses, so one verifier checks both. Old trails are sealed, not rewritten. |
+| **Sandbox attestation** | On `moor up`, moor inspects the running container and hands the pipeline a checked list: read-only, non-root, no capabilities, no mounts. The pipeline can refuse to run an agent without it. |
+| **Check results in the record** | Nothing inside the sandbox writes the record itself; moor collects the pipeline's entries and appends them from outside. |
 | **Pushes you can trace** | `git push` via `moor run` records the branch and the exact commit. |
-| **`moor bundle`** | A verified keel bundle carrying moor's record, built outside the sandbox. |
-| **Real names on approvals** | Approvals made inside the sandbox record your git identity, not "unknown". |
-| **keel pinned in the image** | Rebuilding images installs exactly the keel version you pin. |
+| **`moor bundle`** | A verified evidence bundle carrying moor's record, built outside the sandbox. |
+| **Real names on approvals** | Approvals record your git identity, not "unknown". |
+| **Pinned tooling** | Rebuilding images installs exactly the pipeline version you pin. |
 
-## moor and keel, in one line each
-
-- **moor** decides *where* the agent runs: a sealed sandbox, with the record
-  kept outside it.
-- **keel** decides what's allowed, checks the work, and keeps the record honest.
+What moor is built from, and how the pieces fit, is in
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ---
 
 ## In depth
 
-Containerized, [keel](https://github.com/daneb/keel)-driven sandboxes for
-AI coding agents. Every project gets its own Docker sandbox with no host
-bind mount, no `docker.sock`, and a default-deny egress proxy — the agent
-(Claude Code today) and keel both run entirely inside the container, so a
+Every project gets its own Docker sandbox with no host bind mount, no
+`docker.sock`, and a default-deny egress proxy. The agent (Claude Code
+today) and its pipeline both run entirely inside the container, so a
 misbehaving agent or a malicious cloned repo can compromise at worst one
-throwaway container, never the Mac Mini it runs on.
+throwaway container, never the Mac it runs on.
 
 See [docs/THREAT-MODEL.md](docs/THREAT-MODEL.md) and
-[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full design,
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full design and the
+components moor is built from,
 [docs/MCP.md](docs/MCP.md) for the transport in both directions — how moor
-puts an instruction in front of the agent, and how the agent reaches keel
-through an MCP server that deliberately has no `approve` verb in it —
+puts an instruction in front of the agent, and how the agent reaches the
+pipeline's checks through an MCP server that deliberately has no `approve`
+verb in it —
 [docs/IMAGES.md](docs/IMAGES.md) for what is in each image, what is pinned
 and what isn't, and the build mechanics that are easy to get wrong,
 [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md) for a real ideation-to-shipped
 run against an actual GitHub repo — including the three bugs it found —
 [docs/MIGRATING.md](docs/MIGRATING.md) for bringing an existing project
-(tested against keel's own repo) into a sandbox, and
+into a sandbox, and
 [docs/decisions/0001-container-runtime-choice.md](docs/decisions/0001-container-runtime-choice.md)
 for why this stays on `runc` rather than gVisor or Apple's native
 `container` tool, and
@@ -98,18 +108,17 @@ mode instead of `--dangerously-skip-permissions`,
 [docs/decisions/0004-rename-to-moor.md](docs/decisions/0004-rename-to-moor.md)
 for why this was `isolator` and is now `moor`,
 [docs/decisions/0005-recipe.md](docs/decisions/0005-recipe.md) for
-`moor recipe` — driving keel's spec/gate/plan/gate/run pipeline from a
-loosely-described outcome, stopping for human approval at the same
-checkpoints keel already defines —
+`moor recipe` — driving the spec/plan/build pipeline from a
+loosely-described outcome, stopping for your approval at each checkpoint —
 [docs/decisions/0006-recipe-logs.md](docs/decisions/0006-recipe-logs.md)
 for `moor logs` — a live, timestamped status view of a running recipe
 from any terminal, not just the one driving it —
 [docs/decisions/0007-git-identity.md](docs/decisions/0007-git-identity.md)
 for why the sandbox's git identity is synced from the host's, so
-`keel approve` records a real name instead of "unknown",
+approvals record a real name instead of "unknown",
 [docs/decisions/0008-agent-session-protocol.md](docs/decisions/0008-agent-session-protocol.md)
-for why the agent reaches keel through moor's own MCP server rather than a
-scoped shell with a hand-maintained verb allowlist — and
+for why the agent reaches the pipeline through moor's own MCP server rather
+than a scoped shell with a hand-maintained verb allowlist — and
 [docs/examples/ascii-banner](docs/examples/ascii-banner) for a small
 utility built end to end by a real Claude Code agent running inside a
 sandbox — including two real bugs that run found and fixed, and the
@@ -136,39 +145,32 @@ cd cli && cargo build --release
 moor new my-app --image moor/node:latest
 
 # ...or bring an existing project in — history and all, no bind mount
-moor import keel --from ~/Repos/keel
+moor import my-service --from ~/Repos/my-service
 
-# work inside it
-moor shell my-app
-moor run my-app -- keel status
+# make it the default, so later commands don't need its name
+moor use my-app
 
-# not sure what to do next? `moor next` says where the active spec stands
-# and prints the one command that moves it on, runnable as shown
+# where does the active spec stand, and what's the one command for it?
 moor next
 moor next --all                    # every spec and its step
 moor use my-app --spec greet-name  # pin which spec `moor next` follows
 
-# ...and the commands it points you at, which always act on that spec
+# the commands it points you at, which always act on that spec
 moor go                            # take the next steps until one needs you
 moor approve                       # shows the spec/plan/run first, then asks
 moor reject "needs a rollback plan"
 
-# keel ships in every sandbox, so once a project is up, `moor keel <args>`
-# runs it there directly — no need to name the project again
-moor keel status
-moor keel gate g1 greet-name
-
-# read a spec's plan/spec/tasks markdown without opening a shell
+# read a spec, or its plan or tasks, without opening a shell
 moor view greet-name tasks
 
-# `moor keel`/`moor view` figure out which project you mean the same way:
-# an explicit --project flag, then `moor use <name>` if you've set one,
-# then whichever project's sandbox is actually up — only if none of those
-# resolve to exactly one project do they ask you to disambiguate. Either
-# way, they always print which project they picked first, e.g.:
-#   ==> project: my-app (only sandbox currently up)
-# so a stale `moor use` default can never silently touch the wrong
-# container without you noticing.
+# talk to the agent, or drop into the sandbox yourself
+moor ask "why is the login test flaky?"
+moor shell my-app
+moor run my-app -- npm test
+
+# Commands that take --project work out which project you mean: the flag,
+# then `moor use`'s default, then the one sandbox that's up — and only ask
+# you to choose if none of those settles it.
 
 # check the sandbox is actually locked down the way it should be
 moor selftest my-app
@@ -176,7 +178,7 @@ moor selftest my-app
 # see what's happened in this project so far
 moor audit my-app
 
-# a keel evidence bundle for the latest run, carrying this chain, verified
+# an evidence bundle for the latest run, carrying this trail, verified
 moor bundle -p my-app --out /tmp
 
 moor down my-app
@@ -204,18 +206,18 @@ claude setup-token                                    # one-time, on the host �
 moor secrets set my-app CLAUDE_CODE_OAUTH_TOKEN   # paste the token it prints
 ```
 
-Note: whether `keel` invokes the `claude` driver (vs. falling back to
-`--no-driver` mode) is keel's own credential check, not moor's — see
-[keel](https://github.com/daneb/keel)'s docs if it doesn't pick up
-`CLAUDE_CODE_OAUTH_TOKEN` the same way it picks up `ANTHROPIC_API_KEY`.
+Note: whether the build step runs the agent (rather than falling back to a
+no-agent mode) is decided by the pipeline's own credential check inside the
+sandbox, not by moor. If it doesn't pick up `CLAUDE_CODE_OAUTH_TOKEN` the
+way it picks up `ANTHROPIC_API_KEY`, see
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#what-moor-is-built-from).
 
-## Driving keel from a recipe
+## Driving a whole feature from a recipe
 
-Typing out `keel spec new` → author it → `gate g0` → `approve` →
-`plan` → author it → `gate g1` → `approve` → `run` → `approve --stage
-merge` by hand, every time, gets old. `moor recipe` drives that whole
-sequence from one loosely-described outcome, stopping at the same human
-checkpoints keel already defines:
+Taking a spec through every step by hand — write it, check it, approve it,
+plan it, check the plan, approve it, build it, approve the merge — gets
+old, even with `moor go`. `moor recipe` drives that whole sequence from
+one loosely-described outcome, stopping at the same checkpoints for you:
 
 ```bash
 moor recipe my-app docs/examples/recipe/greet-function.recipe.md
@@ -224,35 +226,37 @@ moor recipe my-app docs/examples/recipe/greet-function.recipe.md
 The recipe file is just YAML front matter (`slug`, `scope`) followed by
 free text describing what you want — not a DSL, deliberately: the free
 text goes to the agent close to verbatim, so writing it loosely is the
-intended way to use this, not a limitation of it.
+intended way to use this, not a limitation of it. The recipe's spec
+becomes the active one, so `moor next` and `moor approve` follow it.
 
-Every run stops and tells you exactly what to do whenever a human
-decision is actually needed:
+Every run stops and tells you exactly what to do whenever a decision is
+actually yours:
 
 ```
-PAUSED for human approval. Review the change, then run:
+PAUSED for your approval. Review it and decide:
 
-    moor run my-app -- keel approve greet-function --stage spec
+    moor approve      (shows it first, then asks)
+    moor reject "why"
 
-...and re-run this recipe to continue.
+...then re-run this recipe to continue.
 ```
 
-Content-authoring gates (spec/plan) get a bounded, tool-restricted
-self-correction loop — a failing gate's own output is fed to an agent
+Content-authoring checks (spec/plan) get a bounded, tool-restricted
+self-correction loop — a failing check's own output is fed to an agent
 that can only use `Write`/`Edit`, never Bash, so it can fix exactly what
-the gate named without going and implementing the feature instead. The
-actual build (`keel run`) gets no such auto-retry beyond a small attempt
-cap — that step has full tool access, and iterating on it unattended is
-exactly the scope creep this project's security posture argues against,
-so it stops and hands the evidence to a human instead. See
+the check named without going and implementing the feature instead. The
+actual build gets no such auto-retry beyond a small attempt cap — that
+step has full tool access, and iterating on it unattended is exactly the
+scope creep this project's security posture argues against, so it stops
+and hands the evidence to you instead. See
 [ADR-0005](docs/decisions/0005-recipe.md) for the full design, and
 [docs/examples/recipe](docs/examples/recipe) for a real run's output —
 including two real bugs this exercise found, with fixes.
 
-Since a step like `keel run` can take a while and a recipe's own
-progress narration used to only go to the terminal that launched it,
-`moor logs <name> [--follow]` reads the same tamper-evident audit chain
-and shows just the critical events — stage transitions, gate attempts,
+Since the build step can take a while and a recipe's own progress
+narration used to only go to the terminal that launched it,
+`moor logs <name> [--follow]` reads the same tamper-evident audit trail
+and shows just the critical events — stage transitions, check attempts,
 pauses for approval — from any terminal, live:
 
 ```bash

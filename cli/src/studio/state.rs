@@ -191,7 +191,7 @@ impl Console {
             }
             match host.keel_next(&name) {
                 Ok(json) => self.apply_next(&name, &json)?,
-                Err(e) => self.status = format!("keel next failed for {name}: {e}"),
+                Err(e) => self.status = format!("couldn't read {name}'s pipeline status: {e}"),
             }
         }
         Ok(())

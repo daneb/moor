@@ -332,7 +332,7 @@ pub fn log_exec_with(
 ) -> Result<()> {
     paths::ensure_project_dirs(project)?;
     if let Err(e) = fold_sink(project, m) {
-        eprintln!("moor: could not fold keel's chain sink: {e:#}");
+        eprintln!("moor: could not fold the sandbox's workflow log into the audit trail: {e:#}");
     }
     let path = paths::chain_log_path(project)?;
     let mut data = json!({
