@@ -36,7 +36,7 @@ pub fn run(name: &str, spec: Option<&str>) -> Result<()> {
         std::fs::write(&path, slug).with_context(|| format!("writing {}", path.display()))?;
         println!("active spec set to '{slug}'");
     }
-    println!("\n  Next:  moor next");
+    println!("\n{}", super::next_cmd::next_hint(name));
     Ok(())
 }
 
