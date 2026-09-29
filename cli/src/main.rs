@@ -3,6 +3,7 @@ mod canary;
 mod commands;
 mod compose;
 mod egress_log;
+mod guide;
 mod manifest;
 mod paths;
 mod posture;
@@ -101,9 +102,24 @@ enum Command {
         /// spec | plan | tasks
         artifact: String,
     },
-    /// Set the default project `moor keel`/`moor view` (and their
-    /// `--project`-taking siblings) use when it's omitted.
-    Use { name: String },
+    /// Where the project's active spec stands, and the one command that
+    /// moves it on — runnable as printed. Project defaults the same way
+    /// `moor keel` does.
+    Next {
+        #[arg(short = 'p', long = "project")]
+        project: Option<String>,
+        /// List every spec and its step instead.
+        #[arg(long)]
+        all: bool,
+    },
+    /// Set the default project `moor keel`/`moor view`/`moor next` (and
+    /// their `--project`-taking siblings) use when it's omitted.
+    Use {
+        name: String,
+        /// Also pin the spec `moor next` guides this project through.
+        #[arg(long, value_name = "SLUG")]
+        spec: Option<String>,
+    },
     /// List all projects and their container status.
     Status,
     /// Show the host-side audit trail for a project (folds in new egress
@@ -231,7 +247,8 @@ fn main() {
             artifact,
         } => commands::resolve_project_announced(project)
             .and_then(|name| commands::view::run(&name, &slug, &artifact)),
-        Command::Use { name } => commands::use_cmd::run(&name),
+        Command::Next { project, all } => commands::next_cmd::run(project, all),
+        Command::Use { name, spec } => commands::use_cmd::run(&name, spec.as_deref()),
         Command::Status => commands::status::run(),
         Command::Audit {
             name,

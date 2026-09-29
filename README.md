@@ -142,6 +142,12 @@ moor import keel --from ~/Repos/keel
 moor shell my-app
 moor run my-app -- keel status
 
+# not sure what to do next? `moor next` says where the active spec stands
+# and prints the one command that moves it on, runnable as shown
+moor next
+moor next --all                    # every spec and its step
+moor use my-app --spec greet-name  # pin which spec `moor next` follows
+
 # keel ships in every sandbox, so once a project is up, `moor keel <args>`
 # runs it there directly — no need to name the project again
 moor keel status

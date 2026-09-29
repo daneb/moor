@@ -54,6 +54,12 @@ pub fn session_path(name: &str) -> Result<PathBuf> {
     Ok(project_dir(name)?.join("session"))
 }
 
+/// The spec `moor next` guides this project through, when pinned with
+/// `moor use <project> --spec <slug>` rather than inferred.
+pub fn active_spec_path(name: &str) -> Result<PathBuf> {
+    Ok(project_dir(name)?.join("active-spec"))
+}
+
 /// The full, redacted text of every `moor ask` turn. Separate from
 /// chain.jsonl on purpose: the chain carries hashes and is exported by
 /// `moor audit --export`, this carries conversation.
