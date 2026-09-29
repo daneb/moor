@@ -5,14 +5,43 @@
 
 # --- stage 1: build keel from crates.io -------------------------------
 FROM rust:1-slim-bookworm AS keel-build
+# Same reason as the runtime stage below: a failed download in a pipe must
+# fail the build, not produce an image without the tool.
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    pkg-config libssl-dev ca-certificates \
+    pkg-config libssl-dev ca-certificates curl \
     && rm -rf /var/lib/apt/lists/*
 # Pinned, so a keel release changes this layer's cache key: an unpinned
 # install was served from cache and kept the previous keel. Bump it here,
 # or pass --build-arg KEEL_VERSION=… (images/build.sh forwards $KEEL_VERSION).
 ARG KEEL_VERSION=0.9.0
 RUN cargo install keel-harness --version "$KEEL_VERSION" --locked
+
+# The scanners a project's gates call for advisories and leaked secrets.
+# A gate that needs one reports "blocked" when it's missing, never "clean"
+# (we did not look is not the same as we looked), so without these every
+# such gate is blocked in the sandbox. Both pinned, like keel.
+ARG CARGO_AUDIT_VERSION=0.22.2
+RUN cargo install cargo-audit --version "$CARGO_AUDIT_VERSION" --locked
+
+# gitleaks is a Go binary: fetched from its release, verified against the
+# release's own checksum file before it is installed.
+ARG GITLEAKS_VERSION=8.30.1
+ARG TARGETARCH
+WORKDIR /tmp/gitleaks
+RUN case "$TARGETARCH" in \
+        arm64) arch=arm64 ;; \
+        amd64) arch=x64 ;; \
+        *) echo "no gitleaks build for $TARGETARCH" >&2; exit 1 ;; \
+    esac \
+    && url="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}" \
+    && tarball="gitleaks_${GITLEAKS_VERSION}_linux_${arch}.tar.gz" \
+    && curl -fsSLO "$url/$tarball" \
+    && curl -fsSLO "$url/gitleaks_${GITLEAKS_VERSION}_checksums.txt" \
+    && grep " ${tarball}\$" "gitleaks_${GITLEAKS_VERSION}_checksums.txt" | sha256sum -c - \
+    && tar -xzf "$tarball" gitleaks \
+    && install -m 0755 gitleaks /usr/local/bin/gitleaks
+WORKDIR /
 
 # moor's own MCP server, built from this repo's mcp/ crate — the agent's
 # only route to keel (see docs/decisions/0008-agent-session-protocol.md).
@@ -65,6 +94,8 @@ RUN npm install -g @anthropic-ai/claude-code && npm cache clean --force
 
 COPY --from=keel-build /usr/local/cargo/bin/keel /usr/local/bin/keel
 COPY --from=keel-build /usr/local/bin/moor-keel-mcp /usr/local/bin/moor-keel-mcp
+COPY --from=keel-build /usr/local/cargo/bin/cargo-audit /usr/local/bin/cargo-audit
+COPY --from=keel-build /usr/local/bin/gitleaks /usr/local/bin/gitleaks
 
 # How `claude` finds that server. Read-only, root-owned, outside any
 # volume and outside /workspace: the agent can read this file but has no
