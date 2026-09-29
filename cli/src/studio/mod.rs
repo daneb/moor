@@ -45,7 +45,7 @@ pub trait Host {
 fn artifact_path(slug: &str, artifact: &str) -> Result<String> {
     // The slug reaches a child process's argv, so it passes the same rule
     // project names do before it is interpolated into a path.
-    crate::manifest::validate_name(slug).context("spec slug from `keel next`")?;
+    crate::manifest::validate_name(slug).context("spec name from the pipeline status")?;
     let file = match artifact {
         "spec" => "spec.md",
         "plan" => "plan.md",

@@ -2,12 +2,11 @@
 
 `moor new` is for starting something fresh. `moor import` is for
 bringing something that already exists on your Mac — a project you've
-been working on outside moor, like keel itself — into a sandbox
-without losing anything and without ever bind-mounting the source
-directory.
+been working on outside moor — into a sandbox without losing anything
+and without ever bind-mounting the source directory.
 
 ```bash
-moor import keel --from ~/Repos/keel
+moor import my-service --from ~/Repos/my-service
 ```
 
 ## What actually happens
@@ -33,24 +32,29 @@ moor import keel --from ~/Repos/keel
    has an `origin` pointing at `github.com`, that URL is set as the
    sandbox clone's `origin` too (replacing the bundle's own path, which
    no longer exists once step 3 finishes). This is what makes importing
-   keel itself work cleanly — `git push` inside the sandbox goes to the
-   same real repo it always did.
+   an existing GitHub project work cleanly — `git push` inside the
+   sandbox goes to the same real repo it always did.
 5. **No remote, and `--github` wasn't passed:** `origin` is left unset,
    with a note showing you the `git remote add` command to run once
    you've decided where this project should live.
 6. **No remote, `--github` was passed:** a private GitHub repo is created
    (same confirm-then-create flow as `moor new --github`) and set as
    `origin`.
-7. **Existing keel configuration is respected.** If `.keel/keel.toml` is
-   already present (true for keel's own repo, and for anything you'd
-   already run `keel init` on), moor does **not** re-run `keel init`
-   — it runs `keel status` instead, so you see the current state without
-   risking anything being overwritten. If there's no `.keel/` yet, `keel
-   init` runs, same as `moor new`.
+7. **An existing spec setup is respected.** If the repo already has one
+   (a `.keel/` directory — see
+   [ARCHITECTURE.md](ARCHITECTURE.md#what-moor-is-built-from)), moor
+   leaves it alone and shows its current status, so nothing is
+   overwritten. Otherwise the workspace is set up for specs, same as
+   `moor new`.
+
+Once it's in, run `moor use <name>` and then `moor next` to see where
+things stand.
 
 ## Verified against a real project
 
-This was tested against keel's own repo, not a toy fixture:
+This was tested against a real multi-branch Rust repo, not a toy
+fixture. The output below is as recorded at the time; the setup messages
+have since been reworded.
 
 ```
 $ moor import keel-import-test --from ~/Repos/keel

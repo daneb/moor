@@ -16,16 +16,25 @@ use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 
 #[derive(Parser)]
-#[command(name = "moor", about = "Containerized, keel-driven AI sandboxes")]
+#[command(
+    name = "moor",
+    about = "Build software with an AI agent inside a locked-down container",
+    after_help = "Not sure what to do next? Run `moor next`."
+)]
 struct Cli {
     #[command(subcommand)]
     command: Command,
 }
 
+/// Ordered by how a project is worked: set it up, follow the guided loop,
+/// then everything else. `moor --help` lists them in this order.
 #[derive(Subcommand)]
 enum Command {
-    /// Create a new project: manifest, sandbox+egress containers, optional
-    /// GitHub repo, `keel init` inside the sandbox.
+    /// Create a new project with its own sandbox.
+    ///
+    /// Writes the project's manifest, starts its sandbox and egress
+    /// containers, optionally creates a private GitHub repo, and prepares
+    /// the workspace for specs.
     New {
         name: String,
         /// moor/base, moor/node, moor/rust, or moor/python
@@ -36,10 +45,10 @@ enum Command {
         #[arg(long)]
         github: bool,
     },
-    /// Bring an existing local git repo (e.g. one you're already working
-    /// on outside moor) into a new sandboxed project. Transfers its
-    /// full history via a `git bundle` — the source directory is never
-    /// bind-mounted, only a one-shot bundle file crosses into the
+    /// Bring an existing local git repo into a new sandboxed project.
+    ///
+    /// Transfers its full history via a `git bundle`: the source directory
+    /// is never bind-mounted, only a one-shot bundle file crosses into the
     /// container. Preserves an existing GitHub remote if there is one.
     Import {
         name: String,
@@ -56,55 +65,15 @@ enum Command {
         #[arg(long)]
         github: bool,
     },
-    /// Start (or restart) a project's sandbox + egress containers.
+    /// Start (or restart) a project's sandbox.
     Up { name: String },
-    /// Stop a project's containers.
+    /// Stop a project's sandbox.
     Down { name: String },
-    /// Open an interactive shell inside a project's sandbox.
-    Shell { name: String },
-    /// Run one command inside a project's sandbox (e.g. `keel run <spec>`).
-    Run {
-        name: String,
-        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
-        cmd: Vec<String>,
-    },
-    /// Run `keel` inside a project's sandbox — sugar for
-    /// `moor run <project> -- keel <args...>`. Project defaults to
-    /// whatever `moor use` last set (or the one project you have, if
-    /// there's only one); pass `--project` to override.
-    Keel {
-        #[arg(short = 'p', long = "project")]
-        project: Option<String>,
-        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
-        args: Vec<String>,
-    },
-    /// Build a keel evidence bundle that carries this project's host audit
-    /// chain, then verify it with keel. Runs in throwaway containers with
-    /// no network, never the sandbox. Project defaults the same way
-    /// `moor keel` does.
-    Bundle {
-        #[arg(short = 'p', long = "project")]
-        project: Option<String>,
-        /// keel run id; defaults to the latest run
-        run: Option<String>,
-        /// Directory to write the bundle into (default: current directory)
-        #[arg(long, value_name = "DIR")]
-        out: Option<PathBuf>,
-    },
-    /// Print one of keel's spec-produced markdown artifacts (spec.md,
-    /// plan.md, tasks.md) for a given spec slug, lightly highlighted.
-    /// Project defaults the same way `moor keel` does.
-    View {
-        #[arg(short = 'p', long = "project")]
-        project: Option<String>,
-        /// The spec slug, e.g. `blast-radius`.
-        slug: String,
-        /// spec | plan | tasks
-        artifact: String,
-    },
-    /// Where the project's active spec stands, and the one command that
-    /// moves it on — runnable as printed. Project defaults the same way
-    /// `moor keel` does.
+    /// Show where the active spec stands and the one command that moves it on.
+    ///
+    /// Every command it prints runs as shown. Project defaults to the one
+    /// set by `moor use`, else the one sandbox that's up, else the only
+    /// project you have.
     Next {
         #[arg(short = 'p', long = "project")]
         project: Option<String>,
@@ -112,8 +81,16 @@ enum Command {
         #[arg(long)]
         all: bool,
     },
-    /// Approve what the active spec is waiting on: shows the spec, plan or
-    /// run first, then asks.
+    /// Take the active spec's next steps until something needs you.
+    ///
+    /// Runs the checks, drafts the plan, and builds, one step after
+    /// another, stopping at the first approval, failure, or step that
+    /// didn't move the spec on.
+    Go {
+        #[arg(short = 'p', long = "project")]
+        project: Option<String>,
+    },
+    /// Approve what the active spec is waiting on (shows it first, then asks).
     Approve {
         #[arg(short = 'p', long = "project")]
         project: Option<String>,
@@ -128,67 +105,32 @@ enum Command {
         /// Why, so the next attempt can address it.
         why: String,
     },
-    /// Take the active spec's next steps (checks, planning, building) until
-    /// something needs you.
-    Go {
-        #[arg(short = 'p', long = "project")]
-        project: Option<String>,
-    },
-    /// Set the default project `moor keel`/`moor view`/`moor next` (and
-    /// their `--project`-taking siblings) use when it's omitted.
+    /// Set the default project, and optionally pin its active spec.
     Use {
         name: String,
         /// Also pin the spec `moor next` guides this project through.
         #[arg(long, value_name = "SLUG")]
         spec: Option<String>,
     },
-    /// List all projects and their container status.
-    Status,
-    /// Show the host-side audit trail for a project (folds in new egress
-    /// gateway log entries first).
-    Audit {
-        name: String,
-        /// Recompute the hash chain and report whether it's intact instead
-        /// of printing the trail.
-        #[arg(long)]
-        verify: bool,
-        /// Export the chain plus the latest keel evidence bundle as a
-        /// tar.gz into this directory instead of printing the trail.
-        #[arg(long, value_name = "DIR")]
-        export: Option<PathBuf>,
+    /// Print a spec, or its plan or tasks.
+    View {
+        #[arg(short = 'p', long = "project")]
+        project: Option<String>,
+        /// The spec's name, e.g. `blast-radius`.
+        slug: String,
+        /// spec | plan | tasks
+        artifact: String,
     },
-    /// Verify a running project's container actually has every hardening
-    /// control applied (read-only rootfs, dropped capabilities, no bind
-    /// mounts, non-root user, no default-bridge network, ...) and run the
-    /// active breakout battery (canary domain, read-only fs, docker.sock).
-    Selftest { name: String },
-    /// Manage a project's secrets in the macOS Keychain, as an
-    /// alternative to exporting them into your shell before every
-    /// `moor up`/`new`.
-    #[command(subcommand)]
-    Secrets(SecretsCommand),
-    /// Drive keel's spec -> gate -> plan -> gate -> run -> gate pipeline
-    /// from a loosely-described recipe file, stopping whenever a stage
-    /// needs a human decision (spec/plan/merge approval, or a gate that
-    /// still fails after retrying). Re-run the same command to continue
-    /// once you've approved or fixed things by hand — see
-    /// docs/decisions/0005-recipe.md.
-    Recipe {
-        name: String,
-        /// Path to the recipe file (YAML front matter — slug, scope —
-        /// followed by a free-text description of the desired outcome).
-        file: PathBuf,
-    },
-    /// Put one instruction in front of the project's agent and get its
-    /// answer back — a single chained, resumable turn. Unlike `moor
-    /// shell`, the whole exchange lands in the audit chain; unlike `moor
-    /// recipe`, you can think the change through first. Project defaults
-    /// the same way `moor keel` does.
+    /// Ask the project's agent something, or have it make a change.
+    ///
+    /// A single turn, recorded in the audit trail and resumable. Unlike
+    /// `moor shell`, the whole exchange is recorded; unlike `moor recipe`,
+    /// you can think the change through first.
     Ask {
         #[arg(short = 'p', long = "project")]
         project: Option<String>,
-        /// brainstorm (Read/Glob/Grep only) | build (adds Edit/Write and
-        /// keel's verification verbs over MCP).
+        /// brainstorm (read-only) | build (can edit files and run the
+        /// project's checks).
         #[arg(long, default_value = "brainstorm")]
         role: String,
         /// Start a new session instead of resuming the stored one.
@@ -201,20 +143,23 @@ enum Command {
         #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
         prompt: Vec<String>,
     },
-    /// One console over every project: which sandboxes are up, what
-    /// stage each spec is at per `keel next`, a conversational turn with
-    /// any of them, and the two-key stage approval. Local terminal only —
-    /// no socket, no port, no daemon.
-    Studio {
-        /// Show just this project instead of every project on disk.
-        #[arg(short = 'p', long = "project")]
-        project: Option<String>,
+    /// Take a change from a written description all the way to a build.
+    ///
+    /// Drives spec, checks, plan, and build from a loosely described
+    /// recipe file, stopping whenever it needs your approval or a check
+    /// still fails after retrying. Re-run the same command to continue.
+    /// See docs/decisions/0005-recipe.md.
+    Recipe {
+        name: String,
+        /// Path to the recipe file (YAML front matter — slug, scope —
+        /// followed by a free-text description of the desired outcome).
+        file: PathBuf,
     },
-    /// Show (or follow) a running `moor recipe`'s progress — stage
-    /// transitions, gate attempts, pauses for approval — from the same
-    /// tamper-evident audit chain `moor audit` reads, so you can check
-    /// where it's at from a different terminal than the one driving it.
-    /// Not deep detail: for full command output, see `moor audit`.
+    /// Show (or follow) a running `moor recipe`'s progress.
+    ///
+    /// Stage changes, check attempts, and pauses for approval, read from
+    /// the audit trail, so you can watch from another terminal. For full
+    /// command output, see `moor audit`.
     Logs {
         name: String,
         /// Keep watching for new events instead of exiting after printing
@@ -224,6 +169,74 @@ enum Command {
         /// How many of the most recent events to print before following.
         #[arg(short = 'n', long, default_value_t = 20)]
         lines: usize,
+    },
+    /// A console over every project: status, stages, the agent, approvals.
+    ///
+    /// Local terminal only — no socket, no port, no daemon.
+    Studio {
+        /// Show just this project instead of every project on disk.
+        #[arg(short = 'p', long = "project")]
+        project: Option<String>,
+    },
+    /// Open an interactive shell inside a project's sandbox.
+    Shell { name: String },
+    /// Run one command inside a project's sandbox.
+    Run {
+        name: String,
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        cmd: Vec<String>,
+    },
+    /// List all projects and whether their sandboxes are up.
+    Status,
+    /// Show a project's tamper-evident audit trail.
+    ///
+    /// Folds in new egress log entries first.
+    Audit {
+        name: String,
+        /// Recompute the hash chain and report whether it's intact instead
+        /// of printing the trail.
+        #[arg(long)]
+        verify: bool,
+        /// Export the chain plus the latest evidence bundle as a tar.gz
+        /// into this directory instead of printing the trail.
+        #[arg(long, value_name = "DIR")]
+        export: Option<PathBuf>,
+    },
+    /// Package a run's evidence with this project's audit trail, and verify it.
+    ///
+    /// Runs in throwaway containers with no network, never the sandbox.
+    Bundle {
+        #[arg(short = 'p', long = "project")]
+        project: Option<String>,
+        /// The run to bundle; defaults to the latest.
+        run: Option<String>,
+        /// Directory to write the bundle into (default: current directory)
+        #[arg(long, value_name = "DIR")]
+        out: Option<PathBuf>,
+    },
+    /// Check a running project's sandbox is locked down the way it should be.
+    ///
+    /// Verifies every hardening control (read-only rootfs, dropped
+    /// capabilities, no bind mounts, non-root user, no default-bridge
+    /// network, ...) and runs the active breakout battery (canary domain,
+    /// read-only fs, docker.sock).
+    Selftest { name: String },
+    /// Manage a project's secrets in the macOS Keychain.
+    ///
+    /// An alternative to exporting them into your shell before every
+    /// `moor up`/`new`.
+    #[command(subcommand)]
+    Secrets(SecretsCommand),
+    /// Pass arguments straight to the workflow engine inside the sandbox.
+    ///
+    /// The escape hatch under `moor next`/`go`/`approve`/`reject`, for
+    /// anything they don't cover. See docs/ARCHITECTURE.md.
+    #[command(hide = true)]
+    Keel {
+        #[arg(short = 'p', long = "project")]
+        project: Option<String>,
+        #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+        args: Vec<String>,
     },
 }
 

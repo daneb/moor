@@ -103,7 +103,7 @@ pub fn run(name: &str, from: &Path, image: Option<String>, github: bool) -> Resu
     // retry now that one actually exists.
     super::sync_git_identity(&m);
 
-    println!("==> checking for existing keel configuration");
+    println!("==> checking whether the workspace is already set up for specs");
     let (status, _) = proc::run_capture(
         "docker",
         &[
@@ -115,9 +115,7 @@ pub fn run(name: &str, from: &Path, image: Option<String>, github: bool) -> Resu
         ],
     )?;
     if status.success() {
-        println!(
-            "   .keel/keel.toml already present — leaving it as-is (not re-running `keel init`)"
-        );
+        println!("   already set up — leaving it as-is");
         let status = proc::run_inherit(
             "docker",
             &["exec", &m.sandbox_container(), "keel", "status"],
@@ -132,16 +130,16 @@ pub fn run(name: &str, from: &Path, image: Option<String>, github: bool) -> Resu
             )?;
         }
     } else {
-        println!("   none found — running `keel init` inside the sandbox");
+        println!("   not yet — setting it up inside the sandbox");
         let status = proc::run_inherit("docker", &["exec", &m.sandbox_container(), "keel", "init"]);
         match status {
             Ok(s) => {
                 audit::log_exec(name, &m, "exec", &["keel".into(), "init".into()], s.code())?;
                 if !s.success() {
-                    println!("   note: `keel init` did not exit cleanly — check with `moor shell {name}`");
+                    println!("   note: workspace setup did not exit cleanly — check with `moor shell {name}`");
                 }
             }
-            Err(e) => println!("   note: could not run `keel init` automatically: {e}"),
+            Err(e) => println!("   note: could not set the workspace up automatically: {e}"),
         }
     }
 

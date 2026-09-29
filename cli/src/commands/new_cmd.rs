@@ -68,16 +68,18 @@ pub fn run(name: &str, image: &str, github: bool) -> Result<()> {
         }
     }
 
-    println!("==> running `keel init` inside the sandbox");
+    println!("==> setting the workspace up for specs");
     let status = proc::run_inherit("docker", &["exec", &m.sandbox_container(), "keel", "init"]);
     match status {
         Ok(s) => {
             audit::log_exec(name, &m, "exec", &["keel".into(), "init".into()], s.code())?;
             if !s.success() {
-                println!("note: `keel init` did not exit cleanly — check with `moor shell {name}`");
+                println!(
+                    "note: workspace setup did not exit cleanly — check with `moor shell {name}`"
+                );
             }
         }
-        Err(e) => println!("note: could not run `keel init` automatically: {e}"),
+        Err(e) => println!("note: could not set the workspace up automatically: {e}"),
     }
 
     // The container's git config was still unset when `compose_up`

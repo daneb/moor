@@ -1,8 +1,14 @@
-# Example: driving keel end-to-end from a loosely-described recipe
+# Example: a feature end to end from a loosely-described recipe
 
 `greet-function.recipe.md` in this directory is the exact recipe used to
 verify [`moor recipe`](../../decisions/0005-recipe.md) end to end, on a
-real project, against real gates. Nothing below is hypothetical.
+real project, against real checks. Nothing below is hypothetical.
+
+> The output below is as recorded at the time, so it shows the pipeline's
+> underlying `keel` commands and moor's older messages. A paused recipe
+> now points you at `moor approve` / `moor reject` instead; see
+> [ARCHITECTURE.md](../../ARCHITECTURE.md#what-moor-is-built-from) for how
+> they map.
 
 ```bash
 moor recipe my-app docs/examples/recipe/greet-function.recipe.md
