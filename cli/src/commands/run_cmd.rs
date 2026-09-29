@@ -22,7 +22,7 @@ fn looks_like_git_push(cmd: &[String]) -> bool {
 /// path explicitly, like `audit::log_decision` does, so it needs no
 /// `$HOME` or running container to test.
 fn gate(chain_path: &Path, name: &str, secrets: &[String], cmd: &[String]) -> Result<()> {
-    if let decision::Verdict::Deny { rule_id, reason } = decision::evaluate(cmd) {
+    if let decision::Verdict::Deny { rule_id, reason } = decision::evaluate(cmd, None) {
         audit::log_decision(chain_path, name, cmd, secrets, rule_id)?;
         anyhow::bail!("moor run: blocked by rule `{rule_id}`: {reason}");
     }
