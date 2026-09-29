@@ -38,6 +38,8 @@ How moor's commands map onto keel, for when you need to look underneath:
 
 | moor | keel, inside the sandbox |
 | --- | --- |
+| `moor spec new <name>` | nothing: writes a starter spec file on the host |
+| `moor spec push <file>` | `keel spec new` (first time only, so the sandbox assigns the id), then writes the file to `.keel/specs/<name>/spec.md` and runs `keel gate g0` |
 | `moor next` | `keel next --json`, turned into one step and one command |
 | `moor go` | whichever of `keel gate g0`, `keel plan`, `keel gate g1` and `keel run` the spec is waiting on |
 | `moor approve` / `moor reject "why"` | `keel approve <spec> --stage <stage>` (with `--reject --note` for a rejection) |
@@ -45,6 +47,12 @@ How moor's commands map onto keel, for when you need to look underneath:
 | `moor new` / `moor import` | `keel init` in the new workspace |
 | `moor bundle` | `keel export --chain` and `keel bundle verify`, in throwaway containers |
 | `moor recipe` | the whole pipeline, as ADR-0005 describes |
+
+`moor spec push` sends text one way only, host to sandbox. The one thing
+it reads back is the spec's sandbox-assigned `id` (and `schema`), accepted
+only in the exact shapes `SPEC-<digits>` and `keel.spec/<digits>`, so a
+compromised sandbox has no way to get its own text into a file on the
+host that a host-side AI assistant might then read.
 
 For anything the guided commands don't cover, `moor keel <args>` runs
 `keel <args>` in the project's sandbox, logged like any `moor run`. It is

@@ -13,6 +13,7 @@ pub mod run_cmd;
 pub mod secrets_status;
 pub mod selftest;
 pub mod shell;
+pub mod spec_cmd;
 pub mod status;
 pub mod studio_cmd;
 pub mod up;

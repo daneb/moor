@@ -69,11 +69,16 @@ pub fn run(name: &str, image: &str, github: bool) -> Result<()> {
     }
 
     println!("==> setting the workspace up for specs");
-    let status = proc::run_inherit("docker", &["exec", &m.sandbox_container(), "keel", "init"]);
+    // Captured, not shown: the pipeline's own setup output ends with its own
+    // "Next:" list of commands, which would compete with moor's. Shown only
+    // when setup fails, since then it's what explains why.
+    let status =
+        proc::run_capture_combined("docker", &["exec", &m.sandbox_container(), "keel", "init"]);
     match status {
-        Ok(s) => {
+        Ok((s, out)) => {
             audit::log_exec(name, &m, "exec", &["keel".into(), "init".into()], s.code())?;
             if !s.success() {
+                println!("{out}");
                 println!(
                     "note: workspace setup did not exit cleanly — check with `moor shell {name}`"
                 );

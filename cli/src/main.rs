@@ -69,6 +69,9 @@ enum Command {
     Up { name: String },
     /// Stop a project's sandbox.
     Down { name: String },
+    /// Write a spec on this Mac, then send it into the sandbox.
+    #[command(subcommand)]
+    Spec(SpecCommand),
     /// Show where the active spec stands and the one command that moves it on.
     ///
     /// Every command it prints runs as shown. Project defaults to the one
@@ -241,6 +244,31 @@ enum Command {
 }
 
 #[derive(Subcommand)]
+enum SpecCommand {
+    /// Write a starter spec file here, with the rules it must meet at the top.
+    ///
+    /// Nothing is sent anywhere: write the spec by hand or with your AI
+    /// assistant, then `moor spec push` it.
+    New {
+        /// The spec's short name, e.g. `login-endpoint`.
+        name: String,
+        /// A human-readable title (defaults to the name).
+        #[arg(long)]
+        title: Option<String>,
+        /// Paths the change may touch, as globs (repeatable; default `src/**`).
+        #[arg(long)]
+        scope: Vec<String>,
+    },
+    /// Send a spec file into the sandbox, make it the active spec, and check it.
+    Push {
+        #[arg(short = 'p', long = "project")]
+        project: Option<String>,
+        /// The spec file, e.g. `login-endpoint.spec.md`.
+        file: PathBuf,
+    },
+}
+
+#[derive(Subcommand)]
 enum SecretsCommand {
     /// Store a secret's value in the Keychain (prompts for it, hidden
     /// where the terminal supports it). Overwrites any existing value.
@@ -282,6 +310,12 @@ fn main() {
             artifact,
         } => commands::resolve_project_announced(project)
             .and_then(|name| commands::view::run(&name, &slug, &artifact)),
+        Command::Spec(SpecCommand::New { name, title, scope }) => {
+            commands::spec_cmd::new(&name, title, &scope)
+        }
+        Command::Spec(SpecCommand::Push { project, file }) => {
+            commands::spec_cmd::push(project, &file)
+        }
         Command::Next { project, all } => commands::next_cmd::run(project, all),
         Command::Approve { project, yes } => commands::flow_cmd::approve(project, yes),
         Command::Reject { project, why } => commands::flow_cmd::reject(project, &why),

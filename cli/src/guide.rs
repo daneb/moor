@@ -265,9 +265,13 @@ pub fn render(
     let Some(active) = active else {
         out.push(format!("{project} · no spec in progress"));
         out.push(String::new());
-        out.push("  Start one by giving it a short name (e.g. login-endpoint).".to_string());
+        out.push(
+            "  Start one: give it a short name (e.g. login-endpoint), write it on this Mac,"
+                .to_string(),
+        );
+        out.push("  then send it in.".to_string());
         out.push(String::new());
-        out.push(format!("  Next:  moor keel{flag} spec new <name>"));
+        out.push("  Next:  moor spec new <name>".to_string());
         return out;
     };
 
@@ -299,7 +303,20 @@ pub fn render(
         Some(s) => {
             out.push(format!("  {}", s.what));
             out.push(String::new());
-            if s.decides.is_some() {
+            if spec.stage == "spec" {
+                // Written on the host, a spec is fixed there and sent again;
+                // one written in the sandbox can just be checked again.
+                out.push(format!(
+                    "  Next:  moor spec push{flag} <file>   (after fixing your copy)"
+                ));
+                out.push(format!(
+                    "  Or:    moor go{flag}                 (check it again as it stands)"
+                ));
+                out.push(format!(
+                    "  See it:  {}",
+                    read_command(&spec.slug, "spec", explicit)
+                ));
+            } else if s.decides.is_some() {
                 let shown = match s.read {
                     Some("report") => "what the run did".to_string(),
                     Some(artifact) => format!("the {artifact}"),
@@ -312,7 +329,7 @@ pub fn render(
             } else {
                 out.push(format!("  Next:  moor go{flag}"));
             }
-            if let (Some(artifact), None) = (s.read, s.decides) {
+            if let (Some(artifact), None, false) = (s.read, s.decides, spec.stage == "spec") {
                 out.push(format!(
                     "  If it fails:  {}",
                     read_command(&spec.slug, artifact, explicit)
@@ -455,7 +472,7 @@ mod tests {
         let lines = render("myapp", None, &r, None);
         assert!(lines
             .iter()
-            .any(|l| l.contains("moor keel spec new <name>")));
+            .any(|l| l.contains("Next:  moor spec new <name>")));
     }
 
     #[test]
