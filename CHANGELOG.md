@@ -4,6 +4,30 @@ Notable changes to moor. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and moor uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **GitHub Copilot as an opt-in in-sandbox build agent.** keel's build
+  step inside the sandbox can now run GitHub Copilot instead of Claude
+  Code, selected per run with `keel run --driver copilot`. Copilot ships
+  in its own image layer, `moor/copilot` (build a project on it with
+  `moor new <name> --image moor/copilot:latest`), so only projects that
+  opt in carry its ~174MB agent binary — the base and language images are
+  unchanged. Copilot auth is injected from the host like Claude's, never
+  baked into the image (`COPILOT_GITHUB_TOKEN` > `GH_TOKEN` >
+  `GITHUB_TOKEN`), and `*.githubcopilot.com` is on the egress allow-list.
+  moor's own agent commands (`moor ask`, `moor studio`, `moor recipe`)
+  remain Claude-specific. See [docs/IMAGES.md](docs/IMAGES.md).
+
+### Fixed
+
+- The base image now patches two CVE-carrying packages vendored inside
+  npm's own dependency tree (`brace-expansion`, `undici`) that no released
+  npm version has picked up the fix for yet, dropping the patched releases
+  straight into npm's tree. Every image inherits the fix; the Trivy CVE
+  gate stays strict, with no ignore file.
+
 ## [0.4.0] - 2026-09-30
 
 ### Added
