@@ -84,9 +84,32 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-reco
 # CVE fixes for those. Pinned to the npm 11 line (not `@latest`, which
 # has already moved to requiring Node >=22.22/24.15 and would break this
 # build again the next time npm cuts a major) for a version compatible
-# with this Node line that still carries current vendored-dependency
-# fixes.
+# with this Node line.
 RUN npm install -g npm@11 && npm cache clean --force
+
+# Patch two CVE'd packages vendored deep inside npm's OWN dependency tree
+# (npm/node_modules/{brace-expansion,undici}) that no released npm version
+# has picked up the fix for yet — verified: npm@11.20.0 and npm@12.1.0
+# both still bundle brace-expansion@5.0.9 and undici@6.28.0, which carry
+# fixable HIGH CVEs (CVE-2026-102276/102278 stack/recursion DoS, and
+# CVE-2026-19534 WebSocket DoS). These are transitive deps of npm's own
+# deps, so a top-level `npm install` or `overrides` can't reach them; the
+# only fix available today is to drop the patched releases straight into
+# npm's tree. Verified after doing so: npm still runs and does live
+# registry ops, and Trivy reports zero fixable HIGH/CRITICAL. This whole
+# step becomes redundant (and can be deleted) once an npm release bundles
+# the fixed versions — check on the next npm bump. Applies to every image,
+# since they all inherit this base.
+RUN npm pack brace-expansion@5.0.11 undici@6.28.1 --pack-destination /tmp >/dev/null \
+    && tar xzf /tmp/brace-expansion-5.0.11.tgz -C /tmp \
+    && rm -rf /usr/lib/node_modules/npm/node_modules/brace-expansion/* \
+    && cp -r /tmp/package/. /usr/lib/node_modules/npm/node_modules/brace-expansion/ \
+    && rm -rf /tmp/package \
+    && tar xzf /tmp/undici-6.28.1.tgz -C /tmp \
+    && rm -rf /usr/lib/node_modules/npm/node_modules/undici/* \
+    && cp -r /tmp/package/. /usr/lib/node_modules/npm/node_modules/undici/ \
+    && rm -rf /tmp/package /tmp/*.tgz \
+    && npm cache clean --force
 
 # Claude Code CLI. No auth material baked in — an API key/token is
 # injected as an env var at `moor up`, never stored in the image.

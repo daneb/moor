@@ -75,6 +75,7 @@ jobs:
           - images/node/Dockerfile
           - images/python/Dockerfile
           - images/rust/Dockerfile
+          - images/copilot/Dockerfile
           - proxy/Dockerfile
     steps:
       - uses: actions/checkout@v5
@@ -103,12 +104,19 @@ jobs:
       - uses: actions/checkout@v5
       - name: build every moor image
         run: ./images/build.sh
-      # One job, one build pass, five scans — a matrix here would rebuild
-      # all five images from scratch per matrix leg instead of once.
+      # One job, one build pass, six scans — a matrix here would rebuild
+      # all six images from scratch per matrix leg instead of once.
       - name: trivy scan base (fixable HIGH/CRITICAL only — see images/base/Dockerfile)
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: moor/base:latest
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: 1
+      - name: trivy scan copilot
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: moor/copilot:latest
           severity: HIGH,CRITICAL
           ignore-unfixed: true
           exit-code: 1

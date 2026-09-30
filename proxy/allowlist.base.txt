@@ -12,6 +12,13 @@
 # Anthropic API — Claude Code CLI
 ^api\.anthropic\.com$
 
+# GitHub Copilot API — the `copilot` CLI agent (keel run --driver copilot).
+# The model/suggestions API lives on *.githubcopilot.com (per GitHub's
+# Copilot allowlist reference); auth/user (api.github.com, github.com/login)
+# is already covered by the github.com pattern above. The apex
+# githubcopilot.com is included alongside its subdomains.
+^([a-zA-Z0-9-]+\.)*githubcopilot\.com$
+
 # Language package registries (add more per-project via moor.yaml)
 ^([a-zA-Z0-9-]+\.)*crates\.io$
 ^registry\.npmjs\.org$

@@ -7,9 +7,12 @@
 # "command not found".
 
 CLI_DIR := cli
-DOCKERFILES := images/base/Dockerfile images/node/Dockerfile images/python/Dockerfile images/rust/Dockerfile proxy/Dockerfile
+DOCKERFILES := images/base/Dockerfile images/node/Dockerfile images/python/Dockerfile images/rust/Dockerfile images/copilot/Dockerfile proxy/Dockerfile
 SHELL_SCRIPTS := images/build.sh proxy/entrypoint.sh tests/e2e.sh release.sh
-IMAGES := base node rust python egress
+# Every moor image; all scanned by trivy with the same strict, fixable
+# HIGH/CRITICAL gate (no ignore file). moor/copilot inherits the patched
+# npm deps from moor/base, so it is clean like the rest.
+IMAGES := base node rust python copilot egress
 
 .DEFAULT_GOAL := help
 
@@ -36,7 +39,7 @@ clean: ## cargo clean (does not touch Docker images/volumes — see `make images
 	cd $(CLI_DIR) && cargo clean
 
 .PHONY: images
-images: ## Build every moor Docker image (base, node, rust, python, egress)
+images: ## Build every moor Docker image (base, node, rust, python, copilot, egress)
 	./images/build.sh
 
 .PHONY: images-clean

@@ -287,7 +287,8 @@ failures within half a second of a real recipe run producing them.
 ## Layout
 
 - `images/` — the sandbox base image + per-language layers (node, rust,
-  python); see [docs/IMAGES.md](docs/IMAGES.md)
+  python) and the opt-in `copilot` agent layer; see
+  [docs/IMAGES.md](docs/IMAGES.md)
 - `mcp/` — `moor-keel-mcp`, the MCP server that ships *inside* the
   sandbox and is the agent's only route to keel; see
   [docs/MCP.md](docs/MCP.md)
