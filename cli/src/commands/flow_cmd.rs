@@ -78,7 +78,7 @@ pub fn approve(explicit: Option<String>, yes: bool) -> Result<()> {
     }
 
     match guide::artifact_to_read(spec) {
-        Some("report") => exec(&t, &["report", &spec.slug])?,
+        Some("report") => merge_review(&t, &spec.slug)?,
         Some(artifact) => super::view::run(&t.name, &spec.slug, artifact)?,
         None => {}
     }
@@ -100,6 +100,63 @@ pub fn approve(explicit: Option<String>, yes: bool) -> Result<()> {
     println!();
     t.print_guidance(&t.report()?);
     Ok(())
+}
+
+/// What a merge approval is approving: the change itself and the checks
+/// the newest run passed, rather than every run's history. Everything shown
+/// comes from the sandbox, so control characters are dropped first.
+fn merge_review(t: &Target, slug: &str) -> Result<()> {
+    let printable = |s: &str| s.chars().filter(|c| !c.is_control()).collect::<String>();
+    println!("What {slug}'s build changes (the pipeline's own records aside):\n");
+    let outside_keel = [".", ":(exclude).keel"];
+    let mut stat = vec!["git", "--no-pager", "diff", "--stat", "HEAD", "--"];
+    stat.extend(outside_keel);
+    let (_, out) = t.exec("approve", &stat)?;
+    for line in out.lines() {
+        println!("  {}", printable(line));
+    }
+    let mut new_files = vec!["git", "ls-files", "--others", "--exclude-standard", "--"];
+    new_files.extend(outside_keel);
+    let (_, out) = t.exec("approve", &new_files)?;
+    for line in out.lines().filter(|l| !l.trim().is_empty()) {
+        println!("  new file: {}", printable(line));
+    }
+
+    let (_, runs) = t.exec("approve", &["keel", "runs", "--json"])?;
+    let runs: serde_json::Value = serde_json::from_str(runs.trim()).unwrap_or_default();
+    if let Some(run) = newest_run(&runs, slug) {
+        println!("\nChecks on run {run}:");
+        for gate in ["G2", "G2.5"] {
+            let path = format!(".keel/runs/{run}/gates/{gate}.json");
+            let (ok, out) = t.exec("approve", &["cat", &path])?;
+            if ok {
+                println!("  {}", gate_summary(gate, &out));
+            }
+        }
+    }
+    println!("\n  Full diff:  moor view {slug} diff");
+    Ok(())
+}
+
+/// "G2 pass — 13 passed, 0 failed, 0 blocked", from a gate's JSON result.
+fn gate_summary(gate: &str, gate_json: &str) -> String {
+    let g: serde_json::Value = serde_json::from_str(gate_json.trim()).unwrap_or_default();
+    let count = |v: &str| {
+        g["checks"]
+            .as_array()
+            .map(|c| c.iter().filter(|c| c["verdict"] == v).count())
+            .unwrap_or(0)
+    };
+    let verdict = g["verdict"]
+        .as_str()
+        .filter(|v| matches!(*v, "pass" | "fail" | "blocked"))
+        .unwrap_or("unknown");
+    format!(
+        "{gate} {verdict} — {} passed, {} failed, {} blocked",
+        count("pass"),
+        count("fail"),
+        count("blocked")
+    )
 }
 
 /// `moor reject "why"`: record a rejection of whatever is waiting on the
@@ -223,7 +280,7 @@ fn build_passed(t: &Target, slug: &str) -> Result<bool> {
 }
 
 /// The id of `slug`'s newest run, if it has the shape of a run id.
-fn newest_run(runs: &serde_json::Value, slug: &str) -> Option<String> {
+pub(crate) fn newest_run(runs: &serde_json::Value, slug: &str) -> Option<String> {
     runs["runs"]
         .as_array()?
         .iter()
@@ -285,6 +342,19 @@ mod tests {
         assert!(!gate_passed(r#"{"gate":"G2","verdict":"fail"}"#));
         assert!(!gate_passed(r#"{"gate":"G2","verdict":"blocked"}"#));
         assert!(!gate_passed("not json"));
+    }
+
+    #[test]
+    fn gate_summary_counts_checks() {
+        let json = r#"{"gate":"G2","verdict":"pass","checks":[{"verdict":"pass"},{"verdict":"pass"},{"verdict":"blocked"}]}"#;
+        assert_eq!(
+            gate_summary("G2", json),
+            "G2 pass — 2 passed, 0 failed, 1 blocked"
+        );
+        assert_eq!(
+            gate_summary("G2", "junk"),
+            "G2 unknown — 0 passed, 0 failed, 0 blocked"
+        );
     }
 
     #[test]

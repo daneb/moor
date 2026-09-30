@@ -45,6 +45,7 @@ How moor's commands map onto keel, for when you need to look underneath:
 | `moor approve` / `moor reject "why"` | `keel approve <spec> --stage <stage>` (with `--reject --note` for a rejection) |
 | `moor go --check` | at the build step, `keel run <spec> --no-driver`: re-checks the work already in the sandbox without the agent |
 | `moor view <spec> <artifact>` | reads `.keel/specs/<spec>/{spec,plan,tasks}.md`; `report` runs `keel report <spec>` |
+| `moor ship` | no keel command: commits the approved spec's change, its spec folder and its runs on `moor/<spec>` in the sandbox, pushes from the sandbox, opens the pull request from the host with `gh`, and switches the sandbox back to its trunk |
 | `moor new` / `moor import` | `keel init` in the new workspace |
 | `moor bundle` | `keel export --chain` and `keel bundle verify`, in throwaway containers |
 | `moor recipe` | the whole pipeline, as ADR-0005 describes |

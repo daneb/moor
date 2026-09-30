@@ -113,7 +113,7 @@ fn humanise(slug: &str) -> String {
 }
 
 /// Splits `---` front matter from the body. `None` if there isn't any.
-fn front_matter(text: &str) -> Option<(&str, &str)> {
+pub(crate) fn front_matter(text: &str) -> Option<(&str, &str)> {
     let rest = text.strip_prefix("---\n")?;
     let end = rest.find("\n---\n")?;
     Some((&rest[..end], &rest[end + 5..]))
@@ -147,7 +147,7 @@ fn parse(content: &str) -> Result<Draft> {
 /// accepted only in their exact expected shapes (`SPEC-` and digits;
 /// `keel.spec/` and digits), since this is the one piece of sandbox
 /// output this command lets through.
-fn read_identity(sandbox_spec: &str) -> Option<(String, String)> {
+pub(crate) fn read_identity(sandbox_spec: &str) -> Option<(String, String)> {
     let (front, _) = front_matter(sandbox_spec)?;
     let field = |key: &str| {
         front

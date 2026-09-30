@@ -166,6 +166,7 @@ moor go                            # take the next steps until one needs you
 moor go --check                    # re-check a build you fixed, without the agent
 moor approve                       # shows the spec/plan/run first, then asks
 moor reject "needs a rollback plan"
+moor ship                          # approved: commit on its own branch, push, open a PR
 
 # read a spec, or its plan or tasks, without opening a shell
 moor view greet-name tasks
