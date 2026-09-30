@@ -1,13 +1,14 @@
 # The images
 
-Five images, built by `images/build.sh` (`make images`):
+Six images, built by `images/build.sh` (`make images`):
 
 ```
 debian:bookworm-slim
       │
       ├── moor/base ──┬── moor/node     (+ pnpm, yarn)
       │               ├── moor/rust     (+ build-essential, rustup stable)
-      │               └── moor/python   (+ python3, venv, pip, pipx)
+      │               ├── moor/python   (+ python3, venv, pip, pipx)
+      │               └── moor/copilot  (+ @github/copilot — opt-in agent)
       │
       └── moor/egress    (tinyproxy — the default-deny forward proxy)
 ```
@@ -37,8 +38,7 @@ compile two binaries that the runtime stage copies out:
 | `git`, `curl`, `jq`, `ripgrep`, `ca-certificates`, `gnupg` | the minimum an agent needs to work a repo |
 | Node 22.x (NodeSource) | the Claude Code CLI is a Node program |
 | `npm@11` | NodeSource's bundled npm is routinely behind on CVE fixes for its own vendored deps (tar, minimatch, glob) |
-| `@anthropic-ai/claude-code` | the default agent |
-| `@github/copilot` | the GitHub Copilot CLI agent, invoked by the `copilot` keel driver (`keel run --driver copilot`); coexists with Claude, not a replacement |
+| `@anthropic-ai/claude-code` | the default agent (GitHub Copilot is a separate opt-in layer, `moor/copilot` — see below) |
 | `/usr/local/bin/keel` | the conductor; runs *inside* the sandbox, not on the host |
 | `/usr/local/bin/moor-keel-mcp` | the agent's only route to keel |
 | `/etc/moor/mcp-config.json` | how `claude` finds that server — root-owned, outside every volume, on a read-only rootfs |
@@ -54,20 +54,28 @@ never baked into a layer.
 
 The build step keel runs *inside the sandbox* (`keel run`) goes through a
 **driver** — a small script in `.keel/drivers/` that shells out to one
-agent CLI. The image ships two agent CLIs (`claude` and `copilot`) so the
-choice is made per run, on the host, without rebuilding anything:
+agent CLI. Claude Code lives in `moor/base` (and every language layer);
+the GitHub Copilot CLI is its own opt-in layer, `moor/copilot`, so only a
+project that wants Copilot carries it (and its binary's CVEs — see the
+`.trivyignore.copilot` note below). To use Claude, run any base/language
+image; to use Copilot, base the project on `moor/copilot`:
 
 ```bash
-# default — Claude Code (keel.toml has claude-code as default = true)
+# default — Claude Code (keel.toml has claude-code as default = true),
+# on any base/language image
 moor run my-app -- keel run <slug>
 
-# GitHub Copilot instead, for this run
+# GitHub Copilot — the project must be on the moor/copilot image
+moor new my-app --image moor/copilot:latest
 moor run my-app -- keel run <slug> --driver copilot
 ```
 
 Both drivers are registered in `.keel/keel.toml`; only `claude-code`
-is `default = true`. Nothing about the image changes between them — the
-same `moor/base` carries both.
+is `default = true`. The `--driver copilot` switch only works if the
+project's image actually carries the `copilot` binary — i.e. it was
+built on `moor/copilot`. `moor/copilot` stacks on `moor/base` by default;
+to get a toolchain too, build it with
+`--build-arg BASE_IMAGE=moor/node:latest` (see `images/copilot/Dockerfile`).
 
 **Auth is per-agent and injected from the host, never baked in** (the
 same rule as Claude, [ADR-0002](decisions/0002-claude-code-authentication.md)):
@@ -100,10 +108,29 @@ GitHub's Copilot endpoints, where the Anthropic-only path only reached
 blocks everything not on the list; see
 [THREAT-MODEL.md](THREAT-MODEL.md).
 
+**CVEs bundled in the Copilot binary — why `moor/copilot` is scanned with
+an ignore file, and no other image is.** `@github/copilot` installs a
+~174MB compiled platform binary that vendors its own npm dependencies
+*inside* the binary. At 1.0.89 that includes `undici` and
+`brace-expansion` versions with three fixable HIGH CVEs — but "fixable"
+means fixed upstream, not fixable *here*: no npm override, dedupe, or
+Dockerfile change can reach a dependency compiled into a third-party
+binary. Only a newer `@github/copilot` release can. All three are
+Denial-of-Service (not RCE, not data exfiltration), against an agent
+already inside moor's strongest containment (non-root, read-only rootfs,
+`cap_drop: ALL`, default-deny egress). So CI scans `moor/copilot` with
+`.trivyignore.copilot` — three specific, individually-justified CVE IDs
+with a "re-check on the next bump" note, *not* a blanket suppression —
+while base/node/rust/python/egress keep the strict gate with no ignore
+file. This is the single reason Copilot is a separate layer rather than
+part of base: confining the binary confines the exception to the projects
+that chose it.
+
 > This covers only keel's in-sandbox build agent. moor's *own* agent
 > commands (`moor ask`, `moor studio`, `moor recipe`) are a separate code
 > path that is still Claude-specific (`cli/src/session.rs`); making those
 > use Copilot is a larger change, not this switch.
+
 
 
 ## Three build mechanics that are easy to get wrong
@@ -176,17 +203,20 @@ oversight: moor's own turn handling keys on the JSON shape
 can move without warning. Pinning it is its own change — an image
 concern, not a protocol one.
 
-**Not pinned: `@github/copilot`** either, for the same reason. It is only
-reached through the `copilot` keel driver (a shell script that shells out
-to the `copilot` binary and reads its exit status), not through moor's
-own JSON-parsing turn handling, so a CLI-surface change is lower-blast
-than the Claude case — but it is still an unpinned `npm install -g` and
-worth the same eventual pin.
+**Not pinned: `@github/copilot`** either (in the `moor/copilot` layer,
+not base), for the same reason. It is only reached through the `copilot`
+keel driver (a shell script that shells out to the `copilot` binary and
+reads its exit status), not through moor's own JSON-parsing turn
+handling, so a CLI-surface change is lower-blast than the Claude case —
+but it is still an unpinned `npm install -g` and worth the same eventual
+pin. Pinning it would also fix the version whose bundled binary carries
+the CVEs suppressed in `.trivyignore.copilot` (see below), turning that
+from "latest, re-check each build" into a deliberate bump.
 
 ## Building, scanning, and checking
 
 ```bash
-make images        # build all five
+make images        # build all six
 make images-clean  # remove every moor-tagged image (leaves project volumes alone)
 make hadolint      # lint every Dockerfile (needs: brew install hadolint)
 make trivy         # CVE scan every built image, fixable HIGH/CRITICAL only
@@ -220,7 +250,7 @@ moor selftest my-app
 # what the image itself carries
 docker run --rm moor/base:latest keel --version
 docker run --rm moor/base:latest claude --version
-docker run --rm moor/base:latest copilot --version
+docker run --rm moor/copilot:latest copilot --version
 docker run --rm moor/base:latest cat /etc/moor/mcp-config.json
 
 # the MCP server speaks only JSON-RPC on stdin — it has no --help

@@ -16,6 +16,13 @@ for lang in node rust python; do
   docker build -t "moor/${lang}:latest" --build-arg BASE_IMAGE=moor/base:latest "./${lang}"
 done
 
+# The opt-in GitHub Copilot agent layer, on top of base. Kept out of
+# moor/base on purpose — it ships a large compiled binary with vendored,
+# not-independently-patchable HIGH CVEs, so only projects that select the
+# copilot driver should carry it. See images/copilot/Dockerfile.
+echo "==> building moor/copilot:latest"
+docker build -t moor/copilot:latest --build-arg BASE_IMAGE=moor/base:latest ./copilot
+
 echo "==> building moor/egress:latest"
 docker build -t moor/egress:latest ../proxy
 

@@ -75,6 +75,7 @@ jobs:
           - images/node/Dockerfile
           - images/python/Dockerfile
           - images/rust/Dockerfile
+          - images/copilot/Dockerfile
           - proxy/Dockerfile
     steps:
       - uses: actions/checkout@v5
@@ -103,14 +104,27 @@ jobs:
       - uses: actions/checkout@v5
       - name: build every moor image
         run: ./images/build.sh
-      # One job, one build pass, five scans — a matrix here would rebuild
-      # all five images from scratch per matrix leg instead of once.
+      # One job, one build pass, six scans — a matrix here would rebuild
+      # all six images from scratch per matrix leg instead of once.
       - name: trivy scan base (fixable HIGH/CRITICAL only — see images/base/Dockerfile)
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: moor/base:latest
           severity: HIGH,CRITICAL
           ignore-unfixed: true
+          exit-code: 1
+      # moor/copilot is the ONLY image scanned with an ignore file. It
+      # carries three fixable-but-unpatchable HIGH CVEs vendored inside
+      # the compiled @github/copilot binary; each is listed and justified
+      # in .trivyignore.copilot. Every other image below keeps the strict
+      # gate with no ignore file.
+      - name: trivy scan copilot (narrow ignore — see .trivyignore.copilot)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: moor/copilot:latest
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          trivyignores: .trivyignore.copilot
           exit-code: 1
       - name: trivy scan node
         uses: aquasecurity/trivy-action@v0.36.0
