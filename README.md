@@ -521,6 +521,25 @@ not separate from it:
   "command not found." Every target here was run for real before being
   documented, not just written.
 
+## Releasing
+
+`master` is protected, so a release is two steps, each checked by
+`release.sh` before it changes anything (add `--dry-run` to see what it
+would do):
+
+```bash
+./release.sh prepare 0.4.0   # opens the release PR: version + CHANGELOG
+# merge that PR, then:
+git pull --ff-only && ./release.sh publish 0.4.0
+```
+
+`publish` runs the same gates CI does, publishes to crates.io with the
+token `cargo login` stored, tags `v0.4.0` (pushing only the tag), and
+creates the GitHub release from the CHANGELOG. It refuses to publish from
+any commit but the one that matches `origin/master`, and a version already
+tagged elsewhere; every step checks whether it's already done, so an
+interrupted release finishes by running the same command again.
+
 ## Development
 
 ```bash
