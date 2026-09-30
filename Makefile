@@ -8,7 +8,7 @@
 
 CLI_DIR := cli
 DOCKERFILES := images/base/Dockerfile images/node/Dockerfile images/python/Dockerfile images/rust/Dockerfile proxy/Dockerfile
-SHELL_SCRIPTS := images/build.sh proxy/entrypoint.sh tests/e2e.sh
+SHELL_SCRIPTS := images/build.sh proxy/entrypoint.sh tests/e2e.sh release.sh
 IMAGES := base node rust python egress
 
 .DEFAULT_GOAL := help
