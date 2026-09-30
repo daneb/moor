@@ -1,6 +1,10 @@
 /cli/target/
 .DS_Store
 
+# Serena MCP: per-developer tool state (project config, symbol cache,
+# memories) — local to a working copy, not part of the project.
+.serena/
+
 # keel: the symbol index is a build artefact, rebuilt by `keel map`
 .keel/store/map/index.sqlite
 .keel/store/map/*.sqlite-*
