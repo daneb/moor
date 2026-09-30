@@ -9,12 +9,10 @@
 CLI_DIR := cli
 DOCKERFILES := images/base/Dockerfile images/node/Dockerfile images/python/Dockerfile images/rust/Dockerfile images/copilot/Dockerfile proxy/Dockerfile
 SHELL_SCRIPTS := images/build.sh proxy/entrypoint.sh tests/e2e.sh release.sh
-# Images scanned by trivy with the strict, no-ignore-file gate. moor/copilot
-# is deliberately NOT here — it needs a scoped ignore file (see the trivy
-# target and .trivyignore.copilot) — but it IS built by `make images` and
-# removed by `make images-clean`.
-IMAGES := base node rust python egress
-IMAGES_ALL := base node rust python copilot egress
+# Every moor image; all scanned by trivy with the same strict, fixable
+# HIGH/CRITICAL gate (no ignore file). moor/copilot inherits the patched
+# npm deps from moor/base, so it is clean like the rest.
+IMAGES := base node rust python copilot egress
 
 .DEFAULT_GOAL := help
 
@@ -46,7 +44,7 @@ images: ## Build every moor Docker image (base, node, rust, python, copilot, egr
 
 .PHONY: images-clean
 images-clean: ## Remove every moor-tagged Docker image (does not touch project volumes)
-	@for img in $(IMAGES_ALL); do docker rmi -f moor/$$img:latest 2>/dev/null || true; done
+	@for img in $(IMAGES); do docker rmi -f moor/$$img:latest 2>/dev/null || true; done
 
 # --- format / lint / test ----------------------------------------------
 
@@ -100,8 +98,6 @@ trivy: images ## Trivy CVE scan of every built image, fixable HIGH/CRITICAL only
 		echo "== trivy scan: moor/$$img:latest =="; \
 		trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 moor/$$img:latest || exit 1; \
 	done
-	@echo "== trivy scan: moor/copilot:latest (scoped ignore — .trivyignore.copilot) =="
-	@trivy image --severity HIGH,CRITICAL --ignore-unfixed --ignorefile .trivyignore.copilot --exit-code 1 moor/copilot:latest || exit 1
 
 .PHONY: security
 security: audit deny shellcheck hadolint gitleaks trivy ## Run every security scan (everything CI's security jobs run)

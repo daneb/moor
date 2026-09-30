@@ -113,18 +113,12 @@ jobs:
           severity: HIGH,CRITICAL
           ignore-unfixed: true
           exit-code: 1
-      # moor/copilot is the ONLY image scanned with an ignore file. It
-      # carries three fixable-but-unpatchable HIGH CVEs vendored inside
-      # the compiled @github/copilot binary; each is listed and justified
-      # in .trivyignore.copilot. Every other image below keeps the strict
-      # gate with no ignore file.
-      - name: trivy scan copilot (narrow ignore — see .trivyignore.copilot)
+      - name: trivy scan copilot
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: moor/copilot:latest
           severity: HIGH,CRITICAL
           ignore-unfixed: true
-          trivyignores: .trivyignore.copilot
           exit-code: 1
       - name: trivy scan node
         uses: aquasecurity/trivy-action@v0.36.0

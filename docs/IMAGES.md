@@ -108,23 +108,18 @@ GitHub's Copilot endpoints, where the Anthropic-only path only reached
 blocks everything not on the list; see
 [THREAT-MODEL.md](THREAT-MODEL.md).
 
-**CVEs bundled in the Copilot binary — why `moor/copilot` is scanned with
-an ignore file, and no other image is.** `@github/copilot` installs a
-~174MB compiled platform binary that vendors its own npm dependencies
-*inside* the binary. At 1.0.89 that includes `undici` and
-`brace-expansion` versions with three fixable HIGH CVEs — but "fixable"
-means fixed upstream, not fixable *here*: no npm override, dedupe, or
-Dockerfile change can reach a dependency compiled into a third-party
-binary. Only a newer `@github/copilot` release can. All three are
-Denial-of-Service (not RCE, not data exfiltration), against an agent
-already inside moor's strongest containment (non-root, read-only rootfs,
-`cap_drop: ALL`, default-deny egress). So CI scans `moor/copilot` with
-`.trivyignore.copilot` — three specific, individually-justified CVE IDs
-with a "re-check on the next bump" note, *not* a blanket suppression —
-while base/node/rust/python/egress keep the strict gate with no ignore
-file. This is the single reason Copilot is a separate layer rather than
-part of base: confining the binary confines the exception to the projects
-that chose it.
+**A note on the Copilot binary's size and CVEs.** `@github/copilot`
+installs a ~174MB compiled platform binary that vendors its own npm
+dependencies *inside* the binary. That size, and the fact that it is a
+non-default opt-in agent, is why it is a separate layer rather than part
+of `moor/base` — only a project that chooses Copilot pays for it. On the
+CVE front specifically: the three HIGH `undici`/`brace-expansion` CVEs
+that first appeared when Copilot was added turned out **not** to come
+from the Copilot binary at all — they were in `npm`'s own vendored
+dependency tree in `moor/base`, present on every image. They are fixed at
+the base layer (see "Fixing CVEs in npm's own vendored deps" below), so
+`moor/copilot` is scanned with the same strict, no-ignore-file Trivy gate
+as every other image.
 
 > This covers only keel's in-sandbox build agent. moor's *own* agent
 > commands (`moor ask`, `moor studio`, `moor recipe`) are a separate code
@@ -133,7 +128,21 @@ that chose it.
 
 
 
-## Three build mechanics that are easy to get wrong
+
+## Four build mechanics that are easy to get wrong
+
+**Fixing CVEs in npm's own vendored deps.** npm bundles a full
+`node_modules` tree of its own, and its transitive deps can carry
+fixable HIGH CVEs that no *released* npm version has picked up yet — at
+the time of writing, `brace-expansion@5.0.9` and `undici@6.28.0` (three
+DoS CVEs) are bundled by every npm through 12.1.0. Because they are
+transitive deps of npm's own deps, a top-level `npm install` or
+`overrides` can't reach them; the base Dockerfile drops the patched
+releases (5.0.11 / 6.28.1) straight into `npm/node_modules/` after
+installing npm. Verified: npm still runs and does live registry ops, and
+Trivy reports zero fixable HIGH/CRITICAL. Delete that RUN step once an
+npm release bundles the fixed versions. Every image inherits the fix from
+base.
 
 **`apt-get upgrade`, not just `install`.** `debian:bookworm-slim`'s base
 layer can be older than Debian's current security snapshot, so packages
@@ -209,9 +218,7 @@ keel driver (a shell script that shells out to the `copilot` binary and
 reads its exit status), not through moor's own JSON-parsing turn
 handling, so a CLI-surface change is lower-blast than the Claude case —
 but it is still an unpinned `npm install -g` and worth the same eventual
-pin. Pinning it would also fix the version whose bundled binary carries
-the CVEs suppressed in `.trivyignore.copilot` (see below), turning that
-from "latest, re-check each build" into a deliberate bump.
+pin.
 
 ## Building, scanning, and checking
 
