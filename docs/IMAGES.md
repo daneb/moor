@@ -37,7 +37,8 @@ compile two binaries that the runtime stage copies out:
 | `git`, `curl`, `jq`, `ripgrep`, `ca-certificates`, `gnupg` | the minimum an agent needs to work a repo |
 | Node 22.x (NodeSource) | the Claude Code CLI is a Node program |
 | `npm@11` | NodeSource's bundled npm is routinely behind on CVE fixes for its own vendored deps (tar, minimatch, glob) |
-| `@anthropic-ai/claude-code` | the agent |
+| `@anthropic-ai/claude-code` | the default agent |
+| `@github/copilot` | the GitHub Copilot CLI agent, invoked by the `copilot` keel driver (`keel run --driver copilot`); coexists with Claude, not a replacement |
 | `/usr/local/bin/keel` | the conductor; runs *inside* the sandbox, not on the host |
 | `/usr/local/bin/moor-keel-mcp` | the agent's only route to keel |
 | `/etc/moor/mcp-config.json` | how `claude` finds that server — root-owned, outside every volume, on a read-only rootfs |
@@ -48,6 +49,62 @@ And deliberately **not** in it: no `docker` CLI, no `sudo`, no SSH
 server, no host toolchain, and no auth material of any kind. An API key
 or OAuth token is injected as an environment variable at `moor up` and is
 never baked into a layer.
+
+## Choosing the in-container build agent (Claude or Copilot)
+
+The build step keel runs *inside the sandbox* (`keel run`) goes through a
+**driver** — a small script in `.keel/drivers/` that shells out to one
+agent CLI. The image ships two agent CLIs (`claude` and `copilot`) so the
+choice is made per run, on the host, without rebuilding anything:
+
+```bash
+# default — Claude Code (keel.toml has claude-code as default = true)
+moor run my-app -- keel run <slug>
+
+# GitHub Copilot instead, for this run
+moor run my-app -- keel run <slug> --driver copilot
+```
+
+Both drivers are registered in `.keel/keel.toml`; only `claude-code`
+is `default = true`. Nothing about the image changes between them — the
+same `moor/base` carries both.
+
+**Auth is per-agent and injected from the host, never baked in** (the
+same rule as Claude, [ADR-0002](decisions/0002-claude-code-authentication.md)):
+
+| agent | secret(s), in precedence order | where it comes from |
+| --- | --- | --- |
+| Claude Code | `CLAUDE_CODE_OAUTH_TOKEN` > `ANTHROPIC_API_KEY` | `claude setup-token` (subscription) or an API key |
+| GitHub Copilot | `COPILOT_GITHUB_TOKEN` > `GH_TOKEN` > `GITHUB_TOKEN` | a GitHub token with a Copilot seat (e.g. `gh auth token`) |
+
+All of these are in a project's default manifest secrets, so storing the
+right one and recreating the container is all it takes:
+
+```bash
+moor secrets set my-app COPILOT_GITHUB_TOKEN   # or GH_TOKEN
+moor up my-app                                  # re-inject into the container
+moor run my-app -- keel run <slug> --driver copilot
+```
+
+Only the secret you actually store is injected; an unset one resolves to
+empty and is a no-op. Whichever token is present is redacted from the
+audit chain the same way every declared secret is.
+
+**Egress.** Copilot talks to `*.githubcopilot.com` (the model API) plus
+`api.github.com`/`github.com` for auth — all in the base proxy
+allowlist (`proxy/allowlist.base.txt`). This is a deliberate posture
+note, not a silent change: switching to Copilot means a GitHub token with
+repo scope now lives inside the (untrusted) sandbox and traffic leaves to
+GitHub's Copilot endpoints, where the Anthropic-only path only reached
+`api.anthropic.com`. The default-deny proxy still logs every request and
+blocks everything not on the list; see
+[THREAT-MODEL.md](THREAT-MODEL.md).
+
+> This covers only keel's in-sandbox build agent. moor's *own* agent
+> commands (`moor ask`, `moor studio`, `moor recipe`) are a separate code
+> path that is still Claude-specific (`cli/src/session.rs`); making those
+> use Copilot is a larger change, not this switch.
+
 
 ## Three build mechanics that are easy to get wrong
 
@@ -119,6 +176,13 @@ oversight: moor's own turn handling keys on the JSON shape
 can move without warning. Pinning it is its own change — an image
 concern, not a protocol one.
 
+**Not pinned: `@github/copilot`** either, for the same reason. It is only
+reached through the `copilot` keel driver (a shell script that shells out
+to the `copilot` binary and reads its exit status), not through moor's
+own JSON-parsing turn handling, so a CLI-surface change is lower-blast
+than the Claude case — but it is still an unpinned `npm install -g` and
+worth the same eventual pin.
+
 ## Building, scanning, and checking
 
 ```bash
@@ -156,6 +220,7 @@ moor selftest my-app
 # what the image itself carries
 docker run --rm moor/base:latest keel --version
 docker run --rm moor/base:latest claude --version
+docker run --rm moor/base:latest copilot --version
 docker run --rm moor/base:latest cat /etc/moor/mcp-config.json
 
 # the MCP server speaks only JSON-RPC on stdin — it has no --help

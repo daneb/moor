@@ -129,11 +129,15 @@ mod tests {
         m.secrets = vec![
             "ANTHROPIC_API_KEY".to_string(),
             "CLAUDE_CODE_OAUTH_TOKEN".to_string(),
+            "COPILOT_GITHUB_TOKEN".to_string(),
+            "GH_TOKEN".to_string(),
             "GITHUB_TOKEN".to_string(),
         ];
         let rendered = render(&m);
         assert!(rendered.contains("ANTHROPIC_API_KEY: \"${ANTHROPIC_API_KEY:-}\""));
         assert!(rendered.contains("CLAUDE_CODE_OAUTH_TOKEN: \"${CLAUDE_CODE_OAUTH_TOKEN:-}\""));
+        assert!(rendered.contains("COPILOT_GITHUB_TOKEN: \"${COPILOT_GITHUB_TOKEN:-}\""));
+        assert!(rendered.contains("GH_TOKEN: \"${GH_TOKEN:-}\""));
         assert!(rendered.contains("GITHUB_TOKEN: \"${GITHUB_TOKEN:-}\""));
     }
 

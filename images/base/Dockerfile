@@ -92,6 +92,15 @@ RUN npm install -g npm@11 && npm cache clean --force
 # injected as an env var at `moor up`, never stored in the image.
 RUN npm install -g @anthropic-ai/claude-code && npm cache clean --force
 
+# GitHub Copilot CLI — the agentic `copilot` (NOT `gh copilot suggest`,
+# which only proposes shell commands and never edits files). This is the
+# binary the `copilot` keel driver (.keel/drivers/copilot) invokes when a
+# build runs with `keel run --driver copilot` inside the sandbox. Same
+# rule as Claude: no auth material baked in — a GitHub token is injected
+# as an env var at `moor up` (COPILOT_GITHUB_TOKEN > GH_TOKEN >
+# GITHUB_TOKEN), never stored in the image.
+RUN npm install -g @github/copilot && npm cache clean --force
+
 COPY --from=keel-build /usr/local/cargo/bin/keel /usr/local/bin/keel
 COPY --from=keel-build /usr/local/bin/moor-keel-mcp /usr/local/bin/moor-keel-mcp
 COPY --from=keel-build /usr/local/cargo/bin/cargo-audit /usr/local/bin/cargo-audit
