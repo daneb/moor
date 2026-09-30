@@ -100,16 +100,15 @@ RUN npm install -g npm@11 && npm cache clean --force
 # step becomes redundant (and can be deleted) once an npm release bundles
 # the fixed versions — check on the next npm bump. Applies to every image,
 # since they all inherit this base.
-RUN cd /tmp \
-    && npm pack brace-expansion@5.0.11 undici@6.28.1 >/dev/null \
-    && tar xzf brace-expansion-5.0.11.tgz \
+RUN npm pack brace-expansion@5.0.11 undici@6.28.1 --pack-destination /tmp >/dev/null \
+    && tar xzf /tmp/brace-expansion-5.0.11.tgz -C /tmp \
     && rm -rf /usr/lib/node_modules/npm/node_modules/brace-expansion/* \
-    && cp -r package/. /usr/lib/node_modules/npm/node_modules/brace-expansion/ \
-    && rm -rf package \
-    && tar xzf undici-6.28.1.tgz \
+    && cp -r /tmp/package/. /usr/lib/node_modules/npm/node_modules/brace-expansion/ \
+    && rm -rf /tmp/package \
+    && tar xzf /tmp/undici-6.28.1.tgz -C /tmp \
     && rm -rf /usr/lib/node_modules/npm/node_modules/undici/* \
-    && cp -r package/. /usr/lib/node_modules/npm/node_modules/undici/ \
-    && rm -rf /tmp/* \
+    && cp -r /tmp/package/. /usr/lib/node_modules/npm/node_modules/undici/ \
+    && rm -rf /tmp/package /tmp/*.tgz \
     && npm cache clean --force
 
 # Claude Code CLI. No auth material baked in — an API key/token is
