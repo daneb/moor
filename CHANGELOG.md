@@ -4,6 +4,18 @@ Notable changes to moor. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and moor uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- `moor next` (and the guidance footer of `moor go`) ignored an explicit
+  active-spec pin whenever another spec had approved-but-unshipped work:
+  it always steered you to ship the unshipped spec, so `moor use <p>
+  --spec <slug>` had no effect on which spec the guidance followed. An
+  explicit pin now wins — the pinned in-progress spec is guided, and the
+  unshipped work is shown as a secondary "Also:" note rather than
+  hijacking the step. Without a pin, unshipped-first is unchanged.
+
 ## [0.5.1] - 2026-09-30
 
 ### Fixed
