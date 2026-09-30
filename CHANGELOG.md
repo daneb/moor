@@ -4,6 +4,23 @@ Notable changes to moor. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and moor uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- The GitHub Copilot in-sandbox agent (shipped in 0.5.0) did not actually
+  work end-to-end. Two bugs, both fixed and verified live against a real
+  SBG enterprise Copilot licence:
+  - The `moor/copilot` image had no writable `~/.copilot`, so the Copilot
+    CLI died silently under the read-only rootfs. The image now creates
+    `~/.copilot` agent-owned and the compose template mounts a
+    `copilot-state` named volume there — the same mechanic as
+    `~/.claude`. (Rebuild the CLI so the compiled-in compose template
+    updates, then recreate the project.)
+  - `*.githubcopilot.com` (the Copilot model API) was in the allowlist
+    source but the `moor/egress` image had not been rebuilt, so egress
+    blocked it. Rebuilding the image picks it up.
+
 ## [0.5.0] - 2026-09-30
 
 ### Added

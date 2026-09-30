@@ -172,6 +172,7 @@ mod tests {
         assert!(rendered.contains("workspace:/workspace"));
         assert!(rendered.contains("cache:/home/agent/.cache"));
         assert!(rendered.contains("claude-state:/home/agent/.claude"));
+        assert!(rendered.contains("copilot-state:/home/agent/.copilot"));
         assert!(!rendered.contains("/Users/"));
         assert!(!rendered.contains("${HOME}"));
     }

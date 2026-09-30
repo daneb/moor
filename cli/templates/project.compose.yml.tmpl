@@ -55,6 +55,12 @@ services:
       # /home/agent/.claude`. A named volume, not a bind mount: still no
       # host path crosses into the container.
       - claude-state:/home/agent/.claude
+      # GitHub Copilot's own state (logs, session bookkeeping, config),
+      # for projects on the moor/copilot image. Same read-only-rootfs
+      # reason as claude-state above; harmless (an empty volume) for
+      # Claude-only projects. The mount point is created agent-owned in
+      # the copilot image so this volume inherits that ownership.
+      - copilot-state:/home/agent/.copilot
     command: ["sleep", "infinity"]
     depends_on:
       - egress
@@ -90,3 +96,5 @@ volumes:
     name: {{PROJECT_NAME}}-cache
   claude-state:
     name: {{PROJECT_NAME}}-claude-state
+  copilot-state:
+    name: {{PROJECT_NAME}}-copilot-state
