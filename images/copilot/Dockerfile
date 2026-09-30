@@ -31,4 +31,17 @@ FROM ${BASE_IMAGE}
 
 USER root
 RUN npm install -g @github/copilot && npm cache clean --force
+
+# The Copilot CLI writes its own state under ~/.copilot (logs, session
+# bookkeeping, config). The sandbox's rootfs is read-only, so moor mounts
+# a named volume there — and Docker copies a fresh volume's initial
+# ownership from whatever exists at that path in the image. This dir must
+# therefore exist, owned by `agent`, IN THE IMAGE, or the mount point is
+# created root-owned and copilot dies (silently: it can't write logs, so
+# it produces no diagnostic either). Exactly the same mechanic as
+# /home/agent/.claude in the base image — see its Dockerfile comment and
+# docs/IMAGES.md. Verified: without this, `copilot -p` exits non-zero with
+# no output on the read-only rootfs.
+RUN mkdir -p /home/agent/.copilot \
+    && chown -R agent:agent /home/agent/.copilot
 USER agent
