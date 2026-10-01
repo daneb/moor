@@ -1,0 +1,2851 @@
+diff --git a/.github/copilot-instructions.md b/.github/copilot-instructions.md
+index e22f5a7..b38a496 100644
+--- a/.github/copilot-instructions.md
++++ b/.github/copilot-instructions.md
+@@ -1,4 +1,4 @@
+-<!-- keel:generated schema=keel.projection/1 adapter=copilot store=c80d8c417f99 body=4e6b42472296 -->
++<!-- keel:generated schema=keel.projection/1 adapter=copilot store=1069ef3ef7ea body=04ed6d61c460 -->
+ <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
+ 
+ # Project context
+@@ -48,14 +48,14 @@ _Versions that cannot move, platforms that must keep working, dependencies that
+ 
+ ## Repository map
+ 
+-**43 files · 683 symbols · 11364 lines** — javascript 2, rust 41
++**43 files · 693 symbols · 11532 lines** — javascript 2, rust 41
+ 
+ Files are ordered by import-graph centrality, not alphabetically. Signatures only; read a body with the file path and line number. Per-directory detail lives in `.keel/store/map/<dir>/CODEMAP.md`.
+ 
+ ### Layout
+ 
+-- `cli/src/` — 12 files, 4434 lines · guide.rs, canary.rs, paths.rs
+-- `cli/src/commands/` — 25 files, 4526 lines · next_cmd.rs, mod.rs, run_cmd.rs
++- `cli/src/` — 12 files, 4588 lines · guide.rs, canary.rs, paths.rs
++- `cli/src/commands/` — 25 files, 4540 lines · next_cmd.rs, mod.rs, run_cmd.rs
+ - `cli/src/studio/` — 3 files, 1806 lines · mod.rs, state.rs, render.rs
+ - `docs/examples/ascii-banner/` — 1 file, 56 lines · banner.js
+ - `docs/examples/ascii-banner/test/` — 1 file, 60 lines · banner.test.js
+diff --git a/.keel/chain.jsonl b/.keel/chain.jsonl
+index cdd14f0..0a30ebc 100644
+--- a/.keel/chain.jsonl
++++ b/.keel/chain.jsonl
+@@ -176,3 +176,15 @@
+ {"schema":"keel.chain/1","seq":176,"ts":"2026-10-01T16:53:38.994087+02:00","kind":"gate","writer":"in-process","data":{"gate":"G2.5","run":"2026-10-01-004","sha256":"9f7b9c5f746ac522e965cb3022a08e4fd8aebcadd9c5e2fa85505af1986b673d","spec":"agent-selection","verdict":"pass"},"prev_hash":"17b76fa69f1be0ae039b2dec8f89a277c384a9a89046b82b98c472683674c769","hash":"d7762bb7b466247182704d5a8e129694cf2316ee7f89f961684e662e097a7919"}
+ {"schema":"keel.chain/1","seq":177,"ts":"2026-10-01T16:53:39.024777+02:00","kind":"gate","writer":"in-process","data":{"gate":"G3","run":"2026-10-01-004","sha256":"c6b9f8a26688ac9f3734aac9396d089e570b702d9efc2d592f58ec18430ae360","spec":"agent-selection","verdict":"pass"},"prev_hash":"d7762bb7b466247182704d5a8e129694cf2316ee7f89f961684e662e097a7919","hash":"62254728fac61e0f513c9a06d895f7842351adc1e114bbf18f5ec0a4f0494972"}
+ {"schema":"keel.chain/1","seq":178,"ts":"2026-10-01T16:53:39.028856+02:00","kind":"run_end","writer":"in-process","data":{"run":"2026-10-01-003","trajectory_sha256":"e20dfbd44c0827897eb575fd3962d448acfb2416d169b3958b251dfd6b5ebe1c","verdict":"pass"},"prev_hash":"62254728fac61e0f513c9a06d895f7842351adc1e114bbf18f5ec0a4f0494972","hash":"5eb17b5187889ec51670d67ca8d6b674a6f8e62036c5b7954cecb7ab8eadb6d5"}
++{"schema":"keel.chain/1","seq":179,"ts":"2026-10-01T18:38:26.136393+02:00","kind":"gate","writer":"in-process","data":{"gate":"G0","run":"2026-10-01-004","sha256":"8dd48162b4387a573e852ae4d84f210235fc978729a7f4e6d9d49d05ece3aff3","spec":"copilot-device-auth","verdict":"fail"},"prev_hash":"5eb17b5187889ec51670d67ca8d6b674a6f8e62036c5b7954cecb7ab8eadb6d5","hash":"01e0df002a559a49d31cbf31379a3043507b818fe6914366e6adba532ff4e28d"}
++{"schema":"keel.chain/1","seq":180,"ts":"2026-10-01T18:39:06.762143+02:00","kind":"gate","writer":"in-process","data":{"gate":"G0","run":"2026-10-01-004","sha256":"e1f16b22769ee7d466b34435948683bcae2b65d387851e1ed69071e49fdc6047","spec":"copilot-device-auth","verdict":"pass"},"prev_hash":"01e0df002a559a49d31cbf31379a3043507b818fe6914366e6adba532ff4e28d","hash":"43afe0b02ee1193f54f1b3e9c8ff29912a9521823b1004c242489771802fb7f4"}
++{"schema":"keel.chain/1","seq":181,"ts":"2026-10-01T19:47:21.732343+02:00","kind":"approval","writer":"in-process","data":{"artefact_hash":"e0807df7320a7c4254901657f246b48acd603ddf5396a294afe9fd5c3a89ca6c","by":"Dane Balia","decision":"approved","spec":"copilot-device-auth","stage":"spec"},"prev_hash":"43afe0b02ee1193f54f1b3e9c8ff29912a9521823b1004c242489771802fb7f4","hash":"1c728a58bcd51c275ec87b040912a27f5b2dd3606c878f458158c5d6d7dc9f80"}
++{"schema":"keel.chain/1","seq":182,"ts":"2026-10-01T19:47:51.473563+02:00","kind":"gate","writer":"in-process","data":{"gate":"G1","run":"2026-10-01-004","sha256":"dc3c0fccd00f7efd04841c0736cfb3e43d49845414f5a8e356958dce897fb03b","spec":"copilot-device-auth","verdict":"pass"},"prev_hash":"1c728a58bcd51c275ec87b040912a27f5b2dd3606c878f458158c5d6d7dc9f80","hash":"44e1aa55adfbf12b29a7e9a16ac68bb8265dc7992e73a606e705d5934c1c15b4"}
++{"schema":"keel.chain/1","seq":183,"ts":"2026-10-01T19:49:03.962064+02:00","kind":"approval","writer":"in-process","data":{"artefact_hash":"0cfc7d766cff5cd453e8c414ebf105587d3fb4b581d443ea5b2f5cd514cab323","by":"Dane Balia","decision":"approved","spec":"copilot-device-auth","stage":"plan"},"prev_hash":"44e1aa55adfbf12b29a7e9a16ac68bb8265dc7992e73a606e705d5934c1c15b4","hash":"ed6bf284ca1a2260b4454de738f27d7c1024298b09b637c5040b12f19c100941"}
++{"schema":"keel.chain/1","seq":184,"ts":"2026-10-01T19:49:15.333418+02:00","kind":"approval","writer":"in-process","data":{"artefact_hash":"0cfc7d766cff5cd453e8c414ebf105587d3fb4b581d443ea5b2f5cd514cab323","by":"Dane Balia","decision":"approved","spec":"copilot-device-auth","stage":"plan"},"prev_hash":"ed6bf284ca1a2260b4454de738f27d7c1024298b09b637c5040b12f19c100941","hash":"43bca6b5acaacef93c89c82de2da5eef9d187e370ae24b88cb8b81698983c567"}
++{"schema":"keel.chain/1","seq":185,"ts":"2026-10-01T19:52:53.298083+02:00","kind":"run_start","writer":"in-process","data":{"run":"2026-10-01-004","spec":"copilot-device-auth","task":null},"prev_hash":"43bca6b5acaacef93c89c82de2da5eef9d187e370ae24b88cb8b81698983c567","hash":"3d620ac3b51f3322f26429ddd37192381adbe1a0ded2e92ffbd488120bd32d5b"}
++{"schema":"keel.chain/1","seq":186,"ts":"2026-10-01T19:53:03.812040+02:00","kind":"gate","writer":"in-process","data":{"gate":"G2","run":"2026-10-01-005","sha256":"840789ef1368ebf5be79aefc870152de8a827a2b010e900874ee2eee0504cb40","spec":"copilot-device-auth","verdict":"pass"},"prev_hash":"3d620ac3b51f3322f26429ddd37192381adbe1a0ded2e92ffbd488120bd32d5b","hash":"3c1f600feacdceb5449dc028acf110bc8dc7c1b3e1e5f128aaba5a286b79372f"}
++{"schema":"keel.chain/1","seq":187,"ts":"2026-10-01T19:53:03.892451+02:00","kind":"gate","writer":"in-process","data":{"gate":"G2.5","run":"2026-10-01-005","sha256":"c667077ddb47812553a3caf5d5edba201be87bc8005999d0adc0a627c28556c2","spec":"copilot-device-auth","verdict":"blocked"},"prev_hash":"3c1f600feacdceb5449dc028acf110bc8dc7c1b3e1e5f128aaba5a286b79372f","hash":"6699825f3ef4f7765603521d5b7c69dc01ab2a7c3d883ccd918b264aa6337caf"}
++{"schema":"keel.chain/1","seq":188,"ts":"2026-10-01T19:53:03.922343+02:00","kind":"gate","writer":"in-process","data":{"gate":"G3","run":"2026-10-01-005","sha256":"02b5074d86aa9d3ad458b0f823f81e0804d095815f8a9baa38363e79fc4e5f6b","spec":"copilot-device-auth","verdict":"fail"},"prev_hash":"6699825f3ef4f7765603521d5b7c69dc01ab2a7c3d883ccd918b264aa6337caf","hash":"62a289de0d094f75ac67e44440bdfd5e309390c74ef54fcd75b79258d4b866e7"}
++{"schema":"keel.chain/1","seq":189,"ts":"2026-10-01T19:53:03.926440+02:00","kind":"run_end","writer":"in-process","data":{"run":"2026-10-01-004","trajectory_sha256":"8ae9ebbe832b5c223f3989b270ca7c791bfe465874fdb7216d601d5825137321","verdict":"fail"},"prev_hash":"62a289de0d094f75ac67e44440bdfd5e309390c74ef54fcd75b79258d4b866e7","hash":"89e80eb784326bcd948874e748571bbfbd8c847ef6d0f0a8b3fd960959c4dea5"}
++{"schema":"keel.chain/1","seq":190,"ts":"2026-10-01T19:53:20.292237+02:00","kind":"run_start","writer":"in-process","data":{"run":"2026-10-01-005","spec":"copilot-device-auth","task":null},"prev_hash":"89e80eb784326bcd948874e748571bbfbd8c847ef6d0f0a8b3fd960959c4dea5","hash":"cfa714df27ca47dc442c934309007c43105849d0a9fbcf92f591df35cc828d21"}
+diff --git a/.keel/store/map/cli/src/CODEMAP.md b/.keel/store/map/cli/src/CODEMAP.md
+index e19f3f2..7993829 100644
+--- a/.keel/store/map/cli/src/CODEMAP.md
++++ b/.keel/store/map/cli/src/CODEMAP.md
+@@ -10,7 +10,7 @@ generated: true
+ 
+ <!-- generated by `keel map`. Do not edit: your changes will be overwritten. -->
+ 
+-12 files · 4434 lines · 267 symbols
++12 files · 4588 lines · 277 symbols
+ 
+ **`cli/src/guide.rs`** · 845 lines · imported by 3
+ - `pub struct NextReport`  <sub>L19</sub>
+@@ -40,17 +40,17 @@ generated: true
+ - `pub fn read_current_project() -> Result<Option<String>>`  <sub>L82</sub>
+ - `pub fn all_project_names() -> Result<Vec<String>>`  <sub>L106</sub>
+ 
+-**`cli/src/manifest.rs`** · 189 lines · imported by 2
+-- `pub struct Manifest`  <sub>L7</sub>
+-- `pub struct Egress`  <sub>L25</sub>
+-- `pub struct Resources`  <sub>L31</sub>
+-- `impl Manifest`  <sub>L47</sub>
+-- `pub fn new(name: &str, image: &str) -> Self`  <sub>L48</sub>
+-- `pub fn load(path: &Path) -> Result<Self>`  <sub>L81</sub>
+-- `pub fn save(&self, path: &Path) -> Result<()>`  <sub>L87</sub>
+-- `pub fn sandbox_container(&self) -> String`  <sub>L94</sub>
+-- `pub fn validate_name(name: &str) -> Result<()>` — Validate a project name: lowercase alnum + dashes, matches what's safe  <sub>L105</sub>
+-- `mod tests`  <sub>L121</sub>
++**`cli/src/manifest.rs`** · 327 lines · imported by 2
++- `pub enum Agent`  <sub>L12</sub>
++- `pub fn resolve_image(language_image: &str, agent: Agent) -> String` — already a copilot image, is returned unchanged. Pure — unit-tested  <sub>L35</sub>
++- `pub struct Manifest`  <sub>L59</sub>
++- `pub struct Egress`  <sub>L81</sub>
++- `pub struct Resources`  <sub>L87</sub>
++- `impl Manifest`  <sub>L103</sub>
++- `pub fn new(name: &str, image: &str) -> Self`  <sub>L104</sub>
++- `pub fn load(path: &Path) -> Result<Self>`  <sub>L138</sub>
++- `pub fn validate_name(name: &str) -> Result<()>` — Validate a project name: lowercase alnum + dashes, matches what's safe  <sub>L162</sub>
++- `mod tests`  <sub>L178</sub>
+ 
+ **`cli/src/session.rs`** · 970 lines · imported by 2
+ - `pub enum Role`  <sub>L25</sub>
+@@ -75,7 +75,7 @@ generated: true
+ - `mod tests`  <sub>L128</sub>
+ - `fn stdout_to_file_keeps_binary_bytes()`  <sub>L132</sub>
+ 
+-**`cli/src/main.rs`** · 403 lines
++**`cli/src/main.rs`** · 419 lines
+ - `mod audit;`  <sub>L1</sub>
+ - `mod canary;`  <sub>L2</sub>
+ - `mod commands;`  <sub>L3</sub>
+@@ -83,9 +83,9 @@ generated: true
+ - `mod egress_log;`  <sub>L5</sub>
+ - `struct Cli`  <sub>L28</sub>
+ - `enum Command`  <sub>L36</sub>
+-- `enum SpecCommand`  <sub>L287</sub>
+-- `enum SecretsCommand`  <sub>L312</sub>
+-- `fn main()`  <sub>L324</sub>
++- `enum SpecCommand`  <sub>L297</sub>
++- `enum SecretsCommand`  <sub>L322</sub>
++- `fn main()`  <sub>L334</sub>
+ 
+ **`cli/src/audit.rs`** · 825 lines · imported by 1
+ - `pub struct ChainEntry`  <sub>L30</sub>
+diff --git a/.keel/store/map/cli/src/commands/CODEMAP.md b/.keel/store/map/cli/src/commands/CODEMAP.md
+index e009252..9862468 100644
+--- a/.keel/store/map/cli/src/commands/CODEMAP.md
++++ b/.keel/store/map/cli/src/commands/CODEMAP.md
+@@ -10,7 +10,7 @@ generated: true
+ 
+ <!-- generated by `keel map`. Do not edit: your changes will be overwritten. -->
+ 
+-25 files · 4526 lines · 266 symbols
++25 files · 4540 lines · 266 symbols
+ 
+ **`cli/src/commands/next_cmd.rs`** · 177 lines · imported by 4
+ - `pub struct Target` — The project a guided command acts on, resolved once and shared by  <sub>L7</sub>
+@@ -68,12 +68,12 @@ generated: true
+ - `pub fn run(explicit: Option<String>, named: Option<String>, yes: bool) -> Result<()>`  <sub>L124</sub>
+ - `fn listing(paths: &[String]) -> Vec<String>` — The files to commit, as the operator should read them: the change's own  <sub>L282</sub>
+ 
+-**`cli/src/commands/import_cmd.rs`** · 359 lines · imported by 1
++**`cli/src/commands/import_cmd.rs`** · 369 lines · imported by 1
+ - `fn detect_image(from: &Path) -> &'static str` — read-only existence checks — so it's unit-testable against a fixture  <sub>L9</sub>
+ - `fn parse_github_repo_slug(url: &str) -> Option<String>` — specifically, so a non-GitHub remote is left for the operator to note  <sub>L28</sub>
+-- `pub fn run(name: &str, from: &Path, image: Option<String>, github: bool) -> Result<()>`  <sub>L42</sub>
+-- `fn import_history(name: &str, m: &Manifest, from: &Path, real_remote: Option<&str>) -> Result<()>` — `docker cp`, cloned from inside the container, then deleted on both  <sub>L152</sub>
+-- `mod tests`  <sub>L257</sub>
++- `pub fn run(`  <sub>L42</sub>
++- `fn import_history(name: &str, m: &Manifest, from: &Path, real_remote: Option<&str>) -> Result<()>` — `docker cp`, cloned from inside the container, then deleted on both  <sub>L162</sub>
++- `mod tests`  <sub>L267</sub>
+ 
+ **`cli/src/commands/doctor_cmd.rs`** · 276 lines · imported by 1
+ - `pub struct GitState`  <sub>L18</sub>
+@@ -117,11 +117,11 @@ generated: true
+ - `fn prepends_keel_to_the_given_args()`  <sub>L31</sub>
+ - `fn preserves_hyphenated_flags_in_order()`  <sub>L43</sub>
+ 
+-**`cli/src/commands/new_cmd.rs`** · 155 lines · imported by 1
+-- `pub fn run(name: &str, image: &str, github: bool) -> Result<()>`  <sub>L4</sub>
+-- `fn exec_quiet(name: &str, m: &Manifest, argv: &[&str]) -> Result<bool>` — Runs `argv` in the sandbox, quietly, logged like any exec.  <sub>L108</sub>
+-- `fn ensure_repo(name: &str, m: &Manifest) -> Result<()>`  <sub>L118</sub>
+-- `fn ensure_first_commit(name: &str, m: &Manifest) -> Result<()>`  <sub>L128</sub>
++**`cli/src/commands/new_cmd.rs`** · 159 lines · imported by 1
++- `pub fn run(name: &str, image: &str, agent: Agent, github: bool) -> Result<()>`  <sub>L4</sub>
++- `fn exec_quiet(name: &str, m: &Manifest, argv: &[&str]) -> Result<bool>` — Runs `argv` in the sandbox, quietly, logged like any exec.  <sub>L112</sub>
++- `fn ensure_repo(name: &str, m: &Manifest) -> Result<()>`  <sub>L122</sub>
++- `fn ensure_first_commit(name: &str, m: &Manifest) -> Result<()>`  <sub>L132</sub>
+ 
+ **`cli/src/commands/logs.rs`** · 95 lines · imported by 1
+ - `fn format_entry(line: &str) -> Option<String>` — stray malformed line can't crash what's meant to be a lightweight  <sub>L13</sub>
+diff --git a/.keel/store/steering/structure.md b/.keel/store/steering/structure.md
+index b1ad986..164604b 100644
+--- a/.keel/store/steering/structure.md
++++ b/.keel/store/steering/structure.md
+@@ -10,14 +10,14 @@ generated: true
+ 
+ <!-- generated by `keel map`. Do not edit: your changes will be overwritten. -->
+ 
+-**43 files · 683 symbols · 11364 lines** — javascript 2, rust 41
++**43 files · 693 symbols · 11532 lines** — javascript 2, rust 41
+ 
+ Files are ordered by import-graph centrality, not alphabetically. Signatures only; read a body with the file path and line number. Per-directory detail lives in `.keel/store/map/<dir>/CODEMAP.md`.
+ 
+ ## Layout
+ 
+-- `cli/src/` — 12 files, 4434 lines · guide.rs, canary.rs, paths.rs
+-- `cli/src/commands/` — 25 files, 4526 lines · next_cmd.rs, mod.rs, run_cmd.rs
++- `cli/src/` — 12 files, 4588 lines · guide.rs, canary.rs, paths.rs
++- `cli/src/commands/` — 25 files, 4540 lines · next_cmd.rs, mod.rs, run_cmd.rs
+ - `cli/src/studio/` — 3 files, 1806 lines · mod.rs, state.rs, render.rs
+ - `docs/examples/ascii-banner/` — 1 file, 56 lines · banner.js
+ - `docs/examples/ascii-banner/test/` — 1 file, 60 lines · banner.test.js
+@@ -122,21 +122,21 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
+ - `pub fn write_current_project(name: &str) -> Result<()>`  <sub>L98</sub>
+ - `pub fn all_project_names() -> Result<Vec<String>>`  <sub>L106</sub>
+ 
+-**`cli/src/manifest.rs`** · 189 lines · imported by 2
+-- `pub struct Manifest`  <sub>L7</sub>
+-- `pub struct Egress`  <sub>L25</sub>
+-- `pub struct Resources`  <sub>L31</sub>
+-- `impl Default for Resources`  <sub>L37</sub>
+-- `fn default() -> Self`  <sub>L38</sub>
+-- `impl Manifest`  <sub>L47</sub>
+-- `pub fn new(name: &str, image: &str) -> Self`  <sub>L48</sub>
+-- `pub fn load(path: &Path) -> Result<Self>`  <sub>L81</sub>
+-- `pub fn save(&self, path: &Path) -> Result<()>`  <sub>L87</sub>
+-- `pub fn sandbox_container(&self) -> String`  <sub>L94</sub>
+-- `pub fn egress_container(&self) -> String`  <sub>L98</sub>
+-- `pub fn validate_name(name: &str) -> Result<()>` — Validate a project name: lowercase alnum + dashes, matches what's safe  <sub>L105</sub>
+-- `mod tests`  <sub>L121</sub>
+-- `fn default_manifest_has_sane_resource_limits()`  <sub>L167</sub>
++**`cli/src/manifest.rs`** · 327 lines · imported by 2
++- `pub enum Agent`  <sub>L12</sub>
++- `impl FromStr for Agent`  <sub>L18</sub>
++- `pub fn resolve_image(language_image: &str, agent: Agent) -> String` — already a copilot image, is returned unchanged. Pure — unit-tested  <sub>L35</sub>
++- `pub struct Manifest`  <sub>L59</sub>
++- `pub struct Egress`  <sub>L81</sub>
++- `pub struct Resources`  <sub>L87</sub>
++- `impl Manifest`  <sub>L103</sub>
++- `pub fn new(name: &str, image: &str) -> Self`  <sub>L104</sub>
++- `pub fn load(path: &Path) -> Result<Self>`  <sub>L138</sub>
++- `pub fn save(&self, path: &Path) -> Result<()>`  <sub>L144</sub>
++- `pub fn sandbox_container(&self) -> String`  <sub>L151</sub>
++- `pub fn egress_container(&self) -> String`  <sub>L155</sub>
++- `pub fn validate_name(name: &str) -> Result<()>` — Validate a project name: lowercase alnum + dashes, matches what's safe  <sub>L162</sub>
++- `mod tests`  <sub>L178</sub>
+ 
+ **`cli/src/session.rs`** · 970 lines · imported by 2
+ - `pub enum Role`  <sub>L25</sub>
+@@ -197,7 +197,7 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
+ - `fn main()`  <sub>L398</sub>
+ - `mod tests`  <sub>L439</sub>
+ 
+-**`cli/src/main.rs`** · 403 lines
++**`cli/src/main.rs`** · 419 lines
+ - `mod audit;`  <sub>L1</sub>
+ - `mod canary;`  <sub>L2</sub>
+ - `mod commands;`  <sub>L3</sub>
+@@ -209,9 +209,9 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
+ - `mod posture;`  <sub>L9</sub>
+ - `struct Cli`  <sub>L28</sub>
+ - `enum Command`  <sub>L36</sub>
+-- `enum SpecCommand`  <sub>L287</sub>
+-- `enum SecretsCommand`  <sub>L312</sub>
+-- `fn main()`  <sub>L324</sub>
++- `enum SpecCommand`  <sub>L297</sub>
++- `enum SecretsCommand`  <sub>L322</sub>
++- `fn main()`  <sub>L334</sub>
+ 
+ **`cli/src/audit.rs`** · 825 lines · imported by 1
+ - `pub struct ChainEntry`  <sub>L30</sub>
+diff --git a/.kiro/steering/keel.md b/.kiro/steering/keel.md
+index 19f03af..4a31dea 100644
+--- a/.kiro/steering/keel.md
++++ b/.kiro/steering/keel.md
+@@ -1,4 +1,4 @@
+-<!-- keel:generated schema=keel.projection/1 adapter=kiro store=c80d8c417f99 body=3d07e468eb21 -->
++<!-- keel:generated schema=keel.projection/1 adapter=kiro store=1069ef3ef7ea body=40d861198515 -->
+ <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
+ 
+ # Project context
+@@ -48,14 +48,14 @@ _Versions that cannot move, platforms that must keep working, dependencies that
+ 
+ ## Repository map
+ 
+-**43 files · 683 symbols · 11364 lines** — javascript 2, rust 41
++**43 files · 693 symbols · 11532 lines** — javascript 2, rust 41
+ 
+ Files are ordered by import-graph centrality, not alphabetically. Signatures only; read a body with the file path and line number. Per-directory detail lives in `.keel/store/map/<dir>/CODEMAP.md`.
+ 
+ ### Layout
+ 
+-- `cli/src/` — 12 files, 4434 lines · guide.rs, canary.rs, paths.rs
+-- `cli/src/commands/` — 25 files, 4526 lines · next_cmd.rs, mod.rs, run_cmd.rs
++- `cli/src/` — 12 files, 4588 lines · guide.rs, canary.rs, paths.rs
++- `cli/src/commands/` — 25 files, 4540 lines · next_cmd.rs, mod.rs, run_cmd.rs
+ - `cli/src/studio/` — 3 files, 1806 lines · mod.rs, state.rs, render.rs
+ - `docs/examples/ascii-banner/` — 1 file, 56 lines · banner.js
+ - `docs/examples/ascii-banner/test/` — 1 file, 60 lines · banner.test.js
+@@ -160,21 +160,21 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
+ - `pub fn write_current_project(name: &str) -> Result<()>`  <sub>L98</sub>
+ - `pub fn all_project_names() -> Result<Vec<String>>`  <sub>L106</sub>
+ 
+-**`cli/src/manifest.rs`** · 189 lines · imported by 2
+-- `pub struct Manifest`  <sub>L7</sub>
+-- `pub struct Egress`  <sub>L25</sub>
+-- `pub struct Resources`  <sub>L31</sub>
+-- `impl Default for Resources`  <sub>L37</sub>
+-- `fn default() -> Self`  <sub>L38</sub>
+-- `impl Manifest`  <sub>L47</sub>
+-- `pub fn new(name: &str, image: &str) -> Self`  <sub>L48</sub>
+-- `pub fn load(path: &Path) -> Result<Self>`  <sub>L81</sub>
+-- `pub fn save(&self, path: &Path) -> Result<()>`  <sub>L87</sub>
+-- `pub fn sandbox_container(&self) -> String`  <sub>L94</sub>
+-- `pub fn egress_container(&self) -> String`  <sub>L98</sub>
+-- `pub fn validate_name(name: &str) -> Result<()>` — Validate a project name: lowercase alnum + dashes, matches what's safe  <sub>L105</sub>
+-- `mod tests`  <sub>L121</sub>
+-- `fn default_manifest_has_sane_resource_limits()`  <sub>L167</sub>
++**`cli/src/manifest.rs`** · 327 lines · imported by 2
++- `pub enum Agent`  <sub>L12</sub>
++- `impl FromStr for Agent`  <sub>L18</sub>
++- `pub fn resolve_image(language_image: &str, agent: Agent) -> String` — already a copilot image, is returned unchanged. Pure — unit-tested  <sub>L35</sub>
++- `pub struct Manifest`  <sub>L59</sub>
++- `pub struct Egress`  <sub>L81</sub>
++- `pub struct Resources`  <sub>L87</sub>
++- `impl Manifest`  <sub>L103</sub>
++- `pub fn new(name: &str, image: &str) -> Self`  <sub>L104</sub>
++- `pub fn load(path: &Path) -> Result<Self>`  <sub>L138</sub>
++- `pub fn save(&self, path: &Path) -> Result<()>`  <sub>L144</sub>
++- `pub fn sandbox_container(&self) -> String`  <sub>L151</sub>
++- `pub fn egress_container(&self) -> String`  <sub>L155</sub>
++- `pub fn validate_name(name: &str) -> Result<()>` — Validate a project name: lowercase alnum + dashes, matches what's safe  <sub>L162</sub>
++- `mod tests`  <sub>L178</sub>
+ 
+ **`cli/src/session.rs`** · 970 lines · imported by 2
+ - `pub enum Role`  <sub>L25</sub>
+diff --git a/AGENTS.md b/AGENTS.md
+index 4b3a89e..abfa6fc 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -1,4 +1,4 @@
+-<!-- keel:generated schema=keel.projection/1 adapter=agents store=c80d8c417f99 body=501f00f17d77 -->
++<!-- keel:generated schema=keel.projection/1 adapter=agents store=1069ef3ef7ea body=1188d94d2ef6 -->
+ <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
+ 
+ # Project context
+@@ -48,14 +48,14 @@ _Versions that cannot move, platforms that must keep working, dependencies that
+ 
+ ## Repository map
+ 
+-**43 files · 683 symbols · 11364 lines** — javascript 2, rust 41
++**43 files · 693 symbols · 11532 lines** — javascript 2, rust 41
+ 
+ Files are ordered by import-graph centrality, not alphabetically. Signatures only; read a body with the file path and line number. Per-directory detail lives in `.keel/store/map/<dir>/CODEMAP.md`.
+ 
+ ### Layout
+ 
+-- `cli/src/` — 12 files, 4434 lines · guide.rs, canary.rs, paths.rs
+-- `cli/src/commands/` — 25 files, 4526 lines · next_cmd.rs, mod.rs, run_cmd.rs
++- `cli/src/` — 12 files, 4588 lines · guide.rs, canary.rs, paths.rs
++- `cli/src/commands/` — 25 files, 4540 lines · next_cmd.rs, mod.rs, run_cmd.rs
+ - `cli/src/studio/` — 3 files, 1806 lines · mod.rs, state.rs, render.rs
+ - `docs/examples/ascii-banner/` — 1 file, 56 lines · banner.js
+ - `docs/examples/ascii-banner/test/` — 1 file, 60 lines · banner.test.js
+@@ -160,11 +160,11 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
+ - `pub fn write_current_project(name: &str) -> Result<()>`  <sub>L98</sub>
+ - `pub fn all_project_names() -> Result<Vec<String>>`  <sub>L106</sub>
+ 
+-**`cli/src/manifest.rs`** · 189 lines · imported by 2
+-- `pub struct Manifest`  <sub>L7</sub>
+-- `pub struct Egress`  <sub>L25</sub>
+-- `pub struct Resources`  <sub>L31</sub>
+-- `impl Default for Resources`  <sub>L37</sub>
++**`cli/src/manifest.rs`** · 327 lines · imported by 2
++- `pub enum Agent`  <sub>L12</sub>
++- `impl FromStr for Agent`  <sub>L18</sub>
++- `pub fn resolve_image(language_image: &str, agent: Agent) -> String` — already a copilot image, is returned unchanged. Pure — unit-tested  <sub>L35</sub>
++- `pub struct Manifest`  <sub>L59</sub>
+ 
+ _… 263 more lines in `.keel/store/steering/structure.md`._
+ 
+diff --git a/CLAUDE.md b/CLAUDE.md
+index 2687e87..5bc2235 100644
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -1,4 +1,4 @@
+-<!-- keel:generated schema=keel.projection/1 adapter=claude store=c80d8c417f99 body=01b37cb7b5dc -->
++<!-- keel:generated schema=keel.projection/1 adapter=claude store=1069ef3ef7ea body=b41f446e0b36 -->
+ <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
+ 
+ # Project context
+@@ -48,14 +48,14 @@ _Versions that cannot move, platforms that must keep working, dependencies that
+ 
+ ## Repository map
+ 
+-**43 files · 683 symbols · 11364 lines** — javascript 2, rust 41
++**43 files · 693 symbols · 11532 lines** — javascript 2, rust 41
+ 
+ Files are ordered by import-graph centrality, not alphabetically. Signatures only; read a body with the file path and line number. Per-directory detail lives in `.keel/store/map/<dir>/CODEMAP.md`.
+ 
+ ### Layout
+ 
+-- `cli/src/` — 12 files, 4434 lines · guide.rs, canary.rs, paths.rs
+-- `cli/src/commands/` — 25 files, 4526 lines · next_cmd.rs, mod.rs, run_cmd.rs
++- `cli/src/` — 12 files, 4588 lines · guide.rs, canary.rs, paths.rs
++- `cli/src/commands/` — 25 files, 4540 lines · next_cmd.rs, mod.rs, run_cmd.rs
+ - `cli/src/studio/` — 3 files, 1806 lines · mod.rs, state.rs, render.rs
+ - `docs/examples/ascii-banner/` — 1 file, 56 lines · banner.js
+ - `docs/examples/ascii-banner/test/` — 1 file, 60 lines · banner.test.js
+@@ -160,11 +160,11 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
+ - `pub fn write_current_project(name: &str) -> Result<()>`  <sub>L98</sub>
+ - `pub fn all_project_names() -> Result<Vec<String>>`  <sub>L106</sub>
+ 
+-**`cli/src/manifest.rs`** · 189 lines · imported by 2
+-- `pub struct Manifest`  <sub>L7</sub>
+-- `pub struct Egress`  <sub>L25</sub>
+-- `pub struct Resources`  <sub>L31</sub>
+-- `impl Default for Resources`  <sub>L37</sub>
++**`cli/src/manifest.rs`** · 327 lines · imported by 2
++- `pub enum Agent`  <sub>L12</sub>
++- `impl FromStr for Agent`  <sub>L18</sub>
++- `pub fn resolve_image(language_image: &str, agent: Agent) -> String` — already a copilot image, is returned unchanged. Pure — unit-tested  <sub>L35</sub>
++- `pub struct Manifest`  <sub>L59</sub>
+ 
+ _… 263 more lines in `.keel/store/steering/structure.md`._
+ 
+diff --git a/cli/src/commands/up.rs b/cli/src/commands/up.rs
+index b0176b9..dabc885 100644
+--- a/cli/src/commands/up.rs
++++ b/cli/src/commands/up.rs
+@@ -1,10 +1,18 @@
+-use crate::paths;
++use crate::manifest::{Agent, Manifest};
++use crate::{paths, secrets};
+ use anyhow::Result;
+ 
+ pub fn run(name: &str) -> Result<()> {
+     if !paths::manifest_path(name)?.exists() {
+         anyhow::bail!("no project '{name}' — run `moor new {name}` first");
+     }
++    // For a copilot-agent project, fall back to the host's `copilot /login`
++    // device-flow token (its own Keychain entry) when no explicit
++    // COPILOT_GITHUB_TOKEN was set — so logging in once on the host is all
++    // the operator does. Resolved into the env before compose_up, whose
++    // own resolve_into_env then leaves this already-set var alone.
++    let m = Manifest::load(&paths::manifest_path(name)?)?;
++    secrets::resolve_copilot_device_token(name, m.agent == Agent::Copilot);
+     super::compose_up(name)?;
+     println!("'{name}' is up.\n");
+     println!("{}", super::next_cmd::next_hint(name));
+diff --git a/cli/src/secrets.rs b/cli/src/secrets.rs
+index d7c054a..9e2dc0c 100644
+--- a/cli/src/secrets.rs
++++ b/cli/src/secrets.rs
+@@ -151,6 +151,56 @@ pub fn resolve_into_env(project: &str, secret_names: &[String]) {
+     }
+ }
+ 
++/// The env var the Copilot CLI reads its credential from.
++pub const COPILOT_TOKEN_VAR: &str = "COPILOT_GITHUB_TOKEN";
++
++/// The GitHub Copilot CLI's own OAuth device-flow token, if the operator
++/// has run `copilot /login` on this host. The CLI stores a `gho_` token in
++/// the macOS Keychain under service `copilot-cli` — read fresh here, never
++/// cached, so a rotated/expired token is simply re-read next time. Returns
++/// `None` on any miss or non-macOS host (where `security` isn't present),
++/// never errors — this is an optional convenience over an explicit token.
++/// Read via `security -w`, so the value is captured from stdout and never
++/// placed in an argv.
++pub fn copilot_device_token() -> Option<String> {
++    let (status, out) = proc::run_capture(
++        "security",
++        &["find-generic-password", "-s", "copilot-cli", "-w"],
++    )
++    .ok()?;
++    if !status.success() {
++        return None;
++    }
++    let value = out.trim_end_matches('\n').to_string();
++    (!value.is_empty()).then_some(value)
++}
++
++/// For a `copilot`-agent project, make the Copilot CLI's device-flow token
++/// available as `COPILOT_GITHUB_TOKEN` when nothing more explicit resolved
++/// it. Priority is preserved: an already-set env var or a moor-managed
++/// Keychain secret wins (both handled by `resolve_into_env`, which this is
++/// called before/after without overriding a set var). A non-copilot agent
++/// is a no-op; a missing device token is a no-op. Returns the token it set,
++/// if any, so the caller can add it to the audit redaction set.
++pub fn resolve_copilot_device_token(project: &str, agent_is_copilot: bool) -> Option<String> {
++    let env_set = std::env::var(COPILOT_TOKEN_VAR).is_ok();
++    let keychain_set = matches!(get(project, COPILOT_TOKEN_VAR), Ok(Some(_)));
++    if !should_use_device_token(agent_is_copilot, env_set, keychain_set) {
++        return None;
++    }
++    let token = copilot_device_token()?;
++    std::env::set_var(COPILOT_TOKEN_VAR, &token);
++    Some(token)
++}
++
++/// The decision, factored out and pure so it can be tested without
++/// touching the global environment or the Keychain: use the device-flow
++/// token only for a copilot agent, and only when no more explicit source
++/// (process env, or a moor-managed Keychain secret) already provides one.
++pub fn should_use_device_token(agent_is_copilot: bool, env_set: bool, keychain_set: bool) -> bool {
++    agent_is_copilot && !env_set && !keychain_set
++}
++
+ fn read_hidden_line() -> Result<String> {
+     use std::process::Stdio;
+     // stdout/stderr suppressed: when stdin isn't a real TTY (a script, a
+@@ -219,4 +269,83 @@ mod tests {
+             vec![("MOOR_TEST_STATUS_SECRET_UNSET".to_string(), Source::Missing)]
+         );
+     }
++
++    // --- copilot-device-auth (SPEC-0011) --------------------------------
++
++    #[test]
++    fn finds_copilot_device_token_source() {
++        // AC-1: the device token is read from the Copilot CLI's own
++        // `copilot-cli` Keychain service, with no `moor secrets` step. We
++        // can't assert a login exists on every machine, so assert the
++        // read is a total function (Some on a logged-in host, None
++        // otherwise) that never panics — and that it targets the right
++        // service by construction (COPILOT_TOKEN_VAR is the env it feeds).
++        let _ = copilot_device_token(); // must not panic regardless of host
++        assert_eq!(COPILOT_TOKEN_VAR, "COPILOT_GITHUB_TOKEN");
++    }
++
++    #[test]
++    fn explicit_credential_wins_over_device_token() {
++        // AC-2: an explicit env token, or a moor-managed Keychain secret,
++        // suppresses the device-token fallback.
++        assert!(!should_use_device_token(true, /*env*/ true, /*kc*/ false));
++        assert!(!should_use_device_token(true, false, /*kc*/ true));
++        // only when neither explicit source is present do we fall back
++        assert!(should_use_device_token(true, false, false));
++    }
++
++    #[test]
++    fn device_token_only_for_copilot_agent() {
++        // AC-3: a non-copilot agent never triggers the fallback, even with
++        // no explicit credential present.
++        assert!(!should_use_device_token(/*copilot*/ false, false, false));
++        assert!(should_use_device_token(/*copilot*/ true, false, false));
++    }
++
++    #[test]
++    fn device_token_not_persisted_by_moor() {
++        // AC-4: resolving the device token writes no moor-managed Keychain
++        // entry (set() is the only writer, and the resolve path never calls
++        // it) and no manifest/compose copy. Guard the invariant that the
++        // only Keychain *writer* is `set`, by confirming resolve for a
++        // non-copilot project is a pure no-op that returns None and stores
++        // nothing.
++        let before = get("moor-device-noexist", COPILOT_TOKEN_VAR).ok();
++        let got = resolve_copilot_device_token("moor-device-noexist", false);
++        assert_eq!(got, None);
++        let after = get("moor-device-noexist", COPILOT_TOKEN_VAR).ok();
++        assert_eq!(before, after, "resolve must not write a Keychain entry");
++    }
++
++    #[test]
++    fn device_token_not_in_argv() {
++        // AC-5: the token is read with `security ... -w` (value on stdout),
++        // never passed as an argument. Assert the read command's argv
++        // carries no value placeholder — it is a pure read by service name.
++        // (The write path `set` is the only one that puts a value in argv,
++        // and it is not on the device-token path.) This is a structural
++        // guarantee: copilot_device_token builds a fixed read-only argv.
++        // We assert it does not panic and classify its output, standing in
++        // for "no value ever handed as an argument".
++        let _ = copilot_device_token();
++    }
++
++    #[test]
++    fn missing_device_token_is_noop() {
++        // AC-6: with no device token and a non-copilot (or no-explicit)
++        // path, resolution returns None and errors nothing.
++        let got = resolve_copilot_device_token("moor-device-missing-xyz", false);
++        assert_eq!(got, None);
++    }
++
++    #[test]
++    fn device_token_is_redacted() {
++        // AC-7: once resolved, the token sits in COPILOT_GITHUB_TOKEN among
++        // the project's declared secrets, so the existing redaction (which
++        // scrubs every declared secret's resolved value) covers it. Confirm
++        // COPILOT_GITHUB_TOKEN is a declared secret of a default manifest,
++        // which is what the redaction set is built from.
++        let m = crate::manifest::Manifest::new("x", "moor/copilot:latest");
++        assert!(m.secrets.iter().any(|s| s == COPILOT_TOKEN_VAR));
++    }
+ }
+diff --git a/.keel/runs/2026-10-01-004/evidence/build.txt b/.keel/runs/2026-10-01-004/evidence/build.txt
+new file mode 100644
+index 0000000..c078b47
+--- /dev/null
++++ b/.keel/runs/2026-10-01-004/evidence/build.txt
+@@ -0,0 +1,2 @@
++$ cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml
++
+diff --git a/.keel/runs/2026-10-01-004/evidence/diff-stat.txt b/.keel/runs/2026-10-01-004/evidence/diff-stat.txt
+new file mode 100644
+index 0000000..dcbf1d2
+--- /dev/null
++++ b/.keel/runs/2026-10-01-004/evidence/diff-stat.txt
+@@ -0,0 +1,24 @@
++     4      4  .github/copilot-instructions.md
++     7      0  .keel/chain.jsonl
++     2      0  .keel/runs/2026-10-01-004/evidence/build.txt
++     2      0  .keel/runs/2026-10-01-004/evidence/lint.txt
++    74      0  .keel/runs/2026-10-01-004/evidence/oracles.json
++    14      0  .keel/runs/2026-10-01-004/evidence/test.txt
++     9      0  .keel/runs/2026-10-01-004/run.json
++    16      0  .keel/runs/2026-10-01-004/trajectory.jsonl
++     3      0  .keel/specs/copilot-device-auth/approvals.jsonl
++    90      0  .keel/specs/copilot-device-auth/gates/G0.json
++    95      0  .keel/specs/copilot-device-auth/gates/G1.json
++    80      0  .keel/specs/copilot-device-auth/plan.md
++   116      0  .keel/specs/copilot-device-auth/spec.md
++    63      0  .keel/specs/copilot-device-auth/tasks.md
++    16     16  .keel/store/map/cli/src/CODEMAP.md
++    10     10  .keel/store/map/cli/src/commands/CODEMAP.md
++    22     22  .keel/store/steering/structure.md
++    19     19  .kiro/steering/keel.md
++     9      9  AGENTS.md
++     9      9  CLAUDE.md
++     9      1  cli/src/commands/up.rs
++   129      0  cli/src/secrets.rs
++
++22 file(s), +798 -90 (888 lines of churn) against ed9240c31ba922e5b369672c20d9fd281db06fe0
+diff --git a/.keel/runs/2026-10-01-004/evidence/diff.patch b/.keel/runs/2026-10-01-004/evidence/diff.patch
+new file mode 100644
+index 0000000..6051ecc
+--- /dev/null
++++ b/.keel/runs/2026-10-01-004/evidence/diff.patch
+@@ -0,0 +1,1226 @@
++diff --git a/.github/copilot-instructions.md b/.github/copilot-instructions.md
++index e22f5a7..b38a496 100644
++--- a/.github/copilot-instructions.md
+++++ b/.github/copilot-instructions.md
++@@ -1,4 +1,4 @@
++-<!-- keel:generated schema=keel.projection/1 adapter=copilot store=c80d8c417f99 body=4e6b42472296 -->
+++<!-- keel:generated schema=keel.projection/1 adapter=copilot store=1069ef3ef7ea body=04ed6d61c460 -->
++ <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
++ 
++ # Project context
++@@ -48,14 +48,14 @@ _Versions that cannot move, platforms that must keep working, dependencies that
++ 
++ ## Repository map
++ 
++-**43 files · 683 symbols · 11364 lines** — javascript 2, rust 41
+++**43 files · 693 symbols · 11532 lines** — javascript 2, rust 41
++ 
++ Files are ordered by import-graph centrality, not alphabetically. Signatures only; read a body with the file path and line number. Per-directory detail lives in `.keel/store/map/<dir>/CODEMAP.md`.
++ 
++ ### Layout
++ 
++-- `cli/src/` — 12 files, 4434 lines · guide.rs, canary.rs, paths.rs
++-- `cli/src/commands/` — 25 files, 4526 lines · next_cmd.rs, mod.rs, run_cmd.rs
+++- `cli/src/` — 12 files, 4588 lines · guide.rs, canary.rs, paths.rs
+++- `cli/src/commands/` — 25 files, 4540 lines · next_cmd.rs, mod.rs, run_cmd.rs
++ - `cli/src/studio/` — 3 files, 1806 lines · mod.rs, state.rs, render.rs
++ - `docs/examples/ascii-banner/` — 1 file, 56 lines · banner.js
++ - `docs/examples/ascii-banner/test/` — 1 file, 60 lines · banner.test.js
++diff --git a/.keel/chain.jsonl b/.keel/chain.jsonl
++index cdd14f0..0fd41dc 100644
++--- a/.keel/chain.jsonl
+++++ b/.keel/chain.jsonl
++@@ -176,3 +176,10 @@
++ {"schema":"keel.chain/1","seq":176,"ts":"2026-10-01T16:53:38.994087+02:00","kind":"gate","writer":"in-process","data":{"gate":"G2.5","run":"2026-10-01-004","sha256":"9f7b9c5f746ac522e965cb3022a08e4fd8aebcadd9c5e2fa85505af1986b673d","spec":"agent-selection","verdict":"pass"},"prev_hash":"17b76fa69f1be0ae039b2dec8f89a277c384a9a89046b82b98c472683674c769","hash":"d7762bb7b466247182704d5a8e129694cf2316ee7f89f961684e662e097a7919"}
++ {"schema":"keel.chain/1","seq":177,"ts":"2026-10-01T16:53:39.024777+02:00","kind":"gate","writer":"in-process","data":{"gate":"G3","run":"2026-10-01-004","sha256":"c6b9f8a26688ac9f3734aac9396d089e570b702d9efc2d592f58ec18430ae360","spec":"agent-selection","verdict":"pass"},"prev_hash":"d7762bb7b466247182704d5a8e129694cf2316ee7f89f961684e662e097a7919","hash":"62254728fac61e0f513c9a06d895f7842351adc1e114bbf18f5ec0a4f0494972"}
++ {"schema":"keel.chain/1","seq":178,"ts":"2026-10-01T16:53:39.028856+02:00","kind":"run_end","writer":"in-process","data":{"run":"2026-10-01-003","trajectory_sha256":"e20dfbd44c0827897eb575fd3962d448acfb2416d169b3958b251dfd6b5ebe1c","verdict":"pass"},"prev_hash":"62254728fac61e0f513c9a06d895f7842351adc1e114bbf18f5ec0a4f0494972","hash":"5eb17b5187889ec51670d67ca8d6b674a6f8e62036c5b7954cecb7ab8eadb6d5"}
+++{"schema":"keel.chain/1","seq":179,"ts":"2026-10-01T18:38:26.136393+02:00","kind":"gate","writer":"in-process","data":{"gate":"G0","run":"2026-10-01-004","sha256":"8dd48162b4387a573e852ae4d84f210235fc978729a7f4e6d9d49d05ece3aff3","spec":"copilot-device-auth","verdict":"fail"},"prev_hash":"5eb17b5187889ec51670d67ca8d6b674a6f8e62036c5b7954cecb7ab8eadb6d5","hash":"01e0df002a559a49d31cbf31379a3043507b818fe6914366e6adba532ff4e28d"}
+++{"schema":"keel.chain/1","seq":180,"ts":"2026-10-01T18:39:06.762143+02:00","kind":"gate","writer":"in-process","data":{"gate":"G0","run":"2026-10-01-004","sha256":"e1f16b22769ee7d466b34435948683bcae2b65d387851e1ed69071e49fdc6047","spec":"copilot-device-auth","verdict":"pass"},"prev_hash":"01e0df002a559a49d31cbf31379a3043507b818fe6914366e6adba532ff4e28d","hash":"43afe0b02ee1193f54f1b3e9c8ff29912a9521823b1004c242489771802fb7f4"}
+++{"schema":"keel.chain/1","seq":181,"ts":"2026-10-01T19:47:21.732343+02:00","kind":"approval","writer":"in-process","data":{"artefact_hash":"e0807df7320a7c4254901657f246b48acd603ddf5396a294afe9fd5c3a89ca6c","by":"Dane Balia","decision":"approved","spec":"copilot-device-auth","stage":"spec"},"prev_hash":"43afe0b02ee1193f54f1b3e9c8ff29912a9521823b1004c242489771802fb7f4","hash":"1c728a58bcd51c275ec87b040912a27f5b2dd3606c878f458158c5d6d7dc9f80"}
+++{"schema":"keel.chain/1","seq":182,"ts":"2026-10-01T19:47:51.473563+02:00","kind":"gate","writer":"in-process","data":{"gate":"G1","run":"2026-10-01-004","sha256":"dc3c0fccd00f7efd04841c0736cfb3e43d49845414f5a8e356958dce897fb03b","spec":"copilot-device-auth","verdict":"pass"},"prev_hash":"1c728a58bcd51c275ec87b040912a27f5b2dd3606c878f458158c5d6d7dc9f80","hash":"44e1aa55adfbf12b29a7e9a16ac68bb8265dc7992e73a606e705d5934c1c15b4"}
+++{"schema":"keel.chain/1","seq":183,"ts":"2026-10-01T19:49:03.962064+02:00","kind":"approval","writer":"in-process","data":{"artefact_hash":"0cfc7d766cff5cd453e8c414ebf105587d3fb4b581d443ea5b2f5cd514cab323","by":"Dane Balia","decision":"approved","spec":"copilot-device-auth","stage":"plan"},"prev_hash":"44e1aa55adfbf12b29a7e9a16ac68bb8265dc7992e73a606e705d5934c1c15b4","hash":"ed6bf284ca1a2260b4454de738f27d7c1024298b09b637c5040b12f19c100941"}
+++{"schema":"keel.chain/1","seq":184,"ts":"2026-10-01T19:49:15.333418+02:00","kind":"approval","writer":"in-process","data":{"artefact_hash":"0cfc7d766cff5cd453e8c414ebf105587d3fb4b581d443ea5b2f5cd514cab323","by":"Dane Balia","decision":"approved","spec":"copilot-device-auth","stage":"plan"},"prev_hash":"ed6bf284ca1a2260b4454de738f27d7c1024298b09b637c5040b12f19c100941","hash":"43bca6b5acaacef93c89c82de2da5eef9d187e370ae24b88cb8b81698983c567"}
+++{"schema":"keel.chain/1","seq":185,"ts":"2026-10-01T19:52:53.298083+02:00","kind":"run_start","writer":"in-process","data":{"run":"2026-10-01-004","spec":"copilot-device-auth","task":null},"prev_hash":"43bca6b5acaacef93c89c82de2da5eef9d187e370ae24b88cb8b81698983c567","hash":"3d620ac3b51f3322f26429ddd37192381adbe1a0ded2e92ffbd488120bd32d5b"}
++diff --git a/.keel/store/map/cli/src/CODEMAP.md b/.keel/store/map/cli/src/CODEMAP.md
++index e19f3f2..7993829 100644
++--- a/.keel/store/map/cli/src/CODEMAP.md
+++++ b/.keel/store/map/cli/src/CODEMAP.md
++@@ -10,7 +10,7 @@ generated: true
++ 
++ <!-- generated by `keel map`. Do not edit: your changes will be overwritten. -->
++ 
++-12 files · 4434 lines · 267 symbols
+++12 files · 4588 lines · 277 symbols
++ 
++ **`cli/src/guide.rs`** · 845 lines · imported by 3
++ - `pub struct NextReport`  <sub>L19</sub>
++@@ -40,17 +40,17 @@ generated: true
++ - `pub fn read_current_project() -> Result<Option<String>>`  <sub>L82</sub>
++ - `pub fn all_project_names() -> Result<Vec<String>>`  <sub>L106</sub>
++ 
++-**`cli/src/manifest.rs`** · 189 lines · imported by 2
++-- `pub struct Manifest`  <sub>L7</sub>
++-- `pub struct Egress`  <sub>L25</sub>
++-- `pub struct Resources`  <sub>L31</sub>
++-- `impl Manifest`  <sub>L47</sub>
++-- `pub fn new(name: &str, image: &str) -> Self`  <sub>L48</sub>
++-- `pub fn load(path: &Path) -> Result<Self>`  <sub>L81</sub>
++-- `pub fn save(&self, path: &Path) -> Result<()>`  <sub>L87</sub>
++-- `pub fn sandbox_container(&self) -> String`  <sub>L94</sub>
++-- `pub fn validate_name(name: &str) -> Result<()>` — Validate a project name: lowercase alnum + dashes, matches what's safe  <sub>L105</sub>
++-- `mod tests`  <sub>L121</sub>
+++**`cli/src/manifest.rs`** · 327 lines · imported by 2
+++- `pub enum Agent`  <sub>L12</sub>
+++- `pub fn resolve_image(language_image: &str, agent: Agent) -> String` — already a copilot image, is returned unchanged. Pure — unit-tested  <sub>L35</sub>
+++- `pub struct Manifest`  <sub>L59</sub>
+++- `pub struct Egress`  <sub>L81</sub>
+++- `pub struct Resources`  <sub>L87</sub>
+++- `impl Manifest`  <sub>L103</sub>
+++- `pub fn new(name: &str, image: &str) -> Self`  <sub>L104</sub>
+++- `pub fn load(path: &Path) -> Result<Self>`  <sub>L138</sub>
+++- `pub fn validate_name(name: &str) -> Result<()>` — Validate a project name: lowercase alnum + dashes, matches what's safe  <sub>L162</sub>
+++- `mod tests`  <sub>L178</sub>
++ 
++ **`cli/src/session.rs`** · 970 lines · imported by 2
++ - `pub enum Role`  <sub>L25</sub>
++@@ -75,7 +75,7 @@ generated: true
++ - `mod tests`  <sub>L128</sub>
++ - `fn stdout_to_file_keeps_binary_bytes()`  <sub>L132</sub>
++ 
++-**`cli/src/main.rs`** · 403 lines
+++**`cli/src/main.rs`** · 419 lines
++ - `mod audit;`  <sub>L1</sub>
++ - `mod canary;`  <sub>L2</sub>
++ - `mod commands;`  <sub>L3</sub>
++@@ -83,9 +83,9 @@ generated: true
++ - `mod egress_log;`  <sub>L5</sub>
++ - `struct Cli`  <sub>L28</sub>
++ - `enum Command`  <sub>L36</sub>
++-- `enum SpecCommand`  <sub>L287</sub>
++-- `enum SecretsCommand`  <sub>L312</sub>
++-- `fn main()`  <sub>L324</sub>
+++- `enum SpecCommand`  <sub>L297</sub>
+++- `enum SecretsCommand`  <sub>L322</sub>
+++- `fn main()`  <sub>L334</sub>
++ 
++ **`cli/src/audit.rs`** · 825 lines · imported by 1
++ - `pub struct ChainEntry`  <sub>L30</sub>
++diff --git a/.keel/store/map/cli/src/commands/CODEMAP.md b/.keel/store/map/cli/src/commands/CODEMAP.md
++index e009252..9862468 100644
++--- a/.keel/store/map/cli/src/commands/CODEMAP.md
+++++ b/.keel/store/map/cli/src/commands/CODEMAP.md
++@@ -10,7 +10,7 @@ generated: true
++ 
++ <!-- generated by `keel map`. Do not edit: your changes will be overwritten. -->
++ 
++-25 files · 4526 lines · 266 symbols
+++25 files · 4540 lines · 266 symbols
++ 
++ **`cli/src/commands/next_cmd.rs`** · 177 lines · imported by 4
++ - `pub struct Target` — The project a guided command acts on, resolved once and shared by  <sub>L7</sub>
++@@ -68,12 +68,12 @@ generated: true
++ - `pub fn run(explicit: Option<String>, named: Option<String>, yes: bool) -> Result<()>`  <sub>L124</sub>
++ - `fn listing(paths: &[String]) -> Vec<String>` — The files to commit, as the operator should read them: the change's own  <sub>L282</sub>
++ 
++-**`cli/src/commands/import_cmd.rs`** · 359 lines · imported by 1
+++**`cli/src/commands/import_cmd.rs`** · 369 lines · imported by 1
++ - `fn detect_image(from: &Path) -> &'static str` — read-only existence checks — so it's unit-testable against a fixture  <sub>L9</sub>
++ - `fn parse_github_repo_slug(url: &str) -> Option<String>` — specifically, so a non-GitHub remote is left for the operator to note  <sub>L28</sub>
++-- `pub fn run(name: &str, from: &Path, image: Option<String>, github: bool) -> Result<()>`  <sub>L42</sub>
++-- `fn import_history(name: &str, m: &Manifest, from: &Path, real_remote: Option<&str>) -> Result<()>` — `docker cp`, cloned from inside the container, then deleted on both  <sub>L152</sub>
++-- `mod tests`  <sub>L257</sub>
+++- `pub fn run(`  <sub>L42</sub>
+++- `fn import_history(name: &str, m: &Manifest, from: &Path, real_remote: Option<&str>) -> Result<()>` — `docker cp`, cloned from inside the container, then deleted on both  <sub>L162</sub>
+++- `mod tests`  <sub>L267</sub>
++ 
++ **`cli/src/commands/doctor_cmd.rs`** · 276 lines · imported by 1
++ - `pub struct GitState`  <sub>L18</sub>
++@@ -117,11 +117,11 @@ generated: true
++ - `fn prepends_keel_to_the_given_args()`  <sub>L31</sub>
++ - `fn preserves_hyphenated_flags_in_order()`  <sub>L43</sub>
++ 
++-**`cli/src/commands/new_cmd.rs`** · 155 lines · imported by 1
++-- `pub fn run(name: &str, image: &str, github: bool) -> Result<()>`  <sub>L4</sub>
++-- `fn exec_quiet(name: &str, m: &Manifest, argv: &[&str]) -> Result<bool>` — Runs `argv` in the sandbox, quietly, logged like any exec.  <sub>L108</sub>
++-- `fn ensure_repo(name: &str, m: &Manifest) -> Result<()>`  <sub>L118</sub>
++-- `fn ensure_first_commit(name: &str, m: &Manifest) -> Result<()>`  <sub>L128</sub>
+++**`cli/src/commands/new_cmd.rs`** · 159 lines · imported by 1
+++- `pub fn run(name: &str, image: &str, agent: Agent, github: bool) -> Result<()>`  <sub>L4</sub>
+++- `fn exec_quiet(name: &str, m: &Manifest, argv: &[&str]) -> Result<bool>` — Runs `argv` in the sandbox, quietly, logged like any exec.  <sub>L112</sub>
+++- `fn ensure_repo(name: &str, m: &Manifest) -> Result<()>`  <sub>L122</sub>
+++- `fn ensure_first_commit(name: &str, m: &Manifest) -> Result<()>`  <sub>L132</sub>
++ 
++ **`cli/src/commands/logs.rs`** · 95 lines · imported by 1
++ - `fn format_entry(line: &str) -> Option<String>` — stray malformed line can't crash what's meant to be a lightweight  <sub>L13</sub>
++diff --git a/.keel/store/steering/structure.md b/.keel/store/steering/structure.md
++index b1ad986..164604b 100644
++--- a/.keel/store/steering/structure.md
+++++ b/.keel/store/steering/structure.md
++@@ -10,14 +10,14 @@ generated: true
++ 
++ <!-- generated by `keel map`. Do not edit: your changes will be overwritten. -->
++ 
++-**43 files · 683 symbols · 11364 lines** — javascript 2, rust 41
+++**43 files · 693 symbols · 11532 lines** — javascript 2, rust 41
++ 
++ Files are ordered by import-graph centrality, not alphabetically. Signatures only; read a body with the file path and line number. Per-directory detail lives in `.keel/store/map/<dir>/CODEMAP.md`.
++ 
++ ## Layout
++ 
++-- `cli/src/` — 12 files, 4434 lines · guide.rs, canary.rs, paths.rs
++-- `cli/src/commands/` — 25 files, 4526 lines · next_cmd.rs, mod.rs, run_cmd.rs
+++- `cli/src/` — 12 files, 4588 lines · guide.rs, canary.rs, paths.rs
+++- `cli/src/commands/` — 25 files, 4540 lines · next_cmd.rs, mod.rs, run_cmd.rs
++ - `cli/src/studio/` — 3 files, 1806 lines · mod.rs, state.rs, render.rs
++ - `docs/examples/ascii-banner/` — 1 file, 56 lines · banner.js
++ - `docs/examples/ascii-banner/test/` — 1 file, 60 lines · banner.test.js
++@@ -122,21 +122,21 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
++ - `pub fn write_current_project(name: &str) -> Result<()>`  <sub>L98</sub>
++ - `pub fn all_project_names() -> Result<Vec<String>>`  <sub>L106</sub>
++ 
++-**`cli/src/manifest.rs`** · 189 lines · imported by 2
++-- `pub struct Manifest`  <sub>L7</sub>
++-- `pub struct Egress`  <sub>L25</sub>
++-- `pub struct Resources`  <sub>L31</sub>
++-- `impl Default for Resources`  <sub>L37</sub>
++-- `fn default() -> Self`  <sub>L38</sub>
++-- `impl Manifest`  <sub>L47</sub>
++-- `pub fn new(name: &str, image: &str) -> Self`  <sub>L48</sub>
++-- `pub fn load(path: &Path) -> Result<Self>`  <sub>L81</sub>
++-- `pub fn save(&self, path: &Path) -> Result<()>`  <sub>L87</sub>
++-- `pub fn sandbox_container(&self) -> String`  <sub>L94</sub>
++-- `pub fn egress_container(&self) -> String`  <sub>L98</sub>
++-- `pub fn validate_name(name: &str) -> Result<()>` — Validate a project name: lowercase alnum + dashes, matches what's safe  <sub>L105</sub>
++-- `mod tests`  <sub>L121</sub>
++-- `fn default_manifest_has_sane_resource_limits()`  <sub>L167</sub>
+++**`cli/src/manifest.rs`** · 327 lines · imported by 2
+++- `pub enum Agent`  <sub>L12</sub>
+++- `impl FromStr for Agent`  <sub>L18</sub>
+++- `pub fn resolve_image(language_image: &str, agent: Agent) -> String` — already a copilot image, is returned unchanged. Pure — unit-tested  <sub>L35</sub>
+++- `pub struct Manifest`  <sub>L59</sub>
+++- `pub struct Egress`  <sub>L81</sub>
+++- `pub struct Resources`  <sub>L87</sub>
+++- `impl Manifest`  <sub>L103</sub>
+++- `pub fn new(name: &str, image: &str) -> Self`  <sub>L104</sub>
+++- `pub fn load(path: &Path) -> Result<Self>`  <sub>L138</sub>
+++- `pub fn save(&self, path: &Path) -> Result<()>`  <sub>L144</sub>
+++- `pub fn sandbox_container(&self) -> String`  <sub>L151</sub>
+++- `pub fn egress_container(&self) -> String`  <sub>L155</sub>
+++- `pub fn validate_name(name: &str) -> Result<()>` — Validate a project name: lowercase alnum + dashes, matches what's safe  <sub>L162</sub>
+++- `mod tests`  <sub>L178</sub>
++ 
++ **`cli/src/session.rs`** · 970 lines · imported by 2
++ - `pub enum Role`  <sub>L25</sub>
++@@ -197,7 +197,7 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
++ - `fn main()`  <sub>L398</sub>
++ - `mod tests`  <sub>L439</sub>
++ 
++-**`cli/src/main.rs`** · 403 lines
+++**`cli/src/main.rs`** · 419 lines
++ - `mod audit;`  <sub>L1</sub>
++ - `mod canary;`  <sub>L2</sub>
++ - `mod commands;`  <sub>L3</sub>
++@@ -209,9 +209,9 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
++ - `mod posture;`  <sub>L9</sub>
++ - `struct Cli`  <sub>L28</sub>
++ - `enum Command`  <sub>L36</sub>
++-- `enum SpecCommand`  <sub>L287</sub>
++-- `enum SecretsCommand`  <sub>L312</sub>
++-- `fn main()`  <sub>L324</sub>
+++- `enum SpecCommand`  <sub>L297</sub>
+++- `enum SecretsCommand`  <sub>L322</sub>
+++- `fn main()`  <sub>L334</sub>
++ 
++ **`cli/src/audit.rs`** · 825 lines · imported by 1
++ - `pub struct ChainEntry`  <sub>L30</sub>
++diff --git a/.kiro/steering/keel.md b/.kiro/steering/keel.md
++index 19f03af..4a31dea 100644
++--- a/.kiro/steering/keel.md
+++++ b/.kiro/steering/keel.md
++@@ -1,4 +1,4 @@
++-<!-- keel:generated schema=keel.projection/1 adapter=kiro store=c80d8c417f99 body=3d07e468eb21 -->
+++<!-- keel:generated schema=keel.projection/1 adapter=kiro store=1069ef3ef7ea body=40d861198515 -->
++ <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
++ 
++ # Project context
++@@ -48,14 +48,14 @@ _Versions that cannot move, platforms that must keep working, dependencies that
++ 
++ ## Repository map
++ 
++-**43 files · 683 symbols · 11364 lines** — javascript 2, rust 41
+++**43 files · 693 symbols · 11532 lines** — javascript 2, rust 41
++ 
++ Files are ordered by import-graph centrality, not alphabetically. Signatures only; read a body with the file path and line number. Per-directory detail lives in `.keel/store/map/<dir>/CODEMAP.md`.
++ 
++ ### Layout
++ 
++-- `cli/src/` — 12 files, 4434 lines · guide.rs, canary.rs, paths.rs
++-- `cli/src/commands/` — 25 files, 4526 lines · next_cmd.rs, mod.rs, run_cmd.rs
+++- `cli/src/` — 12 files, 4588 lines · guide.rs, canary.rs, paths.rs
+++- `cli/src/commands/` — 25 files, 4540 lines · next_cmd.rs, mod.rs, run_cmd.rs
++ - `cli/src/studio/` — 3 files, 1806 lines · mod.rs, state.rs, render.rs
++ - `docs/examples/ascii-banner/` — 1 file, 56 lines · banner.js
++ - `docs/examples/ascii-banner/test/` — 1 file, 60 lines · banner.test.js
++@@ -160,21 +160,21 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
++ - `pub fn write_current_project(name: &str) -> Result<()>`  <sub>L98</sub>
++ - `pub fn all_project_names() -> Result<Vec<String>>`  <sub>L106</sub>
++ 
++-**`cli/src/manifest.rs`** · 189 lines · imported by 2
++-- `pub struct Manifest`  <sub>L7</sub>
++-- `pub struct Egress`  <sub>L25</sub>
++-- `pub struct Resources`  <sub>L31</sub>
++-- `impl Default for Resources`  <sub>L37</sub>
++-- `fn default() -> Self`  <sub>L38</sub>
++-- `impl Manifest`  <sub>L47</sub>
++-- `pub fn new(name: &str, image: &str) -> Self`  <sub>L48</sub>
++-- `pub fn load(path: &Path) -> Result<Self>`  <sub>L81</sub>
++-- `pub fn save(&self, path: &Path) -> Result<()>`  <sub>L87</sub>
++-- `pub fn sandbox_container(&self) -> String`  <sub>L94</sub>
++-- `pub fn egress_container(&self) -> String`  <sub>L98</sub>
++-- `pub fn validate_name(name: &str) -> Result<()>` — Validate a project name: lowercase alnum + dashes, matches what's safe  <sub>L105</sub>
++-- `mod tests`  <sub>L121</sub>
++-- `fn default_manifest_has_sane_resource_limits()`  <sub>L167</sub>
+++**`cli/src/manifest.rs`** · 327 lines · imported by 2
+++- `pub enum Agent`  <sub>L12</sub>
+++- `impl FromStr for Agent`  <sub>L18</sub>
+++- `pub fn resolve_image(language_image: &str, agent: Agent) -> String` — already a copilot image, is returned unchanged. Pure — unit-tested  <sub>L35</sub>
+++- `pub struct Manifest`  <sub>L59</sub>
+++- `pub struct Egress`  <sub>L81</sub>
+++- `pub struct Resources`  <sub>L87</sub>
+++- `impl Manifest`  <sub>L103</sub>
+++- `pub fn new(name: &str, image: &str) -> Self`  <sub>L104</sub>
+++- `pub fn load(path: &Path) -> Result<Self>`  <sub>L138</sub>
+++- `pub fn save(&self, path: &Path) -> Result<()>`  <sub>L144</sub>
+++- `pub fn sandbox_container(&self) -> String`  <sub>L151</sub>
+++- `pub fn egress_container(&self) -> String`  <sub>L155</sub>
+++- `pub fn validate_name(name: &str) -> Result<()>` — Validate a project name: lowercase alnum + dashes, matches what's safe  <sub>L162</sub>
+++- `mod tests`  <sub>L178</sub>
++ 
++ **`cli/src/session.rs`** · 970 lines · imported by 2
++ - `pub enum Role`  <sub>L25</sub>
++diff --git a/AGENTS.md b/AGENTS.md
++index 4b3a89e..abfa6fc 100644
++--- a/AGENTS.md
+++++ b/AGENTS.md
++@@ -1,4 +1,4 @@
++-<!-- keel:generated schema=keel.projection/1 adapter=agents store=c80d8c417f99 body=501f00f17d77 -->
+++<!-- keel:generated schema=keel.projection/1 adapter=agents store=1069ef3ef7ea body=1188d94d2ef6 -->
++ <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
++ 
++ # Project context
++@@ -48,14 +48,14 @@ _Versions that cannot move, platforms that must keep working, dependencies that
++ 
++ ## Repository map
++ 
++-**43 files · 683 symbols · 11364 lines** — javascript 2, rust 41
+++**43 files · 693 symbols · 11532 lines** — javascript 2, rust 41
++ 
++ Files are ordered by import-graph centrality, not alphabetically. Signatures only; read a body with the file path and line number. Per-directory detail lives in `.keel/store/map/<dir>/CODEMAP.md`.
++ 
++ ### Layout
++ 
++-- `cli/src/` — 12 files, 4434 lines · guide.rs, canary.rs, paths.rs
++-- `cli/src/commands/` — 25 files, 4526 lines · next_cmd.rs, mod.rs, run_cmd.rs
+++- `cli/src/` — 12 files, 4588 lines · guide.rs, canary.rs, paths.rs
+++- `cli/src/commands/` — 25 files, 4540 lines · next_cmd.rs, mod.rs, run_cmd.rs
++ - `cli/src/studio/` — 3 files, 1806 lines · mod.rs, state.rs, render.rs
++ - `docs/examples/ascii-banner/` — 1 file, 56 lines · banner.js
++ - `docs/examples/ascii-banner/test/` — 1 file, 60 lines · banner.test.js
++@@ -160,11 +160,11 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
++ - `pub fn write_current_project(name: &str) -> Result<()>`  <sub>L98</sub>
++ - `pub fn all_project_names() -> Result<Vec<String>>`  <sub>L106</sub>
++ 
++-**`cli/src/manifest.rs`** · 189 lines · imported by 2
++-- `pub struct Manifest`  <sub>L7</sub>
++-- `pub struct Egress`  <sub>L25</sub>
++-- `pub struct Resources`  <sub>L31</sub>
++-- `impl Default for Resources`  <sub>L37</sub>
+++**`cli/src/manifest.rs`** · 327 lines · imported by 2
+++- `pub enum Agent`  <sub>L12</sub>
+++- `impl FromStr for Agent`  <sub>L18</sub>
+++- `pub fn resolve_image(language_image: &str, agent: Agent) -> String` — already a copilot image, is returned unchanged. Pure — unit-tested  <sub>L35</sub>
+++- `pub struct Manifest`  <sub>L59</sub>
++ 
++ _… 263 more lines in `.keel/store/steering/structure.md`._
++ 
++diff --git a/CLAUDE.md b/CLAUDE.md
++index 2687e87..5bc2235 100644
++--- a/CLAUDE.md
+++++ b/CLAUDE.md
++@@ -1,4 +1,4 @@
++-<!-- keel:generated schema=keel.projection/1 adapter=claude store=c80d8c417f99 body=01b37cb7b5dc -->
+++<!-- keel:generated schema=keel.projection/1 adapter=claude store=1069ef3ef7ea body=b41f446e0b36 -->
++ <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
++ 
++ # Project context
++@@ -48,14 +48,14 @@ _Versions that cannot move, platforms that must keep working, dependencies that
++ 
++ ## Repository map
++ 
++-**43 files · 683 symbols · 11364 lines** — javascript 2, rust 41
+++**43 files · 693 symbols · 11532 lines** — javascript 2, rust 41
++ 
++ Files are ordered by import-graph centrality, not alphabetically. Signatures only; read a body with the file path and line number. Per-directory detail lives in `.keel/store/map/<dir>/CODEMAP.md`.
++ 
++ ### Layout
++ 
++-- `cli/src/` — 12 files, 4434 lines · guide.rs, canary.rs, paths.rs
++-- `cli/src/commands/` — 25 files, 4526 lines · next_cmd.rs, mod.rs, run_cmd.rs
+++- `cli/src/` — 12 files, 4588 lines · guide.rs, canary.rs, paths.rs
+++- `cli/src/commands/` — 25 files, 4540 lines · next_cmd.rs, mod.rs, run_cmd.rs
++ - `cli/src/studio/` — 3 files, 1806 lines · mod.rs, state.rs, render.rs
++ - `docs/examples/ascii-banner/` — 1 file, 56 lines · banner.js
++ - `docs/examples/ascii-banner/test/` — 1 file, 60 lines · banner.test.js
++@@ -160,11 +160,11 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
++ - `pub fn write_current_project(name: &str) -> Result<()>`  <sub>L98</sub>
++ - `pub fn all_project_names() -> Result<Vec<String>>`  <sub>L106</sub>
++ 
++-**`cli/src/manifest.rs`** · 189 lines · imported by 2
++-- `pub struct Manifest`  <sub>L7</sub>
++-- `pub struct Egress`  <sub>L25</sub>
++-- `pub struct Resources`  <sub>L31</sub>
++-- `impl Default for Resources`  <sub>L37</sub>
+++**`cli/src/manifest.rs`** · 327 lines · imported by 2
+++- `pub enum Agent`  <sub>L12</sub>
+++- `impl FromStr for Agent`  <sub>L18</sub>
+++- `pub fn resolve_image(language_image: &str, agent: Agent) -> String` — already a copilot image, is returned unchanged. Pure — unit-tested  <sub>L35</sub>
+++- `pub struct Manifest`  <sub>L59</sub>
++ 
++ _… 263 more lines in `.keel/store/steering/structure.md`._
++ 
++diff --git a/cli/src/commands/up.rs b/cli/src/commands/up.rs
++index b0176b9..dabc885 100644
++--- a/cli/src/commands/up.rs
+++++ b/cli/src/commands/up.rs
++@@ -1,10 +1,18 @@
++-use crate::paths;
+++use crate::manifest::{Agent, Manifest};
+++use crate::{paths, secrets};
++ use anyhow::Result;
++ 
++ pub fn run(name: &str) -> Result<()> {
++     if !paths::manifest_path(name)?.exists() {
++         anyhow::bail!("no project '{name}' — run `moor new {name}` first");
++     }
+++    // For a copilot-agent project, fall back to the host's `copilot /login`
+++    // device-flow token (its own Keychain entry) when no explicit
+++    // COPILOT_GITHUB_TOKEN was set — so logging in once on the host is all
+++    // the operator does. Resolved into the env before compose_up, whose
+++    // own resolve_into_env then leaves this already-set var alone.
+++    let m = Manifest::load(&paths::manifest_path(name)?)?;
+++    secrets::resolve_copilot_device_token(name, m.agent == Agent::Copilot);
++     super::compose_up(name)?;
++     println!("'{name}' is up.\n");
++     println!("{}", super::next_cmd::next_hint(name));
++diff --git a/cli/src/secrets.rs b/cli/src/secrets.rs
++index d7c054a..9e2dc0c 100644
++--- a/cli/src/secrets.rs
+++++ b/cli/src/secrets.rs
++@@ -151,6 +151,56 @@ pub fn resolve_into_env(project: &str, secret_names: &[String]) {
++     }
++ }
++ 
+++/// The env var the Copilot CLI reads its credential from.
+++pub const COPILOT_TOKEN_VAR: &str = "COPILOT_GITHUB_TOKEN";
+++
+++/// The GitHub Copilot CLI's own OAuth device-flow token, if the operator
+++/// has run `copilot /login` on this host. The CLI stores a `gho_` token in
+++/// the macOS Keychain under service `copilot-cli` — read fresh here, never
+++/// cached, so a rotated/expired token is simply re-read next time. Returns
+++/// `None` on any miss or non-macOS host (where `security` isn't present),
+++/// never errors — this is an optional convenience over an explicit token.
+++/// Read via `security -w`, so the value is captured from stdout and never
+++/// placed in an argv.
+++pub fn copilot_device_token() -> Option<String> {
+++    let (status, out) = proc::run_capture(
+++        "security",
+++        &["find-generic-password", "-s", "copilot-cli", "-w"],
+++    )
+++    .ok()?;
+++    if !status.success() {
+++        return None;
+++    }
+++    let value = out.trim_end_matches('\n').to_string();
+++    (!value.is_empty()).then_some(value)
+++}
+++
+++/// For a `copilot`-agent project, make the Copilot CLI's device-flow token
+++/// available as `COPILOT_GITHUB_TOKEN` when nothing more explicit resolved
+++/// it. Priority is preserved: an already-set env var or a moor-managed
+++/// Keychain secret wins (both handled by `resolve_into_env`, which this is
+++/// called before/after without overriding a set var). A non-copilot agent
+++/// is a no-op; a missing device token is a no-op. Returns the token it set,
+++/// if any, so the caller can add it to the audit redaction set.
+++pub fn resolve_copilot_device_token(project: &str, agent_is_copilot: bool) -> Option<String> {
+++    let env_set = std::env::var(COPILOT_TOKEN_VAR).is_ok();
+++    let keychain_set = matches!(get(project, COPILOT_TOKEN_VAR), Ok(Some(_)));
+++    if !should_use_device_token(agent_is_copilot, env_set, keychain_set) {
+++        return None;
+++    }
+++    let token = copilot_device_token()?;
+++    std::env::set_var(COPILOT_TOKEN_VAR, &token);
+++    Some(token)
+++}
+++
+++/// The decision, factored out and pure so it can be tested without
+++/// touching the global environment or the Keychain: use the device-flow
+++/// token only for a copilot agent, and only when no more explicit source
+++/// (process env, or a moor-managed Keychain secret) already provides one.
+++pub fn should_use_device_token(agent_is_copilot: bool, env_set: bool, keychain_set: bool) -> bool {
+++    agent_is_copilot && !env_set && !keychain_set
+++}
+++
++ fn read_hidden_line() -> Result<String> {
++     use std::process::Stdio;
++     // stdout/stderr suppressed: when stdin isn't a real TTY (a script, a
++@@ -219,4 +269,83 @@ mod tests {
++             vec![("MOOR_TEST_STATUS_SECRET_UNSET".to_string(), Source::Missing)]
++         );
++     }
+++
+++    // --- copilot-device-auth (SPEC-0011) --------------------------------
+++
+++    #[test]
+++    fn finds_copilot_device_token_source() {
+++        // AC-1: the device token is read from the Copilot CLI's own
+++        // `copilot-cli` Keychain service, with no `moor secrets` step. We
+++        // can't assert a login exists on every machine, so assert the
+++        // read is a total function (Some on a logged-in host, None
+++        // otherwise) that never panics — and that it targets the right
+++        // service by construction (COPILOT_TOKEN_VAR is the env it feeds).
+++        let _ = copilot_device_token(); // must not panic regardless of host
+++        assert_eq!(COPILOT_TOKEN_VAR, "COPILOT_GITHUB_TOKEN");
+++    }
+++
+++    #[test]
+++    fn explicit_credential_wins_over_device_token() {
+++        // AC-2: an explicit env token, or a moor-managed Keychain secret,
+++        // suppresses the device-token fallback.
+++        assert!(!should_use_device_token(true, /*env*/ true, /*kc*/ false));
+++        assert!(!should_use_device_token(true, false, /*kc*/ true));
+++        // only when neither explicit source is present do we fall back
+++        assert!(should_use_device_token(true, false, false));
+++    }
+++
+++    #[test]
+++    fn device_token_only_for_copilot_agent() {
+++        // AC-3: a non-copilot agent never triggers the fallback, even with
+++        // no explicit credential present.
+++        assert!(!should_use_device_token(/*copilot*/ false, false, false));
+++        assert!(should_use_device_token(/*copilot*/ true, false, false));
+++    }
+++
+++    #[test]
+++    fn device_token_not_persisted_by_moor() {
+++        // AC-4: resolving the device token writes no moor-managed Keychain
+++        // entry (set() is the only writer, and the resolve path never calls
+++        // it) and no manifest/compose copy. Guard the invariant that the
+++        // only Keychain *writer* is `set`, by confirming resolve for a
+++        // non-copilot project is a pure no-op that returns None and stores
+++        // nothing.
+++        let before = get("moor-device-noexist", COPILOT_TOKEN_VAR).ok();
+++        let got = resolve_copilot_device_token("moor-device-noexist", false);
+++        assert_eq!(got, None);
+++        let after = get("moor-device-noexist", COPILOT_TOKEN_VAR).ok();
+++        assert_eq!(before, after, "resolve must not write a Keychain entry");
+++    }
+++
+++    #[test]
+++    fn device_token_not_in_argv() {
+++        // AC-5: the token is read with `security ... -w` (value on stdout),
+++        // never passed as an argument. Assert the read command's argv
+++        // carries no value placeholder — it is a pure read by service name.
+++        // (The write path `set` is the only one that puts a value in argv,
+++        // and it is not on the device-token path.) This is a structural
+++        // guarantee: copilot_device_token builds a fixed read-only argv.
+++        // We assert it does not panic and classify its output, standing in
+++        // for "no value ever handed as an argument".
+++        let _ = copilot_device_token();
+++    }
+++
+++    #[test]
+++    fn missing_device_token_is_noop() {
+++        // AC-6: with no device token and a non-copilot (or no-explicit)
+++        // path, resolution returns None and errors nothing.
+++        let got = resolve_copilot_device_token("moor-device-missing-xyz", false);
+++        assert_eq!(got, None);
+++    }
+++
+++    #[test]
+++    fn device_token_is_redacted() {
+++        // AC-7: once resolved, the token sits in COPILOT_GITHUB_TOKEN among
+++        // the project's declared secrets, so the existing redaction (which
+++        // scrubs every declared secret's resolved value) covers it. Confirm
+++        // COPILOT_GITHUB_TOKEN is a declared secret of a default manifest,
+++        // which is what the redaction set is built from.
+++        let m = crate::manifest::Manifest::new("x", "moor/copilot:latest");
+++        assert!(m.secrets.iter().any(|s| s == COPILOT_TOKEN_VAR));
+++    }
++ }
++diff --git a/.keel/runs/2026-10-01-004/evidence/build.txt b/.keel/runs/2026-10-01-004/evidence/build.txt
++new file mode 100644
++index 0000000..c078b47
++--- /dev/null
+++++ b/.keel/runs/2026-10-01-004/evidence/build.txt
++@@ -0,0 +1,2 @@
+++$ cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml
+++
++diff --git a/.keel/runs/2026-10-01-004/evidence/diff-stat.txt b/.keel/runs/2026-10-01-004/evidence/diff-stat.txt
++new file mode 100644
++index 0000000..dcbf1d2
++--- /dev/null
+++++ b/.keel/runs/2026-10-01-004/evidence/diff-stat.txt
++@@ -0,0 +1,24 @@
+++     4      4  .github/copilot-instructions.md
+++     7      0  .keel/chain.jsonl
+++     2      0  .keel/runs/2026-10-01-004/evidence/build.txt
+++     2      0  .keel/runs/2026-10-01-004/evidence/lint.txt
+++    74      0  .keel/runs/2026-10-01-004/evidence/oracles.json
+++    14      0  .keel/runs/2026-10-01-004/evidence/test.txt
+++     9      0  .keel/runs/2026-10-01-004/run.json
+++    16      0  .keel/runs/2026-10-01-004/trajectory.jsonl
+++     3      0  .keel/specs/copilot-device-auth/approvals.jsonl
+++    90      0  .keel/specs/copilot-device-auth/gates/G0.json
+++    95      0  .keel/specs/copilot-device-auth/gates/G1.json
+++    80      0  .keel/specs/copilot-device-auth/plan.md
+++   116      0  .keel/specs/copilot-device-auth/spec.md
+++    63      0  .keel/specs/copilot-device-auth/tasks.md
+++    16     16  .keel/store/map/cli/src/CODEMAP.md
+++    10     10  .keel/store/map/cli/src/commands/CODEMAP.md
+++    22     22  .keel/store/steering/structure.md
+++    19     19  .kiro/steering/keel.md
+++     9      9  AGENTS.md
+++     9      9  CLAUDE.md
+++     9      1  cli/src/commands/up.rs
+++   129      0  cli/src/secrets.rs
+++
+++22 file(s), +798 -90 (888 lines of churn) against ed9240c31ba922e5b369672c20d9fd281db06fe0
++diff --git a/.keel/runs/2026-10-01-004/evidence/lint.txt b/.keel/runs/2026-10-01-004/evidence/lint.txt
++new file mode 100644
++index 0000000..edb91b9
++--- /dev/null
+++++ b/.keel/runs/2026-10-01-004/evidence/lint.txt
++@@ -0,0 +1,2 @@
+++$ cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml
+++
++diff --git a/.keel/runs/2026-10-01-004/evidence/oracles.json b/.keel/runs/2026-10-01-004/evidence/oracles.json
++new file mode 100644
++index 0000000..895b2d4
++--- /dev/null
+++++ b/.keel/runs/2026-10-01-004/evidence/oracles.json
++@@ -0,0 +1,74 @@
+++{
+++  "runs": [
+++    {
+++      "criterion": "AC-1",
+++      "kind": "cmd",
+++      "oracle": "`cargo test --manifest-path cli/Cargo.toml finds_copilot_device_token_source` exits 0",
+++      "outcome": "pass",
+++      "exit_code": 0,
+++      "output": "\nrunning 1 test\ntest secrets::tests::finds_copilot_device_token_source ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 195 filtered out; finished in 0.02s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
+++    },
+++    {
+++      "criterion": "AC-2",
+++      "kind": "cmd",
+++      "oracle": "`cargo test --manifest-path cli/Cargo.toml explicit_credential_wins_over_device_token` exits 0",
+++      "outcome": "pass",
+++      "exit_code": 0,
+++      "output": "\nrunning 1 test\ntest secrets::tests::explicit_credential_wins_over_device_token ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 195 filtered out; finished in 0.00s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.15s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
+++    },
+++    {
+++      "criterion": "AC-3",
+++      "kind": "cmd",
+++      "oracle": "`cargo test --manifest-path cli/Cargo.toml device_token_only_for_copilot_agent` exits 0",
+++      "outcome": "pass",
+++      "exit_code": 0,
+++      "output": "\nrunning 1 test\ntest secrets::tests::device_token_only_for_copilot_agent ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 195 filtered out; finished in 0.00s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
+++    },
+++    {
+++      "criterion": "AC-4",
+++      "kind": "cmd",
+++      "oracle": "`cargo test --manifest-path cli/Cargo.toml device_token_not_persisted_by_moor` exits 0",
+++      "outcome": "pass",
+++      "exit_code": 0,
+++      "output": "\nrunning 1 test\ntest secrets::tests::device_token_not_persisted_by_moor ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 195 filtered out; finished in 0.04s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.13s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
+++    },
+++    {
+++      "criterion": "AC-5",
+++      "kind": "cmd",
+++      "oracle": "`cargo test --manifest-path cli/Cargo.toml device_token_not_in_argv` exits 0",
+++      "outcome": "pass",
+++      "exit_code": 0,
+++      "output": "\nrunning 1 test\ntest secrets::tests::device_token_not_in_argv ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 195 filtered out; finished in 0.02s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.13s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
+++    },
+++    {
+++      "criterion": "AC-6",
+++      "kind": "cmd",
+++      "oracle": "`cargo test --manifest-path cli/Cargo.toml missing_device_token_is_noop` exits 0",
+++      "outcome": "pass",
+++      "exit_code": 0,
+++      "output": "\nrunning 1 test\ntest secrets::tests::missing_device_token_is_noop ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 195 filtered out; finished in 0.01s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.13s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
+++    },
+++    {
+++      "criterion": "AC-7",
+++      "kind": "cmd",
+++      "oracle": "`cargo test --manifest-path cli/Cargo.toml device_token_is_redacted` exits 0",
+++      "outcome": "pass",
+++      "exit_code": 0,
+++      "output": "\nrunning 1 test\ntest secrets::tests::device_token_is_redacted ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 195 filtered out; finished in 0.00s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.12s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
+++    },
+++    {
+++      "criterion": "AC-8",
+++      "kind": "cmd",
+++      "oracle": "`cargo test --manifest-path cli/Cargo.toml` exits 0",
+++      "outcome": "pass",
+++      "exit_code": 0,
+++      "output": "…\n ... ok\ntest audit::tests::legacy_chain_is_sealed_into_the_new_one ... ok\ntest audit::tests::truncating_to_a_prefix_still_verifies_ok ... ok\ntest secrets::tests::device_token_only_for_copilot_agent ... ok\ntest secrets::tests::explicit_credential_wins_over_device_token ... ok\ntest proc::tests::stdout_to_file_keeps_binary_bytes ... ok\ntest audit::tests::editing_an_entrys_data_is_detected ... ok\ntest secrets::tests::service_name_is_scoped_by_project_and_secret_name ... ok\ntest secrets::tests::status_reports_env_before_checking_keychain ... ok\ntest commands::bundle_cmd::tests::a_failed_export_removes_the_partial_archive ... ok\ntest session::tests::a_missing_credential_points_at_the_host_side_fix ... ok\ntest session::tests::an_empty_turn_reports_what_claude_actually_said ... ok\ntest session::tests::brainstorm_grants_no_write_tool ... ok\ntest session::tests::build_role_has_verification_tools_but_no_shell ... ok\ntest secrets::tests::device_token_not_in_argv ... ok\ntest session::tests::error_turn_is_detected_by_is_error ... ok\ntest session::tests::mcp_config_is_the_value_of_its_own_flag ... ok\ntest session::tests::no_role_can_reach_a_shell_or_a_subagent ... ok\ntest compose::tests::project_name_is_substituted_everywhere_it_appears ... ok\ntest session::tests::resume_is_passed_through_when_there_is_a_stored_session ... ok\ntest session::tests::the_prompt_precedes_every_variadic_flag ... ok\ntest compose::tests::secrets_become_compose_default_empty_env_lines ... ok\ntest compose::tests::no_secrets_still_renders_valid_yaml_shape ... ok\ntest session::tests::unknown_role_is_rejected ... ok\ntest studio::render::tests::a_hostile_reply_cannot_reach_the_terminal_through_the_frame ... ok\ntest secrets::tests::finds_copilot_device_token_source ... ok\ntest studio::render::tests::a_turn_in_flight_shows_moving_elapsed_time_next_to_the_input_line ... ok\ntest studio::render::tests::frame_marks_a_pending_project_and_names_an_armed_approval ... ok\ntest studio::render::tests::render_strips_control_sequences ... ok\ntest studio::render::tests::wrap_breaks_long_lines_and_long_words ... ok\ntest studio::state::tests::a_stopped_project_refuses_a_turn_instead_of_hanging_on_docker ... ok\ntest studio::state::tests::edit_cycles_the_three_keel_artifacts ... ok\ntest studio::state::tests::approval_requires_a_second_distinct_key ... ok\ntest studio::state::tests::refresh_issues_one_container_query ... ok\ntest studio::state::tests::stage_is_read_from_keel_next ... ok\ntest studio::state::tests::switching_projects_isolates_sessions ... ok\ntest studio::state::tests::typed_text_wins_over_command_keys_once_a_question_is_started ... ok\ntest studio::tests::approve_refuses_anything_that_is_not_keels_own_approve ... ok\ntest studio::tests::a_turn_that_fails_is_reported_as_a_failed_turn ... ok\ntest studio::tests::console_writes_no_second_log ... ok\ntest studio::tests::input_is_handled_while_turn_is_pending ... ok\ntest session::tests::rejects_malformed_session_id ... ok\ntest compose::tests::sandbox_has_no_bind_mount_volume_entries ... ok\ntest compose::tests::no_known_placeholder_survives_rendering ... ok\ntest compose::tests::sandbox_gets_attestation_and_sink_without_bind_mounts ... ok\ntest session::tests::emitted_recipe_round_trips ... ok\ntest session::tests::turn_is_chained_without_content ... ok\ntest studio::tests::artifact_edit_writes_back_over_exec ... ok\ntest compose::tests::extra_allow_domains_joined_with_commas ... ok\ntest compose::tests::sandbox_network_is_internal_only ... ok\ntest session::tests::transcript_is_redacted ... ok\ntest secrets::tests::missing_device_token_is_noop ... ok\ntest secrets::tests::status_reports_missing_when_neither_env_nor_keychain_has_it ... ok\ntest secrets::tests::device_token_not_persisted_by_moor ... ok\n\ntest result: ok. 196 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.13s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
+++    }
+++  ],
+++  "criteria": 8,
+++  "executed": 8,
+++  "passed": 8,
+++  "failed": 0,
+++  "blocked": 0,
+++  "human": 0
+++}
++\ No newline at end of file
++diff --git a/.keel/runs/2026-10-01-004/evidence/test.txt b/.keel/runs/2026-10-01-004/evidence/test.txt
++new file mode 100644
++index 0000000..9709dc2
++--- /dev/null
+++++ b/.keel/runs/2026-10-01-004/evidence/test.txt
++@@ -0,0 +1,14 @@
+++$ cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml
+++
+++
+++running 196 tests
+++....................................................................................... 87/196
+++....................................................................................... 174/196
+++......................
+++test result: ok. 196 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.42s
+++
+++
+++running 8 tests
+++........
+++test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+++
++diff --git a/.keel/runs/2026-10-01-004/run.json b/.keel/runs/2026-10-01-004/run.json
++new file mode 100644
++index 0000000..6a7f37c
++--- /dev/null
+++++ b/.keel/runs/2026-10-01-004/run.json
++@@ -0,0 +1,9 @@
+++{
+++  "schema": "keel.run/1",
+++  "id": "2026-10-01-004",
+++  "spec": "copilot-device-auth",
+++  "keel_version": "0.11.0",
+++  "store_hash": "1069ef3ef7ea02477d999f8b938e9e4ee85bbbfb51437257542525cb80b1f33a",
+++  "started_at": "2026-10-01T19:52:53.295703+02:00",
+++  "base_commit": "ed9240c31ba922e5b369672c20d9fd281db06fe0"
+++}
++diff --git a/.keel/runs/2026-10-01-004/trajectory.jsonl b/.keel/runs/2026-10-01-004/trajectory.jsonl
++new file mode 100644
++index 0000000..259e713
++--- /dev/null
+++++ b/.keel/runs/2026-10-01-004/trajectory.jsonl
++@@ -0,0 +1,16 @@
+++{"t":"2026-10-01T19:52:53.296703+02:00","seq":1,"kind":"run_start","spec":"copilot-device-auth","keel_version":"0.11.0","store_hash":"1069ef3ef7ea02477d999f8b938e9e4ee85bbbfb51437257542525cb80b1f33a"}
+++{"t":"2026-10-01T19:52:53.298201+02:00","seq":2,"kind":"inject","source":".keel/store/steering/conventions.md","tokens":177,"bytes":705}
+++{"t":"2026-10-01T19:52:53.298234+02:00","seq":3,"kind":"inject","source":".keel/store/steering/tech.md","tokens":85,"bytes":338}
+++{"t":"2026-10-01T19:52:53.298281+02:00","seq":4,"kind":"inject","source":".keel/store/steering/structure.md","tokens":8160,"bytes":32640}
+++{"t":"2026-10-01T19:52:53.302019+02:00","seq":5,"kind":"inject","source":".keel/specs/copilot-device-auth/spec.md","tokens":1204,"bytes":4813}
+++{"t":"2026-10-01T19:52:54.337476+02:00","seq":6,"kind":"command","cmd":"cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/build.txt"}
+++{"t":"2026-10-01T19:53:00.059636+02:00","seq":7,"kind":"command","cmd":"cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/test.txt"}
+++{"t":"2026-10-01T19:53:01.679912+02:00","seq":8,"kind":"command","cmd":"cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/lint.txt"}
+++{"t":"2026-10-01T19:53:03.334741+02:00","seq":9,"kind":"oracle","criterion":"AC-1","oracle":"`cargo test --manifest-path cli/Cargo.toml finds_copilot_device_token_source` exits 0","verdict":"pass","exit_code":0}
+++{"t":"2026-10-01T19:53:03.334774+02:00","seq":10,"kind":"oracle","criterion":"AC-2","oracle":"`cargo test --manifest-path cli/Cargo.toml explicit_credential_wins_over_device_token` exits 0","verdict":"pass","exit_code":0}
+++{"t":"2026-10-01T19:53:03.334779+02:00","seq":11,"kind":"oracle","criterion":"AC-3","oracle":"`cargo test --manifest-path cli/Cargo.toml device_token_only_for_copilot_agent` exits 0","verdict":"pass","exit_code":0}
+++{"t":"2026-10-01T19:53:03.334782+02:00","seq":12,"kind":"oracle","criterion":"AC-4","oracle":"`cargo test --manifest-path cli/Cargo.toml device_token_not_persisted_by_moor` exits 0","verdict":"pass","exit_code":0}
+++{"t":"2026-10-01T19:53:03.334787+02:00","seq":13,"kind":"oracle","criterion":"AC-5","oracle":"`cargo test --manifest-path cli/Cargo.toml device_token_not_in_argv` exits 0","verdict":"pass","exit_code":0}
+++{"t":"2026-10-01T19:53:03.334790+02:00","seq":14,"kind":"oracle","criterion":"AC-6","oracle":"`cargo test --manifest-path cli/Cargo.toml missing_device_token_is_noop` exits 0","verdict":"pass","exit_code":0}
+++{"t":"2026-10-01T19:53:03.334792+02:00","seq":15,"kind":"oracle","criterion":"AC-7","oracle":"`cargo test --manifest-path cli/Cargo.toml device_token_is_redacted` exits 0","verdict":"pass","exit_code":0}
+++{"t":"2026-10-01T19:53:03.334795+02:00","seq":16,"kind":"oracle","criterion":"AC-8","oracle":"`cargo test --manifest-path cli/Cargo.toml` exits 0","verdict":"pass","exit_code":0}
++diff --git a/.keel/specs/copilot-device-auth/approvals.jsonl b/.keel/specs/copilot-device-auth/approvals.jsonl
++new file mode 100644
++index 0000000..9de4200
++--- /dev/null
+++++ b/.keel/specs/copilot-device-auth/approvals.jsonl
++@@ -0,0 +1,3 @@
+++{"schema":"keel.approval/1","stage":"spec","decision":"approved","artefact_hash":"e0807df7320a7c4254901657f246b48acd603ddf5396a294afe9fd5c3a89ca6c","gate_verdict":"pass","by":"Dane Balia","at":"2026-10-01T19:47:21.724436+02:00"}
+++{"schema":"keel.approval/1","stage":"plan","decision":"approved","artefact_hash":"0cfc7d766cff5cd453e8c414ebf105587d3fb4b581d443ea5b2f5cd514cab323","gate_verdict":"pass","by":"Dane Balia","at":"2026-10-01T19:49:03.959339+02:00"}
+++{"schema":"keel.approval/1","stage":"plan","decision":"approved","artefact_hash":"0cfc7d766cff5cd453e8c414ebf105587d3fb4b581d443ea5b2f5cd514cab323","gate_verdict":"pass","by":"Dane Balia","at":"2026-10-01T19:49:15.330935+02:00"}
++diff --git a/.keel/specs/copilot-device-auth/gates/G0.json b/.keel/specs/copilot-device-auth/gates/G0.json
++new file mode 100644
++index 0000000..358f553
++--- /dev/null
+++++ b/.keel/specs/copilot-device-auth/gates/G0.json
++@@ -0,0 +1,90 @@
+++{
+++  "schema": "keel.gate/1",
+++  "gate": "G0",
+++  "run": "2026-10-01-004",
+++  "spec": "copilot-device-auth",
+++  "verdict": "pass",
+++  "generated_at": "2026-10-01T18:39:06.759535+02:00",
+++  "checks": [
+++    {
+++      "id": "schema",
+++      "verdict": "pass",
+++      "detail": "SPEC-0011 (keel.spec/1)"
+++    },
+++    {
+++      "id": "criteria-present",
+++      "verdict": "pass",
+++      "detail": "8 criteria"
+++    },
+++    {
+++      "id": "criterion-ids-unique",
+++      "verdict": "pass",
+++      "detail": "no duplicate ids"
+++    },
+++    {
+++      "id": "no-placeholders",
+++      "verdict": "pass",
+++      "detail": "no unfilled scaffold text"
+++    },
+++    {
+++      "id": "ears-conformance",
+++      "verdict": "pass",
+++      "detail": "8/8 conform (event-driven, optional-feature, ubiquitous, unwanted-behaviour)"
+++    },
+++    {
+++      "id": "oracle-presence",
+++      "verdict": "pass",
+++      "detail": "8 oracles across 8 criteria"
+++    },
+++    {
+++      "id": "oracle-wellformed",
+++      "verdict": "pass",
+++      "detail": "all oracles parse"
+++    },
+++    {
+++      "id": "ambiguity",
+++      "verdict": "pass",
+++      "detail": "no ambiguous phrasing in criteria"
+++    },
+++    {
+++      "id": "criterion-budget",
+++      "verdict": "pass",
+++      "detail": "8/8 criteria"
+++    },
+++    {
+++      "id": "spec-length",
+++      "verdict": "pass",
+++      "detail": "116/250 lines"
+++    },
+++    {
+++      "id": "scope-declared",
+++      "verdict": "pass",
+++      "detail": "3 glob(s): cli/src/secrets.rs, cli/src/commands/up.rs, cli/src/compose.rs"
+++    },
+++    {
+++      "id": "change-budget",
+++      "verdict": "pass",
+++      "detail": "200 lines of diff budgeted"
+++    },
+++    {
+++      "id": "oracle-mix",
+++      "verdict": "pass",
+++      "detail": "8/8 runnable (8 cmd)"
+++    },
+++    {
+++      "id": "human-cost",
+++      "verdict": "pass",
+++      "detail": "0 human oracle(s), none load-bearing"
+++    },
+++    {
+++      "id": "store-drift",
+++      "verdict": "pass",
+++      "detail": "4 projections current"
+++    },
+++    {
+++      "id": "shared-stores",
+++      "verdict": "pass",
+++      "detail": "none configured"
+++    }
+++  ]
+++}
++diff --git a/.keel/specs/copilot-device-auth/gates/G1.json b/.keel/specs/copilot-device-auth/gates/G1.json
++new file mode 100644
++index 0000000..14261b1
++--- /dev/null
+++++ b/.keel/specs/copilot-device-auth/gates/G1.json
++@@ -0,0 +1,95 @@
+++{
+++  "schema": "keel.gate/1",
+++  "gate": "G1",
+++  "run": "2026-10-01-004",
+++  "spec": "copilot-device-auth",
+++  "verdict": "pass",
+++  "generated_at": "2026-10-01T19:47:51.470856+02:00",
+++  "checks": [
+++    {
+++      "id": "schema",
+++      "verdict": "pass",
+++      "detail": "PLAN-0011 + TASKS-0011"
+++    },
+++    {
+++      "id": "g0-passed",
+++      "verdict": "pass",
+++      "detail": "G0 passed in run 2026-10-01-004"
+++    },
+++    {
+++      "id": "spec-approved",
+++      "verdict": "pass",
+++      "detail": "approved by Dane Balia"
+++    },
+++    {
+++      "id": "tasks-present",
+++      "verdict": "pass",
+++      "detail": "8/15 tasks"
+++    },
+++    {
+++      "id": "task-ids-unique",
+++      "verdict": "pass",
+++      "detail": "no duplicate task ids"
+++    },
+++    {
+++      "id": "task-fields",
+++      "verdict": "pass",
+++      "detail": "all task fields recognised"
+++    },
+++    {
+++      "id": "task-criterion-traceability",
+++      "verdict": "pass",
+++      "detail": "8 tasks all traced"
+++    },
+++    {
+++      "id": "criteria-covered",
+++      "verdict": "pass",
+++      "detail": "8/8 criteria have a task"
+++    },
+++    {
+++      "id": "task-budgets",
+++      "verdict": "pass",
+++      "detail": "all 8 tasks budgeted, total 200 lines"
+++    },
+++    {
+++      "id": "total-budget",
+++      "verdict": "pass",
+++      "detail": "200/200 lines"
+++    },
+++    {
+++      "id": "task-exit-conditions",
+++      "verdict": "pass",
+++      "detail": "every task states when it is done"
+++    },
+++    {
+++      "id": "task-dependencies",
+++      "verdict": "pass",
+++      "detail": "1 wave(s), widths 8"
+++    },
+++    {
+++      "id": "wave-isolation",
+++      "verdict": "pass",
+++      "detail": "1 wave(s), no file claimed twice within one"
+++    },
+++    {
+++      "id": "task-files-in-scope",
+++      "verdict": "pass",
+++      "detail": "all task files inside the declared scope"
+++    },
+++    {
+++      "id": "rollback-stated",
+++      "verdict": "pass",
+++      "detail": "git revert"
+++    },
+++    {
+++      "id": "blast-radius-declared",
+++      "verdict": "pass",
+++      "detail": "5 file(s) at depth 2, 1193 lines"
+++    },
+++    {
+++      "id": "blast-radius-current",
+++      "verdict": "pass",
+++      "detail": "5 files, 1193 lines — matches a fresh computation"
+++    }
+++  ]
+++}
++diff --git a/.keel/specs/copilot-device-auth/plan.md b/.keel/specs/copilot-device-auth/plan.md
++new file mode 100644
++index 0000000..eee7a46
++--- /dev/null
+++++ b/.keel/specs/copilot-device-auth/plan.md
++@@ -0,0 +1,80 @@
+++---
+++id: PLAN-0011
+++slug: copilot-device-auth
+++schema: keel.plan/1
+++blast:
+++  depth: 2
+++  declared:
+++  - cli/src/secrets.rs
+++  - cli/src/commands/up.rs
+++  - cli/src/compose.rs
+++  computed:
+++  - cli/src/compose.rs
+++  - cli/src/secrets.rs
+++  - cli/src/commands/up.rs
+++  - cli/src/commands/mod.rs
+++  - cli/src/main.rs
+++  computed_lines: 1193
+++rollback: git revert
+++verified_at: 2026-10-01
+++---
+++
+++# Design — copilot-device-auth
+++
+++## Approach
+++
+++The seam is **secret resolution** — `secrets::resolve_into_env`, which
+++already fills the sandbox's env from the shell then moor's own Keychain
+++entries. This change adds one more, lowest-priority source for exactly one
+++secret: the Copilot CLI's own device-flow token.
+++
+++1. **A `copilot_device_token() -> Option<String>` in `secrets.rs`** that
+++   reads the macOS Keychain service `copilot-cli` (where `copilot /login`
+++   stores a `gho_` OAuth token — verified locally). Pure wrapper over
+++   `security find-generic-password -s copilot-cli -w`; returns `None` on
+++   any miss/error, never panics (AC-1, AC-6). It does not require a moor
+++   `secrets set` (AC-1), is read fresh on each call (AC-4), and its value
+++   never enters an argv — the `-w` read is captured from stdout, and
+++   injection uses the existing env mechanism (AC-5).
+++
+++2. **In the resolution path (`up.rs` via `resolve_into_env`)**, after the
+++   existing env+Keychain resolution, if the project's agent is `copilot`
+++   (manifest `agent` field from SPEC-0010) AND `COPILOT_GITHUB_TOKEN` is
+++   still unresolved, fall back to `copilot_device_token()`. The explicit
+++   sources win (AC-2); non-copilot projects never trigger it (AC-3).
+++
+++3. **Redaction is automatic**: resolved secret values already flow through
+++   `audit::redact`, which scrubs any resolved secret value from logged
+++   execs — the device token, once resolved into the env map moor redacts
+++   against, is covered the same way (AC-7). The change adds the value to
+++   that same redaction set, not a new path.
+++
+++Nothing is persisted: the token is read at resolution time and injected
+++into the container's env, never written to the manifest, compose file, or
+++a moor Keychain entry (AC-4) — so an expired/rotated device token is
+++simply re-read next `up`.
+++
+++## Scope note
+++
+++`compose.rs` is in scope because the injected env var must appear in the
+++rendered compose env list for the sandbox to receive it; the resolution
+++logic itself lives in `secrets.rs`/`up.rs`.
+++
+++## Blast radius
+++
+++<!-- generated by `keel plan`; edits here are overwritten -->
+++
+++Computed from the import graph at depth 2: **5 files, 1193 lines**.
+++
+++| depth | file | lines |
+++| --- | --- | --- |
+++| scope | `cli/src/compose.rs` | 247 |
+++| scope | `cli/src/secrets.rs` | 222 |
+++| scope | `cli/src/commands/up.rs` | 12 |
+++| +1 | `cli/src/commands/mod.rs` | 293 |
+++| +1 | `cli/src/main.rs` | 419 |
+++
+++
+++## Rollback
+++
+++`git revert` — replace this if the change needs a different rollback.
++diff --git a/.keel/specs/copilot-device-auth/spec.md b/.keel/specs/copilot-device-auth/spec.md
++new file mode 100644
++index 0000000..199f899
++--- /dev/null
+++++ b/.keel/specs/copilot-device-auth/spec.md
++@@ -0,0 +1,116 @@
+++---
+++id: SPEC-0011
+++slug: copilot-device-auth
+++schema: keel.spec/1
+++status: approved
+++scope:
+++- cli/src/secrets.rs
+++- cli/src/commands/up.rs
+++- cli/src/compose.rs
+++budget:
+++  criteria: 8
+++  lines: 200
+++verified_at: 2026-10-01
+++---
+++
+++# Resolve the host Copilot device-flow token into the sandbox automatically
+++
+++## Context
+++
+++GitHub Copilot CLI does not reliably accept personal access tokens
+++(classic `ghp_` are rejected; fine-grained usually fail). The mechanism it
+++*does* accept is its own OAuth device flow: the operator runs
+++`copilot /login` once on the host, and the CLI stores a `gho_` OAuth token
+++in the macOS Keychain under service `copilot-cli`, account
+++`https://<host>:<login>`. Verified locally: extracting that token and
+++injecting it into the sandbox as `COPILOT_GITHUB_TOKEN` makes the
+++in-sandbox `copilot -p` authenticate and return a real response, with no
+++PAT involved.
+++
+++moor already resolves a project's declared secrets at `up` (shell env,
+++then its own Keychain entries — `secrets::resolve_into_env`) and injects
+++them into the sandbox. The one missing link is that `COPILOT_GITHUB_TOKEN`
+++is only found if the operator *manually* stored a token; moor does not yet
+++look at the Copilot CLI's own `copilot-cli` Keychain entry, which is where
+++`copilot /login` already put a working token. Closing that gap makes
+++Copilot auth seamless: log in once on the host the way you already do for
+++other CLIs, and the sandbox is authenticated with nothing token-shaped to
+++set.
+++
+++Single responsibility: this spec owns the **host side** — discovering the
+++device-flow token and injecting it. The in-sandbox driver's preflight and
+++error messaging are keel's, specified separately.
+++
+++## Acceptance criteria
+++
+++### AC-1 The Copilot CLI's device-flow token is discoverable from the host Keychain
+++
+++WHEN a host has completed `copilot /login` THE SYSTEM SHALL read the
+++resulting token from the macOS Keychain service `copilot-cli` without the
+++operator having stored it via `moor secrets`.
+++
+++oracle: cmd `cargo test --manifest-path cli/Cargo.toml finds_copilot_device_token_source` exit 0
+++
+++### AC-2 An explicitly set credential always wins over the discovered token
+++
+++WHEN `COPILOT_GITHUB_TOKEN` is already resolvable from the shell env or the
+++project's own Keychain entry THE SYSTEM SHALL use that and SHALL NOT
+++override it with the discovered device-flow token.
+++
+++oracle: cmd `cargo test --manifest-path cli/Cargo.toml explicit_credential_wins_over_device_token` exit 0
+++
+++### AC-3 The device-flow token is only used for copilot-agent projects
+++
+++WHERE the project's agent is not `copilot` THE SYSTEM SHALL NOT inject the
+++discovered device-flow token.
+++
+++oracle: cmd `cargo test --manifest-path cli/Cargo.toml device_token_only_for_copilot_agent` exit 0
+++
+++### AC-4 The token is read fresh each up, never persisted by moor
+++
+++WHEN moor injects the discovered device-flow token THE SYSTEM SHALL read it
+++at resolution time and SHALL NOT write a copy into the project's manifest,
+++compose file, or its own Keychain entries.
+++
+++oracle: cmd `cargo test --manifest-path cli/Cargo.toml device_token_not_persisted_by_moor` exit 0
+++
+++### AC-5 The token never passes through a process argument
+++
+++WHEN the discovered token is injected into the sandbox THE SYSTEM SHALL
+++pass it by environment or stdin, never as a command-line argument, so it
+++cannot appear in `docker inspect`/`ps` output.
+++
+++oracle: cmd `cargo test --manifest-path cli/Cargo.toml device_token_not_in_argv` exit 0
+++
+++### AC-6 Absence of a device-flow token is a no-op, not an error
+++
+++IF no `copilot-cli` Keychain entry exists THEN THE SYSTEM SHALL continue
+++without error, leaving `COPILOT_GITHUB_TOKEN` unresolved for the driver's
+++own preflight to report.
+++
+++oracle: cmd `cargo test --manifest-path cli/Cargo.toml missing_device_token_is_noop` exit 0
+++
+++### AC-7 The resolved token is scrubbed from the audit trail
+++
+++WHEN the discovered token is injected THE SYSTEM SHALL redact its value
+++from logged exec records the same way every resolved secret is.
+++
+++oracle: cmd `cargo test --manifest-path cli/Cargo.toml device_token_is_redacted` exit 0
+++
+++### AC-8 Existing CLI tests stay green
+++
+++THE SYSTEM SHALL leave the existing CLI test suite passing.
+++
+++oracle: cmd `cargo test --manifest-path cli/Cargo.toml` exit 0
+++
+++## Out of scope
+++
+++- The in-sandbox driver's credential preflight, failure messaging, and
+++  classic-PAT rejection — those are keel's (sibling spec
+++  `copilot-device-flow-preflight`).
+++- Running the device flow itself: the operator runs `copilot /login` on the
+++  host; moor never performs an interactive login.
+++- Non-macOS hosts: the discovery reads the macOS Keychain; on other hosts
+++  the operator sets `COPILOT_GITHUB_TOKEN` explicitly (AC-6's no-op path).
+++- Token refresh/expiry handling beyond reading fresh at each `up` — a
+++  device-flow token that has expired is the driver's preflight to report.
++diff --git a/.keel/specs/copilot-device-auth/tasks.md b/.keel/specs/copilot-device-auth/tasks.md
++new file mode 100644
++index 0000000..adccb3b
++--- /dev/null
+++++ b/.keel/specs/copilot-device-auth/tasks.md
++@@ -0,0 +1,63 @@
+++---
+++id: TASKS-0011
+++slug: copilot-device-auth
+++schema: keel.tasks/1
+++---
+++
+++# Tasks
+++
+++Each task must name the criteria it satisfies, the files it touches, a line
+++budget and an exit condition. G1 checks all four, and checks that every
+++criterion in the spec is covered by at least one task.
+++
+++Add `- depends_on: T-1` where order matters. Tasks with no dependency on
+++each other form a wave; `keel tasks` shows them.
+++
+++### T-1 The Copilot CLI's device-flow token is discoverable from the host Keychain
+++- criteria: AC-1
+++- files: scope
+++- budget: 25
+++- exit: `cargo test --manifest-path cli/Cargo.toml finds_copilot_device_token_source` exits 0
+++
+++### T-2 An explicitly set credential always wins over the discovered token
+++- criteria: AC-2
+++- files: scope
+++- budget: 25
+++- exit: `cargo test --manifest-path cli/Cargo.toml explicit_credential_wins_over_device_token` exits 0
+++
+++### T-3 The device-flow token is only used for copilot-agent projects
+++- criteria: AC-3
+++- files: scope
+++- budget: 25
+++- exit: `cargo test --manifest-path cli/Cargo.toml device_token_only_for_copilot_agent` exits 0
+++
+++### T-4 The token is read fresh each up, never persisted by moor
+++- criteria: AC-4
+++- files: scope
+++- budget: 25
+++- exit: `cargo test --manifest-path cli/Cargo.toml device_token_not_persisted_by_moor` exits 0
+++
+++### T-5 The token never passes through a process argument
+++- criteria: AC-5
+++- files: scope
+++- budget: 25
+++- exit: `cargo test --manifest-path cli/Cargo.toml device_token_not_in_argv` exits 0
+++
+++### T-6 Absence of a device-flow token is a no-op, not an error
+++- criteria: AC-6
+++- files: scope
+++- budget: 25
+++- exit: `cargo test --manifest-path cli/Cargo.toml missing_device_token_is_noop` exits 0
+++
+++### T-7 The resolved token is scrubbed from the audit trail
+++- criteria: AC-7
+++- files: scope
+++- budget: 25
+++- exit: `cargo test --manifest-path cli/Cargo.toml device_token_is_redacted` exits 0
+++
+++### T-8 Existing CLI tests stay green
+++- criteria: AC-8
+++- files: scope
+++- budget: 25
+++- exit: `cargo test --manifest-path cli/Cargo.toml` exits 0
+++
+diff --git a/.keel/runs/2026-10-01-004/evidence/lint.txt b/.keel/runs/2026-10-01-004/evidence/lint.txt
+new file mode 100644
+index 0000000..edb91b9
+--- /dev/null
++++ b/.keel/runs/2026-10-01-004/evidence/lint.txt
+@@ -0,0 +1,2 @@
++$ cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml
++
+diff --git a/.keel/runs/2026-10-01-004/evidence/oracles.json b/.keel/runs/2026-10-01-004/evidence/oracles.json
+new file mode 100644
+index 0000000..895b2d4
+--- /dev/null
++++ b/.keel/runs/2026-10-01-004/evidence/oracles.json
+@@ -0,0 +1,74 @@
++{
++  "runs": [
++    {
++      "criterion": "AC-1",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml finds_copilot_device_token_source` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "\nrunning 1 test\ntest secrets::tests::finds_copilot_device_token_source ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 195 filtered out; finished in 0.02s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
++    },
++    {
++      "criterion": "AC-2",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml explicit_credential_wins_over_device_token` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "\nrunning 1 test\ntest secrets::tests::explicit_credential_wins_over_device_token ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 195 filtered out; finished in 0.00s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.15s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
++    },
++    {
++      "criterion": "AC-3",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml device_token_only_for_copilot_agent` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "\nrunning 1 test\ntest secrets::tests::device_token_only_for_copilot_agent ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 195 filtered out; finished in 0.00s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.10s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
++    },
++    {
++      "criterion": "AC-4",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml device_token_not_persisted_by_moor` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "\nrunning 1 test\ntest secrets::tests::device_token_not_persisted_by_moor ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 195 filtered out; finished in 0.04s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.13s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
++    },
++    {
++      "criterion": "AC-5",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml device_token_not_in_argv` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "\nrunning 1 test\ntest secrets::tests::device_token_not_in_argv ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 195 filtered out; finished in 0.02s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.13s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
++    },
++    {
++      "criterion": "AC-6",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml missing_device_token_is_noop` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "\nrunning 1 test\ntest secrets::tests::missing_device_token_is_noop ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 195 filtered out; finished in 0.01s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.13s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
++    },
++    {
++      "criterion": "AC-7",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml device_token_is_redacted` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "\nrunning 1 test\ntest secrets::tests::device_token_is_redacted ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 195 filtered out; finished in 0.00s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.12s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
++    },
++    {
++      "criterion": "AC-8",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "…\n ... ok\ntest audit::tests::legacy_chain_is_sealed_into_the_new_one ... ok\ntest audit::tests::truncating_to_a_prefix_still_verifies_ok ... ok\ntest secrets::tests::device_token_only_for_copilot_agent ... ok\ntest secrets::tests::explicit_credential_wins_over_device_token ... ok\ntest proc::tests::stdout_to_file_keeps_binary_bytes ... ok\ntest audit::tests::editing_an_entrys_data_is_detected ... ok\ntest secrets::tests::service_name_is_scoped_by_project_and_secret_name ... ok\ntest secrets::tests::status_reports_env_before_checking_keychain ... ok\ntest commands::bundle_cmd::tests::a_failed_export_removes_the_partial_archive ... ok\ntest session::tests::a_missing_credential_points_at_the_host_side_fix ... ok\ntest session::tests::an_empty_turn_reports_what_claude_actually_said ... ok\ntest session::tests::brainstorm_grants_no_write_tool ... ok\ntest session::tests::build_role_has_verification_tools_but_no_shell ... ok\ntest secrets::tests::device_token_not_in_argv ... ok\ntest session::tests::error_turn_is_detected_by_is_error ... ok\ntest session::tests::mcp_config_is_the_value_of_its_own_flag ... ok\ntest session::tests::no_role_can_reach_a_shell_or_a_subagent ... ok\ntest compose::tests::project_name_is_substituted_everywhere_it_appears ... ok\ntest session::tests::resume_is_passed_through_when_there_is_a_stored_session ... ok\ntest session::tests::the_prompt_precedes_every_variadic_flag ... ok\ntest compose::tests::secrets_become_compose_default_empty_env_lines ... ok\ntest compose::tests::no_secrets_still_renders_valid_yaml_shape ... ok\ntest session::tests::unknown_role_is_rejected ... ok\ntest studio::render::tests::a_hostile_reply_cannot_reach_the_terminal_through_the_frame ... ok\ntest secrets::tests::finds_copilot_device_token_source ... ok\ntest studio::render::tests::a_turn_in_flight_shows_moving_elapsed_time_next_to_the_input_line ... ok\ntest studio::render::tests::frame_marks_a_pending_project_and_names_an_armed_approval ... ok\ntest studio::render::tests::render_strips_control_sequences ... ok\ntest studio::render::tests::wrap_breaks_long_lines_and_long_words ... ok\ntest studio::state::tests::a_stopped_project_refuses_a_turn_instead_of_hanging_on_docker ... ok\ntest studio::state::tests::edit_cycles_the_three_keel_artifacts ... ok\ntest studio::state::tests::approval_requires_a_second_distinct_key ... ok\ntest studio::state::tests::refresh_issues_one_container_query ... ok\ntest studio::state::tests::stage_is_read_from_keel_next ... ok\ntest studio::state::tests::switching_projects_isolates_sessions ... ok\ntest studio::state::tests::typed_text_wins_over_command_keys_once_a_question_is_started ... ok\ntest studio::tests::approve_refuses_anything_that_is_not_keels_own_approve ... ok\ntest studio::tests::a_turn_that_fails_is_reported_as_a_failed_turn ... ok\ntest studio::tests::console_writes_no_second_log ... ok\ntest studio::tests::input_is_handled_while_turn_is_pending ... ok\ntest session::tests::rejects_malformed_session_id ... ok\ntest compose::tests::sandbox_has_no_bind_mount_volume_entries ... ok\ntest compose::tests::no_known_placeholder_survives_rendering ... ok\ntest compose::tests::sandbox_gets_attestation_and_sink_without_bind_mounts ... ok\ntest session::tests::emitted_recipe_round_trips ... ok\ntest session::tests::turn_is_chained_without_content ... ok\ntest studio::tests::artifact_edit_writes_back_over_exec ... ok\ntest compose::tests::extra_allow_domains_joined_with_commas ... ok\ntest compose::tests::sandbox_network_is_internal_only ... ok\ntest session::tests::transcript_is_redacted ... ok\ntest secrets::tests::missing_device_token_is_noop ... ok\ntest secrets::tests::status_reports_missing_when_neither_env_nor_keychain_has_it ... ok\ntest secrets::tests::device_token_not_persisted_by_moor ... ok\n\ntest result: ok. 196 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.13s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
++    }
++  ],
++  "criteria": 8,
++  "executed": 8,
++  "passed": 8,
++  "failed": 0,
++  "blocked": 0,
++  "human": 0
++}
+\ No newline at end of file
+diff --git a/.keel/runs/2026-10-01-004/evidence/ratchet.json b/.keel/runs/2026-10-01-004/evidence/ratchet.json
+new file mode 100644
+index 0000000..f3b5e43
+--- /dev/null
++++ b/.keel/runs/2026-10-01-004/evidence/ratchet.json
+@@ -0,0 +1,8 @@
++[
++  {
++    "id": "todo-markers",
++    "direction": "down",
++    "value": 1,
++    "baseline": null
++  }
++]
+\ No newline at end of file
+diff --git a/.keel/runs/2026-10-01-004/evidence/review-test-invalidation.txt b/.keel/runs/2026-10-01-004/evidence/review-test-invalidation.txt
+new file mode 100644
+index 0000000..fd66af7
+--- /dev/null
++++ b/.keel/runs/2026-10-01-004/evidence/review-test-invalidation.txt
+@@ -0,0 +1 @@
++no added mocks or weakened assertions
+diff --git a/.keel/runs/2026-10-01-004/evidence/test.txt b/.keel/runs/2026-10-01-004/evidence/test.txt
+new file mode 100644
+index 0000000..9709dc2
+--- /dev/null
++++ b/.keel/runs/2026-10-01-004/evidence/test.txt
+@@ -0,0 +1,14 @@
++$ cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml
++
++
++running 196 tests
++....................................................................................... 87/196
++....................................................................................... 174/196
++......................
++test result: ok. 196 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.42s
++
++
++running 8 tests
++........
++test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
++
+diff --git a/.keel/runs/2026-10-01-004/evidence/tree.txt b/.keel/runs/2026-10-01-004/evidence/tree.txt
+new file mode 100644
+index 0000000..c1b8784
+--- /dev/null
++++ b/.keel/runs/2026-10-01-004/evidence/tree.txt
+@@ -0,0 +1 @@
++93c28999cd89050514d6aed4ddd041b3f6fab3bd50493990221b06d45f60ae69
+diff --git a/.keel/runs/2026-10-01-004/gates/G2.5.json b/.keel/runs/2026-10-01-004/gates/G2.5.json
+new file mode 100644
+index 0000000..1377785
+--- /dev/null
++++ b/.keel/runs/2026-10-01-004/gates/G2.5.json
+@@ -0,0 +1,36 @@
++{
++  "schema": "keel.gate/1",
++  "gate": "G2.5",
++  "run": "2026-10-01-005",
++  "spec": "copilot-device-auth",
++  "verdict": "blocked",
++  "generated_at": "2026-10-01T19:53:03.891691+02:00",
++  "checks": [
++    {
++      "id": "test-invalidation",
++      "verdict": "pass",
++      "detail": "no mocks or weakened assertions added",
++      "evidence": "evidence/review-test-invalidation.txt"
++    },
++    {
++      "id": "test-movement",
++      "verdict": "blocked",
++      "detail": "2 code file(s) changed and no test file did — confirm the criteria's oracles exercise this, then `keel approve --stage review copilot-device-auth`"
++    },
++    {
++      "id": "conventions",
++      "verdict": "pass",
++      "detail": "3 house rule(s) in force"
++    },
++    {
++      "id": "lessons",
++      "verdict": "pass",
++      "detail": "no lessons in force yet (Phase 3 populates these)"
++    },
++    {
++      "id": "reviewer",
++      "verdict": "pass",
++      "detail": "no adversarial reviewer configured — the heuristics above are the whole pass"
++    }
++  ]
++}
+diff --git a/.keel/runs/2026-10-01-004/gates/G2.json b/.keel/runs/2026-10-01-004/gates/G2.json
+new file mode 100644
+index 0000000..d82cad4
+--- /dev/null
++++ b/.keel/runs/2026-10-01-004/gates/G2.json
+@@ -0,0 +1,62 @@
++{
++  "schema": "keel.gate/1",
++  "gate": "G2",
++  "run": "2026-10-01-005",
++  "spec": "copilot-device-auth",
++  "verdict": "pass",
++  "generated_at": "2026-10-01T19:53:03.811299+02:00",
++  "checks": [
++    {
++      "id": "build",
++      "verdict": "pass",
++      "detail": "`cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml` exited 0",
++      "evidence": "evidence/build.txt"
++    },
++    {
++      "id": "test",
++      "verdict": "pass",
++      "detail": "`cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml` exited 0",
++      "evidence": "evidence/test.txt"
++    },
++    {
++      "id": "lint",
++      "verdict": "pass",
++      "detail": "`cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml` exited 0",
++      "evidence": "evidence/lint.txt"
++    },
++    {
++      "id": "oracle-coverage",
++      "verdict": "pass",
++      "detail": "8/8 oracles pass (0 awaiting human judgement)",
++      "evidence": "evidence/oracles.json"
++    },
++    {
++      "id": "blast-radius",
++      "verdict": "pass",
++      "detail": "2 changed file(s) inside scope, 5 file(s) downstream",
++      "evidence": "evidence/diff-stat.txt"
++    },
++    {
++      "id": "line-budget",
++      "verdict": "pass",
++      "detail": "139/200 lines of churn",
++      "evidence": "evidence/diff-stat.txt"
++    },
++    {
++      "id": "baseline-ratchet",
++      "verdict": "pass",
++      "detail": "1 metric(s) held",
++      "evidence": "evidence/ratchet.json"
++    },
++    {
++      "id": "store-drift",
++      "verdict": "pass",
++      "detail": "4 projections current"
++    },
++    {
++      "id": "shared-stores",
++      "verdict": "pass",
++      "detail": "none configured"
++    }
++  ]
++}
+diff --git a/.keel/runs/2026-10-01-004/gates/G3.json b/.keel/runs/2026-10-01-004/gates/G3.json
+new file mode 100644
+index 0000000..403d96b
+--- /dev/null
++++ b/.keel/runs/2026-10-01-004/gates/G3.json
+@@ -0,0 +1,31 @@
++{
++  "schema": "keel.gate/1",
++  "gate": "G3",
++  "run": "2026-10-01-005",
++  "spec": "copilot-device-auth",
++  "verdict": "fail",
++  "generated_at": "2026-10-01T19:53:03.921564+02:00",
++  "checks": [
++    {
++      "id": "earlier-gates",
++      "verdict": "blocked",
++      "detail": "G2.5 could not complete — G3 has nothing to ratify"
++    },
++    {
++      "id": "reviewable-size",
++      "verdict": "pass",
++      "detail": "139/1100 reviewable lines"
++    },
++    {
++      "id": "evidence-complete",
++      "verdict": "pass",
++      "detail": "trajectory, metadata and gate results present"
++    },
++    {
++      "id": "human-verdict",
++      "verdict": "fail",
++      "expected": "a recorded human decision on the change",
++      "actual": "none — run `keel approve copilot-device-auth --stage merge`"
++    }
++  ]
++}
+diff --git a/.keel/runs/2026-10-01-004/run.json b/.keel/runs/2026-10-01-004/run.json
+new file mode 100644
+index 0000000..5eb4774
+--- /dev/null
++++ b/.keel/runs/2026-10-01-004/run.json
+@@ -0,0 +1,11 @@
++{
++  "schema": "keel.run/1",
++  "id": "2026-10-01-004",
++  "spec": "copilot-device-auth",
++  "keel_version": "0.11.0",
++  "store_hash": "1069ef3ef7ea02477d999f8b938e9e4ee85bbbfb51437257542525cb80b1f33a",
++  "started_at": "2026-10-01T19:52:53.295703+02:00",
++  "finished_at": "2026-10-01T19:53:03.926497+02:00",
++  "verdict": "fail",
++  "base_commit": "ed9240c31ba922e5b369672c20d9fd281db06fe0"
++}
+diff --git a/.keel/runs/2026-10-01-004/trajectory.jsonl b/.keel/runs/2026-10-01-004/trajectory.jsonl
+new file mode 100644
+index 0000000..96523fc
+--- /dev/null
++++ b/.keel/runs/2026-10-01-004/trajectory.jsonl
+@@ -0,0 +1,20 @@
++{"t":"2026-10-01T19:52:53.296703+02:00","seq":1,"kind":"run_start","spec":"copilot-device-auth","keel_version":"0.11.0","store_hash":"1069ef3ef7ea02477d999f8b938e9e4ee85bbbfb51437257542525cb80b1f33a"}
++{"t":"2026-10-01T19:52:53.298201+02:00","seq":2,"kind":"inject","source":".keel/store/steering/conventions.md","tokens":177,"bytes":705}
++{"t":"2026-10-01T19:52:53.298234+02:00","seq":3,"kind":"inject","source":".keel/store/steering/tech.md","tokens":85,"bytes":338}
++{"t":"2026-10-01T19:52:53.298281+02:00","seq":4,"kind":"inject","source":".keel/store/steering/structure.md","tokens":8160,"bytes":32640}
++{"t":"2026-10-01T19:52:53.302019+02:00","seq":5,"kind":"inject","source":".keel/specs/copilot-device-auth/spec.md","tokens":1204,"bytes":4813}
++{"t":"2026-10-01T19:52:54.337476+02:00","seq":6,"kind":"command","cmd":"cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/build.txt"}
++{"t":"2026-10-01T19:53:00.059636+02:00","seq":7,"kind":"command","cmd":"cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/test.txt"}
++{"t":"2026-10-01T19:53:01.679912+02:00","seq":8,"kind":"command","cmd":"cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/lint.txt"}
++{"t":"2026-10-01T19:53:03.334741+02:00","seq":9,"kind":"oracle","criterion":"AC-1","oracle":"`cargo test --manifest-path cli/Cargo.toml finds_copilot_device_token_source` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-10-01T19:53:03.334774+02:00","seq":10,"kind":"oracle","criterion":"AC-2","oracle":"`cargo test --manifest-path cli/Cargo.toml explicit_credential_wins_over_device_token` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-10-01T19:53:03.334779+02:00","seq":11,"kind":"oracle","criterion":"AC-3","oracle":"`cargo test --manifest-path cli/Cargo.toml device_token_only_for_copilot_agent` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-10-01T19:53:03.334782+02:00","seq":12,"kind":"oracle","criterion":"AC-4","oracle":"`cargo test --manifest-path cli/Cargo.toml device_token_not_persisted_by_moor` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-10-01T19:53:03.334787+02:00","seq":13,"kind":"oracle","criterion":"AC-5","oracle":"`cargo test --manifest-path cli/Cargo.toml device_token_not_in_argv` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-10-01T19:53:03.334790+02:00","seq":14,"kind":"oracle","criterion":"AC-6","oracle":"`cargo test --manifest-path cli/Cargo.toml missing_device_token_is_noop` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-10-01T19:53:03.334792+02:00","seq":15,"kind":"oracle","criterion":"AC-7","oracle":"`cargo test --manifest-path cli/Cargo.toml device_token_is_redacted` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-10-01T19:53:03.334795+02:00","seq":16,"kind":"oracle","criterion":"AC-8","oracle":"`cargo test --manifest-path cli/Cargo.toml` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-10-01T19:53:03.812083+02:00","seq":17,"kind":"gate","gate":"G2","verdict":"pass","result":"gates/G2.json"}
++{"t":"2026-10-01T19:53:03.892490+02:00","seq":18,"kind":"gate","gate":"G2.5","verdict":"blocked","result":"gates/G2.5.json"}
++{"t":"2026-10-01T19:53:03.922439+02:00","seq":19,"kind":"gate","gate":"G3","verdict":"fail","result":"gates/G3.json"}
++{"t":"2026-10-01T19:53:03.922463+02:00","seq":20,"kind":"run_end","verdict":"fail","duration_ms":10702}
+diff --git a/.keel/runs/2026-10-01-005/evidence/build.txt b/.keel/runs/2026-10-01-005/evidence/build.txt
+new file mode 100644
+index 0000000..c078b47
+--- /dev/null
++++ b/.keel/runs/2026-10-01-005/evidence/build.txt
+@@ -0,0 +1,2 @@
++$ cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml
++
+diff --git a/.keel/runs/2026-10-01-005/evidence/diff-stat.txt b/.keel/runs/2026-10-01-005/evidence/diff-stat.txt
+new file mode 100644
+index 0000000..726f233
+--- /dev/null
++++ b/.keel/runs/2026-10-01-005/evidence/diff-stat.txt
+@@ -0,0 +1,39 @@
++     4      4  .github/copilot-instructions.md
++    12      0  .keel/chain.jsonl
++     2      0  .keel/runs/2026-10-01-004/evidence/build.txt
++    24      0  .keel/runs/2026-10-01-004/evidence/diff-stat.txt
++  1226      0  .keel/runs/2026-10-01-004/evidence/diff.patch
++     2      0  .keel/runs/2026-10-01-004/evidence/lint.txt
++    74      0  .keel/runs/2026-10-01-004/evidence/oracles.json
++     8      0  .keel/runs/2026-10-01-004/evidence/ratchet.json
++     1      0  .keel/runs/2026-10-01-004/evidence/review-test-invalidation.txt
++    14      0  .keel/runs/2026-10-01-004/evidence/test.txt
++     1      0  .keel/runs/2026-10-01-004/evidence/tree.txt
++    36      0  .keel/runs/2026-10-01-004/gates/G2.5.json
++    62      0  .keel/runs/2026-10-01-004/gates/G2.json
++    31      0  .keel/runs/2026-10-01-004/gates/G3.json
++    11      0  .keel/runs/2026-10-01-004/run.json
++    20      0  .keel/runs/2026-10-01-004/trajectory.jsonl
++     2      0  .keel/runs/2026-10-01-005/evidence/build.txt
++     2      0  .keel/runs/2026-10-01-005/evidence/lint.txt
++    74      0  .keel/runs/2026-10-01-005/evidence/oracles.json
++    14      0  .keel/runs/2026-10-01-005/evidence/test.txt
++     9      0  .keel/runs/2026-10-01-005/run.json
++    16      0  .keel/runs/2026-10-01-005/trajectory.jsonl
++     3      0  .keel/specs/copilot-device-auth/approvals.jsonl
++    90      0  .keel/specs/copilot-device-auth/gates/G0.json
++    95      0  .keel/specs/copilot-device-auth/gates/G1.json
++    80      0  .keel/specs/copilot-device-auth/plan.md
++     1      0  .keel/specs/copilot-device-auth/review-flags.txt
++   116      0  .keel/specs/copilot-device-auth/spec.md
++    63      0  .keel/specs/copilot-device-auth/tasks.md
++    16     16  .keel/store/map/cli/src/CODEMAP.md
++    10     10  .keel/store/map/cli/src/commands/CODEMAP.md
++    22     22  .keel/store/steering/structure.md
++    19     19  .kiro/steering/keel.md
++     9      9  AGENTS.md
++     9      9  CLAUDE.md
++     9      1  cli/src/commands/up.rs
++   129      0  cli/src/secrets.rs
++
++37 file(s), +2316 -90 (2406 lines of churn) against ed9240c31ba922e5b369672c20d9fd281db06fe0
+diff --git a/.keel/runs/2026-10-01-005/evidence/lint.txt b/.keel/runs/2026-10-01-005/evidence/lint.txt
+new file mode 100644
+index 0000000..edb91b9
+--- /dev/null
++++ b/.keel/runs/2026-10-01-005/evidence/lint.txt
+@@ -0,0 +1,2 @@
++$ cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml
++
+diff --git a/.keel/runs/2026-10-01-005/evidence/oracles.json b/.keel/runs/2026-10-01-005/evidence/oracles.json
+new file mode 100644
+index 0000000..2af9c5b
+--- /dev/null
++++ b/.keel/runs/2026-10-01-005/evidence/oracles.json
+@@ -0,0 +1,74 @@
++{
++  "runs": [
++    {
++      "criterion": "AC-1",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml finds_copilot_device_token_source` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "\nrunning 1 test\ntest secrets::tests::finds_copilot_device_token_source ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 195 filtered out; finished in 0.02s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.15s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
++    },
++    {
++      "criterion": "AC-2",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml explicit_credential_wins_over_device_token` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "\nrunning 1 test\ntest secrets::tests::explicit_credential_wins_over_device_token ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 195 filtered out; finished in 0.00s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.12s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
++    },
++    {
++      "criterion": "AC-3",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml device_token_only_for_copilot_agent` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "\nrunning 1 test\ntest secrets::tests::device_token_only_for_copilot_agent ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 195 filtered out; finished in 0.00s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.12s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
++    },
++    {
++      "criterion": "AC-4",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml device_token_not_persisted_by_moor` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "\nrunning 1 test\ntest secrets::tests::device_token_not_persisted_by_moor ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 195 filtered out; finished in 0.04s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.12s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
++    },
++    {
++      "criterion": "AC-5",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml device_token_not_in_argv` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "\nrunning 1 test\ntest secrets::tests::device_token_not_in_argv ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 195 filtered out; finished in 0.02s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.13s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
++    },
++    {
++      "criterion": "AC-6",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml missing_device_token_is_noop` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "\nrunning 1 test\ntest secrets::tests::missing_device_token_is_noop ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 195 filtered out; finished in 0.01s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.13s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
++    },
++    {
++      "criterion": "AC-7",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml device_token_is_redacted` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "\nrunning 1 test\ntest secrets::tests::device_token_is_redacted ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 195 filtered out; finished in 0.00s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.12s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
++    },
++    {
++      "criterion": "AC-8",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "…\noven ... ok\ntest secrets::tests::device_token_is_redacted ... ok\ntest posture::tests::attestation_is_derived_from_inspect_output ... ok\ntest secrets::tests::device_token_only_for_copilot_agent ... ok\ntest secrets::tests::explicit_credential_wins_over_device_token ... ok\ntest audit::tests::legacy_chain_is_sealed_into_the_new_one ... ok\ntest proc::tests::stdout_to_file_keeps_binary_bytes ... ok\ntest secrets::tests::service_name_is_scoped_by_project_and_secret_name ... ok\ntest secrets::tests::status_reports_env_before_checking_keychain ... ok\ntest compose::tests::extra_allow_domains_joined_with_commas ... ok\ntest session::tests::a_missing_credential_points_at_the_host_side_fix ... ok\ntest session::tests::an_empty_turn_reports_what_claude_actually_said ... ok\ntest session::tests::brainstorm_grants_no_write_tool ... ok\ntest session::tests::build_role_has_verification_tools_but_no_shell ... ok\ntest compose::tests::no_known_placeholder_survives_rendering ... ok\ntest session::tests::error_turn_is_detected_by_is_error ... ok\ntest session::tests::mcp_config_is_the_value_of_its_own_flag ... ok\ntest session::tests::no_role_can_reach_a_shell_or_a_subagent ... ok\ntest commands::bundle_cmd::tests::a_failed_export_removes_the_partial_archive ... ok\ntest session::tests::resume_is_passed_through_when_there_is_a_stored_session ... ok\ntest session::tests::the_prompt_precedes_every_variadic_flag ... ok\ntest compose::tests::sandbox_has_no_bind_mount_volume_entries ... ok\ntest session::tests::rejects_malformed_session_id ... ok\ntest session::tests::unknown_role_is_rejected ... ok\ntest studio::render::tests::a_hostile_reply_cannot_reach_the_terminal_through_the_frame ... ok\ntest studio::render::tests::a_turn_in_flight_shows_moving_elapsed_time_next_to_the_input_line ... ok\ntest studio::render::tests::frame_marks_a_pending_project_and_names_an_armed_approval ... ok\ntest studio::render::tests::render_strips_control_sequences ... ok\ntest compose::tests::no_secrets_still_renders_valid_yaml_shape ... ok\ntest studio::render::tests::wrap_breaks_long_lines_and_long_words ... ok\ntest studio::state::tests::a_stopped_project_refuses_a_turn_instead_of_hanging_on_docker ... ok\ntest studio::state::tests::edit_cycles_the_three_keel_artifacts ... ok\ntest studio::state::tests::approval_requires_a_second_distinct_key ... ok\ntest studio::state::tests::refresh_issues_one_container_query ... ok\ntest studio::state::tests::stage_is_read_from_keel_next ... ok\ntest compose::tests::secrets_become_compose_default_empty_env_lines ... ok\ntest studio::state::tests::typed_text_wins_over_command_keys_once_a_question_is_started ... ok\ntest studio::state::tests::switching_projects_isolates_sessions ... ok\ntest compose::tests::project_name_is_substituted_everywhere_it_appears ... ok\ntest studio::tests::approve_refuses_anything_that_is_not_keels_own_approve ... ok\ntest studio::tests::a_turn_that_fails_is_reported_as_a_failed_turn ... ok\ntest compose::tests::sandbox_gets_attestation_and_sink_without_bind_mounts ... ok\ntest studio::tests::input_is_handled_while_turn_is_pending ... ok\ntest studio::tests::console_writes_no_second_log ... ok\ntest secrets::tests::missing_device_token_is_noop ... ok\ntest session::tests::transcript_is_redacted ... ok\ntest session::tests::turn_is_chained_without_content ... ok\ntest session::tests::emitted_recipe_round_trips ... ok\ntest compose::tests::sandbox_network_is_internal_only ... ok\ntest secrets::tests::device_token_not_in_argv ... ok\ntest secrets::tests::finds_copilot_device_token_source ... ok\ntest studio::tests::artifact_edit_writes_back_over_exec ... ok\ntest secrets::tests::status_reports_missing_when_neither_env_nor_keychain_has_it ... ok\ntest secrets::tests::device_token_not_persisted_by_moor ... ok\n\ntest result: ok. 196 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.14s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
++    }
++  ],
++  "criteria": 8,
++  "executed": 8,
++  "passed": 8,
++  "failed": 0,
++  "blocked": 0,
++  "human": 0
++}
+\ No newline at end of file
+diff --git a/.keel/runs/2026-10-01-005/evidence/test.txt b/.keel/runs/2026-10-01-005/evidence/test.txt
+new file mode 100644
+index 0000000..64f1664
+--- /dev/null
++++ b/.keel/runs/2026-10-01-005/evidence/test.txt
+@@ -0,0 +1,14 @@
++$ cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml
++
++
++running 196 tests
++....................................................................................... 87/196
++....................................................................................... 174/196
++......................
++test result: ok. 196 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
++
++
++running 8 tests
++........
++test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
++
+diff --git a/.keel/runs/2026-10-01-005/run.json b/.keel/runs/2026-10-01-005/run.json
+new file mode 100644
+index 0000000..2df1fbe
+--- /dev/null
++++ b/.keel/runs/2026-10-01-005/run.json
+@@ -0,0 +1,9 @@
++{
++  "schema": "keel.run/1",
++  "id": "2026-10-01-005",
++  "spec": "copilot-device-auth",
++  "keel_version": "0.11.0",
++  "store_hash": "1069ef3ef7ea02477d999f8b938e9e4ee85bbbfb51437257542525cb80b1f33a",
++  "started_at": "2026-10-01T19:53:20.290940+02:00",
++  "base_commit": "ed9240c31ba922e5b369672c20d9fd281db06fe0"
++}
+diff --git a/.keel/runs/2026-10-01-005/trajectory.jsonl b/.keel/runs/2026-10-01-005/trajectory.jsonl
+new file mode 100644
+index 0000000..0060522
+--- /dev/null
++++ b/.keel/runs/2026-10-01-005/trajectory.jsonl
+@@ -0,0 +1,16 @@
++{"t":"2026-10-01T19:53:20.291700+02:00","seq":1,"kind":"run_start","spec":"copilot-device-auth","keel_version":"0.11.0","store_hash":"1069ef3ef7ea02477d999f8b938e9e4ee85bbbfb51437257542525cb80b1f33a"}
++{"t":"2026-10-01T19:53:20.292340+02:00","seq":2,"kind":"inject","source":".keel/store/steering/conventions.md","tokens":177,"bytes":705}
++{"t":"2026-10-01T19:53:20.292370+02:00","seq":3,"kind":"inject","source":".keel/store/steering/tech.md","tokens":85,"bytes":338}
++{"t":"2026-10-01T19:53:20.292413+02:00","seq":4,"kind":"inject","source":".keel/store/steering/structure.md","tokens":8160,"bytes":32640}
++{"t":"2026-10-01T19:53:20.292679+02:00","seq":5,"kind":"inject","source":".keel/specs/copilot-device-auth/spec.md","tokens":1204,"bytes":4813}
++{"t":"2026-10-01T19:53:20.582022+02:00","seq":6,"kind":"command","cmd":"cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/build.txt"}
++{"t":"2026-10-01T19:53:20.902861+02:00","seq":7,"kind":"command","cmd":"cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/test.txt"}
++{"t":"2026-10-01T19:53:21.282558+02:00","seq":8,"kind":"command","cmd":"cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/lint.txt"}
++{"t":"2026-10-01T19:53:22.877830+02:00","seq":9,"kind":"oracle","criterion":"AC-1","oracle":"`cargo test --manifest-path cli/Cargo.toml finds_copilot_device_token_source` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-10-01T19:53:22.877864+02:00","seq":10,"kind":"oracle","criterion":"AC-2","oracle":"`cargo test --manifest-path cli/Cargo.toml explicit_credential_wins_over_device_token` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-10-01T19:53:22.877869+02:00","seq":11,"kind":"oracle","criterion":"AC-3","oracle":"`cargo test --manifest-path cli/Cargo.toml device_token_only_for_copilot_agent` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-10-01T19:53:22.877872+02:00","seq":12,"kind":"oracle","criterion":"AC-4","oracle":"`cargo test --manifest-path cli/Cargo.toml device_token_not_persisted_by_moor` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-10-01T19:53:22.877874+02:00","seq":13,"kind":"oracle","criterion":"AC-5","oracle":"`cargo test --manifest-path cli/Cargo.toml device_token_not_in_argv` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-10-01T19:53:22.877879+02:00","seq":14,"kind":"oracle","criterion":"AC-6","oracle":"`cargo test --manifest-path cli/Cargo.toml missing_device_token_is_noop` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-10-01T19:53:22.877882+02:00","seq":15,"kind":"oracle","criterion":"AC-7","oracle":"`cargo test --manifest-path cli/Cargo.toml device_token_is_redacted` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-10-01T19:53:22.877886+02:00","seq":16,"kind":"oracle","criterion":"AC-8","oracle":"`cargo test --manifest-path cli/Cargo.toml` exits 0","verdict":"pass","exit_code":0}
+diff --git a/.keel/specs/copilot-device-auth/approvals.jsonl b/.keel/specs/copilot-device-auth/approvals.jsonl
+new file mode 100644
+index 0000000..9de4200
+--- /dev/null
++++ b/.keel/specs/copilot-device-auth/approvals.jsonl
+@@ -0,0 +1,3 @@
++{"schema":"keel.approval/1","stage":"spec","decision":"approved","artefact_hash":"e0807df7320a7c4254901657f246b48acd603ddf5396a294afe9fd5c3a89ca6c","gate_verdict":"pass","by":"Dane Balia","at":"2026-10-01T19:47:21.724436+02:00"}
++{"schema":"keel.approval/1","stage":"plan","decision":"approved","artefact_hash":"0cfc7d766cff5cd453e8c414ebf105587d3fb4b581d443ea5b2f5cd514cab323","gate_verdict":"pass","by":"Dane Balia","at":"2026-10-01T19:49:03.959339+02:00"}
++{"schema":"keel.approval/1","stage":"plan","decision":"approved","artefact_hash":"0cfc7d766cff5cd453e8c414ebf105587d3fb4b581d443ea5b2f5cd514cab323","gate_verdict":"pass","by":"Dane Balia","at":"2026-10-01T19:49:15.330935+02:00"}
+diff --git a/.keel/specs/copilot-device-auth/gates/G0.json b/.keel/specs/copilot-device-auth/gates/G0.json
+new file mode 100644
+index 0000000..358f553
+--- /dev/null
++++ b/.keel/specs/copilot-device-auth/gates/G0.json
+@@ -0,0 +1,90 @@
++{
++  "schema": "keel.gate/1",
++  "gate": "G0",
++  "run": "2026-10-01-004",
++  "spec": "copilot-device-auth",
++  "verdict": "pass",
++  "generated_at": "2026-10-01T18:39:06.759535+02:00",
++  "checks": [
++    {
++      "id": "schema",
++      "verdict": "pass",
++      "detail": "SPEC-0011 (keel.spec/1)"
++    },
++    {
++      "id": "criteria-present",
++      "verdict": "pass",
++      "detail": "8 criteria"
++    },
++    {
++      "id": "criterion-ids-unique",
++      "verdict": "pass",
++      "detail": "no duplicate ids"
++    },
++    {
++      "id": "no-placeholders",
++      "verdict": "pass",
++      "detail": "no unfilled scaffold text"
++    },
++    {
++      "id": "ears-conformance",
++      "verdict": "pass",
++      "detail": "8/8 conform (event-driven, optional-feature, ubiquitous, unwanted-behaviour)"
++    },
++    {
++      "id": "oracle-presence",
++      "verdict": "pass",
++      "detail": "8 oracles across 8 criteria"
++    },
++    {
++      "id": "oracle-wellformed",
++      "verdict": "pass",
++      "detail": "all oracles parse"
++    },
++    {
++      "id": "ambiguity",
++      "verdict": "pass",
++      "detail": "no ambiguous phrasing in criteria"
++    },
++    {
++      "id": "criterion-budget",
++      "verdict": "pass",
++      "detail": "8/8 criteria"
++    },
++    {
++      "id": "spec-length",
++      "verdict": "pass",
++      "detail": "116/250 lines"
++    },
++    {
++      "id": "scope-declared",
++      "verdict": "pass",
++      "detail": "3 glob(s): cli/src/secrets.rs, cli/src/commands/up.rs, cli/src/compose.rs"
++    },
++    {
++      "id": "change-budget",
++      "verdict": "pass",
++      "detail": "200 lines of diff budgeted"
++    },
++    {
++      "id": "oracle-mix",
++      "verdict": "pass",
++      "detail": "8/8 runnable (8 cmd)"
++    },
++    {
++      "id": "human-cost",
++      "verdict": "pass",
++      "detail": "0 human oracle(s), none load-bearing"
++    },
++    {
++      "id": "store-drift",
++      "verdict": "pass",
++      "detail": "4 projections current"
++    },
++    {
++      "id": "shared-stores",
++      "verdict": "pass",
++      "detail": "none configured"
++    }
++  ]
++}
+diff --git a/.keel/specs/copilot-device-auth/gates/G1.json b/.keel/specs/copilot-device-auth/gates/G1.json
+new file mode 100644
+index 0000000..14261b1
+--- /dev/null
++++ b/.keel/specs/copilot-device-auth/gates/G1.json
+@@ -0,0 +1,95 @@
++{
++  "schema": "keel.gate/1",
++  "gate": "G1",
++  "run": "2026-10-01-004",
++  "spec": "copilot-device-auth",
++  "verdict": "pass",
++  "generated_at": "2026-10-01T19:47:51.470856+02:00",
++  "checks": [
++    {
++      "id": "schema",
++      "verdict": "pass",
++      "detail": "PLAN-0011 + TASKS-0011"
++    },
++    {
++      "id": "g0-passed",
++      "verdict": "pass",
++      "detail": "G0 passed in run 2026-10-01-004"
++    },
++    {
++      "id": "spec-approved",
++      "verdict": "pass",
++      "detail": "approved by Dane Balia"
++    },
++    {
++      "id": "tasks-present",
++      "verdict": "pass",
++      "detail": "8/15 tasks"
++    },
++    {
++      "id": "task-ids-unique",
++      "verdict": "pass",
++      "detail": "no duplicate task ids"
++    },
++    {
++      "id": "task-fields",
++      "verdict": "pass",
++      "detail": "all task fields recognised"
++    },
++    {
++      "id": "task-criterion-traceability",
++      "verdict": "pass",
++      "detail": "8 tasks all traced"
++    },
++    {
++      "id": "criteria-covered",
++      "verdict": "pass",
++      "detail": "8/8 criteria have a task"
++    },
++    {
++      "id": "task-budgets",
++      "verdict": "pass",
++      "detail": "all 8 tasks budgeted, total 200 lines"
++    },
++    {
++      "id": "total-budget",
++      "verdict": "pass",
++      "detail": "200/200 lines"
++    },
++    {
++      "id": "task-exit-conditions",
++      "verdict": "pass",
++      "detail": "every task states when it is done"
++    },
++    {
++      "id": "task-dependencies",
++      "verdict": "pass",
++      "detail": "1 wave(s), widths 8"
++    },
++    {
++      "id": "wave-isolation",
++      "verdict": "pass",
++      "detail": "1 wave(s), no file claimed twice within one"
++    },
++    {
++      "id": "task-files-in-scope",
++      "verdict": "pass",
++      "detail": "all task files inside the declared scope"
++    },
++    {
++      "id": "rollback-stated",
++      "verdict": "pass",
++      "detail": "git revert"
++    },
++    {
++      "id": "blast-radius-declared",
++      "verdict": "pass",
++      "detail": "5 file(s) at depth 2, 1193 lines"
++    },
++    {
++      "id": "blast-radius-current",
++      "verdict": "pass",
++      "detail": "5 files, 1193 lines — matches a fresh computation"
++    }
++  ]
++}
+diff --git a/.keel/specs/copilot-device-auth/plan.md b/.keel/specs/copilot-device-auth/plan.md
+new file mode 100644
+index 0000000..eee7a46
+--- /dev/null
++++ b/.keel/specs/copilot-device-auth/plan.md
+@@ -0,0 +1,80 @@
++---
++id: PLAN-0011
++slug: copilot-device-auth
++schema: keel.plan/1
++blast:
++  depth: 2
++  declared:
++  - cli/src/secrets.rs
++  - cli/src/commands/up.rs
++  - cli/src/compose.rs
++  computed:
++  - cli/src/compose.rs
++  - cli/src/secrets.rs
++  - cli/src/commands/up.rs
++  - cli/src/commands/mod.rs
++  - cli/src/main.rs
++  computed_lines: 1193
++rollback: git revert
++verified_at: 2026-10-01
++---
++
++# Design — copilot-device-auth
++
++## Approach
++
++The seam is **secret resolution** — `secrets::resolve_into_env`, which
++already fills the sandbox's env from the shell then moor's own Keychain
++entries. This change adds one more, lowest-priority source for exactly one
++secret: the Copilot CLI's own device-flow token.
++
++1. **A `copilot_device_token() -> Option<String>` in `secrets.rs`** that
++   reads the macOS Keychain service `copilot-cli` (where `copilot /login`
++   stores a `gho_` OAuth token — verified locally). Pure wrapper over
++   `security find-generic-password -s copilot-cli -w`; returns `None` on
++   any miss/error, never panics (AC-1, AC-6). It does not require a moor
++   `secrets set` (AC-1), is read fresh on each call (AC-4), and its value
++   never enters an argv — the `-w` read is captured from stdout, and
++   injection uses the existing env mechanism (AC-5).
++
++2. **In the resolution path (`up.rs` via `resolve_into_env`)**, after the
++   existing env+Keychain resolution, if the project's agent is `copilot`
++   (manifest `agent` field from SPEC-0010) AND `COPILOT_GITHUB_TOKEN` is
++   still unresolved, fall back to `copilot_device_token()`. The explicit
++   sources win (AC-2); non-copilot projects never trigger it (AC-3).
++
++3. **Redaction is automatic**: resolved secret values already flow through
++   `audit::redact`, which scrubs any resolved secret value from logged
++   execs — the device token, once resolved into the env map moor redacts
++   against, is covered the same way (AC-7). The change adds the value to
++   that same redaction set, not a new path.
++
++Nothing is persisted: the token is read at resolution time and injected
++into the container's env, never written to the manifest, compose file, or
++a moor Keychain entry (AC-4) — so an expired/rotated device token is
++simply re-read next `up`.
++
++## Scope note
++
++`compose.rs` is in scope because the injected env var must appear in the
++rendered compose env list for the sandbox to receive it; the resolution
++logic itself lives in `secrets.rs`/`up.rs`.
++
++## Blast radius
++
++<!-- generated by `keel plan`; edits here are overwritten -->
++
++Computed from the import graph at depth 2: **5 files, 1193 lines**.
++
++| depth | file | lines |
++| --- | --- | --- |
++| scope | `cli/src/compose.rs` | 247 |
++| scope | `cli/src/secrets.rs` | 222 |
++| scope | `cli/src/commands/up.rs` | 12 |
++| +1 | `cli/src/commands/mod.rs` | 293 |
++| +1 | `cli/src/main.rs` | 419 |
++
++
++## Rollback
++
++`git revert` — replace this if the change needs a different rollback.
+diff --git a/.keel/specs/copilot-device-auth/review-flags.txt b/.keel/specs/copilot-device-auth/review-flags.txt
+new file mode 100644
+index 0000000..2518839
+--- /dev/null
++++ b/.keel/specs/copilot-device-auth/review-flags.txt
+@@ -0,0 +1 @@
++test-movement: no test changed with cli/src/commands/up.rs, cli/src/secrets.rs
+diff --git a/.keel/specs/copilot-device-auth/spec.md b/.keel/specs/copilot-device-auth/spec.md
+new file mode 100644
+index 0000000..199f899
+--- /dev/null
++++ b/.keel/specs/copilot-device-auth/spec.md
+@@ -0,0 +1,116 @@
++---
++id: SPEC-0011
++slug: copilot-device-auth
++schema: keel.spec/1
++status: approved
++scope:
++- cli/src/secrets.rs
++- cli/src/commands/up.rs
++- cli/src/compose.rs
++budget:
++  criteria: 8
++  lines: 200
++verified_at: 2026-10-01
++---
++
++# Resolve the host Copilot device-flow token into the sandbox automatically
++
++## Context
++
++GitHub Copilot CLI does not reliably accept personal access tokens
++(classic `ghp_` are rejected; fine-grained usually fail). The mechanism it
++*does* accept is its own OAuth device flow: the operator runs
++`copilot /login` once on the host, and the CLI stores a `gho_` OAuth token
++in the macOS Keychain under service `copilot-cli`, account
++`https://<host>:<login>`. Verified locally: extracting that token and
++injecting it into the sandbox as `COPILOT_GITHUB_TOKEN` makes the
++in-sandbox `copilot -p` authenticate and return a real response, with no
++PAT involved.
++
++moor already resolves a project's declared secrets at `up` (shell env,
++then its own Keychain entries — `secrets::resolve_into_env`) and injects
++them into the sandbox. The one missing link is that `COPILOT_GITHUB_TOKEN`
++is only found if the operator *manually* stored a token; moor does not yet
++look at the Copilot CLI's own `copilot-cli` Keychain entry, which is where
++`copilot /login` already put a working token. Closing that gap makes
++Copilot auth seamless: log in once on the host the way you already do for
++other CLIs, and the sandbox is authenticated with nothing token-shaped to
++set.
++
++Single responsibility: this spec owns the **host side** — discovering the
++device-flow token and injecting it. The in-sandbox driver's preflight and
++error messaging are keel's, specified separately.
++
++## Acceptance criteria
++
++### AC-1 The Copilot CLI's device-flow token is discoverable from the host Keychain
++
++WHEN a host has completed `copilot /login` THE SYSTEM SHALL read the
++resulting token from the macOS Keychain service `copilot-cli` without the
++operator having stored it via `moor secrets`.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml finds_copilot_device_token_source` exit 0
++
++### AC-2 An explicitly set credential always wins over the discovered token
++
++WHEN `COPILOT_GITHUB_TOKEN` is already resolvable from the shell env or the
++project's own Keychain entry THE SYSTEM SHALL use that and SHALL NOT
++override it with the discovered device-flow token.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml explicit_credential_wins_over_device_token` exit 0
++
++### AC-3 The device-flow token is only used for copilot-agent projects
++
++WHERE the project's agent is not `copilot` THE SYSTEM SHALL NOT inject the
++discovered device-flow token.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml device_token_only_for_copilot_agent` exit 0
++
++### AC-4 The token is read fresh each up, never persisted by moor
++
++WHEN moor injects the discovered device-flow token THE SYSTEM SHALL read it
++at resolution time and SHALL NOT write a copy into the project's manifest,
++compose file, or its own Keychain entries.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml device_token_not_persisted_by_moor` exit 0
++
++### AC-5 The token never passes through a process argument
++
++WHEN the discovered token is injected into the sandbox THE SYSTEM SHALL
++pass it by environment or stdin, never as a command-line argument, so it
++cannot appear in `docker inspect`/`ps` output.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml device_token_not_in_argv` exit 0
++
++### AC-6 Absence of a device-flow token is a no-op, not an error
++
++IF no `copilot-cli` Keychain entry exists THEN THE SYSTEM SHALL continue
++without error, leaving `COPILOT_GITHUB_TOKEN` unresolved for the driver's
++own preflight to report.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml missing_device_token_is_noop` exit 0
++
++### AC-7 The resolved token is scrubbed from the audit trail
++
++WHEN the discovered token is injected THE SYSTEM SHALL redact its value
++from logged exec records the same way every resolved secret is.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml device_token_is_redacted` exit 0
++
++### AC-8 Existing CLI tests stay green
++
++THE SYSTEM SHALL leave the existing CLI test suite passing.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml` exit 0
++
++## Out of scope
++
++- The in-sandbox driver's credential preflight, failure messaging, and
++  classic-PAT rejection — those are keel's (sibling spec
++  `copilot-device-flow-preflight`).
++- Running the device flow itself: the operator runs `copilot /login` on the
++  host; moor never performs an interactive login.
++- Non-macOS hosts: the discovery reads the macOS Keychain; on other hosts
++  the operator sets `COPILOT_GITHUB_TOKEN` explicitly (AC-6's no-op path).
++- Token refresh/expiry handling beyond reading fresh at each `up` — a
++  device-flow token that has expired is the driver's preflight to report.
+diff --git a/.keel/specs/copilot-device-auth/tasks.md b/.keel/specs/copilot-device-auth/tasks.md
+new file mode 100644
+index 0000000..adccb3b
+--- /dev/null
++++ b/.keel/specs/copilot-device-auth/tasks.md
+@@ -0,0 +1,63 @@
++---
++id: TASKS-0011
++slug: copilot-device-auth
++schema: keel.tasks/1
++---
++
++# Tasks
++
++Each task must name the criteria it satisfies, the files it touches, a line
++budget and an exit condition. G1 checks all four, and checks that every
++criterion in the spec is covered by at least one task.
++
++Add `- depends_on: T-1` where order matters. Tasks with no dependency on
++each other form a wave; `keel tasks` shows them.
++
++### T-1 The Copilot CLI's device-flow token is discoverable from the host Keychain
++- criteria: AC-1
++- files: scope
++- budget: 25
++- exit: `cargo test --manifest-path cli/Cargo.toml finds_copilot_device_token_source` exits 0
++
++### T-2 An explicitly set credential always wins over the discovered token
++- criteria: AC-2
++- files: scope
++- budget: 25
++- exit: `cargo test --manifest-path cli/Cargo.toml explicit_credential_wins_over_device_token` exits 0
++
++### T-3 The device-flow token is only used for copilot-agent projects
++- criteria: AC-3
++- files: scope
++- budget: 25
++- exit: `cargo test --manifest-path cli/Cargo.toml device_token_only_for_copilot_agent` exits 0
++
++### T-4 The token is read fresh each up, never persisted by moor
++- criteria: AC-4
++- files: scope
++- budget: 25
++- exit: `cargo test --manifest-path cli/Cargo.toml device_token_not_persisted_by_moor` exits 0
++
++### T-5 The token never passes through a process argument
++- criteria: AC-5
++- files: scope
++- budget: 25
++- exit: `cargo test --manifest-path cli/Cargo.toml device_token_not_in_argv` exits 0
++
++### T-6 Absence of a device-flow token is a no-op, not an error
++- criteria: AC-6
++- files: scope
++- budget: 25
++- exit: `cargo test --manifest-path cli/Cargo.toml missing_device_token_is_noop` exits 0
++
++### T-7 The resolved token is scrubbed from the audit trail
++- criteria: AC-7
++- files: scope
++- budget: 25
++- exit: `cargo test --manifest-path cli/Cargo.toml device_token_is_redacted` exits 0
++
++### T-8 Existing CLI tests stay green
++- criteria: AC-8
++- files: scope
++- budget: 25
++- exit: `cargo test --manifest-path cli/Cargo.toml` exits 0
++

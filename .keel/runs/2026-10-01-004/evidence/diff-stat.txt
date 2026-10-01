@@ -1,0 +1,24 @@
+     4      4  .github/copilot-instructions.md
+     7      0  .keel/chain.jsonl
+     2      0  .keel/runs/2026-10-01-004/evidence/build.txt
+     2      0  .keel/runs/2026-10-01-004/evidence/lint.txt
+    74      0  .keel/runs/2026-10-01-004/evidence/oracles.json
+    14      0  .keel/runs/2026-10-01-004/evidence/test.txt
+     9      0  .keel/runs/2026-10-01-004/run.json
+    16      0  .keel/runs/2026-10-01-004/trajectory.jsonl
+     3      0  .keel/specs/copilot-device-auth/approvals.jsonl
+    90      0  .keel/specs/copilot-device-auth/gates/G0.json
+    95      0  .keel/specs/copilot-device-auth/gates/G1.json
+    80      0  .keel/specs/copilot-device-auth/plan.md
+   116      0  .keel/specs/copilot-device-auth/spec.md
+    63      0  .keel/specs/copilot-device-auth/tasks.md
+    16     16  .keel/store/map/cli/src/CODEMAP.md
+    10     10  .keel/store/map/cli/src/commands/CODEMAP.md
+    22     22  .keel/store/steering/structure.md
+    19     19  .kiro/steering/keel.md
+     9      9  AGENTS.md
+     9      9  CLAUDE.md
+     9      1  cli/src/commands/up.rs
+   129      0  cli/src/secrets.rs
+
+22 file(s), +798 -90 (888 lines of churn) against ed9240c31ba922e5b369672c20d9fd281db06fe0

@@ -1,4 +1,4 @@
-<!-- keel:generated schema=keel.projection/1 adapter=copilot store=c80d8c417f99 body=4e6b42472296 -->
+<!-- keel:generated schema=keel.projection/1 adapter=copilot store=1069ef3ef7ea body=04ed6d61c460 -->
 <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
 
 # Project context
@@ -48,14 +48,14 @@ _Versions that cannot move, platforms that must keep working, dependencies that 
 
 ## Repository map
 
-**43 files · 683 symbols · 11364 lines** — javascript 2, rust 41
+**43 files · 693 symbols · 11532 lines** — javascript 2, rust 41
 
 Files are ordered by import-graph centrality, not alphabetically. Signatures only; read a body with the file path and line number. Per-directory detail lives in `.keel/store/map/<dir>/CODEMAP.md`.
 
 ### Layout
 
-- `cli/src/` — 12 files, 4434 lines · guide.rs, canary.rs, paths.rs
-- `cli/src/commands/` — 25 files, 4526 lines · next_cmd.rs, mod.rs, run_cmd.rs
+- `cli/src/` — 12 files, 4588 lines · guide.rs, canary.rs, paths.rs
+- `cli/src/commands/` — 25 files, 4540 lines · next_cmd.rs, mod.rs, run_cmd.rs
 - `cli/src/studio/` — 3 files, 1806 lines · mod.rs, state.rs, render.rs
 - `docs/examples/ascii-banner/` — 1 file, 56 lines · banner.js
 - `docs/examples/ascii-banner/test/` — 1 file, 60 lines · banner.test.js
