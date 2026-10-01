@@ -1,6 +1,6 @@
 [package]
 name = "moor"
-version = "0.5.1"
+version = "0.5.2"
 edition = "2021"
 description = "Build software with an AI agent inside a locked-down container"
 license = "MIT"
