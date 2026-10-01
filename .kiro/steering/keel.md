@@ -1,4 +1,4 @@
-<!-- keel:generated schema=keel.projection/1 adapter=kiro store=c80d8c417f99 body=3d07e468eb21 -->
+<!-- keel:generated schema=keel.projection/1 adapter=kiro store=1069ef3ef7ea body=40d861198515 -->
 <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
 
 # Project context
@@ -48,14 +48,14 @@ _Versions that cannot move, platforms that must keep working, dependencies that 
 
 ## Repository map
 
-**43 files · 683 symbols · 11364 lines** — javascript 2, rust 41
+**43 files · 693 symbols · 11532 lines** — javascript 2, rust 41
 
 Files are ordered by import-graph centrality, not alphabetically. Signatures only; read a body with the file path and line number. Per-directory detail lives in `.keel/store/map/<dir>/CODEMAP.md`.
 
 ### Layout
 
-- `cli/src/` — 12 files, 4434 lines · guide.rs, canary.rs, paths.rs
-- `cli/src/commands/` — 25 files, 4526 lines · next_cmd.rs, mod.rs, run_cmd.rs
+- `cli/src/` — 12 files, 4588 lines · guide.rs, canary.rs, paths.rs
+- `cli/src/commands/` — 25 files, 4540 lines · next_cmd.rs, mod.rs, run_cmd.rs
 - `cli/src/studio/` — 3 files, 1806 lines · mod.rs, state.rs, render.rs
 - `docs/examples/ascii-banner/` — 1 file, 56 lines · banner.js
 - `docs/examples/ascii-banner/test/` — 1 file, 60 lines · banner.test.js
@@ -160,21 +160,21 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
 - `pub fn write_current_project(name: &str) -> Result<()>`  <sub>L98</sub>
 - `pub fn all_project_names() -> Result<Vec<String>>`  <sub>L106</sub>
 
-**`cli/src/manifest.rs`** · 189 lines · imported by 2
-- `pub struct Manifest`  <sub>L7</sub>
-- `pub struct Egress`  <sub>L25</sub>
-- `pub struct Resources`  <sub>L31</sub>
-- `impl Default for Resources`  <sub>L37</sub>
-- `fn default() -> Self`  <sub>L38</sub>
-- `impl Manifest`  <sub>L47</sub>
-- `pub fn new(name: &str, image: &str) -> Self`  <sub>L48</sub>
-- `pub fn load(path: &Path) -> Result<Self>`  <sub>L81</sub>
-- `pub fn save(&self, path: &Path) -> Result<()>`  <sub>L87</sub>
-- `pub fn sandbox_container(&self) -> String`  <sub>L94</sub>
-- `pub fn egress_container(&self) -> String`  <sub>L98</sub>
-- `pub fn validate_name(name: &str) -> Result<()>` — Validate a project name: lowercase alnum + dashes, matches what's safe  <sub>L105</sub>
-- `mod tests`  <sub>L121</sub>
-- `fn default_manifest_has_sane_resource_limits()`  <sub>L167</sub>
+**`cli/src/manifest.rs`** · 327 lines · imported by 2
+- `pub enum Agent`  <sub>L12</sub>
+- `impl FromStr for Agent`  <sub>L18</sub>
+- `pub fn resolve_image(language_image: &str, agent: Agent) -> String` — already a copilot image, is returned unchanged. Pure — unit-tested  <sub>L35</sub>
+- `pub struct Manifest`  <sub>L59</sub>
+- `pub struct Egress`  <sub>L81</sub>
+- `pub struct Resources`  <sub>L87</sub>
+- `impl Manifest`  <sub>L103</sub>
+- `pub fn new(name: &str, image: &str) -> Self`  <sub>L104</sub>
+- `pub fn load(path: &Path) -> Result<Self>`  <sub>L138</sub>
+- `pub fn save(&self, path: &Path) -> Result<()>`  <sub>L144</sub>
+- `pub fn sandbox_container(&self) -> String`  <sub>L151</sub>
+- `pub fn egress_container(&self) -> String`  <sub>L155</sub>
+- `pub fn validate_name(name: &str) -> Result<()>` — Validate a project name: lowercase alnum + dashes, matches what's safe  <sub>L162</sub>
+- `mod tests`  <sub>L178</sub>
 
 **`cli/src/session.rs`** · 970 lines · imported by 2
 - `pub enum Role`  <sub>L25</sub>

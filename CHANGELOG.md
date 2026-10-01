@@ -4,6 +4,21 @@ Notable changes to moor. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and moor uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Seamless Copilot auth from a host `copilot /login`.** For a
+  `copilot`-agent project, `moor up` discovers the OAuth device-flow token
+  the Copilot CLI stored in the macOS Keychain (service `copilot-cli`) and
+  injects it as `COPILOT_GITHUB_TOKEN` — so logging in once on the host is
+  all it takes, with no personal access token to create or `moor secrets`
+  step. An explicit env/Keychain credential still wins; non-copilot
+  projects are untouched; the token is read fresh each `up` and never
+  persisted. (First host read of Copilot's Keychain item triggers a
+  one-time macOS "Always Allow" prompt.) See
+  [ADR-0012](docs/decisions/0012-copilot-device-flow-auth.md).
+
 ## [0.6.0] - 2026-10-01
 
 ### Added
