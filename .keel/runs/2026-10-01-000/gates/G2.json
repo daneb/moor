@@ -1,0 +1,65 @@
+{
+  "schema": "keel.gate/1",
+  "gate": "G2",
+  "run": "2026-10-01-001",
+  "spec": "agent-selection",
+  "verdict": "fail",
+  "generated_at": "2026-10-01T16:44:55.488913+02:00",
+  "checks": [
+    {
+      "id": "build",
+      "verdict": "pass",
+      "detail": "`cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml` exited 0",
+      "evidence": "evidence/build.txt"
+    },
+    {
+      "id": "test",
+      "verdict": "pass",
+      "detail": "`cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml` exited 0",
+      "evidence": "evidence/test.txt"
+    },
+    {
+      "id": "lint",
+      "verdict": "pass",
+      "detail": "`cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml` exited 0",
+      "evidence": "evidence/lint.txt"
+    },
+    {
+      "id": "oracle-coverage",
+      "verdict": "pass",
+      "detail": "5/5 oracles pass (0 awaiting human judgement)",
+      "evidence": "evidence/oracles.json"
+    },
+    {
+      "id": "blast-radius",
+      "verdict": "fail",
+      "expected": "diff ⊆ cli/src/commands/import_cmd.rs, cli/src/commands/new_cmd.rs, cli/src/manifest.rs, cli/src/main.rs, images/**",
+      "actual": "4 outside scope: CHANGELOG.md (+13 -0), cli/src/commands/doctor_cmd.rs (+276 -0), cli/src/commands/mod.rs (+1 -0), docs/decisions/0011-sandbox-git-visibility-and-guards.md (+110 -0)",
+      "evidence": "evidence/diff-stat.txt"
+    },
+    {
+      "id": "line-budget",
+      "verdict": "fail",
+      "expected": "at most 120 lines of churn",
+      "actual": "594 lines — raise the budget deliberately or split the work",
+      "evidence": "evidence/diff-stat.txt"
+    },
+    {
+      "id": "baseline-ratchet",
+      "verdict": "pass",
+      "detail": "1 metric(s) held",
+      "evidence": "evidence/ratchet.json"
+    },
+    {
+      "id": "store-drift",
+      "verdict": "fail",
+      "expected": "no drifted or stale projections",
+      "actual": "CLAUDE.md (stale), AGENTS.md (stale), .kiro/steering/keel.md (stale), .github/copilot-instructions.md (stale)"
+    },
+    {
+      "id": "shared-stores",
+      "verdict": "pass",
+      "detail": "none configured"
+    }
+  ]
+}

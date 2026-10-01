@@ -44,6 +44,11 @@ enum Command {
         /// moor/base, moor/node, moor/rust, or moor/python
         #[arg(long, default_value = "moor/base:latest")]
         image: String,
+        /// Which agent the sandbox is set up for: `claude` (default) or
+        /// `copilot`. `copilot` composes with the image to select the
+        /// matching `moor/copilot-<lang>` layer.
+        #[arg(long, default_value = "claude")]
+        agent: String,
         /// Also create a private GitHub repo via `gh repo create` (asks
         /// for confirmation before doing anything).
         #[arg(long)]
@@ -64,6 +69,11 @@ enum Command {
         /// pyproject.toml/requirements.txt) if not given.
         #[arg(long)]
         image: Option<String>,
+        /// Which agent the sandbox is set up for: `claude` (default) or
+        /// `copilot`. `copilot` composes with the (detected or given)
+        /// image to select the matching `moor/copilot-<lang>` layer.
+        #[arg(long, default_value = "claude")]
+        agent: String,
         /// If the source repo has no GitHub remote, create one (asks for
         /// confirmation). Ignored if it already has one.
         #[arg(long)]
@@ -319,14 +329,20 @@ fn main() {
         Command::New {
             name,
             image,
+            agent,
             github,
-        } => commands::new_cmd::run(&name, &image, github),
+        } => agent
+            .parse::<manifest::Agent>()
+            .and_then(|a| commands::new_cmd::run(&name, &image, a, github)),
         Command::Import {
             name,
             from,
             image,
+            agent,
             github,
-        } => commands::import_cmd::run(&name, &from, image, github),
+        } => agent
+            .parse::<manifest::Agent>()
+            .and_then(|a| commands::import_cmd::run(&name, &from, image, a, github)),
         Command::Up { name } => commands::up::run(&name),
         Command::Down { name } => commands::down::run(&name),
         Command::Shell { name } => commands::shell::run(&name),

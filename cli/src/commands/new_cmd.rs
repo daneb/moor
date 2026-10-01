@@ -1,7 +1,7 @@
-use crate::{audit, manifest, manifest::Manifest, paths, proc};
+use crate::{audit, manifest, manifest::Agent, manifest::Manifest, paths, proc};
 use anyhow::{Context, Result};
 
-pub fn run(name: &str, image: &str, github: bool) -> Result<()> {
+pub fn run(name: &str, image: &str, agent: Agent, github: bool) -> Result<()> {
     manifest::validate_name(name)?;
 
     let dir = paths::project_dir(name)?;
@@ -9,7 +9,11 @@ pub fn run(name: &str, image: &str, github: bool) -> Result<()> {
         anyhow::bail!("project '{name}' already exists at {}", dir.display());
     }
 
-    let mut m = Manifest::new(name, image);
+    // Compose the chosen agent with the (language) image: Claude leaves it
+    // as-is, Copilot selects the matching moor/copilot-<lang> layer.
+    let image = manifest::resolve_image(image, agent);
+    let mut m = Manifest::new(name, &image);
+    m.agent = agent;
 
     if github {
         match super::create_github_repo_interactive(name)? {

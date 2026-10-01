@@ -1,0 +1,11 @@
+{
+  "schema": "keel.run/1",
+  "id": "2026-10-01-000",
+  "spec": "agent-selection",
+  "keel_version": "0.11.0",
+  "store_hash": "c80d8c417f9948d734f7cabb39eff08a0203db03e904cfe1e13674519941c3bc",
+  "started_at": "2026-10-01T16:44:48.973985+02:00",
+  "finished_at": "2026-10-01T16:44:55.493754+02:00",
+  "verdict": "fail",
+  "base_commit": "6bcbe54ec93ec833fb0a44d874dc035771b6814b"
+}

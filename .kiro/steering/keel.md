@@ -1,4 +1,4 @@
-<!-- keel:generated schema=keel.projection/1 adapter=kiro store=4e07f093d6af body=f9336bf535aa -->
+<!-- keel:generated schema=keel.projection/1 adapter=kiro store=c80d8c417f99 body=3d07e468eb21 -->
 <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
 
 # Project context
@@ -48,38 +48,119 @@ _Versions that cannot move, platforms that must keep working, dependencies that 
 
 ## Repository map
 
-**27 files · 256 symbols · 3806 lines** — javascript 2, rust 25
+**43 files · 683 symbols · 11364 lines** — javascript 2, rust 41
 
 Files are ordered by import-graph centrality, not alphabetically. Signatures only; read a body with the file path and line number. Per-directory detail lives in `.keel/store/map/<dir>/CODEMAP.md`.
 
 ### Layout
 
-- `cli/src/` — 9 files, 1529 lines · canary.rs, paths.rs, manifest.rs
-- `cli/src/commands/` — 16 files, 2161 lines · mod.rs, run_cmd.rs, recipe.rs
+- `cli/src/` — 12 files, 4434 lines · guide.rs, canary.rs, paths.rs
+- `cli/src/commands/` — 25 files, 4526 lines · next_cmd.rs, mod.rs, run_cmd.rs
+- `cli/src/studio/` — 3 files, 1806 lines · mod.rs, state.rs, render.rs
 - `docs/examples/ascii-banner/` — 1 file, 56 lines · banner.js
 - `docs/examples/ascii-banner/test/` — 1 file, 60 lines · banner.test.js
+- `mcp/src/` — 1 file, 482 lines · main.rs
 
 ### Key files
+
+**`cli/src/studio/mod.rs`** · 717 lines · imported by 2
+- `pub mod render;` — inferred from a running terminal.  <sub>L15</sub>
+- `pub mod state;`  <sub>L16</sub>
+- `pub trait Host` — Everything the console needs from outside itself. One trait, so the  <sub>L28</sub>
+- `fn artifact_path(slug: &str, artifact: &str) -> Result<String>` — The three keel artifacts, and where they live inside a sandbox. Same  <sub>L45</sub>
+- `fn write_back_argv(container: &str, path: &str) -> Vec<String>` — container whose rootfs is read-only. No bind mount is created, and none  <sub>L71</sub>
+- `pub struct Docker;` — `audit::log_exec` — the same chained-audit path `moor run` and `moor  <sub>L85</sub>
+- `pub enum Event` — A turn coming back from its own thread. Keypresses are read straight  <sub>L164</sub>
+- `pub fn spawn_turn<F>(tx: &Sender<Event>, project: String, work: F)` — goes to its own thread and reports back through the channel. The caller  <sub>L178</sub>
+- `pub fn edit_artifact(` — changed — an unmodified file is not written back, so opening one to  <sub>L201</sub>
+- `struct RawMode;` — Restores the terminal however the loop ends — clean exit, `?`, or  <sub>L248</sub>
+- `pub fn run(names: Vec<String>) -> Result<()>`  <sub>L283</sub>
+- `fn drain(console: &mut Console, rx: &Receiver<Event>)` — Fold every turn that has come back since the last pass into the  <sub>L354</sub>
+- `pub mod tests`  <sub>L366</sub>
+- `pub struct FakeHost` — refresh costs, what the write-back carries — so the boundary is  <sub>L375</sub>
+
+**`cli/src/studio/state.rs`** · 733 lines · imported by 2
+- `pub enum Line`  <sub>L11</sub>
+- `pub fn waited(&self) -> Option<std::time::Duration>` — How long the in-flight turn has been running.  <sub>L23</sub>
+- `pub struct Project`  <sub>L39</sub>
+- `pub enum Approval`  <sub>L65</sub>
+- `pub enum Key`  <sub>L78</sub>
+- `pub enum Action`  <sub>L90</sub>
+- `struct NextSpec`  <sub>L118</sub>
+- `struct NextReport`  <sub>L127</sub>
+- `pub struct Console`  <sub>L133</sub>
+- `pub fn refresh(&mut self, host: &dyn super::Host) -> Result<()>` — sandboxes that are actually up — a stopped project has no container  <sub>L180</sub>
+- `pub fn apply_next(&mut self, project: &str, json: &str) -> Result<()>` — what files happen to exist — a displayed stage that disagrees with  <sub>L204</sub>
+- `pub fn arm_approval(&mut self)` — slug keel itself reported for it, captured now so a later selection  <sub>L288</sub>
+- `pub fn handle_key(&mut self, key: Key) -> Action`  <sub>L323</sub>
+- `trait CheckedIndex` — Tiny helper so `send` can bail cleanly on an empty project list.  <sub>L454</sub>
+
+**`cli/src/studio/render.rs`** · 356 lines · imported by 1
+- `const BOLD: &str = "\x1b[1m";`  <sub>L8</sub>
+- `const DIM: &str = "\x1b[2m";`  <sub>L9</sub>
+- `const CYAN: &str = "\x1b[36m";`  <sub>L10</sub>
+- `const GREEN: &str = "\x1b[32m";`  <sub>L11</sub>
+- `pub fn sanitize(text: &str) -> String` — Newline and tab survive because they are layout, not addressing.  <sub>L29</sub>
+- `pub fn waiting_label(waited: std::time::Duration) -> String` — available while turns are request/response and nothing streams back  <sub>L82</sub>
+- `pub fn wrap(text: &str, width: usize) -> Vec<String>` — Wrap to the terminal width after sanitizing — a single very long line  <sub>L95</sub>
+- `pub fn frame(c: &Console, width: usize, height: usize) -> String` — The whole frame, as one string. Pure: takes state, returns bytes, so  <sub>L131</sub>
+- `mod tests`  <sub>L204</sub>
+- `fn render_strips_control_sequences()`  <sub>L209</sub>
+- `fn a_hostile_reply_cannot_reach_the_terminal_through_the_frame()`  <sub>L254</sub>
+- `fn wrap_breaks_long_lines_and_long_words()`  <sub>L271</sub>
+- `fn a_turn_in_flight_shows_moving_elapsed_time_next_to_the_input_line()`  <sub>L284</sub>
+- `fn frame_marks_a_pending_project_and_names_an_armed_approval()`  <sub>L337</sub>
+
+**`cli/src/guide.rs`** · 845 lines · imported by 3
+- `pub struct NextReport`  <sub>L19</sub>
+- `pub struct Blocker`  <sub>L27</sub>
+- `pub struct NextSpec`  <sub>L33</sub>
+- `pub struct Approval`  <sub>L47</sub>
+- `pub fn recheck(spec: &NextSpec) -> Option<&str>` — The command `moor go` runs to re-check a rejected or stale approval's  <sub>L69</sub>
+- `pub enum Why`  <sub>L160</sub>
+- `pub struct Active<'a>`  <sub>L167</sub>
+- `pub fn pick_active<'a>(` — chain touched last, else the one furthest along. `chain_lines` is the  <sub>L182</sub>
+- `pub fn pending_decision(spec: &NextSpec) -> Option<&'static str>` — The approval a spec's current stage is waiting on (`spec`, `plan` or  <sub>L244</sub>
+- `pub fn step_label(spec: &NextSpec) -> String` — The step a spec is at, as "step N of 7: title", or "done".  <sub>L277</sub>
+- `pub fn render(` — The full guidance for one project, as printable lines.  <sub>L293</sub>
+- `pub fn build_failed(slug: &str, explicit: Option<&str>) -> String` — the spec, without the agent ever being told what failed, so the first  <sub>L484</sub>
+- `pub fn render_ship(` — Guidance for a spec whose merge is approved but whose work hasn't been  <sub>L506</sub>
+- `pub fn render_all(report: &NextReport, active: Option<&Active>) -> Vec<String>` — Every spec and its step, the active one marked.  <sub>L532</sub>
 
 **`cli/src/canary.rs`** · 23 lines · imported by 3
 - `pub const CANARY_DOMAIN: &str = "canary.moor.invalid";` — deny, because there is no legitimate reason for it to ever be  <sub>L8</sub>
 - `pub fn generate_token() -> String` — this is a secondary control, not the primary one (TLS isn't  <sub>L17</sub>
 
-**`cli/src/paths.rs`** · 90 lines · imported by 4
+**`cli/src/commands/next_cmd.rs`** · 177 lines · imported by 4
+- `pub struct Target` — The project a guided command acts on, resolved once and shared by  <sub>L7</sub>
+- `impl Target`  <sub>L15</sub>
+- `pub fn resolve(explicit: Option<String>) -> Result<Self>` — Resolves the project and checks its sandbox is up — every guided  <sub>L18</sub>
+- `pub fn report(&self) -> Result<guide::NextReport>` — Where every spec stands, from the sandbox. Logged like any exec.  <sub>L32</sub>
+- `pub fn exec(&self, kind: &str, argv: &[&str]) -> Result<(bool, String)>` — Runs `argv` in the sandbox, capturing its combined output, logged  <sub>L45</sub>
+- `pub fn unshipped(&self, report: &guide::NextReport) -> Result<Vec<String>>` — Specs whose folder has uncommitted changes: approved work that  <sub>L57</sub>
+- `pub fn active<'a>(&self, report: &'a guide::NextReport) -> Option<guide::Active<'a>>` — The spec guidance is about — see `guide::pick_active`.  <sub>L86</sub>
+- `pub fn print_guidance(&self, report: &guide::NextReport)` — The guidance block, ending on its "Next:" line (plus a tip when  <sub>L96</sub>
+- `pub(crate) fn read_pin(name: &str) -> Option<String>` — The pinned spec, if one is set and still a well-formed slug. A  <sub>L144</sub>
+- `pub fn next_hint(name: &str) -> String` — The closing line for a command that isn't itself guided: how to ask  <sub>L153</sub>
+- `pub fn run(explicit: Option<String>, all: bool) -> Result<()>` — `moor next`: where the project's active spec stands and the one  <sub>L164</sub>
+
+**`cli/src/paths.rs`** · 122 lines · imported by 4
 - `pub fn moor_home() -> Result<PathBuf>`  <sub>L4</sub>
 - `pub fn project_dir(name: &str) -> Result<PathBuf>`  <sub>L9</sub>
 - `pub fn manifest_path(name: &str) -> Result<PathBuf>`  <sub>L13</sub>
-- `pub fn compose_path(name: &str) -> Result<PathBuf>`  <sub>L17</sub>
-- `pub fn audit_dir(name: &str) -> Result<PathBuf>`  <sub>L21</sub>
 - `pub fn chain_log_path(name: &str) -> Result<PathBuf>` — folded-in egress verdicts, and tripwire hits all append here. See  <sub>L28</sub>
 - `pub fn egress_offset_path(name: &str) -> Result<PathBuf>` — How many raw lines of the egress gateway's access log have already  <sub>L34</sub>
-- `pub fn ensure_project_dirs(name: &str) -> Result<()>`  <sub>L38</sub>
-- `pub fn current_project_path() -> Result<PathBuf>` — like `moor keel`/`moor view` don't need `--project` spelled out on  <sub>L46</sub>
-- `pub fn read_current_project() -> Result<Option<String>>`  <sub>L50</sub>
-- `pub fn write_current_project(name: &str) -> Result<()>`  <sub>L66</sub>
-- `pub fn all_project_names() -> Result<Vec<String>>`  <sub>L74</sub>
+- `pub fn sink_offset_path(name: &str) -> Result<PathBuf>` — How many lines of keel's chain sink (inside the sandbox) have already  <sub>L40</sub>
+- `pub fn posture_path(name: &str) -> Result<PathBuf>` — The host's copy of the posture attestation last written into the  <sub>L46</sub>
+- `pub fn session_path(name: &str) -> Result<PathBuf>` — host-written only: nothing inside a sandbox has this path mounted, so  <sub>L53</sub>
+- `pub fn active_spec_path(name: &str) -> Result<PathBuf>` — The spec `moor next` guides this project through, when pinned with  <sub>L59</sub>
+- `pub fn transcript_path(name: &str) -> Result<PathBuf>` — chain.jsonl on purpose: the chain carries hashes and is exported by  <sub>L66</sub>
+- `pub fn current_project_path() -> Result<PathBuf>` — like `moor keel`/`moor view` don't need `--project` spelled out on  <sub>L78</sub>
+- `pub fn read_current_project() -> Result<Option<String>>`  <sub>L82</sub>
+- `pub fn write_current_project(name: &str) -> Result<()>`  <sub>L98</sub>
+- `pub fn all_project_names() -> Result<Vec<String>>`  <sub>L106</sub>
 
-**`cli/src/manifest.rs`** · 172 lines · imported by 2
+**`cli/src/manifest.rs`** · 189 lines · imported by 2
 - `pub struct Manifest`  <sub>L7</sub>
 - `pub struct Egress`  <sub>L25</sub>
 - `pub struct Resources`  <sub>L31</sub>
@@ -87,106 +168,25 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
 - `fn default() -> Self`  <sub>L38</sub>
 - `impl Manifest`  <sub>L47</sub>
 - `pub fn new(name: &str, image: &str) -> Self`  <sub>L48</sub>
-- `pub fn load(path: &Path) -> Result<Self>`  <sub>L69</sub>
-- `pub fn save(&self, path: &Path) -> Result<()>`  <sub>L75</sub>
-- `pub fn sandbox_container(&self) -> String`  <sub>L82</sub>
-- `pub fn egress_container(&self) -> String`  <sub>L86</sub>
-- `pub fn validate_name(name: &str) -> Result<()>` — Validate a project name: lowercase alnum + dashes, matches what's safe  <sub>L93</sub>
-- `mod tests`  <sub>L109</sub>
-- `fn accepts_valid_names()`  <sub>L113</sub>
+- `pub fn load(path: &Path) -> Result<Self>`  <sub>L81</sub>
+- `pub fn save(&self, path: &Path) -> Result<()>`  <sub>L87</sub>
+- `pub fn sandbox_container(&self) -> String`  <sub>L94</sub>
+- `pub fn egress_container(&self) -> String`  <sub>L98</sub>
+- `pub fn validate_name(name: &str) -> Result<()>` — Validate a project name: lowercase alnum + dashes, matches what's safe  <sub>L105</sub>
+- `mod tests`  <sub>L121</sub>
+- `fn default_manifest_has_sane_resource_limits()`  <sub>L167</sub>
 
-**`cli/src/commands/mod.rs`** · 279 lines · imported by 1
-- `pub mod audit_cmd;`  <sub>L1</sub>
-- `pub mod down;`  <sub>L2</sub>
-- `pub mod import_cmd;`  <sub>L3</sub>
-- `pub mod keel_cmd;`  <sub>L4</sub>
-- `pub mod logs;`  <sub>L5</sub>
-- `fn running_projects(names: &[String]) -> Result<Vec<String>>` — running (`moor up`'d). A single `docker ps` covers every project at  <sub>L24</sub>
-- `pub enum ProjectSource`  <sub>L48</sub>
-- `fn pick_running_or_sole_project(` — once an explicit `--project` and a `moor use` default have both come  <sub>L70</sub>
-- `pub fn resolve_project(explicit: Option<String>) -> Result<(String, Option<ProjectSource>)>` — one project at all, that one. Short-circuits before touching disk or  <sub>L100</sub>
-- `pub fn resolve_project_announced(explicit: Option<String>) -> Result<String>` — appearing in the command line, so it's always visible which container  <sub>L117</sub>
-- `pub fn create_github_repo_interactive(name: &str) -> Result<Option<String>>` — `import` so the confirm-then-create-then-report flow can't drift  <sub>L132</sub>
-- `pub fn compose_up(name: &str) -> Result<()>` — Called by both `new` and `up` so a hand-edited moor.yaml always  <sub>L156</sub>
-- `pub fn sync_git_identity(m: &Manifest)` — now exists call this again afterward) or if the host itself has no  <sub>L190</sub>
-- `pub fn compose_down(name: &str) -> Result<()>`  <sub>L205</sub>
+**`cli/src/session.rs`** · 970 lines · imported by 2
+- `pub enum Role`  <sub>L25</sub>
+- `pub fn deny_shell_argv() -> Vec<String>` — agent steps make the same assumption this corrects: that granting one  <sub>L123</sub>
+- `pub struct TurnResult`  <sub>L135</sub>
+- `pub fn parse_turn(stdout: &str) -> Result<TurnResult>`  <sub>L148</sub>
+- `pub fn turn_failed(t: &TurnResult, exit_ok: bool) -> bool` — A turn failed if it says so, whatever the process exit status said.  <sub>L154</sub>
+- `pub fn valid_session_id(id: &str) -> bool` — different shape of output or something that came from the wrong place,  <sub>L162</sub>
+- `pub fn next_session_id(t: &TurnResult) -> Option<String>` — consulted, so a response that prints a plausible UUID cannot redirect  <sub>L176</sub>
+- `struct ChainedTurn<'a>` — prompt and the response can't drift apart from the hashes taken of  <sub>L236</sub>
 
-**`cli/src/proc.rs`** · 83 lines · imported by 2
-- `pub fn run_inherit(program: &str, args: &[&str]) -> Result<ExitStatus>` — e.g. `docker compose up`, `docker exec -it ... bash`). Returns the exit  <sub>L8</sub>
-- `pub fn run_capture(program: &str, args: &[&str]) -> Result<(ExitStatus, String)>` — Run a command and capture stdout as a String (used for `docker inspect`,  <sub>L20</sub>
-- `pub fn run_capture_combined(program: &str, args: &[&str]) -> Result<(ExitStatus, String)>` — matching and for handing the text to an agent, but not for a human  <sub>L40</sub>
-- `pub fn run_with_stdin_file(program: &str, args: &[&str], stdin_path: &Path) -> Result<ExitStatus>` — through `docker exec -i <container> sh -c 'cat > dest'`'s stdin only  <sub>L57</sub>
-- `pub fn require_success(what: &str, status: ExitStatus) -> Result<()>`  <sub>L78</sub>
-
-**`cli/src/main.rs`** · 212 lines
-- `mod audit;`  <sub>L1</sub>
-- `mod canary;`  <sub>L2</sub>
-- `mod commands;`  <sub>L3</sub>
-- `mod compose;`  <sub>L4</sub>
-- `mod egress_log;`  <sub>L5</sub>
-- `mod manifest;`  <sub>L6</sub>
-- `mod paths;`  <sub>L7</sub>
-- `mod proc;`  <sub>L8</sub>
-- `mod secrets;`  <sub>L9</sub>
-- `struct Cli`  <sub>L16</sub>
-- `enum Command`  <sub>L22</sub>
-- `enum SecretsCommand`  <sub>L146</sub>
-- `fn main()`  <sub>L158</sub>
-
-**`cli/src/commands/run_cmd.rs`** · 81 lines · imported by 2
-- `fn looks_like_git_push(cmd: &[String]) -> bool` — stronger alternative (it runs inside the untrusted sandbox and the  <sub>L13</sub>
-- `pub fn run(name: &str, cmd: &[String]) -> Result<()>`  <sub>L17</sub>
-- `mod tests`  <sub>L42</sub>
-- `fn detects_plain_git_push()`  <sub>L46</sub>
-- `fn does_not_flag_other_git_commands()`  <sub>L57</sub>
-- `fn does_not_flag_non_git_commands()`  <sub>L68</sub>
-- `fn empty_command_is_not_a_push()`  <sub>L78</sub>
-
-**`cli/src/audit.rs`** · 458 lines · imported by 1
-- `pub struct ChainEntry`  <sub>L19</sub>
-- `fn compute_hash(prev_hash: &str, seq: u64, ts: &str, kind: &str, data: &Value) -> String`  <sub>L28</sub>
-- `fn last_entry(path: &Path) -> Result<Option<ChainEntry>>`  <sub>L38</sub>
-- `pub fn append_chained(path: &Path, kind: &str, data: Value) -> Result<ChainEntry>` — Append one entry to a project's hash-chained audit log. This is the  <sub>L55</sub>
-- `pub enum VerifyOutcome`  <sub>L84</sub>
-- `pub fn verify_chain(path: &Path) -> Result<VerifyOutcome>` — reorder, or truncation-from-the-middle of the file will show up here  <sub>L92</sub>
-- `pub fn redact(text: &str, secret_names: &[String]) -> String` — had access to at logging time — see docs/THREAT-MODEL.md and  <sub>L156</sub>
-- `fn redact_argv(argv: &[String], secret_names: &[String]) -> Vec<String>`  <sub>L168</sub>
-- `pub fn log_exec(` — which code actually leaves the sandbox (see docs/THREAT-MODEL.md,  <sub>L178</sub>
-- `pub fn fold_egress_log(project: &str, m: &Manifest) -> Result<usize>` — tmpfs and resets), the offset is detected as stale and reset rather  <sub>L202</sub>
-- `mod tests`  <sub>L250</sub>
-- `fn temp_path(label: &str) -> std::path::PathBuf` — A fresh, never-before-used path under the OS temp dir, unique per  <sub>L256</sub>
-- `fn editing_an_entrys_data_is_detected()`  <sub>L300</sub>
-- `fn appending_a_forged_entry_without_the_real_chain_state_is_detected()`  <sub>L361</sub>
-
-**`cli/src/commands/recipe.rs`** · 423 lines · imported by 1
-- `struct FrontMatter`  <sub>L16</sub>
-- `fn default_max_gate_retries() -> u32`  <sub>L28</sub>
-- `fn default_max_run_attempts() -> u32`  <sub>L32</sub>
-- `struct Recipe`  <sub>L37</sub>
-- `fn parse_recipe(path: &Path) -> Result<Recipe>`  <sub>L42</sub>
-- `struct NextSpec`  <sub>L68</sub>
-- `struct NextReport`  <sub>L76</sub>
-- `fn log_event(name: &str, event: &str, mut data: serde_json::Value) -> Result<()>` — command output, which can be large and is already in the "recipe"  <sub>L89</sub>
-- `fn exec_capture(name: &str, m: &Manifest, argv: &[String]) -> Result<(bool, String)>`  <sub>L98</sub>
-- `fn next_report(name: &str, m: &Manifest, slug: &str) -> Result<NextReport>`  <sub>L107</sub>
-- `fn author_spec(name: &str, m: &Manifest, slug: &str, description: &str) -> Result<()>` — (verified directly: it built the feature and left the spec untouched  <sub>L124</sub>
-- `fn drive_gate(` — used for the build step itself (`keel run`) — only for fixing the  <sub>L158</sub>
-- `pub fn run(name: &str, recipe_path: &Path) -> Result<()>`  <sub>L203</sub>
-- `mod tests`  <sub>L351</sub>
-
-**`cli/src/secrets.rs`** · 222 lines · imported by 1
-- `const ACCOUNT: &str = "moor";` — The service name (one per project+name pair) is what actually scopes  <sub>L9</sub>
-- `fn service_name(project: &str, name: &str) -> String`  <sub>L11</sub>
-- `pub fn get(project: &str, name: &str) -> Result<Option<String>>` — the caller falls back to "not resolvable from Keychain," never errors  <sub>L20</sub>
-- `pub fn set(project: &str, name: &str) -> Result<()>` — API in the stock `security` CLI; this is the same tradeoff every tool  <sub>L54</sub>
-- `pub fn unset(project: &str, name: &str) -> Result<()>` — Remove a secret from the Keychain. Not an error if it wasn't there.  <sub>L98</sub>
-- `pub enum Source`  <sub>L109</sub>
-- `pub fn status(project: &str, secret_names: &[String]) -> Vec<(String, Source)>` — right now, in the same priority order `resolve_into_env` uses: this  <sub>L118</sub>
-- `pub fn resolve_into_env(project: &str, secret_names: &[String])` — either. Never errors on a missing secret: an unresolvable name is left  <sub>L143</sub>
-- `fn read_hidden_line() -> Result<String>`  <sub>L154</sub>
-- `mod tests`  <sub>L183</sub>
-
-_… 103 more lines in `.keel/store/steering/structure.md`._
+_… 243 more lines in `.keel/store/steering/structure.md`._
 
 ## What this is
 

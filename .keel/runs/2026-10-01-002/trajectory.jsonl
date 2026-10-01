@@ -1,0 +1,19 @@
+{"t":"2026-10-01T16:50:32.186150+02:00","seq":1,"kind":"run_start","spec":"agent-selection","keel_version":"0.11.0","store_hash":"c80d8c417f9948d734f7cabb39eff08a0203db03e904cfe1e13674519941c3bc"}
+{"t":"2026-10-01T16:50:32.186856+02:00","seq":2,"kind":"inject","source":".keel/store/steering/conventions.md","tokens":177,"bytes":705}
+{"t":"2026-10-01T16:50:32.186891+02:00","seq":3,"kind":"inject","source":".keel/store/steering/tech.md","tokens":85,"bytes":338}
+{"t":"2026-10-01T16:50:32.186933+02:00","seq":4,"kind":"inject","source":".keel/store/steering/structure.md","tokens":8138,"bytes":32551}
+{"t":"2026-10-01T16:50:32.187345+02:00","seq":5,"kind":"inject","source":".keel/specs/agent-selection/spec.md","tokens":845,"bytes":3379}
+{"t":"2026-10-01T16:50:32.732021+02:00","seq":6,"kind":"command","cmd":"cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/build.txt"}
+{"t":"2026-10-01T16:50:33.021494+02:00","seq":7,"kind":"command","cmd":"cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/test.txt"}
+{"t":"2026-10-01T16:50:33.429853+02:00","seq":8,"kind":"command","cmd":"cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/lint.txt"}
+{"t":"2026-10-01T16:50:34.416416+02:00","seq":9,"kind":"oracle","criterion":"AC-1","oracle":"`cargo test --manifest-path cli/Cargo.toml agent_flag_sets_manifest_agent` exits 0","verdict":"pass","exit_code":0}
+{"t":"2026-10-01T16:50:34.416446+02:00","seq":10,"kind":"oracle","criterion":"AC-2","oracle":"`cargo test --manifest-path cli/Cargo.toml agent_defaults_to_claude` exits 0","verdict":"pass","exit_code":0}
+{"t":"2026-10-01T16:50:34.416451+02:00","seq":11,"kind":"oracle","criterion":"AC-3","oracle":"`cargo test --manifest-path cli/Cargo.toml copilot_composes_with_language` exits 0","verdict":"pass","exit_code":0}
+{"t":"2026-10-01T16:50:34.416455+02:00","seq":12,"kind":"oracle","criterion":"AC-4","oracle":"`cargo test --manifest-path cli/Cargo.toml claude_leaves_image_unchanged` exits 0","verdict":"pass","exit_code":0}
+{"t":"2026-10-01T16:50:34.416461+02:00","seq":13,"kind":"oracle","criterion":"AC-5","oracle":"`cargo test --manifest-path cli/Cargo.toml unknown_agent_is_rejected` exits 0","verdict":"pass","exit_code":0}
+{"t":"2026-10-01T16:50:34.905298+02:00","seq":14,"kind":"gate","gate":"G2","verdict":"pass","result":"gates/G2.json"}
+{"t":"2026-10-01T16:50:34.984044+02:00","seq":15,"kind":"gate","gate":"G2.5","verdict":"blocked","result":"gates/G2.5.json"}
+{"t":"2026-10-01T16:50:35.015017+02:00","seq":16,"kind":"gate","gate":"G3","verdict":"fail","result":"gates/G3.json"}
+{"t":"2026-10-01T16:50:35.015043+02:00","seq":17,"kind":"run_end","verdict":"fail","duration_ms":2898}
+{"t":"2026-10-01T16:52:25.511635+02:00","seq":18,"kind":"human","stage":"review","decision":"approved","by":"Dane Balia"}
+{"t":"2026-10-01T16:52:32.501862+02:00","seq":19,"kind":"human","stage":"merge","decision":"approved","by":"Dane Balia"}
