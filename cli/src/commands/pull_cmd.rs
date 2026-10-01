@@ -106,13 +106,13 @@ pub fn run(explicit: Option<String>) -> Result<()> {
     // (and so no credential) is persisted to .git/config.
     let helper = "credential.helper=!f() { echo username=x-access-token; echo \"password=$GITHUB_TOKEN\"; }; f";
 
-    println!("==> pulling {branch} from {https} (HTTPS, token injected in-container, nothing persisted)");
+    println!(
+        "==> pulling {branch} from {https} (HTTPS, token injected in-container, nothing persisted)"
+    );
     let (ok, out) = exec(
         &name,
         &m,
-        &[
-            "git", "-c", helper, "pull", "--ff-only", &https, branch,
-        ],
+        &["git", "-c", helper, "pull", "--ff-only", &https, branch],
     )?;
     // Scrub a token that could only appear if git echoed the URL back; the
     // helper form above doesn't put it in the URL, but be defensive.
@@ -175,10 +175,7 @@ mod tests {
     #[test]
     fn refuses_non_github_host() {
         assert_eq!(https_github_url("git@gitlab.com:acme/thing.git"), None);
-        assert_eq!(
-            https_github_url("https://gitlab.com/acme/thing.git"),
-            None
-        );
+        assert_eq!(https_github_url("https://gitlab.com/acme/thing.git"), None);
     }
 
     #[test]

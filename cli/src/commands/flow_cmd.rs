@@ -181,7 +181,13 @@ pub fn reject(explicit: Option<String>, why: &str) -> Result<()> {
             exec(
                 &t,
                 &[
-                    "approve", &active.spec.slug, "--stage", decision, "--reject", "--note", why,
+                    "approve",
+                    &active.spec.slug,
+                    "--stage",
+                    decision,
+                    "--reject",
+                    "--note",
+                    why,
                 ],
             )?;
             println!();
