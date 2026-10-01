@@ -94,16 +94,38 @@ impl Target {
     /// The guidance block, ending on its "Next:" line (plus a tip when
     /// the printed commands carry `--project`).
     pub fn print_guidance(&self, report: &guide::NextReport) {
-        // Approved work waiting to ship comes first: starting the next spec
-        // on top of it is how two specs' changes end up tangled.
         let unshipped = self.unshipped(report).unwrap_or_default();
         let active = self.active(report);
+        // An explicit pin wins: if the operator pinned an in-progress spec,
+        // guide that one even when other approved work is waiting to ship —
+        // the pin is a clear "I'm working on this" signal. Without a pin,
+        // approved-but-unshipped work comes first, because starting the next
+        // spec on top of it is how two specs' changes end up tangled.
+        let pinned_active = active
+            .as_ref()
+            .filter(|a| a.why == guide::Why::Pinned)
+            .is_some();
         let mut lines = match unshipped.first() {
-            Some(slug) => {
+            Some(slug) if !pinned_active => {
                 guide::render_ship(&self.name, self.flag.as_deref(), slug, unshipped.len())
             }
-            None => guide::render(&self.name, self.flag.as_deref(), report, active.as_ref()),
+            _ => guide::render(&self.name, self.flag.as_deref(), report, active.as_ref()),
         };
+        // When the pin took precedence but approved work is still waiting,
+        // say so, so it isn't silently forgotten.
+        if pinned_active {
+            if let Some(slug) = unshipped.first() {
+                let more = if unshipped.len() > 1 {
+                    format!(" (and {} other spec(s))", unshipped.len() - 1)
+                } else {
+                    String::new()
+                };
+                lines.push(String::new());
+                lines.push(format!(
+                    "  Also: '{slug}'{more} is approved and waiting to ship — `moor ship` when ready."
+                ));
+            }
+        }
         if self.flag.is_some() {
             lines.push(String::new());
             lines.push(format!(
