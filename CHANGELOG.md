@@ -4,6 +4,19 @@ Notable changes to moor. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and moor uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- `moor ship` said "Nothing to ship" for a spec that `moor next` was
+  pointing at with "approved, not shipped yet". When more than one spec
+  had unshipped work, `ship` chose via the active-spec logic, which only
+  surfaces a pin while the spec is still in progress — so once a build was
+  approved (making the spec `complete`), the pinned spec was dropped and
+  `ship` found nothing, even though `next` still guided you to it. `ship`
+  now consults the pin directly and ships it whenever it is among the
+  unshipped specs, keeping the two commands in agreement.
+
 ## [0.5.2] - 2026-10-01
 
 ### Fixed

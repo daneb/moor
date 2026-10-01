@@ -141,7 +141,7 @@ impl Target {
 
 /// The pinned spec, if one is set and still a well-formed slug. A
 /// hand-edited file that isn't one is treated as no pin, not an error.
-fn read_pin(name: &str) -> Option<String> {
+pub(crate) fn read_pin(name: &str) -> Option<String> {
     let raw = std::fs::read_to_string(paths::active_spec_path(name).ok()?).ok()?;
     let slug = raw.trim();
     manifest::validate_name(slug).ok()?;

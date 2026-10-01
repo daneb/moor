@@ -99,16 +99,24 @@ fn confirm(question: &str) -> bool {
     matches!(line.trim().to_ascii_lowercase().as_str(), "y" | "yes")
 }
 
-/// The spec to ship: the one named, else the only approved-but-unshipped
-/// one, else the active spec's if it is among them.
+/// The spec to ship: the one named; else the only approved-but-unshipped
+/// one; else the active/pinned spec if it is among the unshipped.
+///
+/// The pin is consulted directly here, not via `Target::active`: once a
+/// spec's build is approved it is `complete`, and `pick_active` only
+/// returns a pin while the spec is still in progress — so after approval
+/// an `active`-based lookup would drop the very spec you just approved,
+/// and `moor ship` would say "nothing to ship" while `moor next` points
+/// at it. Keying on the pin's presence in `unshipped` keeps the two in
+/// agreement.
 fn pick(t: &Target, report: &guide::NextReport, named: Option<&str>) -> Result<Option<String>> {
     let unshipped = t.unshipped(report)?;
     Ok(match named {
         Some(n) => Some(n.to_string()),
         None if unshipped.len() == 1 => unshipped.into_iter().next(),
         None => {
-            let active = t.active(report).map(|a| a.spec.slug.clone());
-            active.filter(|a| unshipped.contains(a))
+            let pin = super::next_cmd::read_pin(&t.name);
+            pin.filter(|p| unshipped.contains(p))
         }
     })
 }
