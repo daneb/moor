@@ -4,6 +4,21 @@ Notable changes to moor. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and moor uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **`moor pull`** refreshes the sandbox's current branch from its GitHub
+  remote over HTTPS, with a token injected inside the container at
+  runtime. It works even though the sandbox has no SSH client (so a plain
+  `git pull` against an SSH `origin` fails with "cannot run ssh"): it
+  derives an `https://github.com/...` URL from `origin` in any form
+  (scp-style, SSH host alias like `github.com-sbg`, `ssh://`, or already
+  HTTPS), reads `$GITHUB_TOKEN` via a credential helper so it never
+  appears in a host-side argv, leaves `origin` unchanged, and persists no
+  credential to `.git/config`. See
+  [ADR-0010](docs/decisions/0010-sandbox-git-transport.md).
+
 ## [0.5.2] - 2026-10-01
 
 ### Fixed
