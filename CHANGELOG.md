@@ -6,16 +6,11 @@ Notable changes to moor. The format follows
 
 ## [Unreleased]
 
-### Fixed
+### Added
 
-- `moor ship` said "Nothing to ship" for a spec that `moor next` was
-  pointing at with "approved, not shipped yet". When more than one spec
-  had unshipped work, `ship` chose via the active-spec logic, which only
-  surfaces a pin while the spec is still in progress — so once a build was
-  approved (making the spec `complete`), the pinned spec was dropped and
-  `ship` found nothing, even though `next` still guided you to it. `ship`
-  now consults the pin directly and ships it whenever it is among the
-  unshipped specs, keeping the two commands in agreement.
+- `moor --version` / `moor -V` now report the version (sourced from the
+  crate version, so it always matches the released build). Previously the
+  CLI had no version flag and rejected `--version` as an unknown argument.
 
 ## [0.5.2] - 2026-10-01
 

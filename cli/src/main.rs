@@ -15,9 +15,13 @@ mod studio;
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 
+// `version` with no value makes clap source `moor --version` / `moor -V`
+// from CARGO_PKG_VERSION (the version in cli/Cargo.toml), so there is no
+// second place to bump — it always matches the released crate.
 #[derive(Parser)]
 #[command(
     name = "moor",
+    version,
     about = "Build software with an AI agent inside a locked-down container",
     after_help = "Not sure what to do next? Run `moor next`."
 )]
