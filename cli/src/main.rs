@@ -211,6 +211,15 @@ enum Command {
         #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
         cmd: Vec<String>,
     },
+    /// Refresh the sandbox's current branch from its GitHub remote.
+    ///
+    /// Pulls over HTTPS with a token injected inside the container, so it
+    /// works even though the sandbox has no SSH client and never persists
+    /// a credential. See docs/decisions/0010-sandbox-git-transport.md.
+    Pull {
+        #[arg(short = 'p', long = "project")]
+        project: Option<String>,
+    },
     /// List all projects and whether their sandboxes are up.
     Status,
     /// Show a project's tamper-evident audit trail.
@@ -322,6 +331,7 @@ fn main() {
         Command::Down { name } => commands::down::run(&name),
         Command::Shell { name } => commands::shell::run(&name),
         Command::Run { name, cmd } => commands::run_cmd::run(&name, &cmd),
+        Command::Pull { project } => commands::pull_cmd::run(project),
         Command::Keel { project, args } => commands::resolve_project_announced(project)
             .and_then(|name| commands::keel_cmd::run(&name, &args)),
         Command::Bundle { project, run, out } => commands::resolve_project_announced(project)

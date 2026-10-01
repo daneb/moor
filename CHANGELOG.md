@@ -11,6 +11,35 @@ Notable changes to moor. The format follows
 - `moor --version` / `moor -V` now report the version (sourced from the
   crate version, so it always matches the released build). Previously the
   CLI had no version flag and rejected `--version` as an unknown argument.
+- **`moor pull`** refreshes the sandbox's current branch from its GitHub
+  remote over HTTPS, with a token injected inside the container at
+  runtime. It works even though the sandbox has no SSH client (so a plain
+  `git pull` against an SSH `origin` fails with "cannot run ssh"): it
+  derives an `https://github.com/...` URL from `origin` in any form
+  (scp-style, SSH host alias like `github.com-sbg`, `ssh://`, or already
+  HTTPS), reads `$GITHUB_TOKEN` via a credential helper so it never
+  appears in a host-side argv, leaves `origin` unchanged, and persists no
+  credential to `.git/config`. See
+  [ADR-0010](docs/decisions/0010-sandbox-git-transport.md).
+
+### Fixed
+
+- `moor ship` said "Nothing to ship" for a spec that `moor next` was
+  pointing at with "approved, not shipped yet". When more than one spec
+  had unshipped work, `ship` chose via the active-spec logic, which only
+  surfaces a pin while the spec is still in progress — so once a build was
+  approved (making the spec `complete`), the pinned spec was dropped and
+  `ship` found nothing, even though `next` still guided you to it. `ship`
+  now consults the pin directly and ships it whenever it is among the
+  unshipped specs, keeping the two commands in agreement.
+- `moor reject` did nothing once a spec reached the build step ("step 6 of
+  7: build it"): it reported "Nothing is waiting for your decision" because
+  the build step is not an approval gate, leaving a spec with no guided way
+  to be pulled back after its plan was approved. `moor reject "why"` at the
+  build step now rejects the approved plan that launched the build (with
+  the reason recorded), moving the spec back out of the build step — the
+  honest meaning of "I don't want this built after all". Rejection at the
+  spec/plan/merge gates is unchanged.
 
 ## [0.5.2] - 2026-10-01
 
