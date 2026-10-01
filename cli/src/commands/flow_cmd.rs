@@ -161,23 +161,67 @@ fn gate_summary(gate: &str, gate_json: &str) -> String {
 
 /// `moor reject "why"`: record a rejection of whatever is waiting on the
 /// operator, with the reason.
+///
+/// At a normal approval gate (spec/plan/merge) this rejects that gate. At
+/// the build step there is no pending *approval* — but the operator can
+/// still want to pull the spec back ("don't build this after all"). In
+/// that case reject the plan approval that launched the build, with
+/// `--force` since the spec has moved past it, so the spec leaves the
+/// build step instead of being stuck with no guided way out.
 pub fn reject(explicit: Option<String>, why: &str) -> Result<()> {
     if why.trim().is_empty() {
         anyhow::bail!("say why, so the next attempt can address it: moor reject \"why\"");
     }
     let t = Target::resolve(explicit)?;
     let report = t.report()?;
-    let Some((spec, decision)) = pending(&t, &report) else {
-        return Ok(());
-    };
-    exec(
-        &t,
-        &[
-            "approve", &spec.slug, "--stage", decision, "--reject", "--note", why,
-        ],
-    )?;
-    println!();
-    t.print_guidance(&t.report()?);
+
+    // A pending gate (spec/plan/merge) is rejected directly.
+    if let Some(active) = t.active(&report) {
+        if let Some(decision) = guide::pending_decision(active.spec) {
+            exec(
+                &t,
+                &[
+                    "approve", &active.spec.slug, "--stage", decision, "--reject", "--note", why,
+                ],
+            )?;
+            println!();
+            t.print_guidance(&t.report()?);
+            return Ok(());
+        }
+        // At the build step there is no pending approval, but the plan
+        // approval that launched it can be withdrawn, taking the spec out
+        // of the build step. `--force` because the spec has progressed
+        // past (and may have locked at) that stage.
+        if active.spec.stage == "run" {
+            println!(
+                "{} is building, not at an approval gate — rejecting its approved plan to pull it back.\n",
+                active.spec.slug
+            );
+            exec(
+                &t,
+                &[
+                    "approve",
+                    &active.spec.slug,
+                    "--stage",
+                    "plan",
+                    "--reject",
+                    "--force",
+                    "--note",
+                    why,
+                ],
+            )?;
+            println!();
+            t.print_guidance(&t.report()?);
+            return Ok(());
+        }
+        // Nothing to reject at this stage: say so, and show the way on.
+        println!(
+            "Nothing is waiting for your decision: {} is at {}.\n",
+            active.spec.slug,
+            guide::step_label(active.spec)
+        );
+        t.print_guidance(&report);
+    }
     Ok(())
 }
 

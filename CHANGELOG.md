@@ -12,6 +12,17 @@ Notable changes to moor. The format follows
   crate version, so it always matches the released build). Previously the
   CLI had no version flag and rejected `--version` as an unknown argument.
 
+### Fixed
+
+- `moor reject` did nothing once a spec reached the build step ("step 6 of
+  7: build it"): it reported "Nothing is waiting for your decision" because
+  the build step is not an approval gate, leaving a spec with no guided way
+  to be pulled back after its plan was approved. `moor reject "why"` at the
+  build step now rejects the approved plan that launched the build (with
+  the reason recorded), moving the spec back out of the build step — the
+  honest meaning of "I don't want this built after all". Rejection at the
+  spec/plan/merge gates is unchanged.
+
 ## [0.5.2] - 2026-10-01
 
 ### Fixed
