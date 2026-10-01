@@ -39,7 +39,13 @@ fn parse_github_repo_slug(url: &str) -> Option<String> {
     Some(format!("{owner}/{repo}"))
 }
 
-pub fn run(name: &str, from: &Path, image: Option<String>, github: bool) -> Result<()> {
+pub fn run(
+    name: &str,
+    from: &Path,
+    image: Option<String>,
+    agent: manifest::Agent,
+    github: bool,
+) -> Result<()> {
     manifest::validate_name(name)?;
 
     let dir = paths::project_dir(name)?;
@@ -57,13 +63,17 @@ pub fn run(name: &str, from: &Path, image: Option<String>, github: bool) -> Resu
         );
     }
 
-    let image = image.unwrap_or_else(|| detect_image(&from).to_string());
+    let language_image = image.unwrap_or_else(|| detect_image(&from).to_string());
+    // Compose the chosen agent with the language image (Claude: unchanged;
+    // Copilot: the matching moor/copilot-<lang> layer).
+    let image = manifest::resolve_image(&language_image, agent);
     println!(
-        "==> importing {} as '{name}' (image: {image})",
+        "==> importing {} as '{name}' (image: {image}, agent: {agent:?})",
         from.display()
     );
 
     let mut m = Manifest::new(name, &image);
+    m.agent = agent;
 
     // Preserve the source repo's existing GitHub remote, if it has one —
     // this is the common case for something like keel, which already

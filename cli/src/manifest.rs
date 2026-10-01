@@ -2,11 +2,67 @@ use crate::canary;
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
+use std::str::FromStr;
+
+/// Which agent a project's sandbox is set up for. Orthogonal to the
+/// *language* image: Claude ships in every image, Copilot only in the
+/// opt-in `moor/copilot*` layer. `resolve_image` composes the two.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Agent {
+    #[default]
+    Claude,
+    Copilot,
+}
+
+impl FromStr for Agent {
+    type Err = anyhow::Error;
+    fn from_str(s: &str) -> Result<Self> {
+        match s.trim().to_ascii_lowercase().as_str() {
+            "claude" => Ok(Agent::Claude),
+            "copilot" => Ok(Agent::Copilot),
+            other => anyhow::bail!("unknown agent '{other}' — expected 'claude' or 'copilot'"),
+        }
+    }
+}
+
+/// Compose a language image with the chosen agent. Claude leaves the
+/// language image unchanged (it is in every image); Copilot maps to the
+/// matching opt-in layer: `moor/base` → `moor/copilot`, and
+/// `moor/<lang>` → `moor/copilot-<lang>`. A non-`moor/` image, or one
+/// already a copilot image, is returned unchanged. Pure — unit-tested
+/// without Docker.
+pub fn resolve_image(language_image: &str, agent: Agent) -> String {
+    if agent == Agent::Claude {
+        return language_image.to_string();
+    }
+    // Copilot. Split "moor/<name>:<tag>" into its parts; anything that
+    // isn't a moor image, or is already a copilot image, is left as-is.
+    let (repo, tag) = match language_image.split_once(':') {
+        Some((r, t)) => (r, t),
+        None => (language_image, "latest"),
+    };
+    let Some(name) = repo.strip_prefix("moor/") else {
+        return language_image.to_string();
+    };
+    if name == "copilot" || name.starts_with("copilot-") {
+        return language_image.to_string();
+    }
+    if name == "base" {
+        format!("moor/copilot:{tag}")
+    } else {
+        format!("moor/copilot-{name}:{tag}")
+    }
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Manifest {
     pub name: String,
     pub image: String,
+    /// The agent the sandbox is set up for; see `Agent`. Defaults to
+    /// Claude so manifests written before this field still load.
+    #[serde(default)]
+    pub agent: Agent,
     #[serde(default)]
     pub github_repo: Option<String>,
     #[serde(default)]
@@ -49,6 +105,7 @@ impl Manifest {
         Manifest {
             name: name.to_string(),
             image: image.to_string(),
+            agent: Agent::default(),
             github_repo: None,
             egress: Egress::default(),
             resources: Resources::default(),
@@ -125,6 +182,87 @@ mod tests {
     fn accepts_valid_names() {
         for name in ["a", "sample-app", "my-project-2", "x1"] {
             assert!(validate_name(name).is_ok(), "expected '{name}' to be valid");
+        }
+    }
+
+    // --- agent-selection (SPEC-0010) ------------------------------------
+
+    #[test]
+    fn agent_defaults_to_claude() {
+        // AC-2: no --agent given → Claude, and a manifest written without
+        // an `agent:` field still loads as Claude (serde default).
+        assert_eq!(Agent::default(), Agent::Claude);
+        let m = Manifest::new("sample", "moor/base:latest");
+        assert_eq!(m.agent, Agent::Claude);
+        let no_agent_yaml = "name: x\nimage: moor/base:latest\n";
+        let loaded: Manifest = serde_yaml::from_str(no_agent_yaml).unwrap();
+        assert_eq!(loaded.agent, Agent::Claude);
+    }
+
+    #[test]
+    fn agent_flag_sets_manifest_agent() {
+        // AC-1: the value a `--agent` flag parses to is what the manifest
+        // records, and it round-trips through YAML.
+        let mut m = Manifest::new("sample", "moor/python:latest");
+        m.agent = "copilot".parse().unwrap();
+        assert_eq!(m.agent, Agent::Copilot);
+        let yaml = serde_yaml::to_string(&m).unwrap();
+        assert!(yaml.contains("agent: copilot"), "{yaml}");
+        let back: Manifest = serde_yaml::from_str(&yaml).unwrap();
+        assert_eq!(back.agent, Agent::Copilot);
+    }
+
+    #[test]
+    fn unknown_agent_is_rejected() {
+        // AC-5: anything but claude/copilot errors, not silently defaults.
+        assert!("claude".parse::<Agent>().is_ok());
+        assert!("copilot".parse::<Agent>().is_ok());
+        assert!("Copilot".parse::<Agent>().is_ok()); // case-insensitive
+        for bad in ["gpt", "", "claude-code", "none"] {
+            assert!(bad.parse::<Agent>().is_err(), "expected '{bad}' rejected");
+        }
+    }
+
+    #[test]
+    fn copilot_composes_with_language() {
+        // AC-3: copilot + language image → the matching copilot layer.
+        assert_eq!(
+            resolve_image("moor/python:latest", Agent::Copilot),
+            "moor/copilot-python:latest"
+        );
+        assert_eq!(
+            resolve_image("moor/node:latest", Agent::Copilot),
+            "moor/copilot-node:latest"
+        );
+        assert_eq!(
+            resolve_image("moor/rust:latest", Agent::Copilot),
+            "moor/copilot-rust:latest"
+        );
+        assert_eq!(
+            resolve_image("moor/base:latest", Agent::Copilot),
+            "moor/copilot:latest"
+        );
+        // Already a copilot image, or non-moor image: unchanged.
+        assert_eq!(
+            resolve_image("moor/copilot-python:latest", Agent::Copilot),
+            "moor/copilot-python:latest"
+        );
+        assert_eq!(
+            resolve_image("ubuntu:22.04", Agent::Copilot),
+            "ubuntu:22.04"
+        );
+    }
+
+    #[test]
+    fn claude_leaves_image_unchanged() {
+        // AC-4: claude returns the language image verbatim.
+        for img in [
+            "moor/base:latest",
+            "moor/python:latest",
+            "moor/node:latest",
+            "moor/rust:latest",
+        ] {
+            assert_eq!(resolve_image(img, Agent::Claude), img);
         }
     }
 
