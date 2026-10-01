@@ -4,6 +4,14 @@ Notable changes to moor. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and moor uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- `moor --version` / `moor -V` now report the version (sourced from the
+  crate version, so it always matches the released build). Previously the
+  CLI had no version flag and rejected `--version` as an unknown argument.
+
 ## [0.5.2] - 2026-10-01
 
 ### Fixed
