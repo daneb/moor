@@ -1,0 +1,2004 @@
+diff --git a/.github/copilot-instructions.md b/.github/copilot-instructions.md
+index b38a496..fa0ebd1 100644
+--- a/.github/copilot-instructions.md
++++ b/.github/copilot-instructions.md
+@@ -1,4 +1,4 @@
+-<!-- keel:generated schema=keel.projection/1 adapter=copilot store=1069ef3ef7ea body=04ed6d61c460 -->
++<!-- keel:generated schema=keel.projection/1 adapter=copilot store=13cd739bb32c body=2644258bb9ce -->
+ <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
+ 
+ # Project context
+@@ -48,14 +48,14 @@ _Versions that cannot move, platforms that must keep working, dependencies that
+ 
+ ## Repository map
+ 
+-**43 files · 693 symbols · 11532 lines** — javascript 2, rust 41
++**43 files · 704 symbols · 11669 lines** — javascript 2, rust 41
+ 
+ Files are ordered by import-graph centrality, not alphabetically. Signatures only; read a body with the file path and line number. Per-directory detail lives in `.keel/store/map/<dir>/CODEMAP.md`.
+ 
+ ### Layout
+ 
+-- `cli/src/` — 12 files, 4588 lines · guide.rs, canary.rs, paths.rs
+-- `cli/src/commands/` — 25 files, 4540 lines · next_cmd.rs, mod.rs, run_cmd.rs
++- `cli/src/` — 12 files, 4717 lines · guide.rs, canary.rs, manifest.rs
++- `cli/src/commands/` — 25 files, 4548 lines · next_cmd.rs, mod.rs, run_cmd.rs
+ - `cli/src/studio/` — 3 files, 1806 lines · mod.rs, state.rs, render.rs
+ - `docs/examples/ascii-banner/` — 1 file, 56 lines · banner.js
+ - `docs/examples/ascii-banner/test/` — 1 file, 60 lines · banner.test.js
+@@ -105,7 +105,7 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
+ - `pub fn wrap(text: &str, width: usize) -> Vec<String>` — Wrap to the terminal width after sanitizing — a single very long line  <sub>L95</sub>
+ - `pub fn frame(c: &Console, width: usize, height: usize) -> String` — The whole frame, as one string. Pure: takes state, returns bytes, so  <sub>L131</sub>
+ 
+-_… 324 more lines in `.keel/store/steering/structure.md`._
++_… 325 more lines in `.keel/store/steering/structure.md`._
+ 
+ ## What this is
+ 
+diff --git a/.keel/chain.jsonl b/.keel/chain.jsonl
+index 4a883f9..53180fe 100644
+--- a/.keel/chain.jsonl
++++ b/.keel/chain.jsonl
+@@ -199,3 +199,11 @@
+ {"schema":"keel.chain/1","seq":199,"ts":"2026-10-01T19:54:05.334260+02:00","kind":"gate","writer":"in-process","data":{"gate":"G2.5","run":"2026-10-01-007","sha256":"adf4a944150b5bfa09c4fd79a4c7a7d99fca34d849f482eb824eb57106bad4b9","spec":"copilot-device-auth","verdict":"pass"},"prev_hash":"12d776f09e583285835c3d293cd98743bb152de7613d9a4b475cf4da4e150728","hash":"287fded689bbf878d7afd442f7ba7d148bd9c03ce0d9567166121b266554eb2a"}
+ {"schema":"keel.chain/1","seq":200,"ts":"2026-10-01T19:54:05.366664+02:00","kind":"gate","writer":"in-process","data":{"gate":"G3","run":"2026-10-01-007","sha256":"86a6b2eef66facceaf913f53ec41075895e9200d3ef8c704570e8ca035c3fe7b","spec":"copilot-device-auth","verdict":"pass"},"prev_hash":"287fded689bbf878d7afd442f7ba7d148bd9c03ce0d9567166121b266554eb2a","hash":"a0be13cd8ef51e55e61165e8761fd95ddb23d5cc00b9dc2622858131284d4792"}
+ {"schema":"keel.chain/1","seq":201,"ts":"2026-10-01T19:54:05.370546+02:00","kind":"run_end","writer":"in-process","data":{"run":"2026-10-01-006","trajectory_sha256":"abe8e3e46b50c86510d93f0bdf4d36b8a2d5d6ace429dfd0c2a2cc33aa278f40","verdict":"pass"},"prev_hash":"a0be13cd8ef51e55e61165e8761fd95ddb23d5cc00b9dc2622858131284d4792","hash":"21047b7c74af1c3184dbf7ac9e294e0bf9ac15d81ca5bcb82b1a1967f30f3b19"}
++{"schema":"keel.chain/1","seq":202,"ts":"2026-10-01T21:54:20.781756+02:00","kind":"gate","writer":"in-process","data":{"gate":"G0","run":"2026-10-01-007","sha256":"72ae2b8f5b76fedae22dd3837b7528c93d15a69bd730269b1ed56d98a1a71015","spec":"agent-session-abstraction","verdict":"fail"},"prev_hash":"21047b7c74af1c3184dbf7ac9e294e0bf9ac15d81ca5bcb82b1a1967f30f3b19","hash":"4e42853765649a88b7ddfd9b73112cc1818c916e2e38c3a81d3d481a2c139879"}
++{"schema":"keel.chain/1","seq":203,"ts":"2026-10-01T21:55:39.413330+02:00","kind":"gate","writer":"in-process","data":{"gate":"G0","run":"2026-10-01-007","sha256":"c3c7a9b5fae9d4a17e573540ea63ba45ba7485363e67c2a57c9d3472644d8bc7","spec":"agent-session-abstraction","verdict":"fail"},"prev_hash":"4e42853765649a88b7ddfd9b73112cc1818c916e2e38c3a81d3d481a2c139879","hash":"37cbacd6ad204707ea98f995f3ec4000929942709e3584209a2c46d6be1333b1"}
++{"schema":"keel.chain/1","seq":204,"ts":"2026-10-01T21:57:27.563892+02:00","kind":"gate","writer":"in-process","data":{"gate":"G0","run":"2026-10-01-007","sha256":"a4e9532d78fc468c2377cf4b29c5b66afde3bad70397b1da169a610d5fd8f99b","spec":"agent-session-abstraction","verdict":"pass"},"prev_hash":"37cbacd6ad204707ea98f995f3ec4000929942709e3584209a2c46d6be1333b1","hash":"d246860ac5305c6b09984e58bc5abfb58ef7c86a683b2fd3dcdb0e00763ff933"}
++{"schema":"keel.chain/1","seq":205,"ts":"2026-10-01T22:14:02.205591+02:00","kind":"approval","writer":"in-process","data":{"artefact_hash":"b156519afc109c94d468c9b4589105c75f0c5f44dcc6ff4d7fef6c083a9785e7","by":"Dane Balia","decision":"approved","spec":"agent-session-abstraction","stage":"spec"},"prev_hash":"d246860ac5305c6b09984e58bc5abfb58ef7c86a683b2fd3dcdb0e00763ff933","hash":"78da8fb8ce2dbdeec953e87bd8e11c9c5b935a857db963e4612754ddc40ffc19"}
++{"schema":"keel.chain/1","seq":206,"ts":"2026-10-01T22:14:23.865200+02:00","kind":"gate","writer":"in-process","data":{"gate":"G0","run":"2026-10-01-007","sha256":"2dc42b6c2cdfc034e708441f506806851363860bfb11fb73571780e443bd1ad4","spec":"agent-session-abstraction","verdict":"pass"},"prev_hash":"78da8fb8ce2dbdeec953e87bd8e11c9c5b935a857db963e4612754ddc40ffc19","hash":"3fc24b3bd34d38a63cbe2790cbcb9395d3efae6316a2f2f854e08fcd5e83b700"}
++{"schema":"keel.chain/1","seq":207,"ts":"2026-10-01T22:15:21.571179+02:00","kind":"gate","writer":"in-process","data":{"gate":"G1","run":"2026-10-01-007","sha256":"35ff52b03707375bb47e020a2f67f41c143de734440428ea1df5a9c2f68df178","spec":"agent-session-abstraction","verdict":"pass"},"prev_hash":"3fc24b3bd34d38a63cbe2790cbcb9395d3efae6316a2f2f854e08fcd5e83b700","hash":"e9e0c343596d6899a8c73bc90084dc5143c8f96f6c2987ed18ebeb385e95e10f"}
++{"schema":"keel.chain/1","seq":208,"ts":"2026-10-01T22:17:17.894976+02:00","kind":"approval","writer":"in-process","data":{"artefact_hash":"97d5b410aec3033a0a74aaf82917feefe36d58c03ca6c02f8e6dc8c2b51e0b66","by":"Dane Balia","decision":"approved","spec":"agent-session-abstraction","stage":"plan"},"prev_hash":"e9e0c343596d6899a8c73bc90084dc5143c8f96f6c2987ed18ebeb385e95e10f","hash":"a39e293a40742a15a120a10e0d7c55655767497d1235739c70cf8925416b1cc9"}
++{"schema":"keel.chain/1","seq":209,"ts":"2026-10-01T22:24:35.672473+02:00","kind":"run_start","writer":"in-process","data":{"run":"2026-10-01-007","spec":"agent-session-abstraction","task":null},"prev_hash":"a39e293a40742a15a120a10e0d7c55655767497d1235739c70cf8925416b1cc9","hash":"22c402d0f8e09f0a9e1072a820a048d945ea0f9d732a9ffbfa92aba2a0d5a3b9"}
+diff --git a/.keel/store/map/cli/src/CODEMAP.md b/.keel/store/map/cli/src/CODEMAP.md
+index 7993829..ab86ac1 100644
+--- a/.keel/store/map/cli/src/CODEMAP.md
++++ b/.keel/store/map/cli/src/CODEMAP.md
+@@ -10,7 +10,7 @@ generated: true
+ 
+ <!-- generated by `keel map`. Do not edit: your changes will be overwritten. -->
+ 
+-12 files · 4588 lines · 277 symbols
++12 files · 4717 lines · 288 symbols
+ 
+ **`cli/src/guide.rs`** · 845 lines · imported by 3
+ - `pub struct NextReport`  <sub>L19</sub>
+@@ -28,19 +28,7 @@ generated: true
+ - `pub const CANARY_DOMAIN: &str = "canary.moor.invalid";` — deny, because there is no legitimate reason for it to ever be  <sub>L8</sub>
+ - `pub fn generate_token() -> String` — this is a secondary control, not the primary one (TLS isn't  <sub>L17</sub>
+ 
+-**`cli/src/paths.rs`** · 122 lines · imported by 4
+-- `pub fn chain_log_path(name: &str) -> Result<PathBuf>` — folded-in egress verdicts, and tripwire hits all append here. See  <sub>L28</sub>
+-- `pub fn egress_offset_path(name: &str) -> Result<PathBuf>` — How many raw lines of the egress gateway's access log have already  <sub>L34</sub>
+-- `pub fn sink_offset_path(name: &str) -> Result<PathBuf>` — How many lines of keel's chain sink (inside the sandbox) have already  <sub>L40</sub>
+-- `pub fn posture_path(name: &str) -> Result<PathBuf>` — The host's copy of the posture attestation last written into the  <sub>L46</sub>
+-- `pub fn session_path(name: &str) -> Result<PathBuf>` — host-written only: nothing inside a sandbox has this path mounted, so  <sub>L53</sub>
+-- `pub fn active_spec_path(name: &str) -> Result<PathBuf>` — The spec `moor next` guides this project through, when pinned with  <sub>L59</sub>
+-- `pub fn transcript_path(name: &str) -> Result<PathBuf>` — chain.jsonl on purpose: the chain carries hashes and is exported by  <sub>L66</sub>
+-- `pub fn current_project_path() -> Result<PathBuf>` — like `moor keel`/`moor view` don't need `--project` spelled out on  <sub>L78</sub>
+-- `pub fn read_current_project() -> Result<Option<String>>`  <sub>L82</sub>
+-- `pub fn all_project_names() -> Result<Vec<String>>`  <sub>L106</sub>
+-
+-**`cli/src/manifest.rs`** · 327 lines · imported by 2
++**`cli/src/manifest.rs`** · 327 lines · imported by 3
+ - `pub enum Agent`  <sub>L12</sub>
+ - `pub fn resolve_image(language_image: &str, agent: Agent) -> String` — already a copilot image, is returned unchanged. Pure — unit-tested  <sub>L35</sub>
+ - `pub struct Manifest`  <sub>L59</sub>
+@@ -52,6 +40,18 @@ generated: true
+ - `pub fn validate_name(name: &str) -> Result<()>` — Validate a project name: lowercase alnum + dashes, matches what's safe  <sub>L162</sub>
+ - `mod tests`  <sub>L178</sub>
+ 
++**`cli/src/paths.rs`** · 122 lines · imported by 3
++- `pub fn chain_log_path(name: &str) -> Result<PathBuf>` — folded-in egress verdicts, and tripwire hits all append here. See  <sub>L28</sub>
++- `pub fn egress_offset_path(name: &str) -> Result<PathBuf>` — How many raw lines of the egress gateway's access log have already  <sub>L34</sub>
++- `pub fn sink_offset_path(name: &str) -> Result<PathBuf>` — How many lines of keel's chain sink (inside the sandbox) have already  <sub>L40</sub>
++- `pub fn posture_path(name: &str) -> Result<PathBuf>` — The host's copy of the posture attestation last written into the  <sub>L46</sub>
++- `pub fn session_path(name: &str) -> Result<PathBuf>` — host-written only: nothing inside a sandbox has this path mounted, so  <sub>L53</sub>
++- `pub fn active_spec_path(name: &str) -> Result<PathBuf>` — The spec `moor next` guides this project through, when pinned with  <sub>L59</sub>
++- `pub fn transcript_path(name: &str) -> Result<PathBuf>` — chain.jsonl on purpose: the chain carries hashes and is exported by  <sub>L66</sub>
++- `pub fn current_project_path() -> Result<PathBuf>` — like `moor keel`/`moor view` don't need `--project` spelled out on  <sub>L78</sub>
++- `pub fn read_current_project() -> Result<Option<String>>`  <sub>L82</sub>
++- `pub fn all_project_names() -> Result<Vec<String>>`  <sub>L106</sub>
++
+ **`cli/src/session.rs`** · 970 lines · imported by 2
+ - `pub enum Role`  <sub>L25</sub>
+ - `pub fn deny_shell_argv() -> Vec<String>` — agent steps make the same assumption this corrects: that granting one  <sub>L123</sub>
+@@ -99,6 +99,18 @@ generated: true
+ - `pub fn fold_sink_lines(` — observed. A line that is not a payload is kept as `sink_malformed` —  <sub>L389</sub>
+ - `pub fn fold_egress_log(project: &str, m: &Manifest) -> Result<usize>` — tmpfs and resets), the offset is detected as stale and reset rather  <sub>L430</sub>
+ 
++**`cli/src/secrets.rs`** · 351 lines · imported by 1
++- `pub fn get(project: &str, name: &str) -> Result<Option<String>>` — the caller falls back to "not resolvable from Keychain," never errors  <sub>L20</sub>
++- `pub fn set(project: &str, name: &str) -> Result<()>` — API in the stock `security` CLI; this is the same tradeoff every tool  <sub>L54</sub>
++- `pub fn unset(project: &str, name: &str) -> Result<()>` — Remove a secret from the Keychain. Not an error if it wasn't there.  <sub>L98</sub>
++- `pub enum Source`  <sub>L109</sub>
++- `pub fn status(project: &str, secret_names: &[String]) -> Vec<(String, Source)>` — right now, in the same priority order `resolve_into_env` uses: this  <sub>L118</sub>
++- `pub fn resolve_into_env(project: &str, secret_names: &[String])` — either. Never errors on a missing secret: an unresolvable name is left  <sub>L143</sub>
++- `pub fn copilot_device_token() -> Option<String>` — Read via `security -w`, so the value is captured from stdout and never  <sub>L165</sub>
++- `pub fn resolve_copilot_device_token(project: &str, agent_is_copilot: bool) -> Option<String>` — is a no-op; a missing device token is a no-op. Returns the token it set,  <sub>L185</sub>
++- `pub fn should_use_device_token(agent_is_copilot: bool, env_set: bool, keychain_set: bool) -> bool` — token only for a copilot agent, and only when no more explicit source  <sub>L200</sub>
++- `fn read_hidden_line() -> Result<String>`  <sub>L204</sub>
++
+ **`cli/src/compose.rs`** · 247 lines · imported by 1
+ - `pub fn render(m: &Manifest) -> String` — `include_str!` can't reach outside the package a published crate  <sub>L12</sub>
+ - `fn host_git_identity() -> Vec<(&'static str, String)>` — The host's git identity, whichever of `user.name` and `user.email` are set.  <sub>L17</sub>
+@@ -123,18 +135,6 @@ generated: true
+ - `mod tests`  <sub>L223</sub>
+ - `fn hardened() -> (Value, Vec<Value>)` — The shape of `docker inspect` for a sandbox rendered from moor's own  <sub>L228</sub>
+ 
+-**`cli/src/secrets.rs`** · 222 lines · imported by 1
+-- `const ACCOUNT: &str = "moor";` — The service name (one per project+name pair) is what actually scopes  <sub>L9</sub>
+-- `fn service_name(project: &str, name: &str) -> String`  <sub>L11</sub>
+-- `pub fn get(project: &str, name: &str) -> Result<Option<String>>` — the caller falls back to "not resolvable from Keychain," never errors  <sub>L20</sub>
+-- `pub fn set(project: &str, name: &str) -> Result<()>` — API in the stock `security` CLI; this is the same tradeoff every tool  <sub>L54</sub>
+-- `pub fn unset(project: &str, name: &str) -> Result<()>` — Remove a secret from the Keychain. Not an error if it wasn't there.  <sub>L98</sub>
+-- `pub enum Source`  <sub>L109</sub>
+-- `pub fn status(project: &str, secret_names: &[String]) -> Vec<(String, Source)>` — right now, in the same priority order `resolve_into_env` uses: this  <sub>L118</sub>
+-- `pub fn resolve_into_env(project: &str, secret_names: &[String])` — either. Never errors on a missing secret: an unresolvable name is left  <sub>L143</sub>
+-- `fn read_hidden_line() -> Result<String>`  <sub>L154</sub>
+-- `mod tests`  <sub>L183</sub>
+-
+ **`cli/src/egress_log.rs`** · 138 lines · imported by 1
+ - `pub enum Verdict`  <sub>L5</sub>
+ - `pub enum Severity`  <sub>L11</sub>
+diff --git a/.keel/store/map/cli/src/commands/CODEMAP.md b/.keel/store/map/cli/src/commands/CODEMAP.md
+index 9862468..37cb313 100644
+--- a/.keel/store/map/cli/src/commands/CODEMAP.md
++++ b/.keel/store/map/cli/src/commands/CODEMAP.md
+@@ -10,7 +10,7 @@ generated: true
+ 
+ <!-- generated by `keel map`. Do not edit: your changes will be overwritten. -->
+ 
+-25 files · 4540 lines · 266 symbols
++25 files · 4548 lines · 266 symbols
+ 
+ **`cli/src/commands/next_cmd.rs`** · 177 lines · imported by 4
+ - `pub struct Target` — The project a guided command acts on, resolved once and shared by  <sub>L7</sub>
+@@ -141,15 +141,15 @@ generated: true
+ **`cli/src/commands/secrets_status.rs`** · 21 lines · imported by 1
+ - `pub fn run(project: &str) -> Result<()>`  <sub>L4</sub>
+ 
++**`cli/src/commands/up.rs`** · 20 lines · imported by 1
++- `pub fn run(name: &str) -> Result<()>`  <sub>L5</sub>
++
+ **`cli/src/commands/studio_cmd.rs`** · 15 lines · imported by 1
+ - `pub fn run(only: Option<String>) -> Result<()>` — console itself is `crate::studio`, and the project list comes from the  <sub>L6</sub>
+ 
+ **`cli/src/commands/shell.rs`** · 12 lines · imported by 1
+ - `pub fn run(name: &str) -> Result<()>`  <sub>L4</sub>
+ 
+-**`cli/src/commands/up.rs`** · 12 lines · imported by 1
+-- `pub fn run(name: &str) -> Result<()>`  <sub>L4</sub>
+-
+ **`cli/src/commands/down.rs`** · 7 lines · imported by 1
+ - `pub fn run(name: &str) -> Result<()>`  <sub>L3</sub>
+ 
+diff --git a/.keel/store/steering/structure.md b/.keel/store/steering/structure.md
+index 164604b..fe8d393 100644
+--- a/.keel/store/steering/structure.md
++++ b/.keel/store/steering/structure.md
+@@ -10,14 +10,14 @@ generated: true
+ 
+ <!-- generated by `keel map`. Do not edit: your changes will be overwritten. -->
+ 
+-**43 files · 693 symbols · 11532 lines** — javascript 2, rust 41
++**43 files · 704 symbols · 11669 lines** — javascript 2, rust 41
+ 
+ Files are ordered by import-graph centrality, not alphabetically. Signatures only; read a body with the file path and line number. Per-directory detail lives in `.keel/store/map/<dir>/CODEMAP.md`.
+ 
+ ## Layout
+ 
+-- `cli/src/` — 12 files, 4588 lines · guide.rs, canary.rs, paths.rs
+-- `cli/src/commands/` — 25 files, 4540 lines · next_cmd.rs, mod.rs, run_cmd.rs
++- `cli/src/` — 12 files, 4717 lines · guide.rs, canary.rs, manifest.rs
++- `cli/src/commands/` — 25 files, 4548 lines · next_cmd.rs, mod.rs, run_cmd.rs
+ - `cli/src/studio/` — 3 files, 1806 lines · mod.rs, state.rs, render.rs
+ - `docs/examples/ascii-banner/` — 1 file, 56 lines · banner.js
+ - `docs/examples/ascii-banner/test/` — 1 file, 60 lines · banner.test.js
+@@ -106,23 +106,7 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
+ - `pub fn next_hint(name: &str) -> String` — The closing line for a command that isn't itself guided: how to ask  <sub>L153</sub>
+ - `pub fn run(explicit: Option<String>, all: bool) -> Result<()>` — `moor next`: where the project's active spec stands and the one  <sub>L164</sub>
+ 
+-**`cli/src/paths.rs`** · 122 lines · imported by 4
+-- `pub fn moor_home() -> Result<PathBuf>`  <sub>L4</sub>
+-- `pub fn project_dir(name: &str) -> Result<PathBuf>`  <sub>L9</sub>
+-- `pub fn manifest_path(name: &str) -> Result<PathBuf>`  <sub>L13</sub>
+-- `pub fn chain_log_path(name: &str) -> Result<PathBuf>` — folded-in egress verdicts, and tripwire hits all append here. See  <sub>L28</sub>
+-- `pub fn egress_offset_path(name: &str) -> Result<PathBuf>` — How many raw lines of the egress gateway's access log have already  <sub>L34</sub>
+-- `pub fn sink_offset_path(name: &str) -> Result<PathBuf>` — How many lines of keel's chain sink (inside the sandbox) have already  <sub>L40</sub>
+-- `pub fn posture_path(name: &str) -> Result<PathBuf>` — The host's copy of the posture attestation last written into the  <sub>L46</sub>
+-- `pub fn session_path(name: &str) -> Result<PathBuf>` — host-written only: nothing inside a sandbox has this path mounted, so  <sub>L53</sub>
+-- `pub fn active_spec_path(name: &str) -> Result<PathBuf>` — The spec `moor next` guides this project through, when pinned with  <sub>L59</sub>
+-- `pub fn transcript_path(name: &str) -> Result<PathBuf>` — chain.jsonl on purpose: the chain carries hashes and is exported by  <sub>L66</sub>
+-- `pub fn current_project_path() -> Result<PathBuf>` — like `moor keel`/`moor view` don't need `--project` spelled out on  <sub>L78</sub>
+-- `pub fn read_current_project() -> Result<Option<String>>`  <sub>L82</sub>
+-- `pub fn write_current_project(name: &str) -> Result<()>`  <sub>L98</sub>
+-- `pub fn all_project_names() -> Result<Vec<String>>`  <sub>L106</sub>
+-
+-**`cli/src/manifest.rs`** · 327 lines · imported by 2
++**`cli/src/manifest.rs`** · 327 lines · imported by 3
+ - `pub enum Agent`  <sub>L12</sub>
+ - `impl FromStr for Agent`  <sub>L18</sub>
+ - `pub fn resolve_image(language_image: &str, agent: Agent) -> String` — already a copilot image, is returned unchanged. Pure — unit-tested  <sub>L35</sub>
+@@ -138,6 +122,22 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
+ - `pub fn validate_name(name: &str) -> Result<()>` — Validate a project name: lowercase alnum + dashes, matches what's safe  <sub>L162</sub>
+ - `mod tests`  <sub>L178</sub>
+ 
++**`cli/src/paths.rs`** · 122 lines · imported by 3
++- `pub fn moor_home() -> Result<PathBuf>`  <sub>L4</sub>
++- `pub fn project_dir(name: &str) -> Result<PathBuf>`  <sub>L9</sub>
++- `pub fn manifest_path(name: &str) -> Result<PathBuf>`  <sub>L13</sub>
++- `pub fn chain_log_path(name: &str) -> Result<PathBuf>` — folded-in egress verdicts, and tripwire hits all append here. See  <sub>L28</sub>
++- `pub fn egress_offset_path(name: &str) -> Result<PathBuf>` — How many raw lines of the egress gateway's access log have already  <sub>L34</sub>
++- `pub fn sink_offset_path(name: &str) -> Result<PathBuf>` — How many lines of keel's chain sink (inside the sandbox) have already  <sub>L40</sub>
++- `pub fn posture_path(name: &str) -> Result<PathBuf>` — The host's copy of the posture attestation last written into the  <sub>L46</sub>
++- `pub fn session_path(name: &str) -> Result<PathBuf>` — host-written only: nothing inside a sandbox has this path mounted, so  <sub>L53</sub>
++- `pub fn active_spec_path(name: &str) -> Result<PathBuf>` — The spec `moor next` guides this project through, when pinned with  <sub>L59</sub>
++- `pub fn transcript_path(name: &str) -> Result<PathBuf>` — chain.jsonl on purpose: the chain carries hashes and is exported by  <sub>L66</sub>
++- `pub fn current_project_path() -> Result<PathBuf>` — like `moor keel`/`moor view` don't need `--project` spelled out on  <sub>L78</sub>
++- `pub fn read_current_project() -> Result<Option<String>>`  <sub>L82</sub>
++- `pub fn write_current_project(name: &str) -> Result<()>`  <sub>L98</sub>
++- `pub fn all_project_names() -> Result<Vec<String>>`  <sub>L106</sub>
++
+ **`cli/src/session.rs`** · 970 lines · imported by 2
+ - `pub enum Role`  <sub>L25</sub>
+ - `pub fn deny_shell_argv() -> Vec<String>` — agent steps make the same assumption this corrects: that granting one  <sub>L123</sub>
+@@ -154,6 +154,17 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
+ - `pub fn run_turn(project: &str, role: Role, prompt: &str, new_session: bool) -> Result<TurnOutcome>` — by construction — there is no path to a response that skips this  <sub>L456</sub>
+ - `pub fn ask(` — `moor ask`: one turn, printed for a human.  <sub>L515</sub>
+ 
++**`cli/src/proc.rs`** · 145 lines · imported by 2
++- `pub fn run_inherit(program: &str, args: &[&str]) -> Result<ExitStatus>` — e.g. `docker compose up`, `docker exec -it ... bash`). Returns the exit  <sub>L8</sub>
++- `pub fn run_capture(program: &str, args: &[&str]) -> Result<(ExitStatus, String)>` — Run a command and capture stdout as a String (used for `docker inspect`,  <sub>L20</sub>
++- `pub fn run_capture_split(program: &str, args: &[&str]) -> Result<(ExitStatus, String, String)>` — discarding stderr turns "Invalid MCP configuration" into an  <sub>L36</sub>
++- `pub fn run_capture_combined(program: &str, args: &[&str]) -> Result<(ExitStatus, String)>` — matching and for handing the text to an agent, but not for a human  <sub>L59</sub>
++- `pub fn run_with_stdin_file(program: &str, args: &[&str], stdin_path: &Path) -> Result<ExitStatus>` — through `docker exec -i <container> sh -c 'cat > dest'`'s stdin only  <sub>L76</sub>
++- `pub fn require_success(what: &str, status: ExitStatus) -> Result<()>`  <sub>L97</sub>
++- `pub fn run_stdin_to_file(` — output (an archive) back out of a container: `run_capture` goes through  <sub>L108</sub>
++- `mod tests`  <sub>L128</sub>
++- `fn stdout_to_file_keeps_binary_bytes()`  <sub>L132</sub>
++
+ **`cli/src/commands/mod.rs`** · 293 lines · imported by 1
+ - `pub mod ask_cmd;`  <sub>L1</sub>
+ - `pub mod audit_cmd;`  <sub>L2</sub>
+@@ -170,17 +181,6 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
+ - `pub fn sync_git_identity(m: &Manifest)` — now exists call this again afterward) or if the host itself has no  <sub>L204</sub>
+ - `pub fn compose_down(name: &str) -> Result<()>`  <sub>L219</sub>
+ 
+-**`cli/src/proc.rs`** · 145 lines · imported by 2
+-- `pub fn run_inherit(program: &str, args: &[&str]) -> Result<ExitStatus>` — e.g. `docker compose up`, `docker exec -it ... bash`). Returns the exit  <sub>L8</sub>
+-- `pub fn run_capture(program: &str, args: &[&str]) -> Result<(ExitStatus, String)>` — Run a command and capture stdout as a String (used for `docker inspect`,  <sub>L20</sub>
+-- `pub fn run_capture_split(program: &str, args: &[&str]) -> Result<(ExitStatus, String, String)>` — discarding stderr turns "Invalid MCP configuration" into an  <sub>L36</sub>
+-- `pub fn run_capture_combined(program: &str, args: &[&str]) -> Result<(ExitStatus, String)>` — matching and for handing the text to an agent, but not for a human  <sub>L59</sub>
+-- `pub fn run_with_stdin_file(program: &str, args: &[&str], stdin_path: &Path) -> Result<ExitStatus>` — through `docker exec -i <container> sh -c 'cat > dest'`'s stdin only  <sub>L76</sub>
+-- `pub fn require_success(what: &str, status: ExitStatus) -> Result<()>`  <sub>L97</sub>
+-- `pub fn run_stdin_to_file(` — output (an archive) back out of a container: `run_capture` goes through  <sub>L108</sub>
+-- `mod tests`  <sub>L128</sub>
+-- `fn stdout_to_file_keeps_binary_bytes()`  <sub>L132</sub>
+-
+ **`mcp/src/main.rs`** · 482 lines
+ - `const PROTOCOL_VERSION: &str = "2024-11-05";` — MCP revision this server speaks. Claude Code negotiates by echoing  <sub>L22</sub>
+ - `mod tools` — The tool surface, and the only place a caller-supplied string is ever  <sub>L27</sub>
+@@ -245,6 +245,22 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
+ - `fn empty_command_is_not_a_push()`  <sub>L201</sub>
+ - `fn push_entry_names_ref_and_commit()`  <sub>L210</sub>
+ 
++**`cli/src/secrets.rs`** · 351 lines · imported by 1
++- `const ACCOUNT: &str = "moor";` — The service name (one per project+name pair) is what actually scopes  <sub>L9</sub>
++- `fn service_name(project: &str, name: &str) -> String`  <sub>L11</sub>
++- `pub fn get(project: &str, name: &str) -> Result<Option<String>>` — the caller falls back to "not resolvable from Keychain," never errors  <sub>L20</sub>
++- `pub fn set(project: &str, name: &str) -> Result<()>` — API in the stock `security` CLI; this is the same tradeoff every tool  <sub>L54</sub>
++- `pub fn unset(project: &str, name: &str) -> Result<()>` — Remove a secret from the Keychain. Not an error if it wasn't there.  <sub>L98</sub>
++- `pub enum Source`  <sub>L109</sub>
++- `pub fn status(project: &str, secret_names: &[String]) -> Vec<(String, Source)>` — right now, in the same priority order `resolve_into_env` uses: this  <sub>L118</sub>
++- `pub fn resolve_into_env(project: &str, secret_names: &[String])` — either. Never errors on a missing secret: an unresolvable name is left  <sub>L143</sub>
++- `pub const COPILOT_TOKEN_VAR: &str = "COPILOT_GITHUB_TOKEN";` — The env var the Copilot CLI reads its credential from.  <sub>L155</sub>
++- `pub fn copilot_device_token() -> Option<String>` — Read via `security -w`, so the value is captured from stdout and never  <sub>L165</sub>
++- `pub fn resolve_copilot_device_token(project: &str, agent_is_copilot: bool) -> Option<String>` — is a no-op; a missing device token is a no-op. Returns the token it set,  <sub>L185</sub>
++- `pub fn should_use_device_token(agent_is_copilot: bool, env_set: bool, keychain_set: bool) -> bool` — token only for a copilot agent, and only when no more explicit source  <sub>L200</sub>
++- `fn read_hidden_line() -> Result<String>`  <sub>L204</sub>
++- `mod tests`  <sub>L233</sub>
++
+ **`cli/src/compose.rs`** · 247 lines · imported by 1
+ - `pub fn render(m: &Manifest) -> String` — `include_str!` can't reach outside the package a published crate  <sub>L12</sub>
+ - `fn host_git_identity() -> Vec<(&'static str, String)>` — The host's git identity, whichever of `user.name` and `user.email` are set.  <sub>L17</sub>
+@@ -325,21 +341,6 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
+ - `mod tests`  <sub>L350</sub>
+ - `fn the_newest_run_for_the_spec_is_found()`  <sub>L370</sub>
+ 
+-**`cli/src/secrets.rs`** · 222 lines · imported by 1
+-- `const ACCOUNT: &str = "moor";` — The service name (one per project+name pair) is what actually scopes  <sub>L9</sub>
+-- `fn service_name(project: &str, name: &str) -> String`  <sub>L11</sub>
+-- `pub fn get(project: &str, name: &str) -> Result<Option<String>>` — the caller falls back to "not resolvable from Keychain," never errors  <sub>L20</sub>
+-- `pub fn set(project: &str, name: &str) -> Result<()>` — API in the stock `security` CLI; this is the same tradeoff every tool  <sub>L54</sub>
+-- `pub fn unset(project: &str, name: &str) -> Result<()>` — Remove a secret from the Keychain. Not an error if it wasn't there.  <sub>L98</sub>
+-- `pub enum Source`  <sub>L109</sub>
+-- `pub fn status(project: &str, secret_names: &[String]) -> Vec<(String, Source)>` — right now, in the same priority order `resolve_into_env` uses: this  <sub>L118</sub>
+-- `pub fn resolve_into_env(project: &str, secret_names: &[String])` — either. Never errors on a missing secret: an unresolvable name is left  <sub>L143</sub>
+-- `fn read_hidden_line() -> Result<String>`  <sub>L154</sub>
+-- `mod tests`  <sub>L183</sub>
+-- `fn service_name_is_scoped_by_project_and_secret_name()`  <sub>L187</sub>
+-- `fn status_reports_env_before_checking_keychain()`  <sub>L200</sub>
+-- `fn status_reports_missing_when_neither_env_nor_keychain_has_it()`  <sub>L211</sub>
+-
+ **`cli/src/egress_log.rs`** · 138 lines · imported by 1
+ - `pub enum Verdict`  <sub>L5</sub>
+ - `pub enum Severity`  <sub>L11</sub>
+diff --git a/.kiro/steering/keel.md b/.kiro/steering/keel.md
+index 4a31dea..a523050 100644
+--- a/.kiro/steering/keel.md
++++ b/.kiro/steering/keel.md
+@@ -1,4 +1,4 @@
+-<!-- keel:generated schema=keel.projection/1 adapter=kiro store=1069ef3ef7ea body=40d861198515 -->
++<!-- keel:generated schema=keel.projection/1 adapter=kiro store=13cd739bb32c body=2873c4b36d92 -->
+ <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
+ 
+ # Project context
+@@ -48,14 +48,14 @@ _Versions that cannot move, platforms that must keep working, dependencies that
+ 
+ ## Repository map
+ 
+-**43 files · 693 symbols · 11532 lines** — javascript 2, rust 41
++**43 files · 704 symbols · 11669 lines** — javascript 2, rust 41
+ 
+ Files are ordered by import-graph centrality, not alphabetically. Signatures only; read a body with the file path and line number. Per-directory detail lives in `.keel/store/map/<dir>/CODEMAP.md`.
+ 
+ ### Layout
+ 
+-- `cli/src/` — 12 files, 4588 lines · guide.rs, canary.rs, paths.rs
+-- `cli/src/commands/` — 25 files, 4540 lines · next_cmd.rs, mod.rs, run_cmd.rs
++- `cli/src/` — 12 files, 4717 lines · guide.rs, canary.rs, manifest.rs
++- `cli/src/commands/` — 25 files, 4548 lines · next_cmd.rs, mod.rs, run_cmd.rs
+ - `cli/src/studio/` — 3 files, 1806 lines · mod.rs, state.rs, render.rs
+ - `docs/examples/ascii-banner/` — 1 file, 56 lines · banner.js
+ - `docs/examples/ascii-banner/test/` — 1 file, 60 lines · banner.test.js
+@@ -144,23 +144,7 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
+ - `pub fn next_hint(name: &str) -> String` — The closing line for a command that isn't itself guided: how to ask  <sub>L153</sub>
+ - `pub fn run(explicit: Option<String>, all: bool) -> Result<()>` — `moor next`: where the project's active spec stands and the one  <sub>L164</sub>
+ 
+-**`cli/src/paths.rs`** · 122 lines · imported by 4
+-- `pub fn moor_home() -> Result<PathBuf>`  <sub>L4</sub>
+-- `pub fn project_dir(name: &str) -> Result<PathBuf>`  <sub>L9</sub>
+-- `pub fn manifest_path(name: &str) -> Result<PathBuf>`  <sub>L13</sub>
+-- `pub fn chain_log_path(name: &str) -> Result<PathBuf>` — folded-in egress verdicts, and tripwire hits all append here. See  <sub>L28</sub>
+-- `pub fn egress_offset_path(name: &str) -> Result<PathBuf>` — How many raw lines of the egress gateway's access log have already  <sub>L34</sub>
+-- `pub fn sink_offset_path(name: &str) -> Result<PathBuf>` — How many lines of keel's chain sink (inside the sandbox) have already  <sub>L40</sub>
+-- `pub fn posture_path(name: &str) -> Result<PathBuf>` — The host's copy of the posture attestation last written into the  <sub>L46</sub>
+-- `pub fn session_path(name: &str) -> Result<PathBuf>` — host-written only: nothing inside a sandbox has this path mounted, so  <sub>L53</sub>
+-- `pub fn active_spec_path(name: &str) -> Result<PathBuf>` — The spec `moor next` guides this project through, when pinned with  <sub>L59</sub>
+-- `pub fn transcript_path(name: &str) -> Result<PathBuf>` — chain.jsonl on purpose: the chain carries hashes and is exported by  <sub>L66</sub>
+-- `pub fn current_project_path() -> Result<PathBuf>` — like `moor keel`/`moor view` don't need `--project` spelled out on  <sub>L78</sub>
+-- `pub fn read_current_project() -> Result<Option<String>>`  <sub>L82</sub>
+-- `pub fn write_current_project(name: &str) -> Result<()>`  <sub>L98</sub>
+-- `pub fn all_project_names() -> Result<Vec<String>>`  <sub>L106</sub>
+-
+-**`cli/src/manifest.rs`** · 327 lines · imported by 2
++**`cli/src/manifest.rs`** · 327 lines · imported by 3
+ - `pub enum Agent`  <sub>L12</sub>
+ - `impl FromStr for Agent`  <sub>L18</sub>
+ - `pub fn resolve_image(language_image: &str, agent: Agent) -> String` — already a copilot image, is returned unchanged. Pure — unit-tested  <sub>L35</sub>
+@@ -176,6 +160,22 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
+ - `pub fn validate_name(name: &str) -> Result<()>` — Validate a project name: lowercase alnum + dashes, matches what's safe  <sub>L162</sub>
+ - `mod tests`  <sub>L178</sub>
+ 
++**`cli/src/paths.rs`** · 122 lines · imported by 3
++- `pub fn moor_home() -> Result<PathBuf>`  <sub>L4</sub>
++- `pub fn project_dir(name: &str) -> Result<PathBuf>`  <sub>L9</sub>
++- `pub fn manifest_path(name: &str) -> Result<PathBuf>`  <sub>L13</sub>
++- `pub fn chain_log_path(name: &str) -> Result<PathBuf>` — folded-in egress verdicts, and tripwire hits all append here. See  <sub>L28</sub>
++- `pub fn egress_offset_path(name: &str) -> Result<PathBuf>` — How many raw lines of the egress gateway's access log have already  <sub>L34</sub>
++- `pub fn sink_offset_path(name: &str) -> Result<PathBuf>` — How many lines of keel's chain sink (inside the sandbox) have already  <sub>L40</sub>
++- `pub fn posture_path(name: &str) -> Result<PathBuf>` — The host's copy of the posture attestation last written into the  <sub>L46</sub>
++- `pub fn session_path(name: &str) -> Result<PathBuf>` — host-written only: nothing inside a sandbox has this path mounted, so  <sub>L53</sub>
++- `pub fn active_spec_path(name: &str) -> Result<PathBuf>` — The spec `moor next` guides this project through, when pinned with  <sub>L59</sub>
++- `pub fn transcript_path(name: &str) -> Result<PathBuf>` — chain.jsonl on purpose: the chain carries hashes and is exported by  <sub>L66</sub>
++- `pub fn current_project_path() -> Result<PathBuf>` — like `moor keel`/`moor view` don't need `--project` spelled out on  <sub>L78</sub>
++- `pub fn read_current_project() -> Result<Option<String>>`  <sub>L82</sub>
++- `pub fn write_current_project(name: &str) -> Result<()>`  <sub>L98</sub>
++- `pub fn all_project_names() -> Result<Vec<String>>`  <sub>L106</sub>
++
+ **`cli/src/session.rs`** · 970 lines · imported by 2
+ - `pub enum Role`  <sub>L25</sub>
+ - `pub fn deny_shell_argv() -> Vec<String>` — agent steps make the same assumption this corrects: that granting one  <sub>L123</sub>
+@@ -186,7 +186,7 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
+ - `pub fn next_session_id(t: &TurnResult) -> Option<String>` — consulted, so a response that prints a plausible UUID cannot redirect  <sub>L176</sub>
+ - `struct ChainedTurn<'a>` — prompt and the response can't drift apart from the hashes taken of  <sub>L236</sub>
+ 
+-_… 243 more lines in `.keel/store/steering/structure.md`._
++_… 244 more lines in `.keel/store/steering/structure.md`._
+ 
+ ## What this is
+ 
+diff --git a/AGENTS.md b/AGENTS.md
+index abfa6fc..f2d38f3 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -1,4 +1,4 @@
+-<!-- keel:generated schema=keel.projection/1 adapter=agents store=1069ef3ef7ea body=1188d94d2ef6 -->
++<!-- keel:generated schema=keel.projection/1 adapter=agents store=13cd739bb32c body=18cabdd8af49 -->
+ <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
+ 
+ # Project context
+@@ -48,14 +48,14 @@ _Versions that cannot move, platforms that must keep working, dependencies that
+ 
+ ## Repository map
+ 
+-**43 files · 693 symbols · 11532 lines** — javascript 2, rust 41
++**43 files · 704 symbols · 11669 lines** — javascript 2, rust 41
+ 
+ Files are ordered by import-graph centrality, not alphabetically. Signatures only; read a body with the file path and line number. Per-directory detail lives in `.keel/store/map/<dir>/CODEMAP.md`.
+ 
+ ### Layout
+ 
+-- `cli/src/` — 12 files, 4588 lines · guide.rs, canary.rs, paths.rs
+-- `cli/src/commands/` — 25 files, 4540 lines · next_cmd.rs, mod.rs, run_cmd.rs
++- `cli/src/` — 12 files, 4717 lines · guide.rs, canary.rs, manifest.rs
++- `cli/src/commands/` — 25 files, 4548 lines · next_cmd.rs, mod.rs, run_cmd.rs
+ - `cli/src/studio/` — 3 files, 1806 lines · mod.rs, state.rs, render.rs
+ - `docs/examples/ascii-banner/` — 1 file, 56 lines · banner.js
+ - `docs/examples/ascii-banner/test/` — 1 file, 60 lines · banner.test.js
+@@ -144,29 +144,29 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
+ - `pub fn next_hint(name: &str) -> String` — The closing line for a command that isn't itself guided: how to ask  <sub>L153</sub>
+ - `pub fn run(explicit: Option<String>, all: bool) -> Result<()>` — `moor next`: where the project's active spec stands and the one  <sub>L164</sub>
+ 
+-**`cli/src/paths.rs`** · 122 lines · imported by 4
+-- `pub fn moor_home() -> Result<PathBuf>`  <sub>L4</sub>
+-- `pub fn project_dir(name: &str) -> Result<PathBuf>`  <sub>L9</sub>
+-- `pub fn manifest_path(name: &str) -> Result<PathBuf>`  <sub>L13</sub>
+-- `pub fn chain_log_path(name: &str) -> Result<PathBuf>` — folded-in egress verdicts, and tripwire hits all append here. See  <sub>L28</sub>
+-- `pub fn egress_offset_path(name: &str) -> Result<PathBuf>` — How many raw lines of the egress gateway's access log have already  <sub>L34</sub>
+-- `pub fn sink_offset_path(name: &str) -> Result<PathBuf>` — How many lines of keel's chain sink (inside the sandbox) have already  <sub>L40</sub>
+-- `pub fn posture_path(name: &str) -> Result<PathBuf>` — The host's copy of the posture attestation last written into the  <sub>L46</sub>
+-- `pub fn session_path(name: &str) -> Result<PathBuf>` — host-written only: nothing inside a sandbox has this path mounted, so  <sub>L53</sub>
+-- `pub fn active_spec_path(name: &str) -> Result<PathBuf>` — The spec `moor next` guides this project through, when pinned with  <sub>L59</sub>
+-- `pub fn transcript_path(name: &str) -> Result<PathBuf>` — chain.jsonl on purpose: the chain carries hashes and is exported by  <sub>L66</sub>
+-- `pub fn current_project_path() -> Result<PathBuf>` — like `moor keel`/`moor view` don't need `--project` spelled out on  <sub>L78</sub>
+-- `pub fn read_current_project() -> Result<Option<String>>`  <sub>L82</sub>
+-- `pub fn write_current_project(name: &str) -> Result<()>`  <sub>L98</sub>
+-- `pub fn all_project_names() -> Result<Vec<String>>`  <sub>L106</sub>
+-
+-**`cli/src/manifest.rs`** · 327 lines · imported by 2
++**`cli/src/manifest.rs`** · 327 lines · imported by 3
+ - `pub enum Agent`  <sub>L12</sub>
+ - `impl FromStr for Agent`  <sub>L18</sub>
+ - `pub fn resolve_image(language_image: &str, agent: Agent) -> String` — already a copilot image, is returned unchanged. Pure — unit-tested  <sub>L35</sub>
+ - `pub struct Manifest`  <sub>L59</sub>
++- `pub struct Egress`  <sub>L81</sub>
++- `pub struct Resources`  <sub>L87</sub>
++- `impl Manifest`  <sub>L103</sub>
++- `pub fn new(name: &str, image: &str) -> Self`  <sub>L104</sub>
++- `pub fn load(path: &Path) -> Result<Self>`  <sub>L138</sub>
++- `pub fn save(&self, path: &Path) -> Result<()>`  <sub>L144</sub>
++- `pub fn sandbox_container(&self) -> String`  <sub>L151</sub>
++- `pub fn egress_container(&self) -> String`  <sub>L155</sub>
++- `pub fn validate_name(name: &str) -> Result<()>` — Validate a project name: lowercase alnum + dashes, matches what's safe  <sub>L162</sub>
++- `mod tests`  <sub>L178</sub>
++
++**`cli/src/paths.rs`** · 122 lines · imported by 3
++- `pub fn moor_home() -> Result<PathBuf>`  <sub>L4</sub>
++- `pub fn project_dir(name: &str) -> Result<PathBuf>`  <sub>L9</sub>
++- `pub fn manifest_path(name: &str) -> Result<PathBuf>`  <sub>L13</sub>
++- `pub fn chain_log_path(name: &str) -> Result<PathBuf>` — folded-in egress verdicts, and tripwire hits all append here. See  <sub>L28</sub>
+ 
+-_… 263 more lines in `.keel/store/steering/structure.md`._
++_… 264 more lines in `.keel/store/steering/structure.md`._
+ 
+ ## What this is
+ 
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index 10b7d0e..a1d65f6 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -4,7 +4,7 @@ Notable changes to moor. The format follows
+ [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and moor uses
+ [semantic versioning](https://semver.org/spec/v2.0.0.html).
+ 
+-## [Unreleased]
++## [0.6.1] - 2026-10-01
+ 
+ ### Added
+ 
+diff --git a/CLAUDE.md b/CLAUDE.md
+index 5bc2235..07bbd6c 100644
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -1,4 +1,4 @@
+-<!-- keel:generated schema=keel.projection/1 adapter=claude store=1069ef3ef7ea body=b41f446e0b36 -->
++<!-- keel:generated schema=keel.projection/1 adapter=claude store=13cd739bb32c body=8dc7864333d1 -->
+ <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
+ 
+ # Project context
+@@ -48,14 +48,14 @@ _Versions that cannot move, platforms that must keep working, dependencies that
+ 
+ ## Repository map
+ 
+-**43 files · 693 symbols · 11532 lines** — javascript 2, rust 41
++**43 files · 704 symbols · 11669 lines** — javascript 2, rust 41
+ 
+ Files are ordered by import-graph centrality, not alphabetically. Signatures only; read a body with the file path and line number. Per-directory detail lives in `.keel/store/map/<dir>/CODEMAP.md`.
+ 
+ ### Layout
+ 
+-- `cli/src/` — 12 files, 4588 lines · guide.rs, canary.rs, paths.rs
+-- `cli/src/commands/` — 25 files, 4540 lines · next_cmd.rs, mod.rs, run_cmd.rs
++- `cli/src/` — 12 files, 4717 lines · guide.rs, canary.rs, manifest.rs
++- `cli/src/commands/` — 25 files, 4548 lines · next_cmd.rs, mod.rs, run_cmd.rs
+ - `cli/src/studio/` — 3 files, 1806 lines · mod.rs, state.rs, render.rs
+ - `docs/examples/ascii-banner/` — 1 file, 56 lines · banner.js
+ - `docs/examples/ascii-banner/test/` — 1 file, 60 lines · banner.test.js
+@@ -144,29 +144,29 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
+ - `pub fn next_hint(name: &str) -> String` — The closing line for a command that isn't itself guided: how to ask  <sub>L153</sub>
+ - `pub fn run(explicit: Option<String>, all: bool) -> Result<()>` — `moor next`: where the project's active spec stands and the one  <sub>L164</sub>
+ 
+-**`cli/src/paths.rs`** · 122 lines · imported by 4
+-- `pub fn moor_home() -> Result<PathBuf>`  <sub>L4</sub>
+-- `pub fn project_dir(name: &str) -> Result<PathBuf>`  <sub>L9</sub>
+-- `pub fn manifest_path(name: &str) -> Result<PathBuf>`  <sub>L13</sub>
+-- `pub fn chain_log_path(name: &str) -> Result<PathBuf>` — folded-in egress verdicts, and tripwire hits all append here. See  <sub>L28</sub>
+-- `pub fn egress_offset_path(name: &str) -> Result<PathBuf>` — How many raw lines of the egress gateway's access log have already  <sub>L34</sub>
+-- `pub fn sink_offset_path(name: &str) -> Result<PathBuf>` — How many lines of keel's chain sink (inside the sandbox) have already  <sub>L40</sub>
+-- `pub fn posture_path(name: &str) -> Result<PathBuf>` — The host's copy of the posture attestation last written into the  <sub>L46</sub>
+-- `pub fn session_path(name: &str) -> Result<PathBuf>` — host-written only: nothing inside a sandbox has this path mounted, so  <sub>L53</sub>
+-- `pub fn active_spec_path(name: &str) -> Result<PathBuf>` — The spec `moor next` guides this project through, when pinned with  <sub>L59</sub>
+-- `pub fn transcript_path(name: &str) -> Result<PathBuf>` — chain.jsonl on purpose: the chain carries hashes and is exported by  <sub>L66</sub>
+-- `pub fn current_project_path() -> Result<PathBuf>` — like `moor keel`/`moor view` don't need `--project` spelled out on  <sub>L78</sub>
+-- `pub fn read_current_project() -> Result<Option<String>>`  <sub>L82</sub>
+-- `pub fn write_current_project(name: &str) -> Result<()>`  <sub>L98</sub>
+-- `pub fn all_project_names() -> Result<Vec<String>>`  <sub>L106</sub>
+-
+-**`cli/src/manifest.rs`** · 327 lines · imported by 2
++**`cli/src/manifest.rs`** · 327 lines · imported by 3
+ - `pub enum Agent`  <sub>L12</sub>
+ - `impl FromStr for Agent`  <sub>L18</sub>
+ - `pub fn resolve_image(language_image: &str, agent: Agent) -> String` — already a copilot image, is returned unchanged. Pure — unit-tested  <sub>L35</sub>
+ - `pub struct Manifest`  <sub>L59</sub>
++- `pub struct Egress`  <sub>L81</sub>
++- `pub struct Resources`  <sub>L87</sub>
++- `impl Manifest`  <sub>L103</sub>
++- `pub fn new(name: &str, image: &str) -> Self`  <sub>L104</sub>
++- `pub fn load(path: &Path) -> Result<Self>`  <sub>L138</sub>
++- `pub fn save(&self, path: &Path) -> Result<()>`  <sub>L144</sub>
++- `pub fn sandbox_container(&self) -> String`  <sub>L151</sub>
++- `pub fn egress_container(&self) -> String`  <sub>L155</sub>
++- `pub fn validate_name(name: &str) -> Result<()>` — Validate a project name: lowercase alnum + dashes, matches what's safe  <sub>L162</sub>
++- `mod tests`  <sub>L178</sub>
++
++**`cli/src/paths.rs`** · 122 lines · imported by 3
++- `pub fn moor_home() -> Result<PathBuf>`  <sub>L4</sub>
++- `pub fn project_dir(name: &str) -> Result<PathBuf>`  <sub>L9</sub>
++- `pub fn manifest_path(name: &str) -> Result<PathBuf>`  <sub>L13</sub>
++- `pub fn chain_log_path(name: &str) -> Result<PathBuf>` — folded-in egress verdicts, and tripwire hits all append here. See  <sub>L28</sub>
+ 
+-_… 263 more lines in `.keel/store/steering/structure.md`._
++_… 264 more lines in `.keel/store/steering/structure.md`._
+ 
+ ## What this is
+ 
+diff --git a/cli/Cargo.lock b/cli/Cargo.lock
+index 2df0c7d..3787790 100644
+--- a/cli/Cargo.lock
++++ b/cli/Cargo.lock
+@@ -453,7 +453,7 @@ dependencies = [
+ 
+ [[package]]
+ name = "moor"
+-version = "0.6.0"
++version = "0.6.1"
+ dependencies = [
+  "anyhow",
+  "chrono",
+diff --git a/cli/Cargo.toml b/cli/Cargo.toml
+index 3b16098..4027c56 100644
+--- a/cli/Cargo.toml
++++ b/cli/Cargo.toml
+@@ -1,6 +1,6 @@
+ [package]
+ name = "moor"
+-version = "0.6.0"
++version = "0.6.1"
+ edition = "2021"
+ description = "Build software with an AI agent inside a locked-down container"
+ license = "MIT"
+diff --git a/cli/src/manifest.rs b/cli/src/manifest.rs
+index d94e3b0..137ae07 100644
+--- a/cli/src/manifest.rs
++++ b/cli/src/manifest.rs
+@@ -13,6 +13,7 @@ pub enum Agent {
+     #[default]
+     Claude,
+     Copilot,
++    Kiro,
+ }
+ 
+ impl FromStr for Agent {
+@@ -21,7 +22,10 @@ impl FromStr for Agent {
+         match s.trim().to_ascii_lowercase().as_str() {
+             "claude" => Ok(Agent::Claude),
+             "copilot" => Ok(Agent::Copilot),
+-            other => anyhow::bail!("unknown agent '{other}' — expected 'claude' or 'copilot'"),
++            "kiro" => Ok(Agent::Kiro),
++            other => {
++                anyhow::bail!("unknown agent '{other}' — expected 'claude', 'copilot' or 'kiro'")
++            }
+         }
+     }
+ }
+diff --git a/cli/src/session.rs b/cli/src/session.rs
+index 1269245..b271e37 100644
+--- a/cli/src/session.rs
++++ b/cli/src/session.rs
+@@ -8,7 +8,7 @@
+ //! the operator ever sees the answer, resumable across turns, and
+ //! tool-bounded by role. See docs/decisions/0008-agent-session-protocol.md.
+ 
+-use crate::{audit, manifest::Manifest, paths, proc};
++use crate::{audit, manifest::Agent, manifest::Manifest, paths, proc};
+ use anyhow::{Context, Result};
+ use serde::Deserialize;
+ use serde_json::json;
+@@ -126,6 +126,72 @@ pub fn deny_shell_argv() -> Vec<String> {
+     argv
+ }
+ 
++/// How an agent's output is shaped.
++#[derive(Debug, Clone, Copy, PartialEq, Eq)]
++pub enum OutputShape {
++    /// A JSON envelope with `is_error`/`result`/`session_id` (claude).
++    Json,
++    /// The response on stdout, with no envelope (copilot, kiro).
++    PlainText,
++}
++
++/// Everything that differs between the agents moor can hold a turn with.
++/// One table, so the behaviours below are pure functions of it and no
++/// agent-specific literal survives anywhere else.
++#[derive(Debug, Clone)]
++pub struct AgentProfile {
++    /// The command and the flags that put it in non-interactive mode.
++    pub argv_prefix: &'static [&'static str],
++    /// The flag that *auto-approves* a tool set. Not a restriction — see
++    /// `Role::denied_tools` and ADR-0008.
++    pub allow_flag: Option<&'static str>,
++    /// The flag that actually *denies* tools. `None` means this agent has
++    /// no denial mechanism, so a restricted role cannot be run on it.
++    pub deny_flag: Option<&'static str>,
++    /// The flag that resumes a prior session, if the agent has one.
++    pub resume_flag: Option<&'static str>,
++    pub output: OutputShape,
++    /// What to tell the operator when a turn fails for want of a
++    /// credential.
++    pub auth_hint: &'static str,
++}
++
++/// The profile for an agent. Verified against each CLI's own `--help`:
++/// claude has `--allowedTools`/`--disallowedTools`; copilot has
++/// `--allow-tool`/`--deny-tool`; kiro has only `--trust-tools` (trust
++/// *these*), whose semantics are the auto-approval that ADR-0008 showed
++/// does not restrain — so kiro's `deny_flag` is deliberately `None`.
++pub fn profile(agent: Agent) -> AgentProfile {
++    match agent {
++        Agent::Claude => AgentProfile {
++            argv_prefix: &["claude", "--print", "--output-format", "json"],
++            allow_flag: Some("--allowedTools"),
++            deny_flag: Some("--disallowedTools"),
++            resume_flag: Some("--resume"),
++            output: OutputShape::Json,
++            auth_hint: "this sandbox has no Claude Code credential — store one with `moor secrets set <project> CLAUDE_CODE_OAUTH_TOKEN` (from `claude setup-token` on the host), then `moor up <project>`.",
++        },
++        Agent::Copilot => AgentProfile {
++            argv_prefix: &["copilot", "-p"],
++            allow_flag: Some("--allow-tool"),
++            deny_flag: Some("--deny-tool"),
++            resume_flag: Some("--resume"),
++            output: OutputShape::PlainText,
++            auth_hint: "this sandbox has no usable Copilot credential — run `copilot /login` on the host (device flow; a personal access token will not work), then `moor up <project>`.",
++        },
++        Agent::Kiro => AgentProfile {
++            argv_prefix: &["kiro-cli", "chat", "--no-interactive"],
++            allow_flag: Some("--trust-tools"),
++            // No denial mechanism: `--trust-tools` is an auto-approval
++            // list, not a restriction.
++            deny_flag: None,
++            resume_flag: None,
++            output: OutputShape::PlainText,
++            auth_hint: "this sandbox has no Kiro credential — run `kiro-cli login` on the host, then `moor up <project>`.",
++        },
++    }
++}
++
+ /// The fields of `claude --print --output-format json` this depends on,
+ /// verified directly against the image's Claude Code 2.1.270 rather than
+ /// assumed. `subtype` is deliberately absent: a failed turn there returned
+@@ -145,9 +211,19 @@ pub struct TurnResult {
+     pub permission_denials: Vec<serde_json::Value>,
+ }
+ 
+-pub fn parse_turn(stdout: &str) -> Result<TurnResult> {
+-    serde_json::from_str(stdout.trim())
+-        .with_context(|| format!("parsing `claude --output-format json` output:\n{stdout}"))
++/// Read a turn's result in the selected agent's own output shape. A
++/// plain-text agent emits the response and nothing else, so its stdout
++/// *is* the result — parsing it as JSON would fail a perfectly good turn.
++pub fn parse_turn(agent: Agent, stdout: &str) -> Result<TurnResult> {
++    match profile(agent).output {
++        OutputShape::Json => serde_json::from_str(stdout.trim())
++            .with_context(|| format!("parsing `--output-format json` output:\n{stdout}")),
++        OutputShape::PlainText => Ok(TurnResult {
++            is_error: false,
++            result: stdout.trim().to_string(),
++            ..Default::default()
++        }),
++    }
+ }
+ 
+ /// A turn failed if it says so, whatever the process exit status said.
+@@ -216,6 +292,7 @@ fn append_turn_to(path: &Path, turn: &ChainedTurn) -> Result<audit::ChainEntry>
+         "agent-turn",
+         json!({
+             "project": turn.project,
++            "agent": format!("{:?}", turn.agent).to_lowercase(),
+             "role": turn.role.as_str(),
+             "tools": turn.role.tools(),
+             "session_id": turn.session_id,
+@@ -235,6 +312,8 @@ fn append_turn_to(path: &Path, turn: &ChainedTurn) -> Result<audit::ChainEntry>
+ /// them.
+ struct ChainedTurn<'a> {
+     project: &'a str,
++    /// Which agent produced the turn, so the trail distinguishes them.
++    agent: Agent,
+     role: Role,
+     session_id: Option<&'a str>,
+     prompt: &'a str,
+@@ -293,15 +372,18 @@ pub const VARIADIC_FLAGS: &[&str] = &[
+ /// variadic flag. `--resume <session-id>` takes exactly one value (checked
+ /// against `claude --help`, and against a live container) so it sits with
+ /// the single-value flags ahead of the prompt.
+-pub fn build_turn_argv(role: Role, prompt: &str, resume: Option<&str>) -> Vec<String> {
+-    let mut argv: Vec<String> = vec![
+-        "claude".into(),
+-        "--print".into(),
+-        "--output-format".into(),
+-        "json".into(),
+-    ];
+-    if let Some(id) = resume {
+-        argv.push("--resume".into());
++pub fn build_turn_argv(
++    agent: Agent,
++    role: Role,
++    prompt: &str,
++    resume: Option<&str>,
++) -> Vec<String> {
++    let p = profile(agent);
++    let mut argv: Vec<String> = p.argv_prefix.iter().map(|s| s.to_string()).collect();
++    // Single-value flags first: these take exactly one value, so they are
++    // safe ahead of the positional prompt.
++    if let (Some(flag), Some(id)) = (p.resume_flag, resume) {
++        argv.push(flag.to_string());
+         argv.push(id.to_string());
+     }
+     // The prompt, and then every variadic flag — in that order, which is
+@@ -310,48 +392,67 @@ pub fn build_turn_argv(role: Role, prompt: &str, resume: Option<&str>) -> Vec<St
+     // remember: a new variadic flag gets added to this table, and lands on
+     // the correct side of the prompt by construction.
+     argv.push(prompt.to_string());
+-    let variadic: [(&str, Vec<String>); 3] = [
+-        ("--mcp-config", vec![MCP_CONFIG.to_string()]),
+-        (
+-            "--allowedTools",
+-            role.tools().iter().map(|t| t.to_string()).collect(),
+-        ),
+-        (
+-            "--disallowedTools",
++    let mut variadic: Vec<(&str, Vec<String>)> = Vec::new();
++    // The MCP server is how a turn reaches keel; only agents that take an
++    // --mcp-config get it.
++    if agent == Agent::Claude {
++        variadic.push(("--mcp-config", vec![MCP_CONFIG.to_string()]));
++    }
++    if let Some(flag) = p.allow_flag {
++        variadic.push((flag, role.tools().iter().map(|t| t.to_string()).collect()));
++    }
++    if let Some(flag) = p.deny_flag {
++        variadic.push((
++            flag,
+             role.denied_tools().iter().map(|t| t.to_string()).collect(),
+-        ),
+-    ];
++        ));
++    }
+     for (flag, values) in variadic {
+-        debug_assert!(
+-            VARIADIC_FLAGS.contains(&flag),
+-            "{flag} is appended after the prompt, so it must be listed in VARIADIC_FLAGS"
+-        );
+         argv.push(flag.to_string());
+         argv.extend(values);
+     }
+     argv
+ }
+ 
+-/// Translate an agent failure moor can recognise into the command that
+-/// fixes it. Claude Code reports a missing credential as "Not logged in ·
+-/// Please run /login" — accurate for an interactive session, and useless
+-/// here: there is no interactive session to run `/login` in, and the fix
+-/// is host-side. Secrets are scoped per project+secret pair, so a token
+-/// stored for one project says nothing about another.
+-pub fn failure_hint(project: &str, text: &str) -> Option<String> {
+-    if text.contains("Not logged in") || text.contains("/login") {
+-        return Some(format!(
+-            "this sandbox has no Claude Code credential. `/login` can't help — auth is \
+-             injected from the host at `moor up` (ADR-0002). Check where it resolves from:\n\n    \
+-             moor secrets status {project}\n\n\
+-             then store one and recreate the container so it gets injected:\n\n    \
+-             moor secrets set {project} CLAUDE_CODE_OAUTH_TOKEN\n    \
+-             moor up {project}\n\n\
+-             The value comes from `claude setup-token` on the host; the same token works \
+-             for every project, but has to be set per project."
+-        ));
++/// Translate an agent failure moor can recognise into the fix for *that*
++/// agent. Every one of them reports a missing credential as some variant
++/// of "not logged in", and every one has a different remedy — Claude's is
++/// an injected token, Copilot's is a host device-flow login, Kiro's is
++/// `kiro-cli login`. The interactive advice each CLI prints ("run
++/// /login") is useless inside the sandbox, where there is no interactive
++/// session and the fix is host-side.
++pub fn failure_hint(agent: Agent, project: &str, text: &str) -> Option<String> {
++    let looks_like_auth = text.contains("Not logged in")
++        || text.contains("/login")
++        || text.contains("not authenticated")
++        || text.contains("Unauthorized");
++    if !looks_like_auth {
++        return None;
++    }
++    let hint = profile(agent).auth_hint.replace("<project>", project);
++    Some(format!(
++        "{hint}\n\nWhere each secret resolves from:\n\n    moor secrets status {project}"
++    ))
++}
++
++/// Refuse a role whose restriction this agent cannot express. A role that
++/// denies tools is only restricted if the agent has a denial flag; without
++/// one the turn would run with everything available, which is the opposite
++/// of what the role asked for.
++pub fn refuse_unrestrainable_role(agent: Agent, role: Role) -> Result<()> {
++    if role.denied_tools().is_empty() {
++        return Ok(());
+     }
+-    None
++    if profile(agent).deny_flag.is_some() {
++        return Ok(());
++    }
++    anyhow::bail!(
++        "the '{}' role withholds tools, but the {agent:?} agent has no way to deny them — \
++         running it would give the turn every tool instead.\n\n\
++         Use an agent that can deny tools (claude, copilot) for this role, \
++         or run this step with `keel run --driver` instead.",
++        role.as_str()
++    )
+ }
+ 
+ /// Turn a turn that produced no parseable JSON into something an operator
+@@ -464,14 +565,18 @@ pub fn run_turn(project: &str, role: Role, prompt: &str, new_session: bool) -> R
+     } else {
+         read_session_id(&session_path)
+     };
+-    let argv = build_turn_argv(role, prompt, resume.as_deref());
++    // A restricted role on an agent with no way to deny tools would run
++    // unrestricted — ADR-0008 established that an allow-list alone does
++    // not restrain. Refuse rather than silently widen the role.
++    refuse_unrestrainable_role(m.agent, role)?;
++    let argv = build_turn_argv(m.agent, role, prompt, resume.as_deref());
+ 
+     let container = m.sandbox_container();
+     let mut args: Vec<&str> = vec!["exec", &container];
+     args.extend(argv.iter().map(String::as_str));
+     let (status, out, err) = proc::run_capture_split("docker", &args)?;
+ 
+-    let turn = parse_turn(&out).map_err(|e| unparseable_turn(project, &out, &err, e))?;
++    let turn = parse_turn(m.agent, &out).map_err(|e| unparseable_turn(project, &out, &err, e))?;
+     let failed = turn_failed(&turn, status.success());
+     let session_id = next_session_id(&turn);
+ 
+@@ -481,6 +586,7 @@ pub fn run_turn(project: &str, role: Role, prompt: &str, new_session: bool) -> R
+         &paths::chain_log_path(project)?,
+         &ChainedTurn {
+             project,
++            agent: m.agent,
+             role,
+             session_id: session_id.as_deref(),
+             prompt,
+@@ -501,7 +607,7 @@ pub fn run_turn(project: &str, role: Role, prompt: &str, new_session: bool) -> R
+     }
+ 
+     let hint = failed
+-        .then(|| failure_hint(project, &turn.result))
++        .then(|| failure_hint(m.agent, project, &turn.result))
+         .flatten();
+     Ok(TurnOutcome {
+         text: turn.result,
+@@ -597,14 +703,19 @@ mod tests {
+             );
+         }
+         // The deny list reaches the argv, or it is decoration.
+-        let argv = build_turn_argv(Role::Brainstorm, "think about this", None);
++        let argv = build_turn_argv(Agent::Claude, Role::Brainstorm, "think about this", None);
+         let at = argv.iter().position(|a| a == "--disallowedTools").unwrap();
+         for forbidden in ["Bash", "Write", "Edit", "Task"] {
+             assert!(argv[at..].iter().any(|a| a == forbidden));
+         }
+         // And the granted set in the argv is exactly the role's — the
+         // values of `--allowedTools` up to whatever flag comes next.
+-        let argv = build_turn_argv(Role::Brainstorm, "what should we change?", None);
++        let argv = build_turn_argv(
++            Agent::Claude,
++            Role::Brainstorm,
++            "what should we change?",
++            None,
++        );
+         let at = argv.iter().position(|a| a == "--allowedTools").unwrap();
+         let granted: Vec<&String> = argv[at + 1..]
+             .iter()
+@@ -651,7 +762,7 @@ mod tests {
+             "session_id": "not-a-uuid",
+         })
+         .to_string();
+-        let turn = parse_turn(&smuggled).unwrap();
++        let turn = parse_turn(Agent::Claude, &smuggled).unwrap();
+         assert_eq!(next_session_id(&turn), None);
+         assert!(turn.result.contains("11111111-2222-3333-4444-555555555555"));
+     }
+@@ -667,7 +778,7 @@ mod tests {
+             "3f2504e0-4f89-11d3-9a0c-0305e82c3301",
+             "boom",
+         );
+-        let turn = parse_turn(&raw).unwrap();
++        let turn = parse_turn(Agent::Claude, &raw).unwrap();
+         assert!(turn.is_error);
+         assert!(
+             turn_failed(&turn, true),
+@@ -676,12 +787,15 @@ mod tests {
+         assert!(!raw.contains("\"subtype\": \"error\""));
+ 
+         // A clean turn is a success; a non-zero exit is still a failure.
+-        let ok = parse_turn(&result_json(
+-            false,
+-            "success",
+-            "3f2504e0-4f89-11d3-9a0c-0305e82c3301",
+-            "done",
+-        ))
++        let ok = parse_turn(
++            Agent::Claude,
++            &result_json(
++                false,
++                "success",
++                "3f2504e0-4f89-11d3-9a0c-0305e82c3301",
++                "done",
++            ),
++        )
+         .unwrap();
+         assert!(!turn_failed(&ok, true));
+         assert!(turn_failed(&ok, false));
+@@ -693,18 +807,22 @@ mod tests {
+         let path = temp_path("chain", "jsonl");
+         let prompt = "the operator's private plan for the quarter";
+         let response = "here is what I would do, in detail";
+-        let turn = parse_turn(&result_json(
+-            false,
+-            "success",
+-            "3f2504e0-4f89-11d3-9a0c-0305e82c3301",
+-            response,
+-        ))
++        let turn = parse_turn(
++            Agent::Claude,
++            &result_json(
++                false,
++                "success",
++                "3f2504e0-4f89-11d3-9a0c-0305e82c3301",
++                response,
++            ),
++        )
+         .unwrap();
+ 
+         let entry = append_turn_to(
+             &path,
+             &ChainedTurn {
+                 project: "sample",
++                agent: Agent::Claude,
+                 role: Role::Brainstorm,
+                 session_id: Some("3f2504e0-4f89-11d3-9a0c-0305e82c3301"),
+                 prompt,
+@@ -812,7 +930,7 @@ mod tests {
+     fn no_role_can_reach_a_shell_or_a_subagent() {
+         for role in [Role::Brainstorm, Role::Build] {
+             let denied = role.denied_tools();
+-            let argv = build_turn_argv(role, "do the thing", None);
++            let argv = build_turn_argv(Agent::Claude, role, "do the thing", None);
+             let at = argv
+                 .iter()
+                 .position(|a| a == "--disallowedTools")
+@@ -855,7 +973,7 @@ mod tests {
+         let prompt = "can we add a CI pipeline with security scans";
+         for role in [Role::Brainstorm, Role::Build] {
+             for resume in [None, Some("3f2504e0-4f89-11d3-9a0c-0305e82c3301")] {
+-                let argv = build_turn_argv(role, prompt, resume);
++                let argv = build_turn_argv(Agent::Claude, role, prompt, resume);
+                 let at_prompt = argv
+                     .iter()
+                     .position(|a| a == prompt)
+@@ -884,7 +1002,7 @@ mod tests {
+     /// earlier in the line could have absorbed.
+     #[test]
+     fn mcp_config_is_the_value_of_its_own_flag() {
+-        let argv = build_turn_argv(Role::Build, "go", None);
++        let argv = build_turn_argv(Agent::Claude, Role::Build, "go", None);
+         let at = argv.iter().position(|a| a == "--mcp-config").unwrap();
+         assert_eq!(argv[at + 1], MCP_CONFIG);
+     }
+@@ -893,7 +1011,7 @@ mod tests {
+     /// `claude`'s own words, not a JSON parse error about column 0.
+     #[test]
+     fn an_empty_turn_reports_what_claude_actually_said() {
+-        let parse_err = parse_turn("").unwrap_err();
++        let parse_err = parse_turn(Agent::Claude, "").unwrap_err();
+         let stderr = "Error: Invalid MCP configuration:\nMCP config file not found: /etc/moor/mcp-config.json";
+         let reported = format!("{:?}", unparseable_turn("personil", "", stderr, parse_err));
+         // Names the cause and the exact command that fixes it.
+@@ -907,7 +1025,7 @@ mod tests {
+         );
+ 
+         // Any other silent failure still surfaces stderr verbatim.
+-        let parse_err = parse_turn("").unwrap_err();
++        let parse_err = parse_turn(Agent::Claude, "").unwrap_err();
+         let reported = format!(
+             "{:?}",
+             unparseable_turn("demo", "", "Error: Invalid API key", parse_err)
+@@ -917,7 +1035,7 @@ mod tests {
+ 
+         // Output that is present but not JSON keeps the parse error and
+         // adds stderr rather than replacing it.
+-        let parse_err = parse_turn("not json").unwrap_err();
++        let parse_err = parse_turn(Agent::Claude, "not json").unwrap_err();
+         let reported = format!(
+             "{:?}",
+             unparseable_turn("demo", "not json", "a warning", parse_err)
+@@ -929,6 +1047,7 @@ mod tests {
+     #[test]
+     fn resume_is_passed_through_when_there_is_a_stored_session() {
+         let argv = build_turn_argv(
++            Agent::Claude,
+             Role::Build,
+             "carry on",
+             Some("3f2504e0-4f89-11d3-9a0c-0305e82c3301"),
+@@ -947,17 +1066,23 @@ mod tests {
+     /// actually has: which command fixes this, for which project.
+     #[test]
+     fn a_missing_credential_points_at_the_host_side_fix() {
+-        let hint = failure_hint("omniscient", "Not logged in · Please run /login")
+-            .expect("a missing credential is recognised");
+-        assert!(hint.contains("moor secrets set omniscient CLAUDE_CODE_OAUTH_TOKEN"));
++        let hint = failure_hint(
++            Agent::Claude,
++            "omniscient",
++            "Not logged in · Please run /login",
++        )
++        .expect("a missing credential is recognised");
++        assert!(hint.contains("CLAUDE_CODE_OAUTH_TOKEN"));
+         assert!(hint.contains("moor up omniscient"));
++        // Secrets are scoped per project, so the hint names this project.
+         assert!(hint.contains("moor secrets status omniscient"));
+-        // Per project+secret scoping is the part that surprises people.
+-        assert!(hint.contains("set per project"));
+ 
+         // An ordinary failure gets no invented advice.
+-        assert_eq!(failure_hint("demo", "I could not find that file."), None);
+-        assert_eq!(failure_hint("demo", ""), None);
++        assert_eq!(
++            failure_hint(Agent::Claude, "demo", "I could not find that file."),
++            None
++        );
++        assert_eq!(failure_hint(Agent::Claude, "demo", ""), None);
+     }
+ 
+     #[test]
+@@ -967,4 +1092,158 @@ mod tests {
+         assert!(Role::parse("approve").is_err());
+         assert!(Role::parse("").is_err());
+     }
++    // --- agent-session-abstraction (SPEC-0012) --------------------------
++
++    #[test]
++    fn agent_parses_kiro() {
++        // AC-1
++        assert_eq!("kiro".parse::<Agent>().unwrap(), Agent::Kiro);
++        assert_eq!("KIRO".parse::<Agent>().unwrap(), Agent::Kiro);
++        assert!("kiro-cli".parse::<Agent>().is_err());
++    }
++
++    #[test]
++    fn turn_argv_is_per_agent() {
++        // AC-2: each agent gets its own invocation, not Claude's.
++        let claude = build_turn_argv(Agent::Claude, Role::Brainstorm, "hi", None);
++        assert_eq!(claude[0], "claude");
++        assert!(claude.contains(&"--print".to_string()));
++
++        let copilot = build_turn_argv(Agent::Copilot, Role::Brainstorm, "hi", None);
++        assert_eq!(copilot[0], "copilot");
++        assert!(copilot.contains(&"-p".to_string()));
++        assert!(!copilot.contains(&"--print".to_string()));
++
++        let kiro = build_turn_argv(Agent::Kiro, Role::Brainstorm, "hi", None);
++        assert_eq!(kiro[0], "kiro-cli");
++        assert!(kiro.contains(&"chat".to_string()));
++
++        // The prompt is present for all three, after the prefix.
++        for argv in [&claude, &copilot, &kiro] {
++            assert!(argv.contains(&"hi".to_string()), "{argv:?}");
++        }
++    }
++
++    #[test]
++    fn restricted_role_refused_without_deny_support() {
++        // AC-3: a role that withholds tools cannot run on an agent with no
++        // denial mechanism — it would run unrestricted instead.
++        assert!(!Role::Brainstorm.denied_tools().is_empty());
++        let err = refuse_unrestrainable_role(Agent::Kiro, Role::Brainstorm)
++            .expect_err("kiro has no deny flag, so a restricted role must be refused");
++        let msg = format!("{err}");
++        assert!(msg.contains("no way to deny"), "{msg}");
++        // Agents that can deny are allowed through.
++        assert!(refuse_unrestrainable_role(Agent::Claude, Role::Brainstorm).is_ok());
++        assert!(refuse_unrestrainable_role(Agent::Copilot, Role::Build).is_ok());
++    }
++
++    #[test]
++    fn deny_flag_is_per_agent() {
++        // AC-4: the deny flag, where it exists, is that agent's own.
++        let claude = build_turn_argv(Agent::Claude, Role::Brainstorm, "hi", None);
++        assert!(claude.contains(&"--disallowedTools".to_string()));
++        let copilot = build_turn_argv(Agent::Copilot, Role::Brainstorm, "hi", None);
++        assert!(copilot.contains(&"--deny-tool".to_string()));
++        assert!(!copilot.contains(&"--disallowedTools".to_string()));
++        // Kiro has none, so none is emitted.
++        let kiro = build_turn_argv(Agent::Kiro, Role::Brainstorm, "hi", None);
++        assert!(!kiro.contains(&"--deny-tool".to_string()));
++        assert!(!kiro.contains(&"--disallowedTools".to_string()));
++        // Bash is denied for every agent that can deny at all.
++        for argv in [&claude, &copilot] {
++            assert!(argv.contains(&"Bash".to_string()), "{argv:?}");
++        }
++    }
++
++    #[test]
++    fn turn_output_parsed_per_agent() {
++        // AC-5: a plain-text agent's stdout is the response, not a parse
++        // error; Claude's JSON envelope still parses as before.
++        let plain = parse_turn(Agent::Copilot, "READY\n").unwrap();
++        assert_eq!(plain.result, "READY");
++        assert!(!plain.is_error);
++        let kiro = parse_turn(Agent::Kiro, "done").unwrap();
++        assert_eq!(kiro.result, "done");
++        let json = parse_turn(
++            Agent::Claude,
++            &result_json(
++                false,
++                "success",
++                "3f2504e0-4f89-11d3-9a0c-0305e82c3301",
++                "ok",
++            ),
++        )
++        .unwrap();
++        assert_eq!(json.result, "ok");
++        // Plain text that happens to look like JSON is still just text.
++        assert!(parse_turn(Agent::Copilot, "not json").is_ok());
++        assert!(parse_turn(Agent::Claude, "not json").is_err());
++    }
++
++    #[test]
++    fn resume_form_is_per_agent() {
++        // AC-6: the resume flag is the agent's own, and an agent with no
++        // resume form omits it entirely.
++        let id = "3f2504e0-4f89-11d3-9a0c-0305e82c3301";
++        let claude = build_turn_argv(Agent::Claude, Role::Build, "go", Some(id));
++        let at = claude.iter().position(|a| a == "--resume").unwrap();
++        assert_eq!(claude[at + 1], id);
++        let copilot = build_turn_argv(Agent::Copilot, Role::Build, "go", Some(id));
++        assert!(copilot.contains(&"--resume".to_string()));
++        // Kiro declares no resume form: nothing is passed, and the id is
++        // not smuggled in some other position.
++        let kiro = build_turn_argv(Agent::Kiro, Role::Build, "go", Some(id));
++        assert!(!kiro.contains(&"--resume".to_string()));
++        assert!(!kiro.contains(&id.to_string()), "{kiro:?}");
++    }
++
++    #[test]
++    fn failure_hint_is_per_agent() {
++        // AC-7: each agent's own remedy, not Claude's for all three.
++        let auth = "not authenticated";
++        let c = failure_hint(Agent::Claude, "p", auth).unwrap();
++        assert!(c.contains("CLAUDE_CODE_OAUTH_TOKEN"), "{c}");
++        let g = failure_hint(Agent::Copilot, "p", auth).unwrap();
++        assert!(g.contains("copilot /login"), "{g}");
++        assert!(!g.contains("CLAUDE_CODE_OAUTH_TOKEN"), "{g}");
++        let k = failure_hint(Agent::Kiro, "p", auth).unwrap();
++        assert!(k.contains("kiro-cli login"), "{k}");
++        // A non-auth failure still gets no invented advice, for any agent.
++        for a in [Agent::Claude, Agent::Copilot, Agent::Kiro] {
++            assert_eq!(failure_hint(a, "p", "file not found"), None);
++        }
++    }
++
++    #[test]
++    fn turn_record_names_the_agent() {
++        // AC-8: the chain entry says which agent produced the turn.
++        let dir = std::env::temp_dir().join(format!(
++            "moor-agent-chain-{}",
++            std::time::SystemTime::now()
++                .duration_since(std::time::UNIX_EPOCH)
++                .unwrap()
++                .as_nanos()
++        ));
++        std::fs::create_dir_all(&dir).unwrap();
++        let path = dir.join("chain.jsonl");
++        let result = TurnResult::default();
++        append_turn_to(
++            &path,
++            &ChainedTurn {
++                project: "sample",
++                agent: Agent::Copilot,
++                role: Role::Brainstorm,
++                session_id: None,
++                prompt: "p",
++                response: "r",
++                failed: false,
++                result: &result,
++            },
++        )
++        .unwrap();
++        let written = std::fs::read_to_string(&path).unwrap();
++        assert!(written.contains("\"agent\":\"copilot\""), "{written}");
++        let _ = std::fs::remove_dir_all(&dir);
++    }
+ }
+diff --git a/.keel/runs/2026-10-01-007/evidence/build.txt b/.keel/runs/2026-10-01-007/evidence/build.txt
+new file mode 100644
+index 0000000..31ffb3a
+--- /dev/null
++++ b/.keel/runs/2026-10-01-007/evidence/build.txt
+@@ -0,0 +1,10 @@
++$ cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml
++
++warning: constant `VARIADIC_FLAGS` is never used
++   --> src/session.rs:363:11
++    |
++363 | pub const VARIADIC_FLAGS: &[&str] = &[
++    |           ^^^^^^^^^^^^^^
++    |
++    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
++
+diff --git a/.keel/runs/2026-10-01-007/evidence/diff-stat.txt b/.keel/runs/2026-10-01-007/evidence/diff-stat.txt
+new file mode 100644
+index 0000000..f94dfd0
+--- /dev/null
++++ b/.keel/runs/2026-10-01-007/evidence/diff-stat.txt
+@@ -0,0 +1,27 @@
++     5      5  .github/copilot-instructions.md
++     8      0  .keel/chain.jsonl
++    10      0  .keel/runs/2026-10-01-007/evidence/build.txt
++    10      0  .keel/runs/2026-10-01-007/evidence/lint.txt
++    82      0  .keel/runs/2026-10-01-007/evidence/oracles.json
++    14      0  .keel/runs/2026-10-01-007/evidence/test.txt
++     9      0  .keel/runs/2026-10-01-007/run.json
++    17      0  .keel/runs/2026-10-01-007/trajectory.jsonl
++     2      0  .keel/specs/agent-session-abstraction/approvals.jsonl
++    90      0  .keel/specs/agent-session-abstraction/gates/G0.json
++    95      0  .keel/specs/agent-session-abstraction/gates/G1.json
++    96      0  .keel/specs/agent-session-abstraction/plan.md
++   142      0  .keel/specs/agent-session-abstraction/spec.md
++    69      0  .keel/specs/agent-session-abstraction/tasks.md
++    26     26  .keel/store/map/cli/src/CODEMAP.md
++     4      4  .keel/store/map/cli/src/commands/CODEMAP.md
++    47     46  .keel/store/steering/structure.md
++    22     22  .kiro/steering/keel.md
++    22     22  AGENTS.md
++     1      1  CHANGELOG.md
++    22     22  CLAUDE.md
++     1      1  cli/Cargo.lock
++     1      1  cli/Cargo.toml
++     5      1  cli/src/manifest.rs
++   357     78  cli/src/session.rs
++
++25 file(s), +1157 -229 (1386 lines of churn) against c3c1d3d22afd99dbd815e48c9def6c4aea8ab363
+diff --git a/.keel/runs/2026-10-01-007/evidence/lint.txt b/.keel/runs/2026-10-01-007/evidence/lint.txt
+new file mode 100644
+index 0000000..963236c
+--- /dev/null
++++ b/.keel/runs/2026-10-01-007/evidence/lint.txt
+@@ -0,0 +1,10 @@
++$ cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml
++
++warning: constant `VARIADIC_FLAGS` is never used
++   --> src/session.rs:363:11
++    |
++363 | pub const VARIADIC_FLAGS: &[&str] = &[
++    |           ^^^^^^^^^^^^^^
++    |
++    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
++
+diff --git a/.keel/runs/2026-10-01-007/evidence/oracles.json b/.keel/runs/2026-10-01-007/evidence/oracles.json
+new file mode 100644
+index 0000000..8ed4c38
+--- /dev/null
++++ b/.keel/runs/2026-10-01-007/evidence/oracles.json
+@@ -0,0 +1,82 @@
++{
++  "runs": [
++    {
++      "criterion": "AC-1",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml agent_parses_kiro` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "\nrunning 1 test\ntest session::tests::agent_parses_kiro ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 203 filtered out; finished in 0.00s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.29s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-9886c5b266a81567)"
++    },
++    {
++      "criterion": "AC-2",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml turn_argv_is_per_agent` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "\nrunning 1 test\ntest session::tests::turn_argv_is_per_agent ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 203 filtered out; finished in 0.00s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.13s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-9886c5b266a81567)"
++    },
++    {
++      "criterion": "AC-3",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml restricted_role_refused_without_deny_support` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "\nrunning 1 test\ntest session::tests::restricted_role_refused_without_deny_support ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 203 filtered out; finished in 0.00s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.12s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-9886c5b266a81567)"
++    },
++    {
++      "criterion": "AC-4",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml deny_flag_is_per_agent` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "\nrunning 1 test\ntest session::tests::deny_flag_is_per_agent ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 203 filtered out; finished in 0.00s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.13s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-9886c5b266a81567)"
++    },
++    {
++      "criterion": "AC-5",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml turn_output_parsed_per_agent` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "\nrunning 1 test\ntest session::tests::turn_output_parsed_per_agent ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 203 filtered out; finished in 0.00s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.12s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-9886c5b266a81567)"
++    },
++    {
++      "criterion": "AC-6",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml resume_form_is_per_agent` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "\nrunning 1 test\ntest session::tests::resume_form_is_per_agent ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 203 filtered out; finished in 0.00s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.13s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-9886c5b266a81567)"
++    },
++    {
++      "criterion": "AC-7",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml failure_hint_is_per_agent` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "\nrunning 1 test\ntest session::tests::failure_hint_is_per_agent ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 203 filtered out; finished in 0.00s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.12s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-9886c5b266a81567)"
++    },
++    {
++      "criterion": "AC-8",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml turn_record_names_the_agent` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "\nrunning 1 test\ntest session::tests::turn_record_names_the_agent ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 203 filtered out; finished in 0.00s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.12s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-9886c5b266a81567)"
++    },
++    {
++      "criterion": "AC-9",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "…\ny_project_and_secret_name ... ok\ntest secrets::tests::status_reports_env_before_checking_keychain ... ok\ntest secrets::tests::device_token_not_in_argv ... ok\ntest session::tests::a_missing_credential_points_at_the_host_side_fix ... ok\ntest session::tests::agent_parses_kiro ... ok\ntest session::tests::an_empty_turn_reports_what_claude_actually_said ... ok\ntest session::tests::brainstorm_grants_no_write_tool ... ok\ntest session::tests::build_role_has_verification_tools_but_no_shell ... ok\ntest session::tests::deny_flag_is_per_agent ... ok\ntest compose::tests::extra_allow_domains_joined_with_commas ... ok\ntest session::tests::error_turn_is_detected_by_is_error ... ok\ntest session::tests::failure_hint_is_per_agent ... ok\ntest session::tests::mcp_config_is_the_value_of_its_own_flag ... ok\ntest session::tests::no_role_can_reach_a_shell_or_a_subagent ... ok\ntest compose::tests::no_secrets_still_renders_valid_yaml_shape ... ok\ntest compose::tests::sandbox_has_no_bind_mount_volume_entries ... ok\ntest session::tests::restricted_role_refused_without_deny_support ... ok\ntest session::tests::resume_form_is_per_agent ... ok\ntest session::tests::resume_is_passed_through_when_there_is_a_stored_session ... ok\ntest session::tests::the_prompt_precedes_every_variadic_flag ... ok\ntest session::tests::turn_argv_is_per_agent ... ok\ntest compose::tests::project_name_is_substituted_everywhere_it_appears ... ok\ntest session::tests::turn_output_parsed_per_agent ... ok\ntest compose::tests::sandbox_gets_attestation_and_sink_without_bind_mounts ... ok\ntest session::tests::unknown_role_is_rejected ... ok\ntest studio::render::tests::a_hostile_reply_cannot_reach_the_terminal_through_the_frame ... ok\ntest studio::render::tests::a_turn_in_flight_shows_moving_elapsed_time_next_to_the_input_line ... ok\ntest studio::render::tests::frame_marks_a_pending_project_and_names_an_armed_approval ... ok\ntest studio::render::tests::render_strips_control_sequences ... ok\ntest studio::render::tests::wrap_breaks_long_lines_and_long_words ... ok\ntest studio::state::tests::a_stopped_project_refuses_a_turn_instead_of_hanging_on_docker ... ok\ntest studio::state::tests::approval_requires_a_second_distinct_key ... ok\ntest studio::state::tests::edit_cycles_the_three_keel_artifacts ... ok\ntest studio::state::tests::refresh_issues_one_container_query ... ok\ntest studio::state::tests::stage_is_read_from_keel_next ... ok\ntest studio::state::tests::switching_projects_isolates_sessions ... ok\ntest studio::state::tests::typed_text_wins_over_command_keys_once_a_question_is_started ... ok\ntest studio::tests::a_turn_that_fails_is_reported_as_a_failed_turn ... ok\ntest studio::tests::approve_refuses_anything_that_is_not_keels_own_approve ... ok\ntest session::tests::transcript_is_redacted ... ok\ntest studio::tests::console_writes_no_second_log ... ok\ntest studio::tests::input_is_handled_while_turn_is_pending ... ok\ntest compose::tests::no_known_placeholder_survives_rendering ... ok\ntest secrets::tests::missing_device_token_is_noop ... ok\ntest secrets::tests::finds_copilot_device_token_source ... ok\ntest session::tests::rejects_malformed_session_id ... ok\ntest session::tests::turn_is_chained_without_content ... ok\ntest session::tests::turn_record_names_the_agent ... ok\ntest commands::bundle_cmd::tests::a_failed_export_removes_the_partial_archive ... ok\ntest secrets::tests::status_reports_missing_when_neither_env_nor_keychain_has_it ... ok\ntest compose::tests::sandbox_network_is_internal_only ... ok\ntest compose::tests::secrets_become_compose_default_empty_env_lines ... ok\ntest session::tests::emitted_recipe_round_trips ... ok\ntest studio::tests::artifact_edit_writes_back_over_exec ... ok\ntest secrets::tests::device_token_not_persisted_by_moor ... ok\n\ntest result: ok. 204 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.12s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-9886c5b266a81567)"
++    }
++  ],
++  "criteria": 9,
++  "executed": 9,
++  "passed": 9,
++  "failed": 0,
++  "blocked": 0,
++  "human": 0
++}
+\ No newline at end of file
+diff --git a/.keel/runs/2026-10-01-007/evidence/test.txt b/.keel/runs/2026-10-01-007/evidence/test.txt
+new file mode 100644
+index 0000000..98b72fd
+--- /dev/null
++++ b/.keel/runs/2026-10-01-007/evidence/test.txt
+@@ -0,0 +1,14 @@
++$ cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml
++
++
++running 204 tests
++....................................................................................... 87/204
++....................................................................................... 174/204
++..............................
++test result: ok. 204 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
++
++
++running 8 tests
++........
++test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
++
+diff --git a/.keel/runs/2026-10-01-007/run.json b/.keel/runs/2026-10-01-007/run.json
+new file mode 100644
+index 0000000..3d1c1ce
+--- /dev/null
++++ b/.keel/runs/2026-10-01-007/run.json
+@@ -0,0 +1,9 @@
++{
++  "schema": "keel.run/1",
++  "id": "2026-10-01-007",
++  "spec": "agent-session-abstraction",
++  "keel_version": "0.11.0",
++  "store_hash": "13cd739bb32caf5984b28b0942ce4761e665660038502b5b0d13d8a1f3d73e52",
++  "started_at": "2026-10-01T22:24:35.664422+02:00",
++  "base_commit": "c3c1d3d22afd99dbd815e48c9def6c4aea8ab363"
++}
+diff --git a/.keel/runs/2026-10-01-007/trajectory.jsonl b/.keel/runs/2026-10-01-007/trajectory.jsonl
+new file mode 100644
+index 0000000..a369695
+--- /dev/null
++++ b/.keel/runs/2026-10-01-007/trajectory.jsonl
+@@ -0,0 +1,17 @@
++{"t":"2026-10-01T22:24:35.665602+02:00","seq":1,"kind":"run_start","spec":"agent-session-abstraction","keel_version":"0.11.0","store_hash":"13cd739bb32caf5984b28b0942ce4761e665660038502b5b0d13d8a1f3d73e52"}
++{"t":"2026-10-01T22:24:35.672594+02:00","seq":2,"kind":"inject","source":".keel/store/steering/conventions.md","tokens":177,"bytes":705}
++{"t":"2026-10-01T22:24:35.672628+02:00","seq":3,"kind":"inject","source":".keel/store/steering/tech.md","tokens":85,"bytes":338}
++{"t":"2026-10-01T22:24:35.672672+02:00","seq":4,"kind":"inject","source":".keel/store/steering/structure.md","tokens":8270,"bytes":33079}
++{"t":"2026-10-01T22:24:35.676217+02:00","seq":5,"kind":"inject","source":".keel/specs/agent-session-abstraction/spec.md","tokens":1474,"bytes":5895}
++{"t":"2026-10-01T22:24:36.823270+02:00","seq":6,"kind":"command","cmd":"cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/build.txt"}
++{"t":"2026-10-01T22:24:38.309044+02:00","seq":7,"kind":"command","cmd":"cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/test.txt"}
++{"t":"2026-10-01T22:24:39.887104+02:00","seq":8,"kind":"command","cmd":"cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/lint.txt"}
++{"t":"2026-10-01T22:24:41.773036+02:00","seq":9,"kind":"oracle","criterion":"AC-1","oracle":"`cargo test --manifest-path cli/Cargo.toml agent_parses_kiro` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-10-01T22:24:41.773067+02:00","seq":10,"kind":"oracle","criterion":"AC-2","oracle":"`cargo test --manifest-path cli/Cargo.toml turn_argv_is_per_agent` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-10-01T22:24:41.773071+02:00","seq":11,"kind":"oracle","criterion":"AC-3","oracle":"`cargo test --manifest-path cli/Cargo.toml restricted_role_refused_without_deny_support` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-10-01T22:24:41.773074+02:00","seq":12,"kind":"oracle","criterion":"AC-4","oracle":"`cargo test --manifest-path cli/Cargo.toml deny_flag_is_per_agent` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-10-01T22:24:41.773076+02:00","seq":13,"kind":"oracle","criterion":"AC-5","oracle":"`cargo test --manifest-path cli/Cargo.toml turn_output_parsed_per_agent` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-10-01T22:24:41.773080+02:00","seq":14,"kind":"oracle","criterion":"AC-6","oracle":"`cargo test --manifest-path cli/Cargo.toml resume_form_is_per_agent` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-10-01T22:24:41.773083+02:00","seq":15,"kind":"oracle","criterion":"AC-7","oracle":"`cargo test --manifest-path cli/Cargo.toml failure_hint_is_per_agent` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-10-01T22:24:41.773085+02:00","seq":16,"kind":"oracle","criterion":"AC-8","oracle":"`cargo test --manifest-path cli/Cargo.toml turn_record_names_the_agent` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-10-01T22:24:41.773087+02:00","seq":17,"kind":"oracle","criterion":"AC-9","oracle":"`cargo test --manifest-path cli/Cargo.toml` exits 0","verdict":"pass","exit_code":0}
+diff --git a/.keel/specs/agent-session-abstraction/approvals.jsonl b/.keel/specs/agent-session-abstraction/approvals.jsonl
+new file mode 100644
+index 0000000..b486377
+--- /dev/null
++++ b/.keel/specs/agent-session-abstraction/approvals.jsonl
+@@ -0,0 +1,2 @@
++{"schema":"keel.approval/1","stage":"spec","decision":"approved","artefact_hash":"b156519afc109c94d468c9b4589105c75f0c5f44dcc6ff4d7fef6c083a9785e7","gate_verdict":"pass","by":"Dane Balia","at":"2026-10-01T22:14:02.195859+02:00"}
++{"schema":"keel.approval/1","stage":"plan","decision":"approved","artefact_hash":"97d5b410aec3033a0a74aaf82917feefe36d58c03ca6c02f8e6dc8c2b51e0b66","gate_verdict":"pass","by":"Dane Balia","at":"2026-10-01T22:17:17.888321+02:00"}
+diff --git a/.keel/specs/agent-session-abstraction/gates/G0.json b/.keel/specs/agent-session-abstraction/gates/G0.json
+new file mode 100644
+index 0000000..b212192
+--- /dev/null
++++ b/.keel/specs/agent-session-abstraction/gates/G0.json
+@@ -0,0 +1,90 @@
++{
++  "schema": "keel.gate/1",
++  "gate": "G0",
++  "run": "2026-10-01-007",
++  "spec": "agent-session-abstraction",
++  "verdict": "pass",
++  "generated_at": "2026-10-01T22:14:23.861790+02:00",
++  "checks": [
++    {
++      "id": "schema",
++      "verdict": "pass",
++      "detail": "SPEC-0012 (keel.spec/1)"
++    },
++    {
++      "id": "criteria-present",
++      "verdict": "pass",
++      "detail": "9 criteria"
++    },
++    {
++      "id": "criterion-ids-unique",
++      "verdict": "pass",
++      "detail": "no duplicate ids"
++    },
++    {
++      "id": "no-placeholders",
++      "verdict": "pass",
++      "detail": "no unfilled scaffold text"
++    },
++    {
++      "id": "ears-conformance",
++      "verdict": "pass",
++      "detail": "9/9 conform (event-driven, ubiquitous, unwanted-behaviour)"
++    },
++    {
++      "id": "oracle-presence",
++      "verdict": "pass",
++      "detail": "9 oracles across 9 criteria"
++    },
++    {
++      "id": "oracle-wellformed",
++      "verdict": "pass",
++      "detail": "all oracles parse"
++    },
++    {
++      "id": "ambiguity",
++      "verdict": "pass",
++      "detail": "no ambiguous phrasing in criteria"
++    },
++    {
++      "id": "criterion-budget",
++      "verdict": "pass",
++      "detail": "9/9 criteria"
++    },
++    {
++      "id": "spec-length",
++      "verdict": "pass",
++      "detail": "142/250 lines"
++    },
++    {
++      "id": "scope-declared",
++      "verdict": "pass",
++      "detail": "2 glob(s): cli/src/session.rs, cli/src/manifest.rs"
++    },
++    {
++      "id": "change-budget",
++      "verdict": "pass",
++      "detail": "320 lines of diff budgeted"
++    },
++    {
++      "id": "oracle-mix",
++      "verdict": "pass",
++      "detail": "9/9 runnable (9 cmd)"
++    },
++    {
++      "id": "human-cost",
++      "verdict": "pass",
++      "detail": "0 human oracle(s), none load-bearing"
++    },
++    {
++      "id": "store-drift",
++      "verdict": "pass",
++      "detail": "4 projections current"
++    },
++    {
++      "id": "shared-stores",
++      "verdict": "pass",
++      "detail": "none configured"
++    }
++  ]
++}
+diff --git a/.keel/specs/agent-session-abstraction/gates/G1.json b/.keel/specs/agent-session-abstraction/gates/G1.json
+new file mode 100644
+index 0000000..0750ffd
+--- /dev/null
++++ b/.keel/specs/agent-session-abstraction/gates/G1.json
+@@ -0,0 +1,95 @@
++{
++  "schema": "keel.gate/1",
++  "gate": "G1",
++  "run": "2026-10-01-007",
++  "spec": "agent-session-abstraction",
++  "verdict": "pass",
++  "generated_at": "2026-10-01T22:15:21.569664+02:00",
++  "checks": [
++    {
++      "id": "schema",
++      "verdict": "pass",
++      "detail": "PLAN-0012 + TASKS-0012"
++    },
++    {
++      "id": "g0-passed",
++      "verdict": "pass",
++      "detail": "G0 passed in run 2026-10-01-007"
++    },
++    {
++      "id": "spec-approved",
++      "verdict": "pass",
++      "detail": "approved by Dane Balia"
++    },
++    {
++      "id": "tasks-present",
++      "verdict": "pass",
++      "detail": "9/15 tasks"
++    },
++    {
++      "id": "task-ids-unique",
++      "verdict": "pass",
++      "detail": "no duplicate task ids"
++    },
++    {
++      "id": "task-fields",
++      "verdict": "pass",
++      "detail": "all task fields recognised"
++    },
++    {
++      "id": "task-criterion-traceability",
++      "verdict": "pass",
++      "detail": "9 tasks all traced"
++    },
++    {
++      "id": "criteria-covered",
++      "verdict": "pass",
++      "detail": "9/9 criteria have a task"
++    },
++    {
++      "id": "task-budgets",
++      "verdict": "pass",
++      "detail": "all 9 tasks budgeted, total 315 lines"
++    },
++    {
++      "id": "total-budget",
++      "verdict": "pass",
++      "detail": "315/320 lines"
++    },
++    {
++      "id": "task-exit-conditions",
++      "verdict": "pass",
++      "detail": "every task states when it is done"
++    },
++    {
++      "id": "task-dependencies",
++      "verdict": "pass",
++      "detail": "1 wave(s), widths 9"
++    },
++    {
++      "id": "wave-isolation",
++      "verdict": "pass",
++      "detail": "1 wave(s), no file claimed twice within one"
++    },
++    {
++      "id": "task-files-in-scope",
++      "verdict": "pass",
++      "detail": "all task files inside the declared scope"
++    },
++    {
++      "id": "rollback-stated",
++      "verdict": "pass",
++      "detail": "git revert"
++    },
++    {
++      "id": "blast-radius-declared",
++      "verdict": "pass",
++      "detail": "7 file(s) at depth 2, 2302 lines"
++    },
++    {
++      "id": "blast-radius-current",
++      "verdict": "pass",
++      "detail": "7 files, 2302 lines — matches a fresh computation"
++    }
++  ]
++}
+diff --git a/.keel/specs/agent-session-abstraction/plan.md b/.keel/specs/agent-session-abstraction/plan.md
+new file mode 100644
+index 0000000..33b1a1f
+--- /dev/null
++++ b/.keel/specs/agent-session-abstraction/plan.md
+@@ -0,0 +1,96 @@
++---
++id: PLAN-0012
++slug: agent-session-abstraction
++schema: keel.plan/1
++blast:
++  depth: 2
++  declared:
++  - cli/src/session.rs
++  - cli/src/manifest.rs
++  computed:
++  - cli/src/manifest.rs
++  - cli/src/session.rs
++  - cli/src/main.rs
++  - cli/src/compose.rs
++  - cli/src/commands/ask_cmd.rs
++  - cli/src/commands/up.rs
++  - cli/src/commands/mod.rs
++  computed_lines: 2302
++rollback: git revert
++verified_at: 2026-10-01
++---
++
++# Design — agent-session-abstraction
++
++## Approach
++
++The seam is **one agent profile table** inside `session.rs`. Everything
++Claude-specific today is a hardcoded constant in one of four functions;
++each becomes a field looked up by `Agent`.
++
++1. **`manifest.rs`**: add `Kiro` to the existing `Agent` enum and its
++   `FromStr` (AC-1). `resolve_image` already returns a non-copilot image
++   unchanged, so Kiro needs no image mapping here.
++
++2. **`session.rs`: an `AgentProfile`** returned by `profile(Agent)` —
++   a plain struct of what differs:
++   - `argv_prefix`: `["claude","--print","--output-format","json"]` /
++     `["copilot","-p"]` / `["kiro-cli","chat","--no-interactive"]`
++   - `allow_flag` / `deny_flag`: `Some("--allowedTools")` /
++     `Some("--disallowedTools")`; copilot `--allow-tool` / `--deny-tool`;
++     kiro `--trust-tools` / **`None`** (AC-4)
++   - `resume_flag`: `Some("--resume")` for claude/copilot, `None` for
++     kiro (AC-6)
++   - `output`: `Json` (claude) or `PlainText` (copilot, kiro) (AC-5)
++   - `auth_hint`: the fix for that agent (AC-7)
++
++3. **The four functions take the agent**: `build_turn_argv(agent, role,
++   prompt, resume)` builds from the profile instead of literals;
++   `parse_turn(agent, stdout)` reads JSON or wraps plain output as the
++   response; `failure_hint(agent, project, text)` returns the profile's
++   hint. `run_turn` already loads the project's `Manifest`, so it reads
++   `m.agent` and threads it — **no caller signature changes**, which is
++   what keeps `ask_cmd.rs`/`studio`/`recipe` out of the diff.
++
++4. **AC-3, the safety rule**: if `role.denied_tools()` is non-empty and
++   the profile's `deny_flag` is `None`, `run_turn` returns an error naming
++   the agent and the role rather than building an unrestricted argv. This
++   is a refusal, not a warning: ADR-0008 established that an allow-list
++   alone does not restrain, so running a restricted role on kiro would be
++   running it unrestricted.
++
++5. **AC-8**: the existing `agent-turn` chain entry gains an `agent` field
++   from the same value — the record already carries role and session id,
++   so this is one more field on an existing struct.
++
++The profile table is pure data and every behaviour above is a pure
++function of it, so all nine oracles are unit tests with no container.
++
++## Scope note
++
++`cli/src/commands/ask_cmd.rs`, `studio/`, `recipe.rs`, `main.rs` and
++`compose.rs` appear in the computed blast radius because they depend on
++`session.rs`/`manifest.rs`. Step 3 deliberately keeps the public
++signatures they call (`run_turn`, `ask`) unchanged, so none of them is
++edited by this change.
++
++## Blast radius
++
++<!-- generated by `keel plan`; edits here are overwritten -->
++
++Computed from the import graph at depth 2: **7 files, 2302 lines**.
++
++| depth | file | lines |
++| --- | --- | --- |
++| scope | `cli/src/manifest.rs` | 327 |
++| scope | `cli/src/session.rs` | 970 |
++| +1 | `cli/src/main.rs` | 419 |
++| +1 | `cli/src/compose.rs` | 247 |
++| +1 | `cli/src/commands/ask_cmd.rs` | 26 |
++| +1 | `cli/src/commands/up.rs` | 20 |
++| +2 | `cli/src/commands/mod.rs` | 293 |
++
++
++## Rollback
++
++`git revert` — replace this if the change needs a different rollback.
+diff --git a/.keel/specs/agent-session-abstraction/spec.md b/.keel/specs/agent-session-abstraction/spec.md
+new file mode 100644
+index 0000000..f7d42f4
+--- /dev/null
++++ b/.keel/specs/agent-session-abstraction/spec.md
+@@ -0,0 +1,142 @@
++---
++id: SPEC-0012
++slug: agent-session-abstraction
++schema: keel.spec/1
++status: approved
++scope:
++- cli/src/session.rs
++- cli/src/manifest.rs
++budget:
++  criteria: 9
++  lines: 320
++verified_at: 2026-10-01
++---
++
++# Drive moor's own agent turns through any configured agent, not just Claude
++
++## Context
++
++moor has two independent routes to an agent, and only one of them honours
++the project's chosen agent:
++
++- **keel's driver** (`keel run --driver <id>`) already supports
++  claude-code, copilot, kiro and codex, and SPEC-0010 made the agent
++  selectable at `import`/`new`.
++- **moor's own turns** (`moor ask`, `moor studio`, `moor recipe`'s
++  spec-authoring step) go through `session.rs`, which is hardcoded to
++  Claude: `build_turn_argv` emits `claude --print --output-format json
++  …`, `parse_turn` expects Claude's JSON envelope (`is_error`,
++  `session_id`), `next_session_id` validates Claude's UUID for
++  `--resume`, and `failure_hint` translates Claude's "Not logged in".
++
++So a project created with `--agent copilot` builds with Copilot but
++*converses* with Claude — and on a sandbox with no Claude credential,
++`moor ask`/`studio` fail outright. This blocks `moor studio` from being
++the single interface to a project, because the agent half of it only
++speaks to one agent.
++
++**A safety asymmetry makes this more than plumbing.** Role-based tool
++restriction is a real control: `Role` grants a narrow tool set, and
++[ADR-0008](../../docs/decisions/0008-agent-session-protocol.md) records
++that `--allowedTools` is an *auto-approval* list, not a restriction —
++Claude ran `Bash` regardless — and that `--disallowedTools` is what
++actually denies. Checked directly against each CLI's own help:
++
++| agent | auto-approve flag | deny flag |
++| --- | --- | --- |
++| claude | `--allowedTools` | `--disallowedTools` |
++| copilot | `--allow-tool` | `--deny-tool`, `--excluded-tools` |
++| kiro | `--trust-tools` | *none found* |
++
++Kiro exposes only `--trust-tools` (trust *these* tools), whose semantics
++match the `--allowedTools` that ADR-0008 proved does not restrain. So for
++at least one agent, a restricted role may not be expressible at all. An
++abstraction that quietly runs a restricted role unrestricted would turn a
++convenience into a security regression — the recipe's spec-authoring role
++exists precisely to stop an agent implementing the feature instead of
++writing the spec.
++
++## Acceptance criteria
++
++### AC-1 The agent axis includes kiro
++
++WHEN an agent value of `kiro` is parsed THE SYSTEM SHALL accept it as a
++valid agent alongside `claude` and `copilot`.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml agent_parses_kiro` exit 0
++
++### AC-2 A turn's argv is built for the project's agent
++
++WHEN a turn is built for a given agent THE SYSTEM SHALL emit that agent's
++own invocation (claude `--print`, copilot `-p`, kiro `chat
++--no-interactive`) rather than Claude's for all three.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml turn_argv_is_per_agent` exit 0
++
++### AC-3 A restricted role is refused on an agent that cannot deny tools
++
++IF a role grants a restricted tool set AND the selected agent has no
++tool-denial mechanism THEN THE SYSTEM SHALL refuse the turn rather than
++run it with unrestricted tools.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml restricted_role_refused_without_deny_support` exit 0
++
++### AC-4 Tool denial is expressed per agent where it exists
++
++WHEN a turn is built for an agent whose profile declares a deny flag THE
++SYSTEM SHALL pass that flag with the role's denied tools (claude
++`--disallowedTools`, copilot `--deny-tool`).
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml deny_flag_is_per_agent` exit 0
++
++### AC-5 Turn output is parsed per agent
++
++WHEN a turn completes THE SYSTEM SHALL read success and response text
++using that agent's output shape, treating a non-JSON-emitting agent's
++plain output as the response rather than failing to parse it.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml turn_output_parsed_per_agent` exit 0
++
++### AC-6 Session continuity uses the agent's own resume form
++
++WHEN a turn resumes a prior session THE SYSTEM SHALL pass the resume form
++declared for that agent, and SHALL omit resumption for an agent whose
++profile declares no resume form.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml resume_form_is_per_agent` exit 0
++
++### AC-7 A missing credential names the right fix for that agent
++
++WHEN a turn fails for want of a credential THE SYSTEM SHALL name the fix
++for the selected agent (Claude's token, Copilot's `copilot /login`,
++Kiro's `kiro-cli login`) rather than Claude's for all three.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml failure_hint_is_per_agent` exit 0
++
++### AC-8 The chained turn record names the agent
++
++WHEN a turn is recorded in the audit chain THE SYSTEM SHALL include which
++agent produced it, so the trail distinguishes turns by agent.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml turn_record_names_the_agent` exit 0
++
++### AC-9 Existing CLI tests stay green
++
++THE SYSTEM SHALL leave the existing CLI test suite passing.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml` exit 0
++
++## Out of scope
++
++- Adding codex (keel has a driver; moor's turn path can follow the same
++  shape later once the three here are proven).
++- Changing `keel run`'s driver selection, SPEC-0010's image/agent
++  resolution, or the `moor/copilot-<lang>` image build.
++- Studio's own UX (reject, gate output in context, conversation→spec):
++  this change unblocks them by making studio's agent half agent-agnostic,
++  but does not implement them.
++- Proving, by live experiment, that each agent's deny flag genuinely
++  restrains it the way ADR-0008 did for Claude. This spec requires moor to
++  *pass* the deny flag where it exists and to *refuse* where it does not;
++  an ADR-0008-style live verification per agent is its own follow-up and
++  is named as a known gap rather than assumed.
+diff --git a/.keel/specs/agent-session-abstraction/tasks.md b/.keel/specs/agent-session-abstraction/tasks.md
+new file mode 100644
+index 0000000..7eaec6b
+--- /dev/null
++++ b/.keel/specs/agent-session-abstraction/tasks.md
+@@ -0,0 +1,69 @@
++---
++id: TASKS-0012
++slug: agent-session-abstraction
++schema: keel.tasks/1
++---
++
++# Tasks
++
++Each task must name the criteria it satisfies, the files it touches, a line
++budget and an exit condition. G1 checks all four, and checks that every
++criterion in the spec is covered by at least one task.
++
++Add `- depends_on: T-1` where order matters. Tasks with no dependency on
++each other form a wave; `keel tasks` shows them.
++
++### T-1 The agent axis includes kiro
++- criteria: AC-1
++- files: scope
++- budget: 35
++- exit: `cargo test --manifest-path cli/Cargo.toml agent_parses_kiro` exits 0
++
++### T-2 A turn's argv is built for the project's agent
++- criteria: AC-2
++- files: scope
++- budget: 35
++- exit: `cargo test --manifest-path cli/Cargo.toml turn_argv_is_per_agent` exits 0
++
++### T-3 A restricted role is refused on an agent that cannot deny tools
++- criteria: AC-3
++- files: scope
++- budget: 35
++- exit: `cargo test --manifest-path cli/Cargo.toml restricted_role_refused_without_deny_support` exits 0
++
++### T-4 Tool denial is expressed per agent where it exists
++- criteria: AC-4
++- files: scope
++- budget: 35
++- exit: `cargo test --manifest-path cli/Cargo.toml deny_flag_is_per_agent` exits 0
++
++### T-5 Turn output is parsed per agent
++- criteria: AC-5
++- files: scope
++- budget: 35
++- exit: `cargo test --manifest-path cli/Cargo.toml turn_output_parsed_per_agent` exits 0
++
++### T-6 Session continuity uses the agent's own resume form
++- criteria: AC-6
++- files: scope
++- budget: 35
++- exit: `cargo test --manifest-path cli/Cargo.toml resume_form_is_per_agent` exits 0
++
++### T-7 A missing credential names the right fix for that agent
++- criteria: AC-7
++- files: scope
++- budget: 35
++- exit: `cargo test --manifest-path cli/Cargo.toml failure_hint_is_per_agent` exits 0
++
++### T-8 The chained turn record names the agent
++- criteria: AC-8
++- files: scope
++- budget: 35
++- exit: `cargo test --manifest-path cli/Cargo.toml turn_record_names_the_agent` exits 0
++
++### T-9 Existing CLI tests stay green
++- criteria: AC-9
++- files: scope
++- budget: 35
++- exit: `cargo test --manifest-path cli/Cargo.toml` exits 0
++
