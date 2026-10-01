@@ -4,6 +4,19 @@ Notable changes to moor. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and moor uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **`moor doctor`** shows the sandbox workspace's git state before you
+  build on it — which branch it's on (and whether that's the trunk),
+  clean vs. a count of uncommitted changes, ahead/behind the remote, and
+  detached HEAD — spelling out each concern a build would care about. It
+  is read-only: no fetch, no checkout, it changes nothing (refreshing is
+  `moor pull`). First of a set: a hard build gate and spec archiving (as a
+  recorded, reversible state) are planned on top of it. See
+  [ADR-0011](docs/decisions/0011-sandbox-git-visibility-and-guards.md).
+
 ## [0.5.3] - 2026-10-01
 
 ### Added

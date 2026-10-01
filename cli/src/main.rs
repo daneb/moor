@@ -220,6 +220,15 @@ enum Command {
         #[arg(short = 'p', long = "project")]
         project: Option<String>,
     },
+    /// Show the sandbox's git state before you build on it.
+    ///
+    /// Read-only: which branch it's on (and whether that's the trunk),
+    /// whether the tree is clean, and whether it's behind the remote —
+    /// the things that matter before starting a feature. Changes nothing.
+    Doctor {
+        #[arg(short = 'p', long = "project")]
+        project: Option<String>,
+    },
     /// List all projects and whether their sandboxes are up.
     Status,
     /// Show a project's tamper-evident audit trail.
@@ -332,6 +341,7 @@ fn main() {
         Command::Shell { name } => commands::shell::run(&name),
         Command::Run { name, cmd } => commands::run_cmd::run(&name, &cmd),
         Command::Pull { project } => commands::pull_cmd::run(project),
+        Command::Doctor { project } => commands::doctor_cmd::run(project),
         Command::Keel { project, args } => commands::resolve_project_announced(project)
             .and_then(|name| commands::keel_cmd::run(&name, &args)),
         Command::Bundle { project, run, out } => commands::resolve_project_announced(project)
