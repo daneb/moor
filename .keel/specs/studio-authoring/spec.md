@@ -9,7 +9,7 @@ scope:
 - cli/src/studio/mod.rs
 budget:
   criteria: 8
-  lines: 350
+  lines: 400
 verified_at: 2026-10-01
 ---
 

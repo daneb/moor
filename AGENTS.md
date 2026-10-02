@@ -1,4 +1,4 @@
-<!-- keel:generated schema=keel.projection/1 adapter=agents store=96cfd67a4a89 body=18cabdd8af49 -->
+<!-- keel:generated schema=keel.projection/1 adapter=agents store=965d7ea6966b body=e717ea5b79f7 -->
 <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
 
 # Project context
@@ -48,54 +48,54 @@ _Versions that cannot move, platforms that must keep working, dependencies that 
 
 ## Repository map
 
-**43 files · 704 symbols · 11669 lines** — javascript 2, rust 41
+**43 files · 736 symbols · 12415 lines** — javascript 2, rust 41
 
 Files are ordered by import-graph centrality, not alphabetically. Signatures only; read a body with the file path and line number. Per-directory detail lives in `.keel/store/map/<dir>/CODEMAP.md`.
 
 ### Layout
 
-- `cli/src/` — 12 files, 4717 lines · guide.rs, canary.rs, manifest.rs
+- `cli/src/` — 12 files, 5009 lines · guide.rs, canary.rs, manifest.rs
 - `cli/src/commands/` — 25 files, 4548 lines · next_cmd.rs, mod.rs, run_cmd.rs
-- `cli/src/studio/` — 3 files, 1806 lines · mod.rs, state.rs, render.rs
+- `cli/src/studio/` — 3 files, 2260 lines · mod.rs, state.rs, render.rs
 - `docs/examples/ascii-banner/` — 1 file, 56 lines · banner.js
 - `docs/examples/ascii-banner/test/` — 1 file, 60 lines · banner.test.js
 - `mcp/src/` — 1 file, 482 lines · main.rs
 
 ### Key files
 
-**`cli/src/studio/mod.rs`** · 717 lines · imported by 2
+**`cli/src/studio/mod.rs`** · 789 lines · imported by 2
 - `pub mod render;` — inferred from a running terminal.  <sub>L15</sub>
 - `pub mod state;`  <sub>L16</sub>
 - `pub trait Host` — Everything the console needs from outside itself. One trait, so the  <sub>L28</sub>
-- `fn artifact_path(slug: &str, artifact: &str) -> Result<String>` — The three keel artifacts, and where they live inside a sandbox. Same  <sub>L45</sub>
-- `fn write_back_argv(container: &str, path: &str) -> Vec<String>` — container whose rootfs is read-only. No bind mount is created, and none  <sub>L71</sub>
-- `pub struct Docker;` — `audit::log_exec` — the same chained-audit path `moor run` and `moor  <sub>L85</sub>
-- `pub enum Event` — A turn coming back from its own thread. Keypresses are read straight  <sub>L164</sub>
-- `pub fn spawn_turn<F>(tx: &Sender<Event>, project: String, work: F)` — goes to its own thread and reports back through the channel. The caller  <sub>L178</sub>
-- `pub fn edit_artifact(` — changed — an unmodified file is not written back, so opening one to  <sub>L201</sub>
-- `struct RawMode;` — Restores the terminal however the loop ends — clean exit, `?`, or  <sub>L248</sub>
-- `pub fn run(names: Vec<String>) -> Result<()>`  <sub>L283</sub>
-- `fn drain(console: &mut Console, rx: &Receiver<Event>)` — Fold every turn that has come back since the last pass into the  <sub>L354</sub>
-- `pub mod tests`  <sub>L366</sub>
-- `pub struct FakeHost` — refresh costs, what the write-back carries — so the boundary is  <sub>L375</sub>
+- `fn artifact_path(slug: &str, artifact: &str) -> Result<String>` — The three keel artifacts, and where they live inside a sandbox. Same  <sub>L51</sub>
+- `fn write_back_argv(container: &str, path: &str) -> Vec<String>` — container whose rootfs is read-only. No bind mount is created, and none  <sub>L77</sub>
+- `pub struct Docker;` — `audit::log_exec` — the same chained-audit path `moor run` and `moor  <sub>L91</sub>
+- `pub enum Event` — A turn coming back from its own thread. Keypresses are read straight  <sub>L204</sub>
+- `pub fn spawn_turn<F>(tx: &Sender<Event>, project: String, work: F)` — goes to its own thread and reports back through the channel. The caller  <sub>L218</sub>
+- `pub fn edit_artifact(` — changed — an unmodified file is not written back, so opening one to  <sub>L241</sub>
+- `struct RawMode;` — Restores the terminal however the loop ends — clean exit, `?`, or  <sub>L288</sub>
+- `pub fn run(names: Vec<String>) -> Result<()>`  <sub>L323</sub>
+- `fn drain(console: &mut Console, rx: &Receiver<Event>)` — Fold every turn that has come back since the last pass into the  <sub>L408</sub>
+- `pub mod tests`  <sub>L420</sub>
+- `pub struct FakeHost` — refresh costs, what the write-back carries — so the boundary is  <sub>L429</sub>
 
-**`cli/src/studio/state.rs`** · 733 lines · imported by 2
+**`cli/src/studio/state.rs`** · 1081 lines · imported by 2
 - `pub enum Line`  <sub>L11</sub>
 - `pub fn waited(&self) -> Option<std::time::Duration>` — How long the in-flight turn has been running.  <sub>L23</sub>
 - `pub struct Project`  <sub>L39</sub>
-- `pub enum Approval`  <sub>L65</sub>
-- `pub enum Key`  <sub>L78</sub>
-- `pub enum Action`  <sub>L90</sub>
-- `struct NextSpec`  <sub>L118</sub>
-- `struct NextReport`  <sub>L127</sub>
-- `pub struct Console`  <sub>L133</sub>
-- `pub fn refresh(&mut self, host: &dyn super::Host) -> Result<()>` — sandboxes that are actually up — a stopped project has no container  <sub>L180</sub>
-- `pub fn apply_next(&mut self, project: &str, json: &str) -> Result<()>` — what files happen to exist — a displayed stage that disagrees with  <sub>L204</sub>
-- `pub fn arm_approval(&mut self)` — slug keel itself reported for it, captured now so a later selection  <sub>L288</sub>
-- `pub fn handle_key(&mut self, key: Key) -> Action`  <sub>L323</sub>
-- `trait CheckedIndex` — Tiny helper so `send` can bail cleanly on an empty project list.  <sub>L454</sub>
+- `pub enum Approval`  <sub>L69</sub>
+- `pub enum Key`  <sub>L100</sub>
+- `pub enum Action`  <sub>L112</sub>
+- `struct NextSpec`  <sub>L146</sub>
+- `struct NextReport`  <sub>L155</sub>
+- `pub struct Console`  <sub>L161</sub>
+- `pub fn refresh(&mut self, host: &dyn super::Host) -> Result<()>` — sandboxes that are actually up — a stopped project has no container  <sub>L208</sub>
+- `pub fn apply_next(&mut self, project: &str, json: &str) -> Result<()>` — what files happen to exist — a displayed stage that disagrees with  <sub>L247</sub>
+- `pub fn arm_approval(&mut self)` — slug keel itself reported for it, captured now so a later selection  <sub>L331</sub>
+- `pub fn failing_checks(gate_json: &str) -> Vec<String>` — a missing or half-written evidence file is not worth failing a refresh  <sub>L610</sub>
+- `trait CheckedIndex` — Tiny helper so `send` can bail cleanly on an empty project list.  <sub>L642</sub>
 
-**`cli/src/studio/render.rs`** · 356 lines · imported by 1
+**`cli/src/studio/render.rs`** · 390 lines · imported by 1
 - `const BOLD: &str = "\x1b[1m";`  <sub>L8</sub>
 - `const DIM: &str = "\x1b[2m";`  <sub>L9</sub>
 - `const CYAN: &str = "\x1b[36m";`  <sub>L10</sub>
@@ -104,12 +104,12 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
 - `pub fn waiting_label(waited: std::time::Duration) -> String` — available while turns are request/response and nothing streams back  <sub>L82</sub>
 - `pub fn wrap(text: &str, width: usize) -> Vec<String>` — Wrap to the terminal width after sanitizing — a single very long line  <sub>L95</sub>
 - `pub fn frame(c: &Console, width: usize, height: usize) -> String` — The whole frame, as one string. Pure: takes state, returns bytes, so  <sub>L131</sub>
-- `mod tests`  <sub>L204</sub>
-- `fn render_strips_control_sequences()`  <sub>L209</sub>
-- `fn a_hostile_reply_cannot_reach_the_terminal_through_the_frame()`  <sub>L254</sub>
-- `fn wrap_breaks_long_lines_and_long_words()`  <sub>L271</sub>
-- `fn a_turn_in_flight_shows_moving_elapsed_time_next_to_the_input_line()`  <sub>L284</sub>
-- `fn frame_marks_a_pending_project_and_names_an_armed_approval()`  <sub>L337</sub>
+- `mod tests`  <sub>L238</sub>
+- `fn render_strips_control_sequences()`  <sub>L243</sub>
+- `fn a_hostile_reply_cannot_reach_the_terminal_through_the_frame()`  <sub>L288</sub>
+- `fn wrap_breaks_long_lines_and_long_words()`  <sub>L305</sub>
+- `fn a_turn_in_flight_shows_moving_elapsed_time_next_to_the_input_line()`  <sub>L318</sub>
+- `fn frame_marks_a_pending_project_and_names_an_armed_approval()`  <sub>L371</sub>
 
 **`cli/src/guide.rs`** · 845 lines · imported by 3
 - `pub struct NextReport`  <sub>L19</sub>
@@ -144,27 +144,27 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
 - `pub fn next_hint(name: &str) -> String` — The closing line for a command that isn't itself guided: how to ask  <sub>L153</sub>
 - `pub fn run(explicit: Option<String>, all: bool) -> Result<()>` — `moor next`: where the project's active spec stands and the one  <sub>L164</sub>
 
-**`cli/src/manifest.rs`** · 327 lines · imported by 3
+**`cli/src/manifest.rs`** · 331 lines · imported by 3
 - `pub enum Agent`  <sub>L12</sub>
-- `impl FromStr for Agent`  <sub>L18</sub>
-- `pub fn resolve_image(language_image: &str, agent: Agent) -> String` — already a copilot image, is returned unchanged. Pure — unit-tested  <sub>L35</sub>
-- `pub struct Manifest`  <sub>L59</sub>
-- `pub struct Egress`  <sub>L81</sub>
-- `pub struct Resources`  <sub>L87</sub>
-- `impl Manifest`  <sub>L103</sub>
-- `pub fn new(name: &str, image: &str) -> Self`  <sub>L104</sub>
-- `pub fn load(path: &Path) -> Result<Self>`  <sub>L138</sub>
-- `pub fn save(&self, path: &Path) -> Result<()>`  <sub>L144</sub>
-- `pub fn sandbox_container(&self) -> String`  <sub>L151</sub>
-- `pub fn egress_container(&self) -> String`  <sub>L155</sub>
-- `pub fn validate_name(name: &str) -> Result<()>` — Validate a project name: lowercase alnum + dashes, matches what's safe  <sub>L162</sub>
-- `mod tests`  <sub>L178</sub>
+- `impl FromStr for Agent`  <sub>L19</sub>
+- `pub fn resolve_image(language_image: &str, agent: Agent) -> String` — already a copilot image, is returned unchanged. Pure — unit-tested  <sub>L39</sub>
+- `pub struct Manifest`  <sub>L63</sub>
+- `pub struct Egress`  <sub>L85</sub>
+- `pub struct Resources`  <sub>L91</sub>
+- `impl Manifest`  <sub>L107</sub>
+- `pub fn new(name: &str, image: &str) -> Self`  <sub>L108</sub>
+- `pub fn load(path: &Path) -> Result<Self>`  <sub>L142</sub>
+- `pub fn save(&self, path: &Path) -> Result<()>`  <sub>L148</sub>
+- `pub fn sandbox_container(&self) -> String`  <sub>L155</sub>
+- `pub fn egress_container(&self) -> String`  <sub>L159</sub>
+- `pub fn validate_name(name: &str) -> Result<()>` — Validate a project name: lowercase alnum + dashes, matches what's safe  <sub>L166</sub>
+- `mod tests`  <sub>L182</sub>
 
-**`cli/src/paths.rs`** · 122 lines · imported by 3
-- `pub fn moor_home() -> Result<PathBuf>`  <sub>L4</sub>
-- `pub fn project_dir(name: &str) -> Result<PathBuf>`  <sub>L9</sub>
-- `pub fn manifest_path(name: &str) -> Result<PathBuf>`  <sub>L13</sub>
-- `pub fn chain_log_path(name: &str) -> Result<PathBuf>` — folded-in egress verdicts, and tripwire hits all append here. See  <sub>L28</sub>
+**`cli/src/session.rs`** · 1258 lines · imported by 2
+- `pub enum Role`  <sub>L25</sub>
+- `pub enum OutputShape`  <sub>L131</sub>
+- `pub struct AgentProfile`  <sub>L142</sub>
+- `pub fn profile(agent: Agent) -> AgentProfile` — *these*), whose semantics are the auto-approval that ADR-0008 showed  <sub>L164</sub>
 
 _… 264 more lines in `.keel/store/steering/structure.md`._
 
