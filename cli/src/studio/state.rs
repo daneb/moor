@@ -130,6 +130,13 @@ pub enum Action {
         command: Vec<String>,
         note: String,
     },
+    /// Write the agent's latest answer out as a recipe draft for this
+    /// project. The body is already sanitized here, so whatever writes it
+    /// cannot be handed control sequences.
+    AuthorSpec {
+        project: String,
+        body: String,
+    },
     EditArtifact {
         project: String,
         slug: String,
@@ -538,6 +545,12 @@ impl Console {
                     self.arm_rejection();
                     return Action::None;
                 }
+                // '/' rather than a letter: commands are only commands on
+                // an empty input line, so any letter steals the first
+                // character of a question that starts with it — typing
+                // "secret..." would lose its 's'. No prompt begins with a
+                // slash.
+                '/' => return self.author_spec(),
                 'e' => return self.edit(),
                 _ => {}
             }
@@ -546,6 +559,33 @@ impl Console {
             p.input.push(c);
         }
         Action::None
+    }
+
+    /// Turn the agent's most recent answer for this project into a recipe
+    /// draft. The *last* agent line, not the whole transcript: the thing
+    /// the operator just read is the thing they mean.
+    fn author_spec(&mut self) -> Action {
+        let Some(p) = self.selected_project() else {
+            return Action::None;
+        };
+        let project = p.name.clone();
+        let latest = p.transcript.iter().rev().find_map(|l| match l {
+            Line::Agent(text) if !text.trim().is_empty() => Some(text.clone()),
+            _ => None,
+        });
+        match latest {
+            Some(text) => Action::AuthorSpec {
+                project,
+                // Sanitized before it can reach a file, the same way it is
+                // sanitized before it reaches the screen.
+                body: super::render::sanitize(&text),
+            },
+            None => {
+                self.status =
+                    "nothing to author from: ask the agent for a recipe first, then press s".into();
+                Action::None
+            }
+        }
     }
 
     fn edit(&mut self) -> Action {
@@ -1077,5 +1117,75 @@ mod tests {
         assert!(!drawn.contains("\x1b[2J"), "escape survived: {drawn:?}");
         assert!(!drawn.contains("\x1b]0;"), "OSC survived: {drawn:?}");
         assert!(drawn.contains("evil"), "text lost: {drawn}");
+    }
+    // --- studio-authoring (SPEC-0014) ----------------------------------
+
+    fn with_answer(text: &str) -> Console {
+        let mut c = Console::new(&["alpha".to_string()]);
+        c.projects[0].transcript.push(Line::Operator("ask".into()));
+        c.projects[0].transcript.push(Line::Agent(text.into()));
+        c
+    }
+
+    #[test]
+    fn author_key_drafts_a_spec_from_the_answer() {
+        // AC-1: the latest agent answer becomes the body.
+        let mut c = with_answer("---\nslug: x\n---\ndo the thing");
+        match c.handle_key(Key::Char('/')) {
+            Action::AuthorSpec { project, body } => {
+                assert_eq!(project, "alpha");
+                assert!(body.contains("do the thing"), "{body}");
+            }
+            other => panic!("expected AuthorSpec, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn author_uses_the_latest_answer_not_the_first() {
+        // AC-1, the part that matters in a real conversation.
+        let mut c = with_answer("first answer");
+        c.projects[0]
+            .transcript
+            .push(Line::Agent("second answer".into()));
+        match c.handle_key(Key::Char('/')) {
+            Action::AuthorSpec { body, .. } => assert!(body.contains("second"), "{body}"),
+            other => panic!("expected AuthorSpec, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn author_without_an_answer_writes_nothing() {
+        // AC-2
+        let mut c = Console::new(&["alpha".to_string()]);
+        assert_eq!(c.handle_key(Key::Char('/')), Action::None);
+        assert!(c.status.contains("nothing to author"), "{}", c.status);
+        // An empty agent line does not count as an answer either.
+        let mut c2 = with_answer("   ");
+        assert_eq!(c2.handle_key(Key::Char('/')), Action::None);
+    }
+
+    #[test]
+    fn authored_draft_is_sanitized() {
+        // AC-5: control sequences never reach the file.
+        let mut c = with_answer("evil\x1b[2J\x1b]0;pwned\x07body");
+        match c.handle_key(Key::Char('/')) {
+            Action::AuthorSpec { body, .. } => {
+                assert!(!body.contains('\x1b'), "escape survived: {body:?}");
+                assert!(body.contains("evil"), "text lost: {body}");
+                assert!(body.contains("body"), "text lost: {body}");
+            }
+            other => panic!("expected AuthorSpec, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn the_author_key_does_not_steal_typed_text() {
+        // The reason the key is '/' and not a letter: a command must not
+        // eat the first character of a question.
+        let mut c = with_answer("something");
+        for ch in "secret plan".chars() {
+            c.handle_key(Key::Char(ch));
+        }
+        assert_eq!(c.selected_project().unwrap().input, "secret plan");
     }
 }
