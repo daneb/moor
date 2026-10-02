@@ -44,6 +44,10 @@ pub trait Host {
     /// The newest gate evidence for a spec, as keel wrote it. Empty string
     /// when there is none to read.
     fn gate_output(&self, project: &str, slug: &str) -> Result<String>;
+    /// Write an agent answer out as a recipe draft for this project, on
+    /// *this machine* — never by asking the sandbox to author its own
+    /// spec. Returns the line to show the operator.
+    fn author_spec(&self, project: &str, body: &str) -> Result<String>;
 }
 
 /// The three keel artifacts, and where they live inside a sandbox. Same
@@ -196,6 +200,48 @@ impl Host for Docker {
         let (status, out) = proc::run_capture("docker", &args)?;
         audit::log_exec(project, &m, "studio", &argv, status.code())?;
         Ok(out)
+    }
+
+    fn author_spec(&self, project: &str, body: &str) -> Result<String> {
+        let m = self.manifest(project)?;
+        let stamp = chrono::Local::now().format("%Y%m%d-%H%M%S");
+        let dest = std::path::PathBuf::from(format!("{project}-{stamp}.recipe.md"));
+        // Host-side: a plain file write on this machine. No `docker exec`,
+        // no agent turn — the sandbox is never asked to write its own spec.
+        // `emit_recipe` parses before it installs and discards its temp
+        // file when it does not parse, so a failed parse is kept here as a
+        // `.draft` the operator can fix instead of being lost.
+        let (note, ok) = match session::emit_recipe(&dest, body) {
+            Ok(()) => (
+                format!(
+                    "wrote {} — take it on with:  moor recipe {project} {}",
+                    dest.display(),
+                    dest.display()
+                ),
+                true,
+            ),
+            Err(e) => {
+                let draft = dest.with_extension("draft");
+                std::fs::write(&draft, body)
+                    .with_context(|| format!("keeping the draft at {}", draft.display()))?;
+                (
+                    format!(
+                        "that answer is not a valid recipe, so it was kept as {} instead: {e:#}",
+                        draft.display()
+                    ),
+                    false,
+                )
+            }
+        };
+        // Recorded by the same writer every other host action uses, so the
+        // console still opens no log of its own.
+        let argv = vec![
+            "studio-author".to_string(),
+            dest.display().to_string(),
+            if ok { "written" } else { "draft" }.to_string(),
+        ];
+        audit::log_exec(project, &m, "studio", &argv, Some(0))?;
+        Ok(note)
     }
 }
 
@@ -384,6 +430,16 @@ pub fn run(names: Vec<String>) -> Result<()> {
                 console.note(&project, &format!("rejected '{slug}': {}", out.trim()));
                 console.refresh(&host)?;
             }
+            Action::AuthorSpec { project, body } => {
+                // Through the host, like every other action: the host is
+                // what records it, so the console still opens no log of
+                // its own.
+                let note = match host.author_spec(&project, &body) {
+                    Ok(note) => note,
+                    Err(e) => format!("could not author from that answer: {e:#}"),
+                };
+                console.note(&project, &note);
+            }
             Action::EditArtifact {
                 project,
                 slug,
@@ -438,6 +494,7 @@ pub mod tests {
         pub approvals: Mutex<Vec<Vec<String>>>,
         pub rejections: Mutex<Vec<Vec<String>>>,
         pub gate_json: Mutex<String>,
+        pub authored: Mutex<Vec<(String, String)>>,
     }
 
     impl FakeHost {
@@ -454,6 +511,7 @@ pub mod tests {
                 approvals: Mutex::new(vec![]),
                 rejections: Mutex::new(vec![]),
                 gate_json: Mutex::new(String::new()),
+                authored: Mutex::new(vec![]),
             }
         }
 
@@ -551,6 +609,14 @@ pub mod tests {
 
         fn gate_output(&self, _project: &str, _slug: &str) -> Result<String> {
             Ok(self.gate_json.lock().unwrap().clone())
+        }
+
+        fn author_spec(&self, project: &str, body: &str) -> Result<String> {
+            self.authored
+                .lock()
+                .unwrap()
+                .push((project.to_string(), body.to_string()));
+            Ok(format!("wrote a recipe draft for {project}"))
         }
     }
 
@@ -785,5 +851,92 @@ pub mod tests {
         let Event::TurnDone { failed, text, .. } = rx.recv_timeout(Duration::from_secs(5)).unwrap();
         assert!(failed);
         assert!(text.contains("not running"));
+    }
+    // --- studio-authoring (SPEC-0014), host side -----------------------
+
+    #[test]
+    fn unparseable_answer_stays_a_draft() {
+        // AC-3: a body that is not a recipe is kept as a .draft rather
+        // than installed. Exercised against the real emit_recipe guard in
+        // a temp dir, so the parse is the real one.
+        let dir = std::env::temp_dir().join(format!(
+            "moor-author-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        std::fs::create_dir_all(&dir).unwrap();
+        let dest = dir.join("x.recipe.md");
+        let bad = "this is prose, not a recipe with front matter";
+        assert!(session::emit_recipe(&dest, bad).is_err());
+        assert!(!dest.exists(), "a non-recipe must not be installed");
+        // What the handler then does with it: keep it.
+        let draft = dest.with_extension("draft");
+        std::fs::write(&draft, bad).unwrap();
+        assert_eq!(std::fs::read_to_string(&draft).unwrap(), bad);
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn drafted_spec_names_the_next_command() {
+        // AC-4: the note tells the operator the command that takes it on.
+        let host = FakeHost::new();
+        let note = host
+            .author_spec("alpha", "---\nslug: x\n---\nbody")
+            .unwrap();
+        assert!(note.contains("alpha"), "{note}");
+        // The Docker host's note names `moor recipe`; assert the source
+        // carries it, since the real write is not run in a unit test.
+        let code = include_str!("mod.rs").split("#[cfg(test)]").next().unwrap();
+        assert!(
+            code.contains("moor recipe {project}"),
+            "the note must name the next command"
+        );
+    }
+
+    #[test]
+    fn authoring_is_recorded() {
+        // AC-6: recorded by the same writer every other host action uses,
+        // and *not* by studio opening a log of its own — which
+        // `console_writes_no_second_log` enforces structurally.
+        let code = include_str!("mod.rs").split("#[cfg(test)]").next().unwrap();
+        let author = code
+            .split("fn author_spec(&self, project: &str, body: &str) -> Result<String> {")
+            .nth(1)
+            .expect("the Docker host implements author_spec");
+        let body = &author[..author.find("\n    }").unwrap_or(author.len())];
+        assert!(
+            body.contains("audit::log_exec"),
+            "authoring must be recorded through the existing writer"
+        );
+        assert!(
+            body.contains("studio-author"),
+            "the record must name the action"
+        );
+    }
+
+    #[test]
+    fn draft_is_written_by_the_host() {
+        // AC-7: a local file write, never a docker exec and never an agent
+        // turn — the sandbox is not asked to author its own spec.
+        let code = include_str!("mod.rs").split("#[cfg(test)]").next().unwrap();
+        let author = code
+            .split("fn author_spec(&self, project: &str, body: &str) -> Result<String> {")
+            .nth(1)
+            .expect("the Docker host implements author_spec");
+        let body = &author[..author.find("\n    }").unwrap_or(author.len())];
+        assert!(
+            body.contains("session::emit_recipe"),
+            "the draft goes through the parse-before-write guard"
+        );
+        assert!(
+            !body.contains("\"exec\""),
+            "authoring must not exec into the sandbox"
+        );
+        assert!(
+            !body.contains("run_turn"),
+            "authoring must not spend an agent turn"
+        );
     }
 }

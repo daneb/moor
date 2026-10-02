@@ -1,0 +1,11 @@
+{
+  "schema": "keel.run/1",
+  "id": "2026-10-02-004",
+  "spec": "studio-authoring",
+  "keel_version": "0.11.1",
+  "store_hash": "965d7ea6966b649618643e1e0632d6632d0417eb2167ae3b46044b7bcd214d61",
+  "started_at": "2026-10-02T10:09:54.710951+02:00",
+  "finished_at": "2026-10-02T10:10:03.124804+02:00",
+  "verdict": "fail",
+  "base_commit": "0b7c96448c269fbe96dd2625d58cae9f06155e1e"
+}
