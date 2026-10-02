@@ -13,6 +13,7 @@ pub enum Agent {
     #[default]
     Claude,
     Copilot,
+    Kiro,
 }
 
 impl FromStr for Agent {
@@ -21,7 +22,10 @@ impl FromStr for Agent {
         match s.trim().to_ascii_lowercase().as_str() {
             "claude" => Ok(Agent::Claude),
             "copilot" => Ok(Agent::Copilot),
-            other => anyhow::bail!("unknown agent '{other}' — expected 'claude' or 'copilot'"),
+            "kiro" => Ok(Agent::Kiro),
+            other => {
+                anyhow::bail!("unknown agent '{other}' — expected 'claude', 'copilot' or 'kiro'")
+            }
         }
     }
 }
