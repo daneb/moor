@@ -34,6 +34,13 @@ Running these for real, not just writing the YAML, found genuine bugs:
 - **npm's own vendored dependencies** (`tar`, `minimatch`, `glob`, `cross-spawn`, `brace-expansion`, `pacote`, `sigstore`) carried multiple HIGH/CRITICAL CVEs, all with fixes already published — the Node 22 + npm 11 bump above resolved every one at the time. Later, `brace-expansion` and `undici` (both transitive deps *inside* npm's own tree) picked up fresh HIGH DoS CVEs that no released npm version bundles the fix for yet; the base Dockerfile now drops the patched releases directly into `npm/node_modules/` (see docs/IMAGES.md, "Fixing CVEs in npm's own vendored deps"). Net result, verified: zero fixable HIGH/CRITICAL findings across every image, via `trivy --ignore-unfixed`, no ignore file.
 - **`tests/e2e.sh`'s own cleanup trap never deleted the `claude-state` volume** (added earlier for the Claude Code auth fix) or matched the real export-bundle filename pattern — both fixed; four `$? `-after-the-fact exit-code checks refactored to capture-then-check (shellcheck `SC2181`); the bundle-discovery `ls -t | head -1` replaced with a pure-bash glob (shellcheck's suggested `find` doesn't work reliably in every shell environment — verified directly, see the commit history around this point).
 
+## What evidence is kept
+
+Raw run evidence under `.keel/runs/` is local working state; what gets
+committed is a verified bundle per run (`make evidence`). The reasoning,
+the measured numbers, and the one-time migration are in
+[EVIDENCE.md](EVIDENCE.md).
+
 ## What's deliberately ignored, and why
 
 Real problems got fixed above; these are narrow, documented, non-default suppressions — see `.hadolint.yaml` and `.gitleaks.toml` for the exact list and reasoning inline:
