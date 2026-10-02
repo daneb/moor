@@ -8,7 +8,7 @@
 //! the operator ever sees the answer, resumable across turns, and
 //! tool-bounded by role. See docs/decisions/0008-agent-session-protocol.md.
 
-use crate::{audit, manifest::Manifest, paths, proc};
+use crate::{audit, manifest::Agent, manifest::Manifest, paths, proc};
 use anyhow::{Context, Result};
 use serde::Deserialize;
 use serde_json::json;
@@ -126,6 +126,72 @@ pub fn deny_shell_argv() -> Vec<String> {
     argv
 }
 
+/// How an agent's output is shaped.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OutputShape {
+    /// A JSON envelope with `is_error`/`result`/`session_id` (claude).
+    Json,
+    /// The response on stdout, with no envelope (copilot, kiro).
+    PlainText,
+}
+
+/// Everything that differs between the agents moor can hold a turn with.
+/// One table, so the behaviours below are pure functions of it and no
+/// agent-specific literal survives anywhere else.
+#[derive(Debug, Clone)]
+pub struct AgentProfile {
+    /// The command and the flags that put it in non-interactive mode.
+    pub argv_prefix: &'static [&'static str],
+    /// The flag that *auto-approves* a tool set. Not a restriction — see
+    /// `Role::denied_tools` and ADR-0008.
+    pub allow_flag: Option<&'static str>,
+    /// The flag that actually *denies* tools. `None` means this agent has
+    /// no denial mechanism, so a restricted role cannot be run on it.
+    pub deny_flag: Option<&'static str>,
+    /// The flag that resumes a prior session, if the agent has one.
+    pub resume_flag: Option<&'static str>,
+    pub output: OutputShape,
+    /// What to tell the operator when a turn fails for want of a
+    /// credential.
+    pub auth_hint: &'static str,
+}
+
+/// The profile for an agent. Verified against each CLI's own `--help`:
+/// claude has `--allowedTools`/`--disallowedTools`; copilot has
+/// `--allow-tool`/`--deny-tool`; kiro has only `--trust-tools` (trust
+/// *these*), whose semantics are the auto-approval that ADR-0008 showed
+/// does not restrain — so kiro's `deny_flag` is deliberately `None`.
+pub fn profile(agent: Agent) -> AgentProfile {
+    match agent {
+        Agent::Claude => AgentProfile {
+            argv_prefix: &["claude", "--print", "--output-format", "json"],
+            allow_flag: Some("--allowedTools"),
+            deny_flag: Some("--disallowedTools"),
+            resume_flag: Some("--resume"),
+            output: OutputShape::Json,
+            auth_hint: "this sandbox has no Claude Code credential — store one with `moor secrets set <project> CLAUDE_CODE_OAUTH_TOKEN` (from `claude setup-token` on the host), then `moor up <project>`.",
+        },
+        Agent::Copilot => AgentProfile {
+            argv_prefix: &["copilot", "-p"],
+            allow_flag: Some("--allow-tool"),
+            deny_flag: Some("--deny-tool"),
+            resume_flag: Some("--resume"),
+            output: OutputShape::PlainText,
+            auth_hint: "this sandbox has no usable Copilot credential — run `copilot /login` on the host (device flow; a personal access token will not work), then `moor up <project>`.",
+        },
+        Agent::Kiro => AgentProfile {
+            argv_prefix: &["kiro-cli", "chat", "--no-interactive"],
+            allow_flag: Some("--trust-tools"),
+            // No denial mechanism: `--trust-tools` is an auto-approval
+            // list, not a restriction.
+            deny_flag: None,
+            resume_flag: None,
+            output: OutputShape::PlainText,
+            auth_hint: "this sandbox has no Kiro credential — run `kiro-cli login` on the host, then `moor up <project>`.",
+        },
+    }
+}
+
 /// The fields of `claude --print --output-format json` this depends on,
 /// verified directly against the image's Claude Code 2.1.270 rather than
 /// assumed. `subtype` is deliberately absent: a failed turn there returned
@@ -145,9 +211,19 @@ pub struct TurnResult {
     pub permission_denials: Vec<serde_json::Value>,
 }
 
-pub fn parse_turn(stdout: &str) -> Result<TurnResult> {
-    serde_json::from_str(stdout.trim())
-        .with_context(|| format!("parsing `claude --output-format json` output:\n{stdout}"))
+/// Read a turn's result in the selected agent's own output shape. A
+/// plain-text agent emits the response and nothing else, so its stdout
+/// *is* the result — parsing it as JSON would fail a perfectly good turn.
+pub fn parse_turn(agent: Agent, stdout: &str) -> Result<TurnResult> {
+    match profile(agent).output {
+        OutputShape::Json => serde_json::from_str(stdout.trim())
+            .with_context(|| format!("parsing `--output-format json` output:\n{stdout}")),
+        OutputShape::PlainText => Ok(TurnResult {
+            is_error: false,
+            result: stdout.trim().to_string(),
+            ..Default::default()
+        }),
+    }
 }
 
 /// A turn failed if it says so, whatever the process exit status said.
@@ -216,6 +292,7 @@ fn append_turn_to(path: &Path, turn: &ChainedTurn) -> Result<audit::ChainEntry> 
         "agent-turn",
         json!({
             "project": turn.project,
+            "agent": format!("{:?}", turn.agent).to_lowercase(),
             "role": turn.role.as_str(),
             "tools": turn.role.tools(),
             "session_id": turn.session_id,
@@ -235,6 +312,8 @@ fn append_turn_to(path: &Path, turn: &ChainedTurn) -> Result<audit::ChainEntry> 
 /// them.
 struct ChainedTurn<'a> {
     project: &'a str,
+    /// Which agent produced the turn, so the trail distinguishes them.
+    agent: Agent,
     role: Role,
     session_id: Option<&'a str>,
     prompt: &'a str,
@@ -281,11 +360,16 @@ fn write_transcript(
 /// did exactly the same thing to `moor ask` in live use, reporting the
 /// prompt as a missing config file ("MCP config file not found:
 /// /workspace/say ok").
+/// Every agent's tool/config flags take `<thing...>`, so each must land
+/// *after* the positional prompt. `build_turn_argv` guarantees that
+/// structurally (prompt first, then all flags), and the test below asserts
+/// it against this list for every agent.
 pub const VARIADIC_FLAGS: &[&str] = &[
     "--allowedTools",
-    "--allowed-tools",
     "--disallowedTools",
-    "--disallowed-tools",
+    "--allow-tool",
+    "--deny-tool",
+    "--trust-tools",
     "--mcp-config",
 ];
 
@@ -293,15 +377,18 @@ pub const VARIADIC_FLAGS: &[&str] = &[
 /// variadic flag. `--resume <session-id>` takes exactly one value (checked
 /// against `claude --help`, and against a live container) so it sits with
 /// the single-value flags ahead of the prompt.
-pub fn build_turn_argv(role: Role, prompt: &str, resume: Option<&str>) -> Vec<String> {
-    let mut argv: Vec<String> = vec![
-        "claude".into(),
-        "--print".into(),
-        "--output-format".into(),
-        "json".into(),
-    ];
-    if let Some(id) = resume {
-        argv.push("--resume".into());
+pub fn build_turn_argv(
+    agent: Agent,
+    role: Role,
+    prompt: &str,
+    resume: Option<&str>,
+) -> Vec<String> {
+    let p = profile(agent);
+    let mut argv: Vec<String> = p.argv_prefix.iter().map(|s| s.to_string()).collect();
+    // Single-value flags first: these take exactly one value, so they are
+    // safe ahead of the positional prompt.
+    if let (Some(flag), Some(id)) = (p.resume_flag, resume) {
+        argv.push(flag.to_string());
         argv.push(id.to_string());
     }
     // The prompt, and then every variadic flag — in that order, which is
@@ -310,17 +397,21 @@ pub fn build_turn_argv(role: Role, prompt: &str, resume: Option<&str>) -> Vec<St
     // remember: a new variadic flag gets added to this table, and lands on
     // the correct side of the prompt by construction.
     argv.push(prompt.to_string());
-    let variadic: [(&str, Vec<String>); 3] = [
-        ("--mcp-config", vec![MCP_CONFIG.to_string()]),
-        (
-            "--allowedTools",
-            role.tools().iter().map(|t| t.to_string()).collect(),
-        ),
-        (
-            "--disallowedTools",
+    let mut variadic: Vec<(&str, Vec<String>)> = Vec::new();
+    // The MCP server is how a turn reaches keel; only agents that take an
+    // --mcp-config get it.
+    if agent == Agent::Claude {
+        variadic.push(("--mcp-config", vec![MCP_CONFIG.to_string()]));
+    }
+    if let Some(flag) = p.allow_flag {
+        variadic.push((flag, role.tools().iter().map(|t| t.to_string()).collect()));
+    }
+    if let Some(flag) = p.deny_flag {
+        variadic.push((
+            flag,
             role.denied_tools().iter().map(|t| t.to_string()).collect(),
-        ),
-    ];
+        ));
+    }
     for (flag, values) in variadic {
         debug_assert!(
             VARIADIC_FLAGS.contains(&flag),
@@ -332,26 +423,45 @@ pub fn build_turn_argv(role: Role, prompt: &str, resume: Option<&str>) -> Vec<St
     argv
 }
 
-/// Translate an agent failure moor can recognise into the command that
-/// fixes it. Claude Code reports a missing credential as "Not logged in ·
-/// Please run /login" — accurate for an interactive session, and useless
-/// here: there is no interactive session to run `/login` in, and the fix
-/// is host-side. Secrets are scoped per project+secret pair, so a token
-/// stored for one project says nothing about another.
-pub fn failure_hint(project: &str, text: &str) -> Option<String> {
-    if text.contains("Not logged in") || text.contains("/login") {
-        return Some(format!(
-            "this sandbox has no Claude Code credential. `/login` can't help — auth is \
-             injected from the host at `moor up` (ADR-0002). Check where it resolves from:\n\n    \
-             moor secrets status {project}\n\n\
-             then store one and recreate the container so it gets injected:\n\n    \
-             moor secrets set {project} CLAUDE_CODE_OAUTH_TOKEN\n    \
-             moor up {project}\n\n\
-             The value comes from `claude setup-token` on the host; the same token works \
-             for every project, but has to be set per project."
-        ));
+/// Translate an agent failure moor can recognise into the fix for *that*
+/// agent. Every one of them reports a missing credential as some variant
+/// of "not logged in", and every one has a different remedy — Claude's is
+/// an injected token, Copilot's is a host device-flow login, Kiro's is
+/// `kiro-cli login`. The interactive advice each CLI prints ("run
+/// /login") is useless inside the sandbox, where there is no interactive
+/// session and the fix is host-side.
+pub fn failure_hint(agent: Agent, project: &str, text: &str) -> Option<String> {
+    let looks_like_auth = text.contains("Not logged in")
+        || text.contains("/login")
+        || text.contains("not authenticated")
+        || text.contains("Unauthorized");
+    if !looks_like_auth {
+        return None;
     }
-    None
+    let hint = profile(agent).auth_hint.replace("<project>", project);
+    Some(format!(
+        "{hint}\n\nWhere each secret resolves from:\n\n    moor secrets status {project}"
+    ))
+}
+
+/// Refuse a role whose restriction this agent cannot express. A role that
+/// denies tools is only restricted if the agent has a denial flag; without
+/// one the turn would run with everything available, which is the opposite
+/// of what the role asked for.
+pub fn refuse_unrestrainable_role(agent: Agent, role: Role) -> Result<()> {
+    if role.denied_tools().is_empty() {
+        return Ok(());
+    }
+    if profile(agent).deny_flag.is_some() {
+        return Ok(());
+    }
+    anyhow::bail!(
+        "the '{}' role withholds tools, but the {agent:?} agent has no way to deny them — \
+         running it would give the turn every tool instead.\n\n\
+         Use an agent that can deny tools (claude, copilot) for this role, \
+         or run this step with `keel run --driver` instead.",
+        role.as_str()
+    )
 }
 
 /// Turn a turn that produced no parseable JSON into something an operator
@@ -464,14 +574,18 @@ pub fn run_turn(project: &str, role: Role, prompt: &str, new_session: bool) -> R
     } else {
         read_session_id(&session_path)
     };
-    let argv = build_turn_argv(role, prompt, resume.as_deref());
+    // A restricted role on an agent with no way to deny tools would run
+    // unrestricted — ADR-0008 established that an allow-list alone does
+    // not restrain. Refuse rather than silently widen the role.
+    refuse_unrestrainable_role(m.agent, role)?;
+    let argv = build_turn_argv(m.agent, role, prompt, resume.as_deref());
 
     let container = m.sandbox_container();
     let mut args: Vec<&str> = vec!["exec", &container];
     args.extend(argv.iter().map(String::as_str));
     let (status, out, err) = proc::run_capture_split("docker", &args)?;
 
-    let turn = parse_turn(&out).map_err(|e| unparseable_turn(project, &out, &err, e))?;
+    let turn = parse_turn(m.agent, &out).map_err(|e| unparseable_turn(project, &out, &err, e))?;
     let failed = turn_failed(&turn, status.success());
     let session_id = next_session_id(&turn);
 
@@ -481,6 +595,7 @@ pub fn run_turn(project: &str, role: Role, prompt: &str, new_session: bool) -> R
         &paths::chain_log_path(project)?,
         &ChainedTurn {
             project,
+            agent: m.agent,
             role,
             session_id: session_id.as_deref(),
             prompt,
@@ -501,7 +616,7 @@ pub fn run_turn(project: &str, role: Role, prompt: &str, new_session: bool) -> R
     }
 
     let hint = failed
-        .then(|| failure_hint(project, &turn.result))
+        .then(|| failure_hint(m.agent, project, &turn.result))
         .flatten();
     Ok(TurnOutcome {
         text: turn.result,
@@ -597,14 +712,19 @@ mod tests {
             );
         }
         // The deny list reaches the argv, or it is decoration.
-        let argv = build_turn_argv(Role::Brainstorm, "think about this", None);
+        let argv = build_turn_argv(Agent::Claude, Role::Brainstorm, "think about this", None);
         let at = argv.iter().position(|a| a == "--disallowedTools").unwrap();
         for forbidden in ["Bash", "Write", "Edit", "Task"] {
             assert!(argv[at..].iter().any(|a| a == forbidden));
         }
         // And the granted set in the argv is exactly the role's — the
         // values of `--allowedTools` up to whatever flag comes next.
-        let argv = build_turn_argv(Role::Brainstorm, "what should we change?", None);
+        let argv = build_turn_argv(
+            Agent::Claude,
+            Role::Brainstorm,
+            "what should we change?",
+            None,
+        );
         let at = argv.iter().position(|a| a == "--allowedTools").unwrap();
         let granted: Vec<&String> = argv[at + 1..]
             .iter()
@@ -651,7 +771,7 @@ mod tests {
             "session_id": "not-a-uuid",
         })
         .to_string();
-        let turn = parse_turn(&smuggled).unwrap();
+        let turn = parse_turn(Agent::Claude, &smuggled).unwrap();
         assert_eq!(next_session_id(&turn), None);
         assert!(turn.result.contains("11111111-2222-3333-4444-555555555555"));
     }
@@ -667,7 +787,7 @@ mod tests {
             "3f2504e0-4f89-11d3-9a0c-0305e82c3301",
             "boom",
         );
-        let turn = parse_turn(&raw).unwrap();
+        let turn = parse_turn(Agent::Claude, &raw).unwrap();
         assert!(turn.is_error);
         assert!(
             turn_failed(&turn, true),
@@ -676,12 +796,15 @@ mod tests {
         assert!(!raw.contains("\"subtype\": \"error\""));
 
         // A clean turn is a success; a non-zero exit is still a failure.
-        let ok = parse_turn(&result_json(
-            false,
-            "success",
-            "3f2504e0-4f89-11d3-9a0c-0305e82c3301",
-            "done",
-        ))
+        let ok = parse_turn(
+            Agent::Claude,
+            &result_json(
+                false,
+                "success",
+                "3f2504e0-4f89-11d3-9a0c-0305e82c3301",
+                "done",
+            ),
+        )
         .unwrap();
         assert!(!turn_failed(&ok, true));
         assert!(turn_failed(&ok, false));
@@ -693,18 +816,22 @@ mod tests {
         let path = temp_path("chain", "jsonl");
         let prompt = "the operator's private plan for the quarter";
         let response = "here is what I would do, in detail";
-        let turn = parse_turn(&result_json(
-            false,
-            "success",
-            "3f2504e0-4f89-11d3-9a0c-0305e82c3301",
-            response,
-        ))
+        let turn = parse_turn(
+            Agent::Claude,
+            &result_json(
+                false,
+                "success",
+                "3f2504e0-4f89-11d3-9a0c-0305e82c3301",
+                response,
+            ),
+        )
         .unwrap();
 
         let entry = append_turn_to(
             &path,
             &ChainedTurn {
                 project: "sample",
+                agent: Agent::Claude,
                 role: Role::Brainstorm,
                 session_id: Some("3f2504e0-4f89-11d3-9a0c-0305e82c3301"),
                 prompt,
@@ -812,7 +939,7 @@ mod tests {
     fn no_role_can_reach_a_shell_or_a_subagent() {
         for role in [Role::Brainstorm, Role::Build] {
             let denied = role.denied_tools();
-            let argv = build_turn_argv(role, "do the thing", None);
+            let argv = build_turn_argv(Agent::Claude, role, "do the thing", None);
             let at = argv
                 .iter()
                 .position(|a| a == "--disallowedTools")
@@ -855,7 +982,7 @@ mod tests {
         let prompt = "can we add a CI pipeline with security scans";
         for role in [Role::Brainstorm, Role::Build] {
             for resume in [None, Some("3f2504e0-4f89-11d3-9a0c-0305e82c3301")] {
-                let argv = build_turn_argv(role, prompt, resume);
+                let argv = build_turn_argv(Agent::Claude, role, prompt, resume);
                 let at_prompt = argv
                     .iter()
                     .position(|a| a == prompt)
@@ -884,7 +1011,7 @@ mod tests {
     /// earlier in the line could have absorbed.
     #[test]
     fn mcp_config_is_the_value_of_its_own_flag() {
-        let argv = build_turn_argv(Role::Build, "go", None);
+        let argv = build_turn_argv(Agent::Claude, Role::Build, "go", None);
         let at = argv.iter().position(|a| a == "--mcp-config").unwrap();
         assert_eq!(argv[at + 1], MCP_CONFIG);
     }
@@ -893,7 +1020,7 @@ mod tests {
     /// `claude`'s own words, not a JSON parse error about column 0.
     #[test]
     fn an_empty_turn_reports_what_claude_actually_said() {
-        let parse_err = parse_turn("").unwrap_err();
+        let parse_err = parse_turn(Agent::Claude, "").unwrap_err();
         let stderr = "Error: Invalid MCP configuration:\nMCP config file not found: /etc/moor/mcp-config.json";
         let reported = format!("{:?}", unparseable_turn("personil", "", stderr, parse_err));
         // Names the cause and the exact command that fixes it.
@@ -907,7 +1034,7 @@ mod tests {
         );
 
         // Any other silent failure still surfaces stderr verbatim.
-        let parse_err = parse_turn("").unwrap_err();
+        let parse_err = parse_turn(Agent::Claude, "").unwrap_err();
         let reported = format!(
             "{:?}",
             unparseable_turn("demo", "", "Error: Invalid API key", parse_err)
@@ -917,7 +1044,7 @@ mod tests {
 
         // Output that is present but not JSON keeps the parse error and
         // adds stderr rather than replacing it.
-        let parse_err = parse_turn("not json").unwrap_err();
+        let parse_err = parse_turn(Agent::Claude, "not json").unwrap_err();
         let reported = format!(
             "{:?}",
             unparseable_turn("demo", "not json", "a warning", parse_err)
@@ -929,6 +1056,7 @@ mod tests {
     #[test]
     fn resume_is_passed_through_when_there_is_a_stored_session() {
         let argv = build_turn_argv(
+            Agent::Claude,
             Role::Build,
             "carry on",
             Some("3f2504e0-4f89-11d3-9a0c-0305e82c3301"),
@@ -947,17 +1075,23 @@ mod tests {
     /// actually has: which command fixes this, for which project.
     #[test]
     fn a_missing_credential_points_at_the_host_side_fix() {
-        let hint = failure_hint("omniscient", "Not logged in · Please run /login")
-            .expect("a missing credential is recognised");
-        assert!(hint.contains("moor secrets set omniscient CLAUDE_CODE_OAUTH_TOKEN"));
+        let hint = failure_hint(
+            Agent::Claude,
+            "omniscient",
+            "Not logged in · Please run /login",
+        )
+        .expect("a missing credential is recognised");
+        assert!(hint.contains("CLAUDE_CODE_OAUTH_TOKEN"));
         assert!(hint.contains("moor up omniscient"));
+        // Secrets are scoped per project, so the hint names this project.
         assert!(hint.contains("moor secrets status omniscient"));
-        // Per project+secret scoping is the part that surprises people.
-        assert!(hint.contains("set per project"));
 
         // An ordinary failure gets no invented advice.
-        assert_eq!(failure_hint("demo", "I could not find that file."), None);
-        assert_eq!(failure_hint("demo", ""), None);
+        assert_eq!(
+            failure_hint(Agent::Claude, "demo", "I could not find that file."),
+            None
+        );
+        assert_eq!(failure_hint(Agent::Claude, "demo", ""), None);
     }
 
     #[test]
@@ -966,5 +1100,159 @@ mod tests {
         assert!(Role::parse("build").is_ok());
         assert!(Role::parse("approve").is_err());
         assert!(Role::parse("").is_err());
+    }
+    // --- agent-session-abstraction (SPEC-0012) --------------------------
+
+    #[test]
+    fn agent_parses_kiro() {
+        // AC-1
+        assert_eq!("kiro".parse::<Agent>().unwrap(), Agent::Kiro);
+        assert_eq!("KIRO".parse::<Agent>().unwrap(), Agent::Kiro);
+        assert!("kiro-cli".parse::<Agent>().is_err());
+    }
+
+    #[test]
+    fn turn_argv_is_per_agent() {
+        // AC-2: each agent gets its own invocation, not Claude's.
+        let claude = build_turn_argv(Agent::Claude, Role::Brainstorm, "hi", None);
+        assert_eq!(claude[0], "claude");
+        assert!(claude.contains(&"--print".to_string()));
+
+        let copilot = build_turn_argv(Agent::Copilot, Role::Brainstorm, "hi", None);
+        assert_eq!(copilot[0], "copilot");
+        assert!(copilot.contains(&"-p".to_string()));
+        assert!(!copilot.contains(&"--print".to_string()));
+
+        let kiro = build_turn_argv(Agent::Kiro, Role::Brainstorm, "hi", None);
+        assert_eq!(kiro[0], "kiro-cli");
+        assert!(kiro.contains(&"chat".to_string()));
+
+        // The prompt is present for all three, after the prefix.
+        for argv in [&claude, &copilot, &kiro] {
+            assert!(argv.contains(&"hi".to_string()), "{argv:?}");
+        }
+    }
+
+    #[test]
+    fn restricted_role_refused_without_deny_support() {
+        // AC-3: a role that withholds tools cannot run on an agent with no
+        // denial mechanism — it would run unrestricted instead.
+        assert!(!Role::Brainstorm.denied_tools().is_empty());
+        let err = refuse_unrestrainable_role(Agent::Kiro, Role::Brainstorm)
+            .expect_err("kiro has no deny flag, so a restricted role must be refused");
+        let msg = format!("{err}");
+        assert!(msg.contains("no way to deny"), "{msg}");
+        // Agents that can deny are allowed through.
+        assert!(refuse_unrestrainable_role(Agent::Claude, Role::Brainstorm).is_ok());
+        assert!(refuse_unrestrainable_role(Agent::Copilot, Role::Build).is_ok());
+    }
+
+    #[test]
+    fn deny_flag_is_per_agent() {
+        // AC-4: the deny flag, where it exists, is that agent's own.
+        let claude = build_turn_argv(Agent::Claude, Role::Brainstorm, "hi", None);
+        assert!(claude.contains(&"--disallowedTools".to_string()));
+        let copilot = build_turn_argv(Agent::Copilot, Role::Brainstorm, "hi", None);
+        assert!(copilot.contains(&"--deny-tool".to_string()));
+        assert!(!copilot.contains(&"--disallowedTools".to_string()));
+        // Kiro has none, so none is emitted.
+        let kiro = build_turn_argv(Agent::Kiro, Role::Brainstorm, "hi", None);
+        assert!(!kiro.contains(&"--deny-tool".to_string()));
+        assert!(!kiro.contains(&"--disallowedTools".to_string()));
+        // Bash is denied for every agent that can deny at all.
+        for argv in [&claude, &copilot] {
+            assert!(argv.contains(&"Bash".to_string()), "{argv:?}");
+        }
+    }
+
+    #[test]
+    fn turn_output_parsed_per_agent() {
+        // AC-5: a plain-text agent's stdout is the response, not a parse
+        // error; Claude's JSON envelope still parses as before.
+        let plain = parse_turn(Agent::Copilot, "READY\n").unwrap();
+        assert_eq!(plain.result, "READY");
+        assert!(!plain.is_error);
+        let kiro = parse_turn(Agent::Kiro, "done").unwrap();
+        assert_eq!(kiro.result, "done");
+        let json = parse_turn(
+            Agent::Claude,
+            &result_json(
+                false,
+                "success",
+                "3f2504e0-4f89-11d3-9a0c-0305e82c3301",
+                "ok",
+            ),
+        )
+        .unwrap();
+        assert_eq!(json.result, "ok");
+        // Plain text that happens to look like JSON is still just text.
+        assert!(parse_turn(Agent::Copilot, "not json").is_ok());
+        assert!(parse_turn(Agent::Claude, "not json").is_err());
+    }
+
+    #[test]
+    fn resume_form_is_per_agent() {
+        // AC-6: the resume flag is the agent's own, and an agent with no
+        // resume form omits it entirely.
+        let id = "3f2504e0-4f89-11d3-9a0c-0305e82c3301";
+        let claude = build_turn_argv(Agent::Claude, Role::Build, "go", Some(id));
+        let at = claude.iter().position(|a| a == "--resume").unwrap();
+        assert_eq!(claude[at + 1], id);
+        let copilot = build_turn_argv(Agent::Copilot, Role::Build, "go", Some(id));
+        assert!(copilot.contains(&"--resume".to_string()));
+        // Kiro declares no resume form: nothing is passed, and the id is
+        // not smuggled in some other position.
+        let kiro = build_turn_argv(Agent::Kiro, Role::Build, "go", Some(id));
+        assert!(!kiro.contains(&"--resume".to_string()));
+        assert!(!kiro.contains(&id.to_string()), "{kiro:?}");
+    }
+
+    #[test]
+    fn failure_hint_is_per_agent() {
+        // AC-7: each agent's own remedy, not Claude's for all three.
+        let auth = "not authenticated";
+        let c = failure_hint(Agent::Claude, "p", auth).unwrap();
+        assert!(c.contains("CLAUDE_CODE_OAUTH_TOKEN"), "{c}");
+        let g = failure_hint(Agent::Copilot, "p", auth).unwrap();
+        assert!(g.contains("copilot /login"), "{g}");
+        assert!(!g.contains("CLAUDE_CODE_OAUTH_TOKEN"), "{g}");
+        let k = failure_hint(Agent::Kiro, "p", auth).unwrap();
+        assert!(k.contains("kiro-cli login"), "{k}");
+        // A non-auth failure still gets no invented advice, for any agent.
+        for a in [Agent::Claude, Agent::Copilot, Agent::Kiro] {
+            assert_eq!(failure_hint(a, "p", "file not found"), None);
+        }
+    }
+
+    #[test]
+    fn turn_record_names_the_agent() {
+        // AC-8: the chain entry says which agent produced the turn.
+        let dir = std::env::temp_dir().join(format!(
+            "moor-agent-chain-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        std::fs::create_dir_all(&dir).unwrap();
+        let path = dir.join("chain.jsonl");
+        let result = TurnResult::default();
+        append_turn_to(
+            &path,
+            &ChainedTurn {
+                project: "sample",
+                agent: Agent::Copilot,
+                role: Role::Brainstorm,
+                session_id: None,
+                prompt: "p",
+                response: "r",
+                failed: false,
+                result: &result,
+            },
+        )
+        .unwrap();
+        let written = std::fs::read_to_string(&path).unwrap();
+        assert!(written.contains("\"agent\":\"copilot\""), "{written}");
+        let _ = std::fs::remove_dir_all(&dir);
     }
 }

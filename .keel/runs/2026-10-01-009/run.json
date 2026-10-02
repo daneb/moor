@@ -1,0 +1,11 @@
+{
+  "schema": "keel.run/1",
+  "id": "2026-10-01-009",
+  "spec": "agent-session-abstraction",
+  "keel_version": "0.11.0",
+  "store_hash": "13cd739bb32caf5984b28b0942ce4761e665660038502b5b0d13d8a1f3d73e52",
+  "started_at": "2026-10-01T22:28:41.015886+02:00",
+  "finished_at": "2026-10-01T22:28:45.242223+02:00",
+  "verdict": "fail",
+  "base_commit": "c3c1d3d22afd99dbd815e48c9def6c4aea8ab363"
+}
