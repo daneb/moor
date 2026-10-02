@@ -12,7 +12,7 @@ pub fn run(name: &str) -> Result<()> {
     // the operator does. Resolved into the env before compose_up, whose
     // own resolve_into_env then leaves this already-set var alone.
     let m = Manifest::load(&paths::manifest_path(name)?)?;
-    secrets::resolve_copilot_device_token(name, m.agent == Agent::Copilot);
+    secrets::resolve_copilot_device_token(name, m.agent() == Agent::Copilot);
     super::compose_up(name)?;
     println!("'{name}' is up.\n");
     println!("{}", super::next_cmd::next_hint(name));
