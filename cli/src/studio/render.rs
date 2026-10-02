@@ -130,7 +130,7 @@ pub fn wrap(text: &str, width: usize) -> Vec<String> {
 /// what the console would draw can be asserted on directly.
 pub fn frame(c: &Console, width: usize, height: usize) -> String {
     let mut out = String::new();
-    out.push_str(&format!("{BOLD}{CYAN}moor studio{RESET}{DIM}  ↑/↓ project · type to ask · Enter send · e edit · a approve · r refresh · q quit{RESET}\n\n"));
+    out.push_str(&format!("{BOLD}{CYAN}moor studio{RESET}{DIM}  ↑/↓ project · type to ask · Enter send · e edit · a approve · x reject · r refresh · q quit{RESET}\n\n"));
 
     for (i, p) in c.projects.iter().enumerate() {
         let marker = if i == c.selected { REVERSE } else { "" };
@@ -150,6 +150,14 @@ pub fn frame(c: &Console, width: usize, height: usize) -> String {
             "{marker} {:<24}{RESET} {state}  {stage}\n",
             p.name
         ));
+        // What the last gate actually failed on. Sanitized like every
+        // other string that came out of a sandbox.
+        for check in &p.failing_checks {
+            for line in wrap(&format!("    {RED}✗{RESET} {}", sanitize(check)), width) {
+                out.push_str(&line);
+                out.push('\n');
+            }
+        }
     }
     out.push('\n');
 
@@ -162,6 +170,32 @@ pub fn frame(c: &Console, width: usize, height: usize) -> String {
     {
         out.push_str(&format!(
             "{RED}{BOLD}approve {stage} stage of '{slug}' in project '{project}'? press y to confirm, any other key cancels{RESET}\n\n"
+        ));
+    }
+
+    if let Approval::Rejecting {
+        slug,
+        stage,
+        reason,
+        ..
+    } = &c.approval
+    {
+        out.push_str(&format!(
+            "{RED}{BOLD}reject {stage} stage of '{slug}' — why? {RESET}{}{RED}{BOLD}▏{RESET}  {DIM}Enter to continue · Esc to abandon{RESET}\n\n",
+            sanitize(reason)
+        ));
+    }
+
+    if let Approval::RejectArmed {
+        slug,
+        stage,
+        reason,
+        ..
+    } = &c.approval
+    {
+        out.push_str(&format!(
+            "{RED}{BOLD}reject {stage} stage of '{slug}'?{RESET} reason: {}  {RED}{BOLD}press y to confirm, any other key cancels{RESET}\n\n",
+            sanitize(reason)
         ));
     }
 

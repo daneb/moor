@@ -2,11 +2,11 @@
 id: SPEC-0014
 slug: studio-authoring
 schema: keel.spec/1
-status: draft
+status: approved
 scope:
-  - "cli/src/studio/state.rs"
-  - "cli/src/studio/render.rs"
-  - "cli/src/studio/mod.rs"
+- cli/src/studio/state.rs
+- cli/src/studio/render.rs
+- cli/src/studio/mod.rs
 budget:
   criteria: 8
   lines: 350

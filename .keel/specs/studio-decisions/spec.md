@@ -2,14 +2,14 @@
 id: SPEC-0013
 slug: studio-decisions
 schema: keel.spec/1
-status: draft
+status: approved
 scope:
-  - "cli/src/studio/state.rs"
-  - "cli/src/studio/render.rs"
-  - "cli/src/studio/mod.rs"
+- cli/src/studio/state.rs
+- cli/src/studio/render.rs
+- cli/src/studio/mod.rs
 budget:
   criteria: 8
-  lines: 400
+  lines: 520
 verified_at: 2026-10-01
 ---
 

@@ -1,0 +1,2 @@
+cli/src/studio/state.rs: let host = crate::studio::tests::FakeHost::new()
+cli/src/studio/state.rs: let host2 = crate::studio::tests::FakeHost::new()

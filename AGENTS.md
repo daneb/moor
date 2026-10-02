@@ -1,4 +1,4 @@
-<!-- keel:generated schema=keel.projection/1 adapter=agents store=1069ef3ef7ea body=1188d94d2ef6 -->
+<!-- keel:generated schema=keel.projection/1 adapter=agents store=96cfd67a4a89 body=18cabdd8af49 -->
 <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
 
 # Project context
@@ -48,14 +48,14 @@ _Versions that cannot move, platforms that must keep working, dependencies that 
 
 ## Repository map
 
-**43 files · 693 symbols · 11532 lines** — javascript 2, rust 41
+**43 files · 704 symbols · 11669 lines** — javascript 2, rust 41
 
 Files are ordered by import-graph centrality, not alphabetically. Signatures only; read a body with the file path and line number. Per-directory detail lives in `.keel/store/map/<dir>/CODEMAP.md`.
 
 ### Layout
 
-- `cli/src/` — 12 files, 4588 lines · guide.rs, canary.rs, paths.rs
-- `cli/src/commands/` — 25 files, 4540 lines · next_cmd.rs, mod.rs, run_cmd.rs
+- `cli/src/` — 12 files, 4717 lines · guide.rs, canary.rs, manifest.rs
+- `cli/src/commands/` — 25 files, 4548 lines · next_cmd.rs, mod.rs, run_cmd.rs
 - `cli/src/studio/` — 3 files, 1806 lines · mod.rs, state.rs, render.rs
 - `docs/examples/ascii-banner/` — 1 file, 56 lines · banner.js
 - `docs/examples/ascii-banner/test/` — 1 file, 60 lines · banner.test.js
@@ -144,29 +144,29 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
 - `pub fn next_hint(name: &str) -> String` — The closing line for a command that isn't itself guided: how to ask  <sub>L153</sub>
 - `pub fn run(explicit: Option<String>, all: bool) -> Result<()>` — `moor next`: where the project's active spec stands and the one  <sub>L164</sub>
 
-**`cli/src/paths.rs`** · 122 lines · imported by 4
-- `pub fn moor_home() -> Result<PathBuf>`  <sub>L4</sub>
-- `pub fn project_dir(name: &str) -> Result<PathBuf>`  <sub>L9</sub>
-- `pub fn manifest_path(name: &str) -> Result<PathBuf>`  <sub>L13</sub>
-- `pub fn chain_log_path(name: &str) -> Result<PathBuf>` — folded-in egress verdicts, and tripwire hits all append here. See  <sub>L28</sub>
-- `pub fn egress_offset_path(name: &str) -> Result<PathBuf>` — How many raw lines of the egress gateway's access log have already  <sub>L34</sub>
-- `pub fn sink_offset_path(name: &str) -> Result<PathBuf>` — How many lines of keel's chain sink (inside the sandbox) have already  <sub>L40</sub>
-- `pub fn posture_path(name: &str) -> Result<PathBuf>` — The host's copy of the posture attestation last written into the  <sub>L46</sub>
-- `pub fn session_path(name: &str) -> Result<PathBuf>` — host-written only: nothing inside a sandbox has this path mounted, so  <sub>L53</sub>
-- `pub fn active_spec_path(name: &str) -> Result<PathBuf>` — The spec `moor next` guides this project through, when pinned with  <sub>L59</sub>
-- `pub fn transcript_path(name: &str) -> Result<PathBuf>` — chain.jsonl on purpose: the chain carries hashes and is exported by  <sub>L66</sub>
-- `pub fn current_project_path() -> Result<PathBuf>` — like `moor keel`/`moor view` don't need `--project` spelled out on  <sub>L78</sub>
-- `pub fn read_current_project() -> Result<Option<String>>`  <sub>L82</sub>
-- `pub fn write_current_project(name: &str) -> Result<()>`  <sub>L98</sub>
-- `pub fn all_project_names() -> Result<Vec<String>>`  <sub>L106</sub>
-
-**`cli/src/manifest.rs`** · 327 lines · imported by 2
+**`cli/src/manifest.rs`** · 327 lines · imported by 3
 - `pub enum Agent`  <sub>L12</sub>
 - `impl FromStr for Agent`  <sub>L18</sub>
 - `pub fn resolve_image(language_image: &str, agent: Agent) -> String` — already a copilot image, is returned unchanged. Pure — unit-tested  <sub>L35</sub>
 - `pub struct Manifest`  <sub>L59</sub>
+- `pub struct Egress`  <sub>L81</sub>
+- `pub struct Resources`  <sub>L87</sub>
+- `impl Manifest`  <sub>L103</sub>
+- `pub fn new(name: &str, image: &str) -> Self`  <sub>L104</sub>
+- `pub fn load(path: &Path) -> Result<Self>`  <sub>L138</sub>
+- `pub fn save(&self, path: &Path) -> Result<()>`  <sub>L144</sub>
+- `pub fn sandbox_container(&self) -> String`  <sub>L151</sub>
+- `pub fn egress_container(&self) -> String`  <sub>L155</sub>
+- `pub fn validate_name(name: &str) -> Result<()>` — Validate a project name: lowercase alnum + dashes, matches what's safe  <sub>L162</sub>
+- `mod tests`  <sub>L178</sub>
 
-_… 263 more lines in `.keel/store/steering/structure.md`._
+**`cli/src/paths.rs`** · 122 lines · imported by 3
+- `pub fn moor_home() -> Result<PathBuf>`  <sub>L4</sub>
+- `pub fn project_dir(name: &str) -> Result<PathBuf>`  <sub>L9</sub>
+- `pub fn manifest_path(name: &str) -> Result<PathBuf>`  <sub>L13</sub>
+- `pub fn chain_log_path(name: &str) -> Result<PathBuf>` — folded-in egress verdicts, and tripwire hits all append here. See  <sub>L28</sub>
+
+_… 264 more lines in `.keel/store/steering/structure.md`._
 
 ## What this is
 
