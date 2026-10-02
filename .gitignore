@@ -10,8 +10,23 @@
 .keel/store/map/*.sqlite-*
 .keel/store/map/index.sqlite.tmp
 
-# Evidence bundles are regenerated from runs by `keel export`.
-.keel/bundles/
+# Run evidence is local working state, not repository content. Two
+# reasons, both measured (docs/EVIDENCE.md): a run captures the
+# working-tree diff, so while runs are tracked every run's diff contains
+# the previous runs' evidence and doubles in size; and 39 runs came to 12M
+# of a 13M .keel. What gets committed instead is the bundle below, which
+# `keel cover` already treats as the artefact that covers a tree.
+.keel/runs/
+
+# The evidence chain is append-only and hash-linked, so two branches
+# always conflict in it and resolving the conflict necessarily discards
+# one side's entries — which has happened three times here. It ships
+# inside bundles, where it is verifiable, rather than being merged.
+.keel/chain.jsonl
+
+# NOT ignored: .keel/bundles/ — a bundle written by `keel export` is the
+# verified, portable evidence for a run (232K against a 1.1M raw run) and
+# is what belongs in a commit. `make evidence` writes and verifies one.
 
 # Transient: re-proposed by `keel learn` from the runs themselves.
 .keel/candidates.json

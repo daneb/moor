@@ -99,6 +99,15 @@ trivy: images ## Trivy CVE scan of every built image, fixable HIGH/CRITICAL only
 		trivy image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 moor/$$img:latest || exit 1; \
 	done
 
+.PHONY: evidence
+evidence: ## Write and verify an evidence bundle for the latest keel run (this is what gets committed — see docs/EVIDENCE.md)
+	@command -v keel >/dev/null 2>&1 || { echo "keel not found — install with: cargo install keel-harness"; exit 1; }
+	@bundle=$$(keel export | tail -1); \
+		test -n "$$bundle" || { echo "keel export wrote nothing"; exit 1; }; \
+		echo "== verifying $$bundle"; \
+		keel export --verify "$$bundle" || { echo "bundle did not verify — not committable"; exit 1; }; \
+		echo "== commit it:  git add $$bundle"
+
 .PHONY: security
 security: audit deny shellcheck hadolint gitleaks trivy ## Run every security scan (everything CI's security jobs run)
 

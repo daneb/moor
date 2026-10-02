@@ -1,4 +1,4 @@
-<!-- keel:generated schema=keel.projection/1 adapter=agents store=965d7ea6966b body=e717ea5b79f7 -->
+<!-- keel:generated schema=keel.projection/1 adapter=agents store=5f6ba5f3b50f body=94a3a5012e8d -->
 <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
 
 # Project context
@@ -48,7 +48,7 @@ _Versions that cannot move, platforms that must keep working, dependencies that 
 
 ## Repository map
 
-**43 files · 736 symbols · 12415 lines** — javascript 2, rust 41
+**43 files · 750 symbols · 12678 lines** — javascript 2, rust 41
 
 Files are ordered by import-graph centrality, not alphabetically. Signatures only; read a body with the file path and line number. Per-directory detail lives in `.keel/store/map/<dir>/CODEMAP.md`.
 
@@ -56,44 +56,44 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
 
 - `cli/src/` — 12 files, 5009 lines · guide.rs, canary.rs, manifest.rs
 - `cli/src/commands/` — 25 files, 4548 lines · next_cmd.rs, mod.rs, run_cmd.rs
-- `cli/src/studio/` — 3 files, 2260 lines · mod.rs, state.rs, render.rs
+- `cli/src/studio/` — 3 files, 2523 lines · mod.rs, state.rs, render.rs
 - `docs/examples/ascii-banner/` — 1 file, 56 lines · banner.js
 - `docs/examples/ascii-banner/test/` — 1 file, 60 lines · banner.test.js
 - `mcp/src/` — 1 file, 482 lines · main.rs
 
 ### Key files
 
-**`cli/src/studio/mod.rs`** · 789 lines · imported by 2
+**`cli/src/studio/mod.rs`** · 942 lines · imported by 2
 - `pub mod render;` — inferred from a running terminal.  <sub>L15</sub>
 - `pub mod state;`  <sub>L16</sub>
 - `pub trait Host` — Everything the console needs from outside itself. One trait, so the  <sub>L28</sub>
-- `fn artifact_path(slug: &str, artifact: &str) -> Result<String>` — The three keel artifacts, and where they live inside a sandbox. Same  <sub>L51</sub>
-- `fn write_back_argv(container: &str, path: &str) -> Vec<String>` — container whose rootfs is read-only. No bind mount is created, and none  <sub>L77</sub>
-- `pub struct Docker;` — `audit::log_exec` — the same chained-audit path `moor run` and `moor  <sub>L91</sub>
-- `pub enum Event` — A turn coming back from its own thread. Keypresses are read straight  <sub>L204</sub>
-- `pub fn spawn_turn<F>(tx: &Sender<Event>, project: String, work: F)` — goes to its own thread and reports back through the channel. The caller  <sub>L218</sub>
-- `pub fn edit_artifact(` — changed — an unmodified file is not written back, so opening one to  <sub>L241</sub>
-- `struct RawMode;` — Restores the terminal however the loop ends — clean exit, `?`, or  <sub>L288</sub>
-- `pub fn run(names: Vec<String>) -> Result<()>`  <sub>L323</sub>
-- `fn drain(console: &mut Console, rx: &Receiver<Event>)` — Fold every turn that has come back since the last pass into the  <sub>L408</sub>
-- `pub mod tests`  <sub>L420</sub>
-- `pub struct FakeHost` — refresh costs, what the write-back carries — so the boundary is  <sub>L429</sub>
+- `fn artifact_path(slug: &str, artifact: &str) -> Result<String>` — The three keel artifacts, and where they live inside a sandbox. Same  <sub>L55</sub>
+- `fn write_back_argv(container: &str, path: &str) -> Vec<String>` — container whose rootfs is read-only. No bind mount is created, and none  <sub>L81</sub>
+- `pub struct Docker;` — `audit::log_exec` — the same chained-audit path `moor run` and `moor  <sub>L95</sub>
+- `pub enum Event` — A turn coming back from its own thread. Keypresses are read straight  <sub>L250</sub>
+- `pub fn spawn_turn<F>(tx: &Sender<Event>, project: String, work: F)` — goes to its own thread and reports back through the channel. The caller  <sub>L264</sub>
+- `pub fn edit_artifact(` — changed — an unmodified file is not written back, so opening one to  <sub>L287</sub>
+- `struct RawMode;` — Restores the terminal however the loop ends — clean exit, `?`, or  <sub>L334</sub>
+- `pub fn run(names: Vec<String>) -> Result<()>`  <sub>L369</sub>
+- `fn drain(console: &mut Console, rx: &Receiver<Event>)` — Fold every turn that has come back since the last pass into the  <sub>L464</sub>
+- `pub mod tests`  <sub>L476</sub>
+- `pub struct FakeHost` — refresh costs, what the write-back carries — so the boundary is  <sub>L485</sub>
 
-**`cli/src/studio/state.rs`** · 1081 lines · imported by 2
+**`cli/src/studio/state.rs`** · 1191 lines · imported by 2
 - `pub enum Line`  <sub>L11</sub>
 - `pub fn waited(&self) -> Option<std::time::Duration>` — How long the in-flight turn has been running.  <sub>L23</sub>
 - `pub struct Project`  <sub>L39</sub>
 - `pub enum Approval`  <sub>L69</sub>
 - `pub enum Key`  <sub>L100</sub>
 - `pub enum Action`  <sub>L112</sub>
-- `struct NextSpec`  <sub>L146</sub>
-- `struct NextReport`  <sub>L155</sub>
-- `pub struct Console`  <sub>L161</sub>
-- `pub fn refresh(&mut self, host: &dyn super::Host) -> Result<()>` — sandboxes that are actually up — a stopped project has no container  <sub>L208</sub>
-- `pub fn apply_next(&mut self, project: &str, json: &str) -> Result<()>` — what files happen to exist — a displayed stage that disagrees with  <sub>L247</sub>
-- `pub fn arm_approval(&mut self)` — slug keel itself reported for it, captured now so a later selection  <sub>L331</sub>
-- `pub fn failing_checks(gate_json: &str) -> Vec<String>` — a missing or half-written evidence file is not worth failing a refresh  <sub>L610</sub>
-- `trait CheckedIndex` — Tiny helper so `send` can bail cleanly on an empty project list.  <sub>L642</sub>
+- `struct NextSpec`  <sub>L153</sub>
+- `struct NextReport`  <sub>L162</sub>
+- `pub struct Console`  <sub>L168</sub>
+- `pub fn refresh(&mut self, host: &dyn super::Host) -> Result<()>` — sandboxes that are actually up — a stopped project has no container  <sub>L215</sub>
+- `pub fn apply_next(&mut self, project: &str, json: &str) -> Result<()>` — what files happen to exist — a displayed stage that disagrees with  <sub>L254</sub>
+- `pub fn arm_approval(&mut self)` — slug keel itself reported for it, captured now so a later selection  <sub>L338</sub>
+- `pub fn failing_checks(gate_json: &str) -> Vec<String>` — a missing or half-written evidence file is not worth failing a refresh  <sub>L650</sub>
+- `trait CheckedIndex` — Tiny helper so `send` can bail cleanly on an empty project list.  <sub>L682</sub>
 
 **`cli/src/studio/render.rs`** · 390 lines · imported by 1
 - `const BOLD: &str = "\x1b[1m";`  <sub>L8</sub>

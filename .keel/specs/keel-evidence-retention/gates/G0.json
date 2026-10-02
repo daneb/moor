@@ -1,10 +1,10 @@
 {
   "schema": "keel.gate/1",
   "gate": "G0",
-  "run": "2026-10-02-004",
+  "run": "2026-10-02-006",
   "spec": "keel-evidence-retention",
   "verdict": "pass",
-  "generated_at": "2026-10-02T09:45:21.289508+02:00",
+  "generated_at": "2026-10-02T11:20:57.779115+02:00",
   "checks": [
     {
       "id": "schema",
@@ -54,7 +54,7 @@
     {
       "id": "spec-length",
       "verdict": "pass",
-      "detail": "127/250 lines"
+      "detail": "134/250 lines"
     },
     {
       "id": "scope-declared",

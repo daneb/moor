@@ -56,6 +56,13 @@ What stays tracked either way: `.keel/specs/` (spec, plan, tasks,
 approvals — small, and the human record of what was decided) and
 `.keel/store/` with its projections.
 
+The ignore oracles below pass `--no-index`. `git check-ignore` consults
+the index by default and reports an already-tracked path as *not*
+ignored, whatever the rules say — so without it these criteria could only
+pass after the migration, which is deliberately outside this change.
+`--no-index` asks the question the criteria are actually about: are the
+rules right?
+
 ## Acceptance criteria
 
 ### AC-1 Raw run evidence is not tracked
@@ -64,14 +71,14 @@ WHEN the repository's ignore rules are evaluated THE SYSTEM SHALL ignore
 `.keel/runs/`, so no run's evidence enters a commit and no run's diff can
 contain another's.
 
-oracle: cmd `git check-ignore -q .keel/runs` exit 0
+oracle: cmd `git check-ignore -q --no-index .keel/runs` exit 0
 
 ### AC-2 Verified bundles are tracked
 
 WHEN the repository's ignore rules are evaluated THE SYSTEM SHALL NOT
 ignore `.keel/bundles/`, so an exported bundle is committable.
 
-oracle: cmd `! git check-ignore -q .keel/bundles` exit 0
+oracle: cmd `! git check-ignore -q --no-index .keel/bundles` exit 0
 
 ### AC-3 The evidence chain is not tracked
 
@@ -80,7 +87,7 @@ WHEN the repository's ignore rules are evaluated THE SYSTEM SHALL ignore
 cannot be merged between branches without discarding entries; it travels
 inside bundles instead.
 
-oracle: cmd `git check-ignore -q .keel/chain.jsonl` exit 0
+oracle: cmd `git check-ignore -q --no-index .keel/chain.jsonl` exit 0
 
 ### AC-4 A bundle verifies on its own
 
