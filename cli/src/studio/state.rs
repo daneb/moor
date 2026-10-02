@@ -54,6 +54,10 @@ pub struct Project {
     /// question into another repository.
     pub input: String,
     pub transcript: Vec<Line>,
+    /// Names of the checks the project's last gate run failed, read from
+    /// keel's own gate evidence. Empty when the stage is not a failed
+    /// gate — never inferred from anything else.
+    pub failing_checks: Vec<String>,
 }
 
 /// Approval is a two-step, and the steps are different keys. A single
@@ -64,6 +68,24 @@ pub struct Project {
 #[derive(Debug, PartialEq, Eq)]
 pub enum Approval {
     Idle,
+    /// Collecting the reason for a rejection. keel records a note with a
+    /// rejection, so this cannot be a single keypress the way a cancel
+    /// could be.
+    Rejecting {
+        project: String,
+        slug: String,
+        stage: String,
+        command: Vec<String>,
+        reason: String,
+    },
+    /// A rejection with a reason, waiting on the confirming key.
+    RejectArmed {
+        project: String,
+        slug: String,
+        stage: String,
+        command: Vec<String>,
+        reason: String,
+    },
     Armed {
         project: String,
         slug: String,
@@ -101,6 +123,12 @@ pub enum Action {
         project: String,
         slug: String,
         command: Vec<String>,
+    },
+    Reject {
+        project: String,
+        slug: String,
+        command: Vec<String>,
+        note: String,
     },
     EditArtifact {
         project: String,
@@ -193,6 +221,21 @@ impl Console {
                 Ok(json) => self.apply_next(&name, &json)?,
                 Err(e) => self.status = format!("couldn't read {name}'s pipeline status: {e}"),
             }
+            // Only for a spec whose stage is a gate: everything else has no
+            // failing checks to show, and reading evidence for it would be
+            // a wasted exec per refresh.
+            let slug = self.projects[i].slug.clone();
+            let at_gate = self.projects[i]
+                .stage
+                .as_deref()
+                .is_some_and(|s| s.contains("gate"));
+            self.projects[i].failing_checks = match (slug, at_gate) {
+                (Some(slug), true) => host
+                    .gate_output(&name, &slug)
+                    .map(|json| failing_checks(&json))
+                    .unwrap_or_default(),
+                _ => vec![],
+            };
         }
         Ok(())
     }
@@ -286,6 +329,16 @@ impl Console {
     /// slug keel itself reported for it, captured now so a later selection
     /// change cannot redirect the confirmation at something else.
     pub fn arm_approval(&mut self) {
+        self.arm_decision(false);
+    }
+
+    /// Arm a decision on whatever keel says this project is waiting on,
+    /// capturing the slug and the command keel itself reported so a later
+    /// selection change cannot redirect the confirmation at something
+    /// else. `reject` picks which state it lands in; the resolution and
+    /// every refusal are identical, which is why they share this.
+    fn arm_decision(&mut self, reject: bool) {
+        let verb = if reject { "reject" } else { "approve" };
         let Some(p) = self.selected_project() else {
             return;
         };
@@ -303,11 +356,23 @@ impl Console {
             && command.get(1).map(String::as_str) == Some("approve");
         match (&p.slug, &p.stage, is_approve) {
             (Some(slug), Some(stage), true) => {
-                self.approval = Approval::Armed {
-                    project: p.name.clone(),
-                    slug: slug.clone(),
-                    stage: stage.clone(),
-                    command,
+                let (project, slug, stage) = (p.name.clone(), slug.clone(), stage.clone());
+                self.approval = if reject {
+                    self.status = "why reject? type a reason, then Enter".into();
+                    Approval::Rejecting {
+                        project,
+                        slug,
+                        stage,
+                        command,
+                        reason: String::new(),
+                    }
+                } else {
+                    Approval::Armed {
+                        project,
+                        slug,
+                        stage,
+                        command,
+                    }
                 };
             }
             (_, _, false) if p.slug.is_some() => {
@@ -316,11 +381,94 @@ impl Console {
                     p.next_command.clone().unwrap_or_else(|| "unknown".into())
                 )
             }
-            _ => self.status = "nothing to approve: keel reports no active spec here".into(),
+            _ => self.status = format!("nothing to {verb}: keel reports no active spec here"),
         }
     }
 
+    /// Keys while a rejection's reason is being typed. Enter arms it, but
+    /// only with a reason: keel records the note, and an empty one tells
+    /// the next attempt nothing.
+    fn key_while_rejecting(&mut self, key: Key) -> Action {
+        let Approval::Rejecting {
+            project,
+            slug,
+            stage,
+            command,
+            reason,
+        } = &mut self.approval
+        else {
+            return Action::None;
+        };
+        match key {
+            Key::Esc => {
+                self.approval = Approval::Idle;
+                self.status = "rejection abandoned".into();
+            }
+            Key::Backspace => {
+                reason.pop();
+            }
+            Key::Char(c) => reason.push(c),
+            Key::Enter => {
+                if reason.trim().is_empty() {
+                    self.status = "a rejection needs a reason — type why, then Enter".into();
+                    return Action::None;
+                }
+                let armed = Approval::RejectArmed {
+                    project: project.clone(),
+                    slug: slug.clone(),
+                    stage: stage.clone(),
+                    command: command.clone(),
+                    reason: reason.trim().to_string(),
+                };
+                self.approval = armed;
+                self.status = "press y to confirm the rejection".into();
+            }
+            Key::Up | Key::Down => {}
+        }
+        Action::None
+    }
+
+    /// Begin a rejection: same resolution as `arm_approval`, different
+    /// landing state.
+    pub fn arm_rejection(&mut self) {
+        self.arm_decision(true);
+    }
+
     pub fn handle_key(&mut self, key: Key) -> Action {
+        // A rejection in progress owns the keyboard: its reason is typed,
+        // so ordinary text keys must not reach the agent input, and Esc
+        // abandons it rather than quitting the console.
+        if let Approval::Rejecting { .. } = &self.approval {
+            return self.key_while_rejecting(key);
+        }
+        if let Approval::RejectArmed {
+            project,
+            slug,
+            stage,
+            command,
+            reason,
+        } = &self.approval
+        {
+            let armed = (
+                project.clone(),
+                slug.clone(),
+                stage.clone(),
+                command.clone(),
+                reason.clone(),
+            );
+            self.approval = Approval::Idle;
+            if key == Key::Char('y') {
+                self.status = format!("rejecting {} stage of '{}'", armed.2, armed.1);
+                return Action::Reject {
+                    project: armed.0,
+                    slug: armed.1,
+                    command: armed.3,
+                    note: armed.4,
+                };
+            }
+            self.status = "rejection cancelled".into();
+            return Action::None;
+        }
         // An armed approval consumes the next key, whatever it is. Only
         // `y` confirms; everything else — including another `a` — cancels,
         // so no repeated keystroke can approve a stage.
@@ -386,6 +534,10 @@ impl Console {
                     self.arm_approval();
                     return Action::None;
                 }
+                'x' => {
+                    self.arm_rejection();
+                    return Action::None;
+                }
                 'e' => return self.edit(),
                 _ => {}
             }
@@ -448,6 +600,42 @@ impl Console {
             resume: self.sessions[i].clone(),
         }
     }
+}
+
+/// The names of the checks a keel gate record reports as failed. Pure, so
+/// it is tested against real gate JSON without a container. Anything that
+/// is not a recognisable gate record yields no names rather than an error:
+/// a missing or half-written evidence file is not worth failing a refresh
+/// over.
+pub fn failing_checks(gate_json: &str) -> Vec<String> {
+    let Ok(v) = serde_json::from_str::<serde_json::Value>(gate_json.trim()) else {
+        return vec![];
+    };
+    let checks = v
+        .get("checks")
+        .and_then(|c| c.as_array())
+        .map(|a| a.as_slice())
+        .unwrap_or_default();
+    // keel's gate record names each check by `id` and its outcome by
+    // `verdict` — checked against a real G1.json rather than assumed.
+    // `detail` carries why, which is the part the operator actually needs.
+    checks
+        .iter()
+        .filter(|c| {
+            matches!(
+                c.get("verdict").and_then(|s| s.as_str()),
+                Some("fail") | Some("blocked")
+            )
+        })
+        .filter_map(|c| {
+            let id = c.get("id").and_then(|n| n.as_str())?;
+            Ok::<String, ()>(match c.get("detail").and_then(|d| d.as_str()) {
+                Some(d) if !d.trim().is_empty() => format!("{id}: {d}"),
+                _ => id.to_string(),
+            })
+            .ok()
+        })
+        .collect()
 }
 
 /// Tiny helper so `send` can bail cleanly on an empty project list.
@@ -729,5 +917,165 @@ mod tests {
             }
         }
         assert_eq!(seen, vec!["spec", "plan", "tasks"]);
+    }
+    // --- studio-decisions (SPEC-0013) ----------------------------------
+
+    /// A console with one project sitting on an approval keel reported.
+    fn awaiting_decision() -> Console {
+        let mut c = Console::new(&["alpha".to_string()]);
+        c.apply_next(
+            "alpha",
+            r#"{"specs":[{"slug":"login","stage":"spec_approval","complete":false,
+                 "command":"keel approve login --stage spec"}]}"#,
+        )
+        .unwrap();
+        c
+    }
+
+    #[test]
+    fn reject_key_collects_a_reason() {
+        // AC-1
+        let mut c = awaiting_decision();
+        assert_eq!(c.handle_key(Key::Char('x')), Action::None);
+        assert!(matches!(c.approval, Approval::Rejecting { .. }));
+        for ch in "too vague".chars() {
+            assert_eq!(c.handle_key(Key::Char(ch)), Action::None);
+        }
+        match &c.approval {
+            Approval::Rejecting { reason, .. } => assert_eq!(reason, "too vague"),
+            other => panic!("expected Rejecting, got {other:?}"),
+        }
+        // The typed reason did not leak into the agent input line.
+        assert_eq!(c.selected_project().unwrap().input, "");
+    }
+
+    #[test]
+    fn empty_reason_records_no_rejection() {
+        // AC-2
+        let mut c = awaiting_decision();
+        c.handle_key(Key::Char('x'));
+        assert_eq!(c.handle_key(Key::Enter), Action::None);
+        // Still collecting, nothing emitted, and it says why.
+        assert!(matches!(c.approval, Approval::Rejecting { .. }));
+        assert!(c.status.contains("needs a reason"), "{}", c.status);
+    }
+
+    #[test]
+    fn rejection_needs_a_second_key() {
+        // AC-3: Enter arms; only `y` records.
+        let mut c = awaiting_decision();
+        c.handle_key(Key::Char('x'));
+        for ch in "nope".chars() {
+            c.handle_key(Key::Char(ch));
+        }
+        assert_eq!(c.handle_key(Key::Enter), Action::None);
+        assert!(matches!(c.approval, Approval::RejectArmed { .. }));
+        match c.handle_key(Key::Char('y')) {
+            Action::Reject { slug, note, .. } => {
+                assert_eq!(slug, "login");
+                assert_eq!(note, "nope");
+            }
+            other => panic!("expected Reject, got {other:?}"),
+        }
+        // A non-y key cancels instead of recording.
+        let mut c2 = awaiting_decision();
+        c2.handle_key(Key::Char('x'));
+        c2.handle_key(Key::Char('z'));
+        c2.handle_key(Key::Enter);
+        assert_eq!(c2.handle_key(Key::Char('n')), Action::None);
+        assert!(matches!(c2.approval, Approval::Idle));
+    }
+
+    #[test]
+    fn escape_abandons_a_rejection() {
+        // AC-4
+        let mut c = awaiting_decision();
+        c.handle_key(Key::Char('x'));
+        c.handle_key(Key::Char('w'));
+        assert_eq!(c.handle_key(Key::Esc), Action::None); // not Quit
+        assert!(matches!(c.approval, Approval::Idle));
+        assert!(c.status.contains("abandoned"), "{}", c.status);
+    }
+
+    #[test]
+    fn rejection_uses_keels_own_command_and_note() {
+        // AC-5: keel's verbatim command, with the reason as the note.
+        let mut c = awaiting_decision();
+        c.handle_key(Key::Char('x'));
+        for ch in "needs rollback".chars() {
+            c.handle_key(Key::Char(ch));
+        }
+        c.handle_key(Key::Enter);
+        match c.handle_key(Key::Char('y')) {
+            Action::Reject { command, note, .. } => {
+                assert_eq!(command, vec!["keel", "approve", "login", "--stage", "spec"]);
+                assert_eq!(note, "needs rollback");
+            }
+            other => panic!("expected Reject, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn failing_checks_are_shown() {
+        // AC-6: the parser reads keel's real gate shape, and the frame
+        // draws the names.
+        let gate = r#"{"gate":"G1","verdict":"fail","checks":[
+            {"id":"schema","verdict":"pass","detail":"ok"},
+            {"id":"task-exit-conditions","verdict":"fail","detail":"no exit condition on T-1"},
+            {"id":"test-movement","verdict":"blocked","detail":"confirm the oracles"}]}"#;
+        let names = failing_checks(gate);
+        assert_eq!(names.len(), 2, "{names:?}");
+        assert!(names[0].starts_with("task-exit-conditions"), "{names:?}");
+        assert!(names[1].starts_with("test-movement"), "{names:?}");
+        // Not a gate record at all: no names, no error.
+        assert!(failing_checks("not json").is_empty());
+        assert!(failing_checks("").is_empty());
+
+        let mut c = Console::new(&["alpha".to_string()]);
+        c.projects[0].failing_checks = names;
+        let drawn = crate::studio::render::frame(&c, 100, 24);
+        assert!(drawn.contains("task-exit-conditions"), "{drawn}");
+    }
+
+    #[test]
+    fn failing_checks_come_through_the_host_on_refresh() {
+        // AC-6, at the boundary: refresh reads gate evidence via the Host
+        // for a spec at a gate, and only for one at a gate.
+        let gate = r#"{"gate":"G1","verdict":"fail","checks":[
+            {"id":"total-budget","verdict":"fail","detail":"446 lines"}]}"#;
+        let host = crate::studio::tests::FakeHost::new()
+            .with_running(&["alpha"])
+            .with_next(
+                r#"{"specs":[{"slug":"login","stage":"plan_gate","complete":false,
+                     "command":"keel gate g1 login"}]}"#,
+            )
+            .with_gate_json(gate);
+        let mut c = Console::new(&["alpha".to_string()]);
+        c.refresh(&host).unwrap();
+        assert_eq!(c.projects[0].failing_checks.len(), 1);
+        assert!(c.projects[0].failing_checks[0].starts_with("total-budget"));
+
+        // A spec that is not at a gate gets no gate read at all.
+        let host2 = crate::studio::tests::FakeHost::new()
+            .with_running(&["alpha"])
+            .with_next(
+                r#"{"specs":[{"slug":"login","stage":"spec_approval","complete":false,
+                     "command":"keel approve login --stage spec"}]}"#,
+            )
+            .with_gate_json(gate);
+        let mut c2 = Console::new(&["alpha".to_string()]);
+        c2.refresh(&host2).unwrap();
+        assert!(c2.projects[0].failing_checks.is_empty());
+    }
+
+    #[test]
+    fn gate_output_is_sanitized() {
+        // AC-7: a hostile check name cannot address the terminal.
+        let mut c = Console::new(&["alpha".to_string()]);
+        c.projects[0].failing_checks = vec!["evil\x1b[2J\x1b]0;pwned\x07check".to_string()];
+        let drawn = crate::studio::render::frame(&c, 100, 24);
+        assert!(!drawn.contains("\x1b[2J"), "escape survived: {drawn:?}");
+        assert!(!drawn.contains("\x1b]0;"), "OSC survived: {drawn:?}");
+        assert!(drawn.contains("evil"), "text lost: {drawn}");
     }
 }

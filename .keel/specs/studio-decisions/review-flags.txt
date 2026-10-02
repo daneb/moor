@@ -1,0 +1,3 @@
+cli/src/studio/state.rs: let host = crate::studio::tests::FakeHost::new()
+cli/src/studio/state.rs: let host2 = crate::studio::tests::FakeHost::new()
+test-movement: no test changed with cli/src/studio/mod.rs, cli/src/studio/render.rs, cli/src/studio/state.rs

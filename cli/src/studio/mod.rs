@@ -38,6 +38,12 @@ pub trait Host {
     fn write_artifact(&self, project: &str, slug: &str, artifact: &str, local: &Path)
         -> Result<()>;
     fn approve(&self, project: &str, command: &[String]) -> Result<String>;
+    /// Record a rejection. Separate from `approve` so the two can never be
+    /// confused at the boundary, even though both end in `keel approve`.
+    fn reject(&self, project: &str, command: &[String]) -> Result<String>;
+    /// The newest gate evidence for a spec, as keel wrote it. Empty string
+    /// when there is none to read.
+    fn gate_output(&self, project: &str, slug: &str) -> Result<String>;
 }
 
 /// The three keel artifacts, and where they live inside a sandbox. Same
@@ -155,6 +161,40 @@ impl Host for Docker {
             anyhow::bail!("refusing to run '{}' as an approval", command.join(" "));
         }
         let (_, out) = self.exec(project, command)?;
+        Ok(out)
+    }
+
+    fn reject(&self, project: &str, command: &[String]) -> Result<String> {
+        // Same guard as `approve`: keel's own verb, and the rejection
+        // flags this console appended. Nothing else is runnable here.
+        if command.first().map(String::as_str) != Some("keel")
+            || command.get(1).map(String::as_str) != Some("approve")
+            || !command.iter().any(|a| a == "--reject")
+        {
+            anyhow::bail!("refusing to run '{}' as a rejection", command.join(" "));
+        }
+        let (_, out) = self.exec(project, command)?;
+        Ok(out)
+    }
+
+    fn gate_output(&self, project: &str, slug: &str) -> Result<String> {
+        crate::manifest::validate_name(slug).context("spec name from the pipeline status")?;
+        let m = self.manifest(project)?;
+        // The newest gate evidence keel wrote for this spec. `|| true` so a
+        // spec with no gates yet is an empty read, not a failure.
+        let script = format!(
+            "cat \"$(ls -1t .keel/specs/{slug}/gates/*.json 2>/dev/null | head -1)\" 2>/dev/null || true"
+        );
+        let argv: Vec<String> = vec![
+            "exec".into(),
+            m.sandbox_container(),
+            "sh".into(),
+            "-c".into(),
+            script,
+        ];
+        let args: Vec<&str> = argv.iter().map(String::as_str).collect();
+        let (status, out) = proc::run_capture("docker", &args)?;
+        audit::log_exec(project, &m, "studio", &argv, status.code())?;
         Ok(out)
     }
 }
@@ -330,6 +370,20 @@ pub fn run(names: Vec<String>) -> Result<()> {
                 console.note(&project, &format!("approved '{slug}': {}", out.trim()));
                 console.refresh(&host)?;
             }
+            Action::Reject {
+                project,
+                slug,
+                command,
+                note,
+            } => {
+                let mut argv = command.clone();
+                argv.push("--reject".into());
+                argv.push("--note".into());
+                argv.push(note);
+                let out = host.reject(&project, &argv)?;
+                console.note(&project, &format!("rejected '{slug}': {}", out.trim()));
+                console.refresh(&host)?;
+            }
             Action::EditArtifact {
                 project,
                 slug,
@@ -382,6 +436,8 @@ pub mod tests {
         artifacts: Mutex<Vec<(String, String, String, String)>>,
         pub writes: Mutex<Vec<(String, String, String, String)>>,
         pub approvals: Mutex<Vec<Vec<String>>>,
+        pub rejections: Mutex<Vec<Vec<String>>>,
+        pub gate_json: Mutex<String>,
     }
 
     impl FakeHost {
@@ -396,7 +452,14 @@ pub mod tests {
                 artifacts: Mutex::new(vec![]),
                 writes: Mutex::new(vec![]),
                 approvals: Mutex::new(vec![]),
+                rejections: Mutex::new(vec![]),
+                gate_json: Mutex::new(String::new()),
             }
+        }
+
+        pub fn with_gate_json(self, json: &str) -> Self {
+            *self.gate_json.lock().unwrap() = json.to_string();
+            self
         }
 
         pub fn with_running(mut self, names: &[&str]) -> Self {
@@ -479,6 +542,15 @@ pub mod tests {
         fn approve(&self, _project: &str, command: &[String]) -> Result<String> {
             self.approvals.lock().unwrap().push(command.to_vec());
             Ok("approved".into())
+        }
+
+        fn reject(&self, _project: &str, command: &[String]) -> Result<String> {
+            self.rejections.lock().unwrap().push(command.to_vec());
+            Ok("rejected".into())
+        }
+
+        fn gate_output(&self, _project: &str, _slug: &str) -> Result<String> {
+            Ok(self.gate_json.lock().unwrap().clone())
         }
     }
 

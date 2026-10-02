@@ -2,7 +2,7 @@
 id: MAP-cli-src-commands
 scope: dir:cli/src/commands
 owner: agent
-verified_at: 2026-10-01
+verified_at: 2026-10-02
 generated: true
 ---
 

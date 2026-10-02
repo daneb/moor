@@ -1,4 +1,4 @@
-<!-- keel:generated schema=keel.projection/1 adapter=kiro store=13cd739bb32c body=2873c4b36d92 -->
+<!-- keel:generated schema=keel.projection/1 adapter=kiro store=96cfd67a4a89 body=2873c4b36d92 -->
 <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
 
 # Project context

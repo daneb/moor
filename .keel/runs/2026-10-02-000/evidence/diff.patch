@@ -1,0 +1,2100 @@
+diff --git a/.github/copilot-instructions.md b/.github/copilot-instructions.md
+index b38a496..073278f 100644
+--- a/.github/copilot-instructions.md
++++ b/.github/copilot-instructions.md
+@@ -1,4 +1,4 @@
+-<!-- keel:generated schema=keel.projection/1 adapter=copilot store=1069ef3ef7ea body=04ed6d61c460 -->
++<!-- keel:generated schema=keel.projection/1 adapter=copilot store=96cfd67a4a89 body=2644258bb9ce -->
+ <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
+ 
+ # Project context
+@@ -48,14 +48,14 @@ _Versions that cannot move, platforms that must keep working, dependencies that
+ 
+ ## Repository map
+ 
+-**43 files · 693 symbols · 11532 lines** — javascript 2, rust 41
++**43 files · 704 symbols · 11669 lines** — javascript 2, rust 41
+ 
+ Files are ordered by import-graph centrality, not alphabetically. Signatures only; read a body with the file path and line number. Per-directory detail lives in `.keel/store/map/<dir>/CODEMAP.md`.
+ 
+ ### Layout
+ 
+-- `cli/src/` — 12 files, 4588 lines · guide.rs, canary.rs, paths.rs
+-- `cli/src/commands/` — 25 files, 4540 lines · next_cmd.rs, mod.rs, run_cmd.rs
++- `cli/src/` — 12 files, 4717 lines · guide.rs, canary.rs, manifest.rs
++- `cli/src/commands/` — 25 files, 4548 lines · next_cmd.rs, mod.rs, run_cmd.rs
+ - `cli/src/studio/` — 3 files, 1806 lines · mod.rs, state.rs, render.rs
+ - `docs/examples/ascii-banner/` — 1 file, 56 lines · banner.js
+ - `docs/examples/ascii-banner/test/` — 1 file, 60 lines · banner.test.js
+@@ -105,7 +105,7 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
+ - `pub fn wrap(text: &str, width: usize) -> Vec<String>` — Wrap to the terminal width after sanitizing — a single very long line  <sub>L95</sub>
+ - `pub fn frame(c: &Console, width: usize, height: usize) -> String` — The whole frame, as one string. Pure: takes state, returns bytes, so  <sub>L131</sub>
+ 
+-_… 324 more lines in `.keel/store/steering/structure.md`._
++_… 325 more lines in `.keel/store/steering/structure.md`._
+ 
+ ## What this is
+ 
+diff --git a/.keel/chain.jsonl b/.keel/chain.jsonl
+index 4a883f9..cac9bb4 100644
+--- a/.keel/chain.jsonl
++++ b/.keel/chain.jsonl
+@@ -199,3 +199,12 @@
+ {"schema":"keel.chain/1","seq":199,"ts":"2026-10-01T19:54:05.334260+02:00","kind":"gate","writer":"in-process","data":{"gate":"G2.5","run":"2026-10-01-007","sha256":"adf4a944150b5bfa09c4fd79a4c7a7d99fca34d849f482eb824eb57106bad4b9","spec":"copilot-device-auth","verdict":"pass"},"prev_hash":"12d776f09e583285835c3d293cd98743bb152de7613d9a4b475cf4da4e150728","hash":"287fded689bbf878d7afd442f7ba7d148bd9c03ce0d9567166121b266554eb2a"}
+ {"schema":"keel.chain/1","seq":200,"ts":"2026-10-01T19:54:05.366664+02:00","kind":"gate","writer":"in-process","data":{"gate":"G3","run":"2026-10-01-007","sha256":"86a6b2eef66facceaf913f53ec41075895e9200d3ef8c704570e8ca035c3fe7b","spec":"copilot-device-auth","verdict":"pass"},"prev_hash":"287fded689bbf878d7afd442f7ba7d148bd9c03ce0d9567166121b266554eb2a","hash":"a0be13cd8ef51e55e61165e8761fd95ddb23d5cc00b9dc2622858131284d4792"}
+ {"schema":"keel.chain/1","seq":201,"ts":"2026-10-01T19:54:05.370546+02:00","kind":"run_end","writer":"in-process","data":{"run":"2026-10-01-006","trajectory_sha256":"abe8e3e46b50c86510d93f0bdf4d36b8a2d5d6ace429dfd0c2a2cc33aa278f40","verdict":"pass"},"prev_hash":"a0be13cd8ef51e55e61165e8761fd95ddb23d5cc00b9dc2622858131284d4792","hash":"21047b7c74af1c3184dbf7ac9e294e0bf9ac15d81ca5bcb82b1a1967f30f3b19"}
++{"schema":"keel.chain/1","seq":202,"ts":"2026-10-01T22:32:05.656290+02:00","kind":"gate","writer":"in-process","data":{"gate":"G0","run":"2026-10-01-007","sha256":"83ed9cd3d2f8965abb4c3938284eb457d12587dfee0dcad86dadd706b9975901","spec":"studio-decisions","verdict":"fail"},"prev_hash":"21047b7c74af1c3184dbf7ac9e294e0bf9ac15d81ca5bcb82b1a1967f30f3b19","hash":"0935415c46857ab2157e09bf001fb6aa58bd6620be6fccb4b77d8e5f3145af09"}
++{"schema":"keel.chain/1","seq":203,"ts":"2026-10-01T22:32:05.675316+02:00","kind":"gate","writer":"in-process","data":{"gate":"G0","run":"2026-10-01-007","sha256":"9e46c80388925665b3a0ba91bc4dcffe409910b90314ce561db6a4e6482d5645","spec":"studio-authoring","verdict":"fail"},"prev_hash":"0935415c46857ab2157e09bf001fb6aa58bd6620be6fccb4b77d8e5f3145af09","hash":"8e154011f948df1780bf9e69689889cbe7f6df1b0968c103d39973117e999cde"}
++{"schema":"keel.chain/1","seq":204,"ts":"2026-10-01T22:33:41.498016+02:00","kind":"gate","writer":"in-process","data":{"gate":"G0","run":"2026-10-01-007","sha256":"e24dce2e87186418bbcce681662b9360cc98a0d2c11fda06ed2bee0c6a4614ff","spec":"studio-decisions","verdict":"pass"},"prev_hash":"8e154011f948df1780bf9e69689889cbe7f6df1b0968c103d39973117e999cde","hash":"a8078f30250011a6f9445f26796234e5fe43a818fbfe8bd5b151136f9847d3d5"}
++{"schema":"keel.chain/1","seq":205,"ts":"2026-10-01T22:33:41.510290+02:00","kind":"gate","writer":"in-process","data":{"gate":"G0","run":"2026-10-01-007","sha256":"fd37ed55d0571be5dced6ac49f8d0454d537feee15f0f7574fead91d39ce6e9a","spec":"studio-authoring","verdict":"pass"},"prev_hash":"a8078f30250011a6f9445f26796234e5fe43a818fbfe8bd5b151136f9847d3d5","hash":"d16ab9f38d8204d6f05bc77b39bfcbefed90f0d479e9f3607dc67b1c362cd4ff"}
++{"schema":"keel.chain/1","seq":206,"ts":"2026-10-02T07:13:30.498685+02:00","kind":"approval","writer":"in-process","data":{"artefact_hash":"4f1e51afd89896a91d16d18f03b4ef8c7076738a845a10aaf9ad798e910e7288","by":"Dane Balia","decision":"approved","spec":"studio-decisions","stage":"spec"},"prev_hash":"d16ab9f38d8204d6f05bc77b39bfcbefed90f0d479e9f3607dc67b1c362cd4ff","hash":"f7f9ea7c744f93f2306990e12da0adc8d2dbbe1b87d45a78ff1c6647218edee8"}
++{"schema":"keel.chain/1","seq":207,"ts":"2026-10-02T07:13:36.789870+02:00","kind":"approval","writer":"in-process","data":{"artefact_hash":"868963a985b0b73723ba37829cd25e955c4187d55ae172f17b5a461f65dbb48e","by":"Dane Balia","decision":"approved","spec":"studio-authoring","stage":"spec"},"prev_hash":"f7f9ea7c744f93f2306990e12da0adc8d2dbbe1b87d45a78ff1c6647218edee8","hash":"1299957317ecfae95a85ea40b4cba12560c792a89f929d23c47e2842fca22c2c"}
++{"schema":"keel.chain/1","seq":208,"ts":"2026-10-02T08:06:48.530685+02:00","kind":"gate","writer":"in-process","data":{"gate":"G1","run":"2026-10-02-000","sha256":"02a18efad9d704a1b35cd0cecff53507984dd7bc9fb0deae0f055a724be768ae","spec":"studio-decisions","verdict":"pass"},"prev_hash":"1299957317ecfae95a85ea40b4cba12560c792a89f929d23c47e2842fca22c2c","hash":"9760ba1dc5fc211183301d5e48e368fa9fbe7b75b07e4e5955c65d37a9e338c4"}
++{"schema":"keel.chain/1","seq":209,"ts":"2026-10-02T08:09:38.974075+02:00","kind":"approval","writer":"in-process","data":{"artefact_hash":"426edd4ee5407df3cd0f99c37d6f12d13c041d9d12f259704adc5c7ce5545d4d","by":"Dane Balia","decision":"approved","spec":"studio-decisions","stage":"plan"},"prev_hash":"9760ba1dc5fc211183301d5e48e368fa9fbe7b75b07e4e5955c65d37a9e338c4","hash":"af40b6714e98801f18c4e4a46c3765848ed2d41df09afce093088963b2cce519"}
++{"schema":"keel.chain/1","seq":210,"ts":"2026-10-02T08:16:02.141974+02:00","kind":"run_start","writer":"in-process","data":{"run":"2026-10-02-000","spec":"studio-decisions","task":null},"prev_hash":"af40b6714e98801f18c4e4a46c3765848ed2d41df09afce093088963b2cce519","hash":"cef1b6fe270794657032f36eddf0e2a72906dfe5be174860a9ce7bc3ee625086"}
+diff --git a/.keel/specs/studio-authoring/gates/G0.json b/.keel/specs/studio-authoring/gates/G0.json
+new file mode 100644
+index 0000000..3682c94
+--- /dev/null
++++ b/.keel/specs/studio-authoring/gates/G0.json
+@@ -0,0 +1,90 @@
++{
++  "schema": "keel.gate/1",
++  "gate": "G0",
++  "run": "2026-10-01-007",
++  "spec": "studio-authoring",
++  "verdict": "pass",
++  "generated_at": "2026-10-01T22:33:41.509069+02:00",
++  "checks": [
++    {
++      "id": "schema",
++      "verdict": "pass",
++      "detail": "SPEC-0014 (keel.spec/1)"
++    },
++    {
++      "id": "criteria-present",
++      "verdict": "pass",
++      "detail": "8 criteria"
++    },
++    {
++      "id": "criterion-ids-unique",
++      "verdict": "pass",
++      "detail": "no duplicate ids"
++    },
++    {
++      "id": "no-placeholders",
++      "verdict": "pass",
++      "detail": "no unfilled scaffold text"
++    },
++    {
++      "id": "ears-conformance",
++      "verdict": "pass",
++      "detail": "8/8 conform (event-driven, ubiquitous, unwanted-behaviour)"
++    },
++    {
++      "id": "oracle-presence",
++      "verdict": "pass",
++      "detail": "8 oracles across 8 criteria"
++    },
++    {
++      "id": "oracle-wellformed",
++      "verdict": "pass",
++      "detail": "all oracles parse"
++    },
++    {
++      "id": "ambiguity",
++      "verdict": "pass",
++      "detail": "no ambiguous phrasing in criteria"
++    },
++    {
++      "id": "criterion-budget",
++      "verdict": "pass",
++      "detail": "8/8 criteria"
++    },
++    {
++      "id": "spec-length",
++      "verdict": "pass",
++      "detail": "109/250 lines"
++    },
++    {
++      "id": "scope-declared",
++      "verdict": "pass",
++      "detail": "3 glob(s): cli/src/studio/state.rs, cli/src/studio/render.rs, cli/src/studio/mod.rs"
++    },
++    {
++      "id": "change-budget",
++      "verdict": "pass",
++      "detail": "350 lines of diff budgeted"
++    },
++    {
++      "id": "oracle-mix",
++      "verdict": "pass",
++      "detail": "8/8 runnable (8 cmd)"
++    },
++    {
++      "id": "human-cost",
++      "verdict": "pass",
++      "detail": "0 human oracle(s), none load-bearing"
++    },
++    {
++      "id": "store-drift",
++      "verdict": "pass",
++      "detail": "4 projections current"
++    },
++    {
++      "id": "shared-stores",
++      "verdict": "pass",
++      "detail": "none configured"
++    }
++  ]
++}
+diff --git a/.keel/specs/studio-authoring/spec.md b/.keel/specs/studio-authoring/spec.md
+new file mode 100644
+index 0000000..95bf368
+--- /dev/null
++++ b/.keel/specs/studio-authoring/spec.md
+@@ -0,0 +1,109 @@
++---
++id: SPEC-0014
++slug: studio-authoring
++schema: keel.spec/1
++status: approved
++scope:
++- cli/src/studio/state.rs
++- cli/src/studio/render.rs
++- cli/src/studio/mod.rs
++budget:
++  criteria: 8
++  lines: 350
++verified_at: 2026-10-01
++---
++
++# Turn a studio conversation into a spec
++
++## Context
++
++The way a feature starts today is split across places: you brainstorm with
++the agent (`moor ask`, or studio's input), then write a spec file on the
++host by hand, then `moor spec push` it — or you write a recipe file and
++run `moor recipe`. The thinking and the artefact live in different tools,
++so the step from "we worked out what to build" to "there is a spec" is
++manual retyping.
++
++Studio already holds the conversation and already edits artefacts in the
++sandbox (`edit_artifact`, write-back through `docker exec -i`, no bind
++mount). And moor already has the piece that makes this safe:
++`session::emit_recipe` writes an agent answer to a draft, **parses it
++first**, and only moves it into place if it is a well-formed recipe —
++otherwise it keeps the draft and says so. `moor ask --emit-recipe` uses
++exactly that.
++
++So the missing step is small: a key in studio that takes the answer
++currently on screen and turns it into a spec for that project, reusing the
++parse-before-write guard rather than trusting the agent's output.
++
++## Acceptance criteria
++
++### AC-1 A key turns the current answer into a spec draft
++
++WHEN the operator presses the author key while an agent answer is on
++screen THE SYSTEM SHALL write that answer as a spec draft for the selected
++project.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml author_key_drafts_a_spec_from_the_answer` exit 0
++
++### AC-2 Nothing is written when there is no answer
++
++IF the operator presses the author key and the selected project has no
++agent answer yet THEN THE SYSTEM SHALL write nothing and say why.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml author_without_an_answer_writes_nothing` exit 0
++
++### AC-3 A draft that does not parse is kept as a draft, not installed
++
++IF the answer does not parse as the expected artefact THEN THE SYSTEM
++SHALL leave it as a draft file and report that, rather than installing it
++as the project's spec.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml unparseable_answer_stays_a_draft` exit 0
++
++### AC-4 A drafted spec is reported with the command that checks it
++
++WHEN a spec draft is written THE SYSTEM SHALL show the next command that
++checks it, so the operator is not left guessing the pipeline step.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml drafted_spec_names_the_next_command` exit 0
++
++### AC-5 The answer is sanitized before it becomes an artefact
++
++WHEN an agent answer is written to a draft THE SYSTEM SHALL strip
++terminal control sequences from it first, as studio already does before
++drawing it.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml authored_draft_is_sanitized` exit 0
++
++### AC-6 Authoring is recorded like any other sandbox action
++
++WHEN a spec is authored from studio THE SYSTEM SHALL record the action in
++the project's audit trail, as studio's other sandbox actions are.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml authoring_is_recorded` exit 0
++
++### AC-7 The host writes the draft; the sandbox is not asked to author it
++
++WHEN a draft is written THE SYSTEM SHALL write it from the host (or
++through the same `docker exec` stdin path `edit_artifact` uses) rather
++than asking the agent inside the sandbox to write its own spec file.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml draft_is_written_by_the_host` exit 0
++
++### AC-8 Existing CLI tests stay green
++
++THE SYSTEM SHALL leave the existing CLI test suite passing.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml` exit 0
++
++## Out of scope
++
++- Rejection and gate output in studio — sibling spec `studio-decisions`.
++- Authoring a *plan* from a conversation: the plan is generated by `keel
++  plan` from an approved spec, and its approach section is a human edit
++  (`e` already opens it). This spec covers the spec artefact only.
++- Approving the authored spec: that is a decision, and it stays an
++  explicit human act at the existing approval gate.
++- Replacing `moor spec push` or `moor recipe`; both keep working. This adds
++  a path from a conversation already in studio.
+diff --git a/.keel/specs/studio-decisions/gates/G0.json b/.keel/specs/studio-decisions/gates/G0.json
+new file mode 100644
+index 0000000..3fe039b
+--- /dev/null
++++ b/.keel/specs/studio-decisions/gates/G0.json
+@@ -0,0 +1,90 @@
++{
++  "schema": "keel.gate/1",
++  "gate": "G0",
++  "run": "2026-10-01-007",
++  "spec": "studio-decisions",
++  "verdict": "pass",
++  "generated_at": "2026-10-01T22:33:41.496120+02:00",
++  "checks": [
++    {
++      "id": "schema",
++      "verdict": "pass",
++      "detail": "SPEC-0013 (keel.spec/1)"
++    },
++    {
++      "id": "criteria-present",
++      "verdict": "pass",
++      "detail": "8 criteria"
++    },
++    {
++      "id": "criterion-ids-unique",
++      "verdict": "pass",
++      "detail": "no duplicate ids"
++    },
++    {
++      "id": "no-placeholders",
++      "verdict": "pass",
++      "detail": "no unfilled scaffold text"
++    },
++    {
++      "id": "ears-conformance",
++      "verdict": "pass",
++      "detail": "8/8 conform (event-driven, ubiquitous, unwanted-behaviour)"
++    },
++    {
++      "id": "oracle-presence",
++      "verdict": "pass",
++      "detail": "8 oracles across 8 criteria"
++    },
++    {
++      "id": "oracle-wellformed",
++      "verdict": "pass",
++      "detail": "all oracles parse"
++    },
++    {
++      "id": "ambiguity",
++      "verdict": "pass",
++      "detail": "no ambiguous phrasing in criteria"
++    },
++    {
++      "id": "criterion-budget",
++      "verdict": "pass",
++      "detail": "8/8 criteria"
++    },
++    {
++      "id": "spec-length",
++      "verdict": "pass",
++      "detail": "110/250 lines"
++    },
++    {
++      "id": "scope-declared",
++      "verdict": "pass",
++      "detail": "3 glob(s): cli/src/studio/state.rs, cli/src/studio/render.rs, cli/src/studio/mod.rs"
++    },
++    {
++      "id": "change-budget",
++      "verdict": "pass",
++      "detail": "400 lines of diff budgeted"
++    },
++    {
++      "id": "oracle-mix",
++      "verdict": "pass",
++      "detail": "8/8 runnable (8 cmd)"
++    },
++    {
++      "id": "human-cost",
++      "verdict": "pass",
++      "detail": "0 human oracle(s), none load-bearing"
++    },
++    {
++      "id": "store-drift",
++      "verdict": "pass",
++      "detail": "4 projections current"
++    },
++    {
++      "id": "shared-stores",
++      "verdict": "pass",
++      "detail": "none configured"
++    }
++  ]
++}
+diff --git a/.keel/specs/studio-decisions/spec.md b/.keel/specs/studio-decisions/spec.md
+new file mode 100644
+index 0000000..57e5a5f
+--- /dev/null
++++ b/.keel/specs/studio-decisions/spec.md
+@@ -0,0 +1,110 @@
++---
++id: SPEC-0013
++slug: studio-decisions
++schema: keel.spec/1
++status: approved
++scope:
++- cli/src/studio/state.rs
++- cli/src/studio/render.rs
++- cli/src/studio/mod.rs
++budget:
++  criteria: 8
++  lines: 400
++verified_at: 2026-10-01
++---
++
++# Decide and unblock from studio without dropping to the CLI
++
++## Context
++
++`moor studio` can already show every project's stage, hold a turn with the
++agent, edit an artefact, and **approve** what a spec is waiting on — the
++approval being an armed two-key confirmation in a terminal, which is what
++makes it a human act rather than something a process can perform.
++
++Two gaps force the operator back to the CLI mid-flow, which is why studio
++is not yet the single interface to a project:
++
++- **No rejection.** `a` approves; there is no way to reject. Rejection
++  needs a reason (keel records a note), so it needs text entry, not just a
++  keypress — studio already has a text input for the agent prompt, so the
++  mechanism exists.
++- **No gate output in context.** When a spec sits at a failing gate,
++  studio shows the stage but not *which checks failed*. The operator sees
++  "fix plan" with no idea what to fix, and leaves to run the gate by hand.
++  The failing checks are already on disk in the sandbox
++  (`.keel/specs/<slug>/gates/G*.json`), written by keel.
++
++Closing both keeps the decision — approve or reject, with a reason — a
++keypress in a terminal the operator owns, rather than a command any
++process could run.
++
++## Acceptance criteria
++
++### AC-1 A key begins a rejection and takes a reason
++
++WHEN the operator presses the reject key on a project whose spec is
++waiting on a decision THE SYSTEM SHALL enter a state that collects a typed
++reason before anything is recorded.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml reject_key_collects_a_reason` exit 0
++
++### AC-2 An empty reason records nothing
++
++IF the operator confirms a rejection whose reason is empty THEN THE SYSTEM
++SHALL record no rejection and SHALL say a reason is required.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml empty_reason_records_no_rejection` exit 0
++
++### AC-3 Rejection is confirmed, not a single keypress
++
++WHEN a rejection has a reason THE SYSTEM SHALL require a second, distinct
++confirming key before it is recorded, as approval already does.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml rejection_needs_a_second_key` exit 0
++
++### AC-4 Escape abandons a rejection
++
++WHEN the operator presses escape while entering a rejection THE SYSTEM
++SHALL abandon it and record nothing.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml escape_abandons_a_rejection` exit 0
++
++### AC-5 The recorded rejection carries keel's own command and the reason
++
++WHEN a rejection is confirmed THE SYSTEM SHALL emit keel's own reject
++command for that stage with the typed reason as its note, rather than a
++command reassembled from the stage name.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml rejection_uses_keels_own_command_and_note` exit 0
++
++### AC-6 A failing gate's checks are shown with the project
++
++WHEN a project's spec is at a gate that last failed THE SYSTEM SHALL show
++the names of the failing checks alongside that project.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml failing_checks_are_shown` exit 0
++
++### AC-7 Gate output is sanitized before it is drawn
++
++WHEN gate output is drawn THE SYSTEM SHALL strip terminal control
++sequences from it first, as every other sandbox-sourced string already is.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml gate_output_is_sanitized` exit 0
++
++### AC-8 Existing CLI tests stay green
++
++THE SYSTEM SHALL leave the existing CLI test suite passing.
++
++oracle: cmd `cargo test --manifest-path cli/Cargo.toml` exit 0
++
++## Out of scope
++
++- Turning a conversation into a spec or a plan — sibling spec
++  `studio-authoring`.
++- Showing the full diff at a merge decision (the CLI's `moor approve`
++  does this); studio shows the failing checks of a *gate*, which is the
++  thing that currently has no visibility at all.
++- Running a gate from studio: the stage already tells the operator the one
++  command, and `moor go` runs it. This spec is about *seeing why it
++  failed* and *recording a decision*, not about adding a runner.
+diff --git a/.keel/store/map/cli/src/CODEMAP.md b/.keel/store/map/cli/src/CODEMAP.md
+index 7993829..e385f66 100644
+--- a/.keel/store/map/cli/src/CODEMAP.md
++++ b/.keel/store/map/cli/src/CODEMAP.md
+@@ -2,7 +2,7 @@
+ id: MAP-cli-src
+ scope: dir:cli/src
+ owner: agent
+-verified_at: 2026-10-01
++verified_at: 2026-10-02
+ generated: true
+ ---
+ 
+@@ -10,7 +10,7 @@ generated: true
+ 
+ <!-- generated by `keel map`. Do not edit: your changes will be overwritten. -->
+ 
+-12 files · 4588 lines · 277 symbols
++12 files · 4717 lines · 288 symbols
+ 
+ **`cli/src/guide.rs`** · 845 lines · imported by 3
+ - `pub struct NextReport`  <sub>L19</sub>
+@@ -28,19 +28,7 @@ generated: true
+ - `pub const CANARY_DOMAIN: &str = "canary.moor.invalid";` — deny, because there is no legitimate reason for it to ever be  <sub>L8</sub>
+ - `pub fn generate_token() -> String` — this is a secondary control, not the primary one (TLS isn't  <sub>L17</sub>
+ 
+-**`cli/src/paths.rs`** · 122 lines · imported by 4
+-- `pub fn chain_log_path(name: &str) -> Result<PathBuf>` — folded-in egress verdicts, and tripwire hits all append here. See  <sub>L28</sub>
+-- `pub fn egress_offset_path(name: &str) -> Result<PathBuf>` — How many raw lines of the egress gateway's access log have already  <sub>L34</sub>
+-- `pub fn sink_offset_path(name: &str) -> Result<PathBuf>` — How many lines of keel's chain sink (inside the sandbox) have already  <sub>L40</sub>
+-- `pub fn posture_path(name: &str) -> Result<PathBuf>` — The host's copy of the posture attestation last written into the  <sub>L46</sub>
+-- `pub fn session_path(name: &str) -> Result<PathBuf>` — host-written only: nothing inside a sandbox has this path mounted, so  <sub>L53</sub>
+-- `pub fn active_spec_path(name: &str) -> Result<PathBuf>` — The spec `moor next` guides this project through, when pinned with  <sub>L59</sub>
+-- `pub fn transcript_path(name: &str) -> Result<PathBuf>` — chain.jsonl on purpose: the chain carries hashes and is exported by  <sub>L66</sub>
+-- `pub fn current_project_path() -> Result<PathBuf>` — like `moor keel`/`moor view` don't need `--project` spelled out on  <sub>L78</sub>
+-- `pub fn read_current_project() -> Result<Option<String>>`  <sub>L82</sub>
+-- `pub fn all_project_names() -> Result<Vec<String>>`  <sub>L106</sub>
+-
+-**`cli/src/manifest.rs`** · 327 lines · imported by 2
++**`cli/src/manifest.rs`** · 327 lines · imported by 3
+ - `pub enum Agent`  <sub>L12</sub>
+ - `pub fn resolve_image(language_image: &str, agent: Agent) -> String` — already a copilot image, is returned unchanged. Pure — unit-tested  <sub>L35</sub>
+ - `pub struct Manifest`  <sub>L59</sub>
+@@ -52,6 +40,18 @@ generated: true
+ - `pub fn validate_name(name: &str) -> Result<()>` — Validate a project name: lowercase alnum + dashes, matches what's safe  <sub>L162</sub>
+ - `mod tests`  <sub>L178</sub>
+ 
++**`cli/src/paths.rs`** · 122 lines · imported by 3
++- `pub fn chain_log_path(name: &str) -> Result<PathBuf>` — folded-in egress verdicts, and tripwire hits all append here. See  <sub>L28</sub>
++- `pub fn egress_offset_path(name: &str) -> Result<PathBuf>` — How many raw lines of the egress gateway's access log have already  <sub>L34</sub>
++- `pub fn sink_offset_path(name: &str) -> Result<PathBuf>` — How many lines of keel's chain sink (inside the sandbox) have already  <sub>L40</sub>
++- `pub fn posture_path(name: &str) -> Result<PathBuf>` — The host's copy of the posture attestation last written into the  <sub>L46</sub>
++- `pub fn session_path(name: &str) -> Result<PathBuf>` — host-written only: nothing inside a sandbox has this path mounted, so  <sub>L53</sub>
++- `pub fn active_spec_path(name: &str) -> Result<PathBuf>` — The spec `moor next` guides this project through, when pinned with  <sub>L59</sub>
++- `pub fn transcript_path(name: &str) -> Result<PathBuf>` — chain.jsonl on purpose: the chain carries hashes and is exported by  <sub>L66</sub>
++- `pub fn current_project_path() -> Result<PathBuf>` — like `moor keel`/`moor view` don't need `--project` spelled out on  <sub>L78</sub>
++- `pub fn read_current_project() -> Result<Option<String>>`  <sub>L82</sub>
++- `pub fn all_project_names() -> Result<Vec<String>>`  <sub>L106</sub>
++
+ **`cli/src/session.rs`** · 970 lines · imported by 2
+ - `pub enum Role`  <sub>L25</sub>
+ - `pub fn deny_shell_argv() -> Vec<String>` — agent steps make the same assumption this corrects: that granting one  <sub>L123</sub>
+@@ -99,6 +99,18 @@ generated: true
+ - `pub fn fold_sink_lines(` — observed. A line that is not a payload is kept as `sink_malformed` —  <sub>L389</sub>
+ - `pub fn fold_egress_log(project: &str, m: &Manifest) -> Result<usize>` — tmpfs and resets), the offset is detected as stale and reset rather  <sub>L430</sub>
+ 
++**`cli/src/secrets.rs`** · 351 lines · imported by 1
++- `pub fn get(project: &str, name: &str) -> Result<Option<String>>` — the caller falls back to "not resolvable from Keychain," never errors  <sub>L20</sub>
++- `pub fn set(project: &str, name: &str) -> Result<()>` — API in the stock `security` CLI; this is the same tradeoff every tool  <sub>L54</sub>
++- `pub fn unset(project: &str, name: &str) -> Result<()>` — Remove a secret from the Keychain. Not an error if it wasn't there.  <sub>L98</sub>
++- `pub enum Source`  <sub>L109</sub>
++- `pub fn status(project: &str, secret_names: &[String]) -> Vec<(String, Source)>` — right now, in the same priority order `resolve_into_env` uses: this  <sub>L118</sub>
++- `pub fn resolve_into_env(project: &str, secret_names: &[String])` — either. Never errors on a missing secret: an unresolvable name is left  <sub>L143</sub>
++- `pub fn copilot_device_token() -> Option<String>` — Read via `security -w`, so the value is captured from stdout and never  <sub>L165</sub>
++- `pub fn resolve_copilot_device_token(project: &str, agent_is_copilot: bool) -> Option<String>` — is a no-op; a missing device token is a no-op. Returns the token it set,  <sub>L185</sub>
++- `pub fn should_use_device_token(agent_is_copilot: bool, env_set: bool, keychain_set: bool) -> bool` — token only for a copilot agent, and only when no more explicit source  <sub>L200</sub>
++- `fn read_hidden_line() -> Result<String>`  <sub>L204</sub>
++
+ **`cli/src/compose.rs`** · 247 lines · imported by 1
+ - `pub fn render(m: &Manifest) -> String` — `include_str!` can't reach outside the package a published crate  <sub>L12</sub>
+ - `fn host_git_identity() -> Vec<(&'static str, String)>` — The host's git identity, whichever of `user.name` and `user.email` are set.  <sub>L17</sub>
+@@ -123,18 +135,6 @@ generated: true
+ - `mod tests`  <sub>L223</sub>
+ - `fn hardened() -> (Value, Vec<Value>)` — The shape of `docker inspect` for a sandbox rendered from moor's own  <sub>L228</sub>
+ 
+-**`cli/src/secrets.rs`** · 222 lines · imported by 1
+-- `const ACCOUNT: &str = "moor";` — The service name (one per project+name pair) is what actually scopes  <sub>L9</sub>
+-- `fn service_name(project: &str, name: &str) -> String`  <sub>L11</sub>
+-- `pub fn get(project: &str, name: &str) -> Result<Option<String>>` — the caller falls back to "not resolvable from Keychain," never errors  <sub>L20</sub>
+-- `pub fn set(project: &str, name: &str) -> Result<()>` — API in the stock `security` CLI; this is the same tradeoff every tool  <sub>L54</sub>
+-- `pub fn unset(project: &str, name: &str) -> Result<()>` — Remove a secret from the Keychain. Not an error if it wasn't there.  <sub>L98</sub>
+-- `pub enum Source`  <sub>L109</sub>
+-- `pub fn status(project: &str, secret_names: &[String]) -> Vec<(String, Source)>` — right now, in the same priority order `resolve_into_env` uses: this  <sub>L118</sub>
+-- `pub fn resolve_into_env(project: &str, secret_names: &[String])` — either. Never errors on a missing secret: an unresolvable name is left  <sub>L143</sub>
+-- `fn read_hidden_line() -> Result<String>`  <sub>L154</sub>
+-- `mod tests`  <sub>L183</sub>
+-
+ **`cli/src/egress_log.rs`** · 138 lines · imported by 1
+ - `pub enum Verdict`  <sub>L5</sub>
+ - `pub enum Severity`  <sub>L11</sub>
+diff --git a/.keel/store/map/cli/src/commands/CODEMAP.md b/.keel/store/map/cli/src/commands/CODEMAP.md
+index 9862468..f523fe2 100644
+--- a/.keel/store/map/cli/src/commands/CODEMAP.md
++++ b/.keel/store/map/cli/src/commands/CODEMAP.md
+@@ -2,7 +2,7 @@
+ id: MAP-cli-src-commands
+ scope: dir:cli/src/commands
+ owner: agent
+-verified_at: 2026-10-01
++verified_at: 2026-10-02
+ generated: true
+ ---
+ 
+@@ -10,7 +10,7 @@ generated: true
+ 
+ <!-- generated by `keel map`. Do not edit: your changes will be overwritten. -->
+ 
+-25 files · 4540 lines · 266 symbols
++25 files · 4548 lines · 266 symbols
+ 
+ **`cli/src/commands/next_cmd.rs`** · 177 lines · imported by 4
+ - `pub struct Target` — The project a guided command acts on, resolved once and shared by  <sub>L7</sub>
+@@ -141,15 +141,15 @@ generated: true
+ **`cli/src/commands/secrets_status.rs`** · 21 lines · imported by 1
+ - `pub fn run(project: &str) -> Result<()>`  <sub>L4</sub>
+ 
++**`cli/src/commands/up.rs`** · 20 lines · imported by 1
++- `pub fn run(name: &str) -> Result<()>`  <sub>L5</sub>
++
+ **`cli/src/commands/studio_cmd.rs`** · 15 lines · imported by 1
+ - `pub fn run(only: Option<String>) -> Result<()>` — console itself is `crate::studio`, and the project list comes from the  <sub>L6</sub>
+ 
+ **`cli/src/commands/shell.rs`** · 12 lines · imported by 1
+ - `pub fn run(name: &str) -> Result<()>`  <sub>L4</sub>
+ 
+-**`cli/src/commands/up.rs`** · 12 lines · imported by 1
+-- `pub fn run(name: &str) -> Result<()>`  <sub>L4</sub>
+-
+ **`cli/src/commands/down.rs`** · 7 lines · imported by 1
+ - `pub fn run(name: &str) -> Result<()>`  <sub>L3</sub>
+ 
+diff --git a/.keel/store/map/cli/src/studio/CODEMAP.md b/.keel/store/map/cli/src/studio/CODEMAP.md
+index 6f87115..6db4db9 100644
+--- a/.keel/store/map/cli/src/studio/CODEMAP.md
++++ b/.keel/store/map/cli/src/studio/CODEMAP.md
+@@ -2,7 +2,7 @@
+ id: MAP-cli-src-studio
+ scope: dir:cli/src/studio
+ owner: agent
+-verified_at: 2026-10-01
++verified_at: 2026-10-02
+ generated: true
+ ---
+ 
+diff --git a/.keel/store/steering/structure.md b/.keel/store/steering/structure.md
+index 164604b..c31fa83 100644
+--- a/.keel/store/steering/structure.md
++++ b/.keel/store/steering/structure.md
+@@ -2,7 +2,7 @@
+ id: STRUCT-0001
+ scope: repo
+ owner: agent
+-verified_at: 2026-10-01
++verified_at: 2026-10-02
+ generated: true
+ ---
+ 
+@@ -10,14 +10,14 @@ generated: true
+ 
+ <!-- generated by `keel map`. Do not edit: your changes will be overwritten. -->
+ 
+-**43 files · 693 symbols · 11532 lines** — javascript 2, rust 41
++**43 files · 704 symbols · 11669 lines** — javascript 2, rust 41
+ 
+ Files are ordered by import-graph centrality, not alphabetically. Signatures only; read a body with the file path and line number. Per-directory detail lives in `.keel/store/map/<dir>/CODEMAP.md`.
+ 
+ ## Layout
+ 
+-- `cli/src/` — 12 files, 4588 lines · guide.rs, canary.rs, paths.rs
+-- `cli/src/commands/` — 25 files, 4540 lines · next_cmd.rs, mod.rs, run_cmd.rs
++- `cli/src/` — 12 files, 4717 lines · guide.rs, canary.rs, manifest.rs
++- `cli/src/commands/` — 25 files, 4548 lines · next_cmd.rs, mod.rs, run_cmd.rs
+ - `cli/src/studio/` — 3 files, 1806 lines · mod.rs, state.rs, render.rs
+ - `docs/examples/ascii-banner/` — 1 file, 56 lines · banner.js
+ - `docs/examples/ascii-banner/test/` — 1 file, 60 lines · banner.test.js
+@@ -106,23 +106,7 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
+ - `pub fn next_hint(name: &str) -> String` — The closing line for a command that isn't itself guided: how to ask  <sub>L153</sub>
+ - `pub fn run(explicit: Option<String>, all: bool) -> Result<()>` — `moor next`: where the project's active spec stands and the one  <sub>L164</sub>
+ 
+-**`cli/src/paths.rs`** · 122 lines · imported by 4
+-- `pub fn moor_home() -> Result<PathBuf>`  <sub>L4</sub>
+-- `pub fn project_dir(name: &str) -> Result<PathBuf>`  <sub>L9</sub>
+-- `pub fn manifest_path(name: &str) -> Result<PathBuf>`  <sub>L13</sub>
+-- `pub fn chain_log_path(name: &str) -> Result<PathBuf>` — folded-in egress verdicts, and tripwire hits all append here. See  <sub>L28</sub>
+-- `pub fn egress_offset_path(name: &str) -> Result<PathBuf>` — How many raw lines of the egress gateway's access log have already  <sub>L34</sub>
+-- `pub fn sink_offset_path(name: &str) -> Result<PathBuf>` — How many lines of keel's chain sink (inside the sandbox) have already  <sub>L40</sub>
+-- `pub fn posture_path(name: &str) -> Result<PathBuf>` — The host's copy of the posture attestation last written into the  <sub>L46</sub>
+-- `pub fn session_path(name: &str) -> Result<PathBuf>` — host-written only: nothing inside a sandbox has this path mounted, so  <sub>L53</sub>
+-- `pub fn active_spec_path(name: &str) -> Result<PathBuf>` — The spec `moor next` guides this project through, when pinned with  <sub>L59</sub>
+-- `pub fn transcript_path(name: &str) -> Result<PathBuf>` — chain.jsonl on purpose: the chain carries hashes and is exported by  <sub>L66</sub>
+-- `pub fn current_project_path() -> Result<PathBuf>` — like `moor keel`/`moor view` don't need `--project` spelled out on  <sub>L78</sub>
+-- `pub fn read_current_project() -> Result<Option<String>>`  <sub>L82</sub>
+-- `pub fn write_current_project(name: &str) -> Result<()>`  <sub>L98</sub>
+-- `pub fn all_project_names() -> Result<Vec<String>>`  <sub>L106</sub>
+-
+-**`cli/src/manifest.rs`** · 327 lines · imported by 2
++**`cli/src/manifest.rs`** · 327 lines · imported by 3
+ - `pub enum Agent`  <sub>L12</sub>
+ - `impl FromStr for Agent`  <sub>L18</sub>
+ - `pub fn resolve_image(language_image: &str, agent: Agent) -> String` — already a copilot image, is returned unchanged. Pure — unit-tested  <sub>L35</sub>
+@@ -138,6 +122,22 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
+ - `pub fn validate_name(name: &str) -> Result<()>` — Validate a project name: lowercase alnum + dashes, matches what's safe  <sub>L162</sub>
+ - `mod tests`  <sub>L178</sub>
+ 
++**`cli/src/paths.rs`** · 122 lines · imported by 3
++- `pub fn moor_home() -> Result<PathBuf>`  <sub>L4</sub>
++- `pub fn project_dir(name: &str) -> Result<PathBuf>`  <sub>L9</sub>
++- `pub fn manifest_path(name: &str) -> Result<PathBuf>`  <sub>L13</sub>
++- `pub fn chain_log_path(name: &str) -> Result<PathBuf>` — folded-in egress verdicts, and tripwire hits all append here. See  <sub>L28</sub>
++- `pub fn egress_offset_path(name: &str) -> Result<PathBuf>` — How many raw lines of the egress gateway's access log have already  <sub>L34</sub>
++- `pub fn sink_offset_path(name: &str) -> Result<PathBuf>` — How many lines of keel's chain sink (inside the sandbox) have already  <sub>L40</sub>
++- `pub fn posture_path(name: &str) -> Result<PathBuf>` — The host's copy of the posture attestation last written into the  <sub>L46</sub>
++- `pub fn session_path(name: &str) -> Result<PathBuf>` — host-written only: nothing inside a sandbox has this path mounted, so  <sub>L53</sub>
++- `pub fn active_spec_path(name: &str) -> Result<PathBuf>` — The spec `moor next` guides this project through, when pinned with  <sub>L59</sub>
++- `pub fn transcript_path(name: &str) -> Result<PathBuf>` — chain.jsonl on purpose: the chain carries hashes and is exported by  <sub>L66</sub>
++- `pub fn current_project_path() -> Result<PathBuf>` — like `moor keel`/`moor view` don't need `--project` spelled out on  <sub>L78</sub>
++- `pub fn read_current_project() -> Result<Option<String>>`  <sub>L82</sub>
++- `pub fn write_current_project(name: &str) -> Result<()>`  <sub>L98</sub>
++- `pub fn all_project_names() -> Result<Vec<String>>`  <sub>L106</sub>
++
+ **`cli/src/session.rs`** · 970 lines · imported by 2
+ - `pub enum Role`  <sub>L25</sub>
+ - `pub fn deny_shell_argv() -> Vec<String>` — agent steps make the same assumption this corrects: that granting one  <sub>L123</sub>
+@@ -154,6 +154,17 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
+ - `pub fn run_turn(project: &str, role: Role, prompt: &str, new_session: bool) -> Result<TurnOutcome>` — by construction — there is no path to a response that skips this  <sub>L456</sub>
+ - `pub fn ask(` — `moor ask`: one turn, printed for a human.  <sub>L515</sub>
+ 
++**`cli/src/proc.rs`** · 145 lines · imported by 2
++- `pub fn run_inherit(program: &str, args: &[&str]) -> Result<ExitStatus>` — e.g. `docker compose up`, `docker exec -it ... bash`). Returns the exit  <sub>L8</sub>
++- `pub fn run_capture(program: &str, args: &[&str]) -> Result<(ExitStatus, String)>` — Run a command and capture stdout as a String (used for `docker inspect`,  <sub>L20</sub>
++- `pub fn run_capture_split(program: &str, args: &[&str]) -> Result<(ExitStatus, String, String)>` — discarding stderr turns "Invalid MCP configuration" into an  <sub>L36</sub>
++- `pub fn run_capture_combined(program: &str, args: &[&str]) -> Result<(ExitStatus, String)>` — matching and for handing the text to an agent, but not for a human  <sub>L59</sub>
++- `pub fn run_with_stdin_file(program: &str, args: &[&str], stdin_path: &Path) -> Result<ExitStatus>` — through `docker exec -i <container> sh -c 'cat > dest'`'s stdin only  <sub>L76</sub>
++- `pub fn require_success(what: &str, status: ExitStatus) -> Result<()>`  <sub>L97</sub>
++- `pub fn run_stdin_to_file(` — output (an archive) back out of a container: `run_capture` goes through  <sub>L108</sub>
++- `mod tests`  <sub>L128</sub>
++- `fn stdout_to_file_keeps_binary_bytes()`  <sub>L132</sub>
++
+ **`cli/src/commands/mod.rs`** · 293 lines · imported by 1
+ - `pub mod ask_cmd;`  <sub>L1</sub>
+ - `pub mod audit_cmd;`  <sub>L2</sub>
+@@ -170,17 +181,6 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
+ - `pub fn sync_git_identity(m: &Manifest)` — now exists call this again afterward) or if the host itself has no  <sub>L204</sub>
+ - `pub fn compose_down(name: &str) -> Result<()>`  <sub>L219</sub>
+ 
+-**`cli/src/proc.rs`** · 145 lines · imported by 2
+-- `pub fn run_inherit(program: &str, args: &[&str]) -> Result<ExitStatus>` — e.g. `docker compose up`, `docker exec -it ... bash`). Returns the exit  <sub>L8</sub>
+-- `pub fn run_capture(program: &str, args: &[&str]) -> Result<(ExitStatus, String)>` — Run a command and capture stdout as a String (used for `docker inspect`,  <sub>L20</sub>
+-- `pub fn run_capture_split(program: &str, args: &[&str]) -> Result<(ExitStatus, String, String)>` — discarding stderr turns "Invalid MCP configuration" into an  <sub>L36</sub>
+-- `pub fn run_capture_combined(program: &str, args: &[&str]) -> Result<(ExitStatus, String)>` — matching and for handing the text to an agent, but not for a human  <sub>L59</sub>
+-- `pub fn run_with_stdin_file(program: &str, args: &[&str], stdin_path: &Path) -> Result<ExitStatus>` — through `docker exec -i <container> sh -c 'cat > dest'`'s stdin only  <sub>L76</sub>
+-- `pub fn require_success(what: &str, status: ExitStatus) -> Result<()>`  <sub>L97</sub>
+-- `pub fn run_stdin_to_file(` — output (an archive) back out of a container: `run_capture` goes through  <sub>L108</sub>
+-- `mod tests`  <sub>L128</sub>
+-- `fn stdout_to_file_keeps_binary_bytes()`  <sub>L132</sub>
+-
+ **`mcp/src/main.rs`** · 482 lines
+ - `const PROTOCOL_VERSION: &str = "2024-11-05";` — MCP revision this server speaks. Claude Code negotiates by echoing  <sub>L22</sub>
+ - `mod tools` — The tool surface, and the only place a caller-supplied string is ever  <sub>L27</sub>
+@@ -245,6 +245,22 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
+ - `fn empty_command_is_not_a_push()`  <sub>L201</sub>
+ - `fn push_entry_names_ref_and_commit()`  <sub>L210</sub>
+ 
++**`cli/src/secrets.rs`** · 351 lines · imported by 1
++- `const ACCOUNT: &str = "moor";` — The service name (one per project+name pair) is what actually scopes  <sub>L9</sub>
++- `fn service_name(project: &str, name: &str) -> String`  <sub>L11</sub>
++- `pub fn get(project: &str, name: &str) -> Result<Option<String>>` — the caller falls back to "not resolvable from Keychain," never errors  <sub>L20</sub>
++- `pub fn set(project: &str, name: &str) -> Result<()>` — API in the stock `security` CLI; this is the same tradeoff every tool  <sub>L54</sub>
++- `pub fn unset(project: &str, name: &str) -> Result<()>` — Remove a secret from the Keychain. Not an error if it wasn't there.  <sub>L98</sub>
++- `pub enum Source`  <sub>L109</sub>
++- `pub fn status(project: &str, secret_names: &[String]) -> Vec<(String, Source)>` — right now, in the same priority order `resolve_into_env` uses: this  <sub>L118</sub>
++- `pub fn resolve_into_env(project: &str, secret_names: &[String])` — either. Never errors on a missing secret: an unresolvable name is left  <sub>L143</sub>
++- `pub const COPILOT_TOKEN_VAR: &str = "COPILOT_GITHUB_TOKEN";` — The env var the Copilot CLI reads its credential from.  <sub>L155</sub>
++- `pub fn copilot_device_token() -> Option<String>` — Read via `security -w`, so the value is captured from stdout and never  <sub>L165</sub>
++- `pub fn resolve_copilot_device_token(project: &str, agent_is_copilot: bool) -> Option<String>` — is a no-op; a missing device token is a no-op. Returns the token it set,  <sub>L185</sub>
++- `pub fn should_use_device_token(agent_is_copilot: bool, env_set: bool, keychain_set: bool) -> bool` — token only for a copilot agent, and only when no more explicit source  <sub>L200</sub>
++- `fn read_hidden_line() -> Result<String>`  <sub>L204</sub>
++- `mod tests`  <sub>L233</sub>
++
+ **`cli/src/compose.rs`** · 247 lines · imported by 1
+ - `pub fn render(m: &Manifest) -> String` — `include_str!` can't reach outside the package a published crate  <sub>L12</sub>
+ - `fn host_git_identity() -> Vec<(&'static str, String)>` — The host's git identity, whichever of `user.name` and `user.email` are set.  <sub>L17</sub>
+@@ -325,21 +341,6 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
+ - `mod tests`  <sub>L350</sub>
+ - `fn the_newest_run_for_the_spec_is_found()`  <sub>L370</sub>
+ 
+-**`cli/src/secrets.rs`** · 222 lines · imported by 1
+-- `const ACCOUNT: &str = "moor";` — The service name (one per project+name pair) is what actually scopes  <sub>L9</sub>
+-- `fn service_name(project: &str, name: &str) -> String`  <sub>L11</sub>
+-- `pub fn get(project: &str, name: &str) -> Result<Option<String>>` — the caller falls back to "not resolvable from Keychain," never errors  <sub>L20</sub>
+-- `pub fn set(project: &str, name: &str) -> Result<()>` — API in the stock `security` CLI; this is the same tradeoff every tool  <sub>L54</sub>
+-- `pub fn unset(project: &str, name: &str) -> Result<()>` — Remove a secret from the Keychain. Not an error if it wasn't there.  <sub>L98</sub>
+-- `pub enum Source`  <sub>L109</sub>
+-- `pub fn status(project: &str, secret_names: &[String]) -> Vec<(String, Source)>` — right now, in the same priority order `resolve_into_env` uses: this  <sub>L118</sub>
+-- `pub fn resolve_into_env(project: &str, secret_names: &[String])` — either. Never errors on a missing secret: an unresolvable name is left  <sub>L143</sub>
+-- `fn read_hidden_line() -> Result<String>`  <sub>L154</sub>
+-- `mod tests`  <sub>L183</sub>
+-- `fn service_name_is_scoped_by_project_and_secret_name()`  <sub>L187</sub>
+-- `fn status_reports_env_before_checking_keychain()`  <sub>L200</sub>
+-- `fn status_reports_missing_when_neither_env_nor_keychain_has_it()`  <sub>L211</sub>
+-
+ **`cli/src/egress_log.rs`** · 138 lines · imported by 1
+ - `pub enum Verdict`  <sub>L5</sub>
+ - `pub enum Severity`  <sub>L11</sub>
+diff --git a/.kiro/steering/keel.md b/.kiro/steering/keel.md
+index 4a31dea..1733581 100644
+--- a/.kiro/steering/keel.md
++++ b/.kiro/steering/keel.md
+@@ -1,4 +1,4 @@
+-<!-- keel:generated schema=keel.projection/1 adapter=kiro store=1069ef3ef7ea body=40d861198515 -->
++<!-- keel:generated schema=keel.projection/1 adapter=kiro store=96cfd67a4a89 body=2873c4b36d92 -->
+ <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
+ 
+ # Project context
+@@ -48,14 +48,14 @@ _Versions that cannot move, platforms that must keep working, dependencies that
+ 
+ ## Repository map
+ 
+-**43 files · 693 symbols · 11532 lines** — javascript 2, rust 41
++**43 files · 704 symbols · 11669 lines** — javascript 2, rust 41
+ 
+ Files are ordered by import-graph centrality, not alphabetically. Signatures only; read a body with the file path and line number. Per-directory detail lives in `.keel/store/map/<dir>/CODEMAP.md`.
+ 
+ ### Layout
+ 
+-- `cli/src/` — 12 files, 4588 lines · guide.rs, canary.rs, paths.rs
+-- `cli/src/commands/` — 25 files, 4540 lines · next_cmd.rs, mod.rs, run_cmd.rs
++- `cli/src/` — 12 files, 4717 lines · guide.rs, canary.rs, manifest.rs
++- `cli/src/commands/` — 25 files, 4548 lines · next_cmd.rs, mod.rs, run_cmd.rs
+ - `cli/src/studio/` — 3 files, 1806 lines · mod.rs, state.rs, render.rs
+ - `docs/examples/ascii-banner/` — 1 file, 56 lines · banner.js
+ - `docs/examples/ascii-banner/test/` — 1 file, 60 lines · banner.test.js
+@@ -144,23 +144,7 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
+ - `pub fn next_hint(name: &str) -> String` — The closing line for a command that isn't itself guided: how to ask  <sub>L153</sub>
+ - `pub fn run(explicit: Option<String>, all: bool) -> Result<()>` — `moor next`: where the project's active spec stands and the one  <sub>L164</sub>
+ 
+-**`cli/src/paths.rs`** · 122 lines · imported by 4
+-- `pub fn moor_home() -> Result<PathBuf>`  <sub>L4</sub>
+-- `pub fn project_dir(name: &str) -> Result<PathBuf>`  <sub>L9</sub>
+-- `pub fn manifest_path(name: &str) -> Result<PathBuf>`  <sub>L13</sub>
+-- `pub fn chain_log_path(name: &str) -> Result<PathBuf>` — folded-in egress verdicts, and tripwire hits all append here. See  <sub>L28</sub>
+-- `pub fn egress_offset_path(name: &str) -> Result<PathBuf>` — How many raw lines of the egress gateway's access log have already  <sub>L34</sub>
+-- `pub fn sink_offset_path(name: &str) -> Result<PathBuf>` — How many lines of keel's chain sink (inside the sandbox) have already  <sub>L40</sub>
+-- `pub fn posture_path(name: &str) -> Result<PathBuf>` — The host's copy of the posture attestation last written into the  <sub>L46</sub>
+-- `pub fn session_path(name: &str) -> Result<PathBuf>` — host-written only: nothing inside a sandbox has this path mounted, so  <sub>L53</sub>
+-- `pub fn active_spec_path(name: &str) -> Result<PathBuf>` — The spec `moor next` guides this project through, when pinned with  <sub>L59</sub>
+-- `pub fn transcript_path(name: &str) -> Result<PathBuf>` — chain.jsonl on purpose: the chain carries hashes and is exported by  <sub>L66</sub>
+-- `pub fn current_project_path() -> Result<PathBuf>` — like `moor keel`/`moor view` don't need `--project` spelled out on  <sub>L78</sub>
+-- `pub fn read_current_project() -> Result<Option<String>>`  <sub>L82</sub>
+-- `pub fn write_current_project(name: &str) -> Result<()>`  <sub>L98</sub>
+-- `pub fn all_project_names() -> Result<Vec<String>>`  <sub>L106</sub>
+-
+-**`cli/src/manifest.rs`** · 327 lines · imported by 2
++**`cli/src/manifest.rs`** · 327 lines · imported by 3
+ - `pub enum Agent`  <sub>L12</sub>
+ - `impl FromStr for Agent`  <sub>L18</sub>
+ - `pub fn resolve_image(language_image: &str, agent: Agent) -> String` — already a copilot image, is returned unchanged. Pure — unit-tested  <sub>L35</sub>
+@@ -176,6 +160,22 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
+ - `pub fn validate_name(name: &str) -> Result<()>` — Validate a project name: lowercase alnum + dashes, matches what's safe  <sub>L162</sub>
+ - `mod tests`  <sub>L178</sub>
+ 
++**`cli/src/paths.rs`** · 122 lines · imported by 3
++- `pub fn moor_home() -> Result<PathBuf>`  <sub>L4</sub>
++- `pub fn project_dir(name: &str) -> Result<PathBuf>`  <sub>L9</sub>
++- `pub fn manifest_path(name: &str) -> Result<PathBuf>`  <sub>L13</sub>
++- `pub fn chain_log_path(name: &str) -> Result<PathBuf>` — folded-in egress verdicts, and tripwire hits all append here. See  <sub>L28</sub>
++- `pub fn egress_offset_path(name: &str) -> Result<PathBuf>` — How many raw lines of the egress gateway's access log have already  <sub>L34</sub>
++- `pub fn sink_offset_path(name: &str) -> Result<PathBuf>` — How many lines of keel's chain sink (inside the sandbox) have already  <sub>L40</sub>
++- `pub fn posture_path(name: &str) -> Result<PathBuf>` — The host's copy of the posture attestation last written into the  <sub>L46</sub>
++- `pub fn session_path(name: &str) -> Result<PathBuf>` — host-written only: nothing inside a sandbox has this path mounted, so  <sub>L53</sub>
++- `pub fn active_spec_path(name: &str) -> Result<PathBuf>` — The spec `moor next` guides this project through, when pinned with  <sub>L59</sub>
++- `pub fn transcript_path(name: &str) -> Result<PathBuf>` — chain.jsonl on purpose: the chain carries hashes and is exported by  <sub>L66</sub>
++- `pub fn current_project_path() -> Result<PathBuf>` — like `moor keel`/`moor view` don't need `--project` spelled out on  <sub>L78</sub>
++- `pub fn read_current_project() -> Result<Option<String>>`  <sub>L82</sub>
++- `pub fn write_current_project(name: &str) -> Result<()>`  <sub>L98</sub>
++- `pub fn all_project_names() -> Result<Vec<String>>`  <sub>L106</sub>
++
+ **`cli/src/session.rs`** · 970 lines · imported by 2
+ - `pub enum Role`  <sub>L25</sub>
+ - `pub fn deny_shell_argv() -> Vec<String>` — agent steps make the same assumption this corrects: that granting one  <sub>L123</sub>
+@@ -186,7 +186,7 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
+ - `pub fn next_session_id(t: &TurnResult) -> Option<String>` — consulted, so a response that prints a plausible UUID cannot redirect  <sub>L176</sub>
+ - `struct ChainedTurn<'a>` — prompt and the response can't drift apart from the hashes taken of  <sub>L236</sub>
+ 
+-_… 243 more lines in `.keel/store/steering/structure.md`._
++_… 244 more lines in `.keel/store/steering/structure.md`._
+ 
+ ## What this is
+ 
+diff --git a/AGENTS.md b/AGENTS.md
+index abfa6fc..27b9f4e 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -1,4 +1,4 @@
+-<!-- keel:generated schema=keel.projection/1 adapter=agents store=1069ef3ef7ea body=1188d94d2ef6 -->
++<!-- keel:generated schema=keel.projection/1 adapter=agents store=96cfd67a4a89 body=18cabdd8af49 -->
+ <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
+ 
+ # Project context
+@@ -48,14 +48,14 @@ _Versions that cannot move, platforms that must keep working, dependencies that
+ 
+ ## Repository map
+ 
+-**43 files · 693 symbols · 11532 lines** — javascript 2, rust 41
++**43 files · 704 symbols · 11669 lines** — javascript 2, rust 41
+ 
+ Files are ordered by import-graph centrality, not alphabetically. Signatures only; read a body with the file path and line number. Per-directory detail lives in `.keel/store/map/<dir>/CODEMAP.md`.
+ 
+ ### Layout
+ 
+-- `cli/src/` — 12 files, 4588 lines · guide.rs, canary.rs, paths.rs
+-- `cli/src/commands/` — 25 files, 4540 lines · next_cmd.rs, mod.rs, run_cmd.rs
++- `cli/src/` — 12 files, 4717 lines · guide.rs, canary.rs, manifest.rs
++- `cli/src/commands/` — 25 files, 4548 lines · next_cmd.rs, mod.rs, run_cmd.rs
+ - `cli/src/studio/` — 3 files, 1806 lines · mod.rs, state.rs, render.rs
+ - `docs/examples/ascii-banner/` — 1 file, 56 lines · banner.js
+ - `docs/examples/ascii-banner/test/` — 1 file, 60 lines · banner.test.js
+@@ -144,29 +144,29 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
+ - `pub fn next_hint(name: &str) -> String` — The closing line for a command that isn't itself guided: how to ask  <sub>L153</sub>
+ - `pub fn run(explicit: Option<String>, all: bool) -> Result<()>` — `moor next`: where the project's active spec stands and the one  <sub>L164</sub>
+ 
+-**`cli/src/paths.rs`** · 122 lines · imported by 4
+-- `pub fn moor_home() -> Result<PathBuf>`  <sub>L4</sub>
+-- `pub fn project_dir(name: &str) -> Result<PathBuf>`  <sub>L9</sub>
+-- `pub fn manifest_path(name: &str) -> Result<PathBuf>`  <sub>L13</sub>
+-- `pub fn chain_log_path(name: &str) -> Result<PathBuf>` — folded-in egress verdicts, and tripwire hits all append here. See  <sub>L28</sub>
+-- `pub fn egress_offset_path(name: &str) -> Result<PathBuf>` — How many raw lines of the egress gateway's access log have already  <sub>L34</sub>
+-- `pub fn sink_offset_path(name: &str) -> Result<PathBuf>` — How many lines of keel's chain sink (inside the sandbox) have already  <sub>L40</sub>
+-- `pub fn posture_path(name: &str) -> Result<PathBuf>` — The host's copy of the posture attestation last written into the  <sub>L46</sub>
+-- `pub fn session_path(name: &str) -> Result<PathBuf>` — host-written only: nothing inside a sandbox has this path mounted, so  <sub>L53</sub>
+-- `pub fn active_spec_path(name: &str) -> Result<PathBuf>` — The spec `moor next` guides this project through, when pinned with  <sub>L59</sub>
+-- `pub fn transcript_path(name: &str) -> Result<PathBuf>` — chain.jsonl on purpose: the chain carries hashes and is exported by  <sub>L66</sub>
+-- `pub fn current_project_path() -> Result<PathBuf>` — like `moor keel`/`moor view` don't need `--project` spelled out on  <sub>L78</sub>
+-- `pub fn read_current_project() -> Result<Option<String>>`  <sub>L82</sub>
+-- `pub fn write_current_project(name: &str) -> Result<()>`  <sub>L98</sub>
+-- `pub fn all_project_names() -> Result<Vec<String>>`  <sub>L106</sub>
+-
+-**`cli/src/manifest.rs`** · 327 lines · imported by 2
++**`cli/src/manifest.rs`** · 327 lines · imported by 3
+ - `pub enum Agent`  <sub>L12</sub>
+ - `impl FromStr for Agent`  <sub>L18</sub>
+ - `pub fn resolve_image(language_image: &str, agent: Agent) -> String` — already a copilot image, is returned unchanged. Pure — unit-tested  <sub>L35</sub>
+ - `pub struct Manifest`  <sub>L59</sub>
++- `pub struct Egress`  <sub>L81</sub>
++- `pub struct Resources`  <sub>L87</sub>
++- `impl Manifest`  <sub>L103</sub>
++- `pub fn new(name: &str, image: &str) -> Self`  <sub>L104</sub>
++- `pub fn load(path: &Path) -> Result<Self>`  <sub>L138</sub>
++- `pub fn save(&self, path: &Path) -> Result<()>`  <sub>L144</sub>
++- `pub fn sandbox_container(&self) -> String`  <sub>L151</sub>
++- `pub fn egress_container(&self) -> String`  <sub>L155</sub>
++- `pub fn validate_name(name: &str) -> Result<()>` — Validate a project name: lowercase alnum + dashes, matches what's safe  <sub>L162</sub>
++- `mod tests`  <sub>L178</sub>
++
++**`cli/src/paths.rs`** · 122 lines · imported by 3
++- `pub fn moor_home() -> Result<PathBuf>`  <sub>L4</sub>
++- `pub fn project_dir(name: &str) -> Result<PathBuf>`  <sub>L9</sub>
++- `pub fn manifest_path(name: &str) -> Result<PathBuf>`  <sub>L13</sub>
++- `pub fn chain_log_path(name: &str) -> Result<PathBuf>` — folded-in egress verdicts, and tripwire hits all append here. See  <sub>L28</sub>
+ 
+-_… 263 more lines in `.keel/store/steering/structure.md`._
++_… 264 more lines in `.keel/store/steering/structure.md`._
+ 
+ ## What this is
+ 
+diff --git a/CLAUDE.md b/CLAUDE.md
+index 5bc2235..4e4954e 100644
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -1,4 +1,4 @@
+-<!-- keel:generated schema=keel.projection/1 adapter=claude store=1069ef3ef7ea body=b41f446e0b36 -->
++<!-- keel:generated schema=keel.projection/1 adapter=claude store=96cfd67a4a89 body=8dc7864333d1 -->
+ <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
+ 
+ # Project context
+@@ -48,14 +48,14 @@ _Versions that cannot move, platforms that must keep working, dependencies that
+ 
+ ## Repository map
+ 
+-**43 files · 693 symbols · 11532 lines** — javascript 2, rust 41
++**43 files · 704 symbols · 11669 lines** — javascript 2, rust 41
+ 
+ Files are ordered by import-graph centrality, not alphabetically. Signatures only; read a body with the file path and line number. Per-directory detail lives in `.keel/store/map/<dir>/CODEMAP.md`.
+ 
+ ### Layout
+ 
+-- `cli/src/` — 12 files, 4588 lines · guide.rs, canary.rs, paths.rs
+-- `cli/src/commands/` — 25 files, 4540 lines · next_cmd.rs, mod.rs, run_cmd.rs
++- `cli/src/` — 12 files, 4717 lines · guide.rs, canary.rs, manifest.rs
++- `cli/src/commands/` — 25 files, 4548 lines · next_cmd.rs, mod.rs, run_cmd.rs
+ - `cli/src/studio/` — 3 files, 1806 lines · mod.rs, state.rs, render.rs
+ - `docs/examples/ascii-banner/` — 1 file, 56 lines · banner.js
+ - `docs/examples/ascii-banner/test/` — 1 file, 60 lines · banner.test.js
+@@ -144,29 +144,29 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
+ - `pub fn next_hint(name: &str) -> String` — The closing line for a command that isn't itself guided: how to ask  <sub>L153</sub>
+ - `pub fn run(explicit: Option<String>, all: bool) -> Result<()>` — `moor next`: where the project's active spec stands and the one  <sub>L164</sub>
+ 
+-**`cli/src/paths.rs`** · 122 lines · imported by 4
+-- `pub fn moor_home() -> Result<PathBuf>`  <sub>L4</sub>
+-- `pub fn project_dir(name: &str) -> Result<PathBuf>`  <sub>L9</sub>
+-- `pub fn manifest_path(name: &str) -> Result<PathBuf>`  <sub>L13</sub>
+-- `pub fn chain_log_path(name: &str) -> Result<PathBuf>` — folded-in egress verdicts, and tripwire hits all append here. See  <sub>L28</sub>
+-- `pub fn egress_offset_path(name: &str) -> Result<PathBuf>` — How many raw lines of the egress gateway's access log have already  <sub>L34</sub>
+-- `pub fn sink_offset_path(name: &str) -> Result<PathBuf>` — How many lines of keel's chain sink (inside the sandbox) have already  <sub>L40</sub>
+-- `pub fn posture_path(name: &str) -> Result<PathBuf>` — The host's copy of the posture attestation last written into the  <sub>L46</sub>
+-- `pub fn session_path(name: &str) -> Result<PathBuf>` — host-written only: nothing inside a sandbox has this path mounted, so  <sub>L53</sub>
+-- `pub fn active_spec_path(name: &str) -> Result<PathBuf>` — The spec `moor next` guides this project through, when pinned with  <sub>L59</sub>
+-- `pub fn transcript_path(name: &str) -> Result<PathBuf>` — chain.jsonl on purpose: the chain carries hashes and is exported by  <sub>L66</sub>
+-- `pub fn current_project_path() -> Result<PathBuf>` — like `moor keel`/`moor view` don't need `--project` spelled out on  <sub>L78</sub>
+-- `pub fn read_current_project() -> Result<Option<String>>`  <sub>L82</sub>
+-- `pub fn write_current_project(name: &str) -> Result<()>`  <sub>L98</sub>
+-- `pub fn all_project_names() -> Result<Vec<String>>`  <sub>L106</sub>
+-
+-**`cli/src/manifest.rs`** · 327 lines · imported by 2
++**`cli/src/manifest.rs`** · 327 lines · imported by 3
+ - `pub enum Agent`  <sub>L12</sub>
+ - `impl FromStr for Agent`  <sub>L18</sub>
+ - `pub fn resolve_image(language_image: &str, agent: Agent) -> String` — already a copilot image, is returned unchanged. Pure — unit-tested  <sub>L35</sub>
+ - `pub struct Manifest`  <sub>L59</sub>
++- `pub struct Egress`  <sub>L81</sub>
++- `pub struct Resources`  <sub>L87</sub>
++- `impl Manifest`  <sub>L103</sub>
++- `pub fn new(name: &str, image: &str) -> Self`  <sub>L104</sub>
++- `pub fn load(path: &Path) -> Result<Self>`  <sub>L138</sub>
++- `pub fn save(&self, path: &Path) -> Result<()>`  <sub>L144</sub>
++- `pub fn sandbox_container(&self) -> String`  <sub>L151</sub>
++- `pub fn egress_container(&self) -> String`  <sub>L155</sub>
++- `pub fn validate_name(name: &str) -> Result<()>` — Validate a project name: lowercase alnum + dashes, matches what's safe  <sub>L162</sub>
++- `mod tests`  <sub>L178</sub>
++
++**`cli/src/paths.rs`** · 122 lines · imported by 3
++- `pub fn moor_home() -> Result<PathBuf>`  <sub>L4</sub>
++- `pub fn project_dir(name: &str) -> Result<PathBuf>`  <sub>L9</sub>
++- `pub fn manifest_path(name: &str) -> Result<PathBuf>`  <sub>L13</sub>
++- `pub fn chain_log_path(name: &str) -> Result<PathBuf>` — folded-in egress verdicts, and tripwire hits all append here. See  <sub>L28</sub>
+ 
+-_… 263 more lines in `.keel/store/steering/structure.md`._
++_… 264 more lines in `.keel/store/steering/structure.md`._
+ 
+ ## What this is
+ 
+diff --git a/cli/src/studio/mod.rs b/cli/src/studio/mod.rs
+index be5bc6b..77a9a0e 100644
+--- a/cli/src/studio/mod.rs
++++ b/cli/src/studio/mod.rs
+@@ -38,6 +38,12 @@ pub trait Host {
+     fn write_artifact(&self, project: &str, slug: &str, artifact: &str, local: &Path)
+         -> Result<()>;
+     fn approve(&self, project: &str, command: &[String]) -> Result<String>;
++    /// Record a rejection. Separate from `approve` so the two can never be
++    /// confused at the boundary, even though both end in `keel approve`.
++    fn reject(&self, project: &str, command: &[String]) -> Result<String>;
++    /// The newest gate evidence for a spec, as keel wrote it. Empty string
++    /// when there is none to read.
++    fn gate_output(&self, project: &str, slug: &str) -> Result<String>;
+ }
+ 
+ /// The three keel artifacts, and where they live inside a sandbox. Same
+@@ -157,6 +163,40 @@ impl Host for Docker {
+         let (_, out) = self.exec(project, command)?;
+         Ok(out)
+     }
++
++    fn reject(&self, project: &str, command: &[String]) -> Result<String> {
++        // Same guard as `approve`: keel's own verb, and the rejection
++        // flags this console appended. Nothing else is runnable here.
++        if command.first().map(String::as_str) != Some("keel")
++            || command.get(1).map(String::as_str) != Some("approve")
++            || !command.iter().any(|a| a == "--reject")
++        {
++            anyhow::bail!("refusing to run '{}' as a rejection", command.join(" "));
++        }
++        let (_, out) = self.exec(project, command)?;
++        Ok(out)
++    }
++
++    fn gate_output(&self, project: &str, slug: &str) -> Result<String> {
++        crate::manifest::validate_name(slug).context("spec name from the pipeline status")?;
++        let m = self.manifest(project)?;
++        // The newest gate evidence keel wrote for this spec. `|| true` so a
++        // spec with no gates yet is an empty read, not a failure.
++        let script = format!(
++            "cat \"$(ls -1t .keel/specs/{slug}/gates/*.json 2>/dev/null | head -1)\" 2>/dev/null || true"
++        );
++        let argv: Vec<String> = vec![
++            "exec".into(),
++            m.sandbox_container(),
++            "sh".into(),
++            "-c".into(),
++            script,
++        ];
++        let args: Vec<&str> = argv.iter().map(String::as_str).collect();
++        let (status, out) = proc::run_capture("docker", &args)?;
++        audit::log_exec(project, &m, "studio", &argv, status.code())?;
++        Ok(out)
++    }
+ }
+ 
+ /// A turn coming back from its own thread. Keypresses are read straight
+@@ -330,6 +370,20 @@ pub fn run(names: Vec<String>) -> Result<()> {
+                 console.note(&project, &format!("approved '{slug}': {}", out.trim()));
+                 console.refresh(&host)?;
+             }
++            Action::Reject {
++                project,
++                slug,
++                command,
++                note,
++            } => {
++                let mut argv = command.clone();
++                argv.push("--reject".into());
++                argv.push("--note".into());
++                argv.push(note);
++                let out = host.reject(&project, &argv)?;
++                console.note(&project, &format!("rejected '{slug}': {}", out.trim()));
++                console.refresh(&host)?;
++            }
+             Action::EditArtifact {
+                 project,
+                 slug,
+@@ -382,6 +436,8 @@ pub mod tests {
+         artifacts: Mutex<Vec<(String, String, String, String)>>,
+         pub writes: Mutex<Vec<(String, String, String, String)>>,
+         pub approvals: Mutex<Vec<Vec<String>>>,
++        pub rejections: Mutex<Vec<Vec<String>>>,
++        pub gate_json: Mutex<String>,
+     }
+ 
+     impl FakeHost {
+@@ -396,9 +452,16 @@ pub mod tests {
+                 artifacts: Mutex::new(vec![]),
+                 writes: Mutex::new(vec![]),
+                 approvals: Mutex::new(vec![]),
++                rejections: Mutex::new(vec![]),
++                gate_json: Mutex::new(String::new()),
+             }
+         }
+ 
++        pub fn with_gate_json(self, json: &str) -> Self {
++            *self.gate_json.lock().unwrap() = json.to_string();
++            self
++        }
++
+         pub fn with_running(mut self, names: &[&str]) -> Self {
+             self.running = names.iter().map(|s| s.to_string()).collect();
+             self
+@@ -480,6 +543,15 @@ pub mod tests {
+             self.approvals.lock().unwrap().push(command.to_vec());
+             Ok("approved".into())
+         }
++
++        fn reject(&self, _project: &str, command: &[String]) -> Result<String> {
++            self.rejections.lock().unwrap().push(command.to_vec());
++            Ok("rejected".into())
++        }
++
++        fn gate_output(&self, _project: &str, _slug: &str) -> Result<String> {
++            Ok(self.gate_json.lock().unwrap().clone())
++        }
+     }
+ 
+     /// AC-2
+diff --git a/cli/src/studio/render.rs b/cli/src/studio/render.rs
+index 298a835..161862c 100644
+--- a/cli/src/studio/render.rs
++++ b/cli/src/studio/render.rs
+@@ -130,7 +130,7 @@ pub fn wrap(text: &str, width: usize) -> Vec<String> {
+ /// what the console would draw can be asserted on directly.
+ pub fn frame(c: &Console, width: usize, height: usize) -> String {
+     let mut out = String::new();
+-    out.push_str(&format!("{BOLD}{CYAN}moor studio{RESET}{DIM}  ↑/↓ project · type to ask · Enter send · e edit · a approve · r refresh · q quit{RESET}\n\n"));
++    out.push_str(&format!("{BOLD}{CYAN}moor studio{RESET}{DIM}  ↑/↓ project · type to ask · Enter send · e edit · a approve · x reject · r refresh · q quit{RESET}\n\n"));
+ 
+     for (i, p) in c.projects.iter().enumerate() {
+         let marker = if i == c.selected { REVERSE } else { "" };
+@@ -150,6 +150,14 @@ pub fn frame(c: &Console, width: usize, height: usize) -> String {
+             "{marker} {:<24}{RESET} {state}  {stage}\n",
+             p.name
+         ));
++        // What the last gate actually failed on. Sanitized like every
++        // other string that came out of a sandbox.
++        for check in &p.failing_checks {
++            for line in wrap(&format!("    {RED}✗{RESET} {}", sanitize(check)), width) {
++                out.push_str(&line);
++                out.push('\n');
++            }
++        }
+     }
+     out.push('\n');
+ 
+@@ -165,6 +173,32 @@ pub fn frame(c: &Console, width: usize, height: usize) -> String {
+         ));
+     }
+ 
++    if let Approval::Rejecting {
++        slug,
++        stage,
++        reason,
++        ..
++    } = &c.approval
++    {
++        out.push_str(&format!(
++            "{RED}{BOLD}reject {stage} stage of '{slug}' — why? {RESET}{}{RED}{BOLD}▏{RESET}  {DIM}Enter to continue · Esc to abandon{RESET}\n\n",
++            sanitize(reason)
++        ));
++    }
++
++    if let Approval::RejectArmed {
++        slug,
++        stage,
++        reason,
++        ..
++    } = &c.approval
++    {
++        out.push_str(&format!(
++            "{RED}{BOLD}reject {stage} stage of '{slug}'?{RESET} reason: {}  {RED}{BOLD}press y to confirm, any other key cancels{RESET}\n\n",
++            sanitize(reason)
++        ));
++    }
++
+     if let Some(p) = c.selected_project() {
+         let body_height = height.saturating_sub(c.projects.len() + 8).max(3);
+         let mut body: Vec<String> = vec![];
+diff --git a/cli/src/studio/state.rs b/cli/src/studio/state.rs
+index 8f69bf5..1c3a29a 100644
+--- a/cli/src/studio/state.rs
++++ b/cli/src/studio/state.rs
+@@ -54,6 +54,10 @@ pub struct Project {
+     /// question into another repository.
+     pub input: String,
+     pub transcript: Vec<Line>,
++    /// Names of the checks the project's last gate run failed, read from
++    /// keel's own gate evidence. Empty when the stage is not a failed
++    /// gate — never inferred from anything else.
++    pub failing_checks: Vec<String>,
+ }
+ 
+ /// Approval is a two-step, and the steps are different keys. A single
+@@ -64,6 +68,24 @@ pub struct Project {
+ #[derive(Debug, PartialEq, Eq)]
+ pub enum Approval {
+     Idle,
++    /// Collecting the reason for a rejection. keel records a note with a
++    /// rejection, so this cannot be a single keypress the way a cancel
++    /// could be.
++    Rejecting {
++        project: String,
++        slug: String,
++        stage: String,
++        command: Vec<String>,
++        reason: String,
++    },
++    /// A rejection with a reason, waiting on the confirming key.
++    RejectArmed {
++        project: String,
++        slug: String,
++        stage: String,
++        command: Vec<String>,
++        reason: String,
++    },
+     Armed {
+         project: String,
+         slug: String,
+@@ -102,6 +124,12 @@ pub enum Action {
+         slug: String,
+         command: Vec<String>,
+     },
++    Reject {
++        project: String,
++        slug: String,
++        command: Vec<String>,
++        note: String,
++    },
+     EditArtifact {
+         project: String,
+         slug: String,
+@@ -193,6 +221,21 @@ impl Console {
+                 Ok(json) => self.apply_next(&name, &json)?,
+                 Err(e) => self.status = format!("couldn't read {name}'s pipeline status: {e}"),
+             }
++            // Only for a spec whose stage is a gate: everything else has no
++            // failing checks to show, and reading evidence for it would be
++            // a wasted exec per refresh.
++            let slug = self.projects[i].slug.clone();
++            let at_gate = self.projects[i]
++                .stage
++                .as_deref()
++                .is_some_and(|s| s.contains("gate"));
++            self.projects[i].failing_checks = match (slug, at_gate) {
++                (Some(slug), true) => host
++                    .gate_output(&name, &slug)
++                    .map(|json| failing_checks(&json))
++                    .unwrap_or_default(),
++                _ => vec![],
++            };
+         }
+         Ok(())
+     }
+@@ -320,7 +363,121 @@ impl Console {
+         }
+     }
+ 
++    /// Keys while a rejection's reason is being typed. Enter arms it, but
++    /// only with a reason: keel records the note, and an empty one tells
++    /// the next attempt nothing.
++    fn key_while_rejecting(&mut self, key: Key) -> Action {
++        let Approval::Rejecting {
++            project,
++            slug,
++            stage,
++            command,
++            reason,
++        } = &mut self.approval
++        else {
++            return Action::None;
++        };
++        match key {
++            Key::Esc => {
++                self.approval = Approval::Idle;
++                self.status = "rejection abandoned".into();
++            }
++            Key::Backspace => {
++                reason.pop();
++            }
++            Key::Char(c) => reason.push(c),
++            Key::Enter => {
++                if reason.trim().is_empty() {
++                    self.status = "a rejection needs a reason — type why, then Enter".into();
++                    return Action::None;
++                }
++                let armed = Approval::RejectArmed {
++                    project: project.clone(),
++                    slug: slug.clone(),
++                    stage: stage.clone(),
++                    command: command.clone(),
++                    reason: reason.trim().to_string(),
++                };
++                self.approval = armed;
++                self.status = "press y to confirm the rejection".into();
++            }
++            Key::Up | Key::Down => {}
++        }
++        Action::None
++    }
++
++    /// Begin a rejection of whatever keel says this project is waiting on.
++    /// Mirrors `arm_approval`, including taking keel's own command rather
++    /// than rebuilding it from the stage name.
++    pub fn arm_rejection(&mut self) {
++        let Some(p) = self.selected_project() else {
++            return;
++        };
++        let command: Vec<String> = p
++            .next_command
++            .as_deref()
++            .unwrap_or_default()
++            .split_whitespace()
++            .map(String::from)
++            .collect();
++        let is_approve = command.first().map(String::as_str) == Some("keel")
++            && command.get(1).map(String::as_str) == Some("approve");
++        match (&p.slug, &p.stage, is_approve) {
++            (Some(slug), Some(stage), true) => {
++                self.approval = Approval::Rejecting {
++                    project: p.name.clone(),
++                    slug: slug.clone(),
++                    stage: stage.clone(),
++                    command,
++                    reason: String::new(),
++                };
++                self.status = "why reject? type a reason, then Enter".into();
++            }
++            (_, _, false) if p.slug.is_some() => {
++                self.status = format!(
++                    "keel's next step here is not a decision: {}",
++                    p.next_command.clone().unwrap_or_else(|| "unknown".into())
++                )
++            }
++            _ => self.status = "nothing to reject: keel reports no active spec here".into(),
++        }
++    }
++
+     pub fn handle_key(&mut self, key: Key) -> Action {
++        // A rejection in progress owns the keyboard: its reason is typed,
++        // so ordinary text keys must not reach the agent input, and Esc
++        // abandons it rather than quitting the console.
++        if let Approval::Rejecting { .. } = &self.approval {
++            return self.key_while_rejecting(key);
++        }
++        if let Approval::RejectArmed {
++            project,
++            slug,
++            stage,
++            command,
++            reason,
++        } = &self.approval
++        {
++            let armed = (
++                project.clone(),
++                slug.clone(),
++                stage.clone(),
++                command.clone(),
++                reason.clone(),
++            );
++            self.approval = Approval::Idle;
++            if key == Key::Char('y') {
++                self.status = format!("rejecting {} stage of '{}'", armed.2, armed.1);
++                return Action::Reject {
++                    project: armed.0,
++                    slug: armed.1,
++                    command: armed.3,
++                    note: armed.4,
++                };
++            }
++            self.status = "rejection cancelled".into();
++            return Action::None;
++        }
+         // An armed approval consumes the next key, whatever it is. Only
+         // `y` confirms; everything else — including another `a` — cancels,
+         // so no repeated keystroke can approve a stage.
+@@ -386,6 +543,10 @@ impl Console {
+                     self.arm_approval();
+                     return Action::None;
+                 }
++                'x' => {
++                    self.arm_rejection();
++                    return Action::None;
++                }
+                 'e' => return self.edit(),
+                 _ => {}
+             }
+@@ -450,6 +611,42 @@ impl Console {
+     }
+ }
+ 
++/// The names of the checks a keel gate record reports as failed. Pure, so
++/// it is tested against real gate JSON without a container. Anything that
++/// is not a recognisable gate record yields no names rather than an error:
++/// a missing or half-written evidence file is not worth failing a refresh
++/// over.
++pub fn failing_checks(gate_json: &str) -> Vec<String> {
++    let Ok(v) = serde_json::from_str::<serde_json::Value>(gate_json.trim()) else {
++        return vec![];
++    };
++    let checks = v
++        .get("checks")
++        .and_then(|c| c.as_array())
++        .map(|a| a.as_slice())
++        .unwrap_or_default();
++    // keel's gate record names each check by `id` and its outcome by
++    // `verdict` — checked against a real G1.json rather than assumed.
++    // `detail` carries why, which is the part the operator actually needs.
++    checks
++        .iter()
++        .filter(|c| {
++            matches!(
++                c.get("verdict").and_then(|s| s.as_str()),
++                Some("fail") | Some("blocked")
++            )
++        })
++        .filter_map(|c| {
++            let id = c.get("id").and_then(|n| n.as_str())?;
++            Ok::<String, ()>(match c.get("detail").and_then(|d| d.as_str()) {
++                Some(d) if !d.trim().is_empty() => format!("{id}: {d}"),
++                _ => id.to_string(),
++            })
++            .ok()
++        })
++        .collect()
++}
++
+ /// Tiny helper so `send` can bail cleanly on an empty project list.
+ trait CheckedIndex {
+     fn checked_index(&self, i: usize) -> Option<usize>;
+@@ -730,4 +927,164 @@ mod tests {
+         }
+         assert_eq!(seen, vec!["spec", "plan", "tasks"]);
+     }
++    // --- studio-decisions (SPEC-0013) ----------------------------------
++
++    /// A console with one project sitting on an approval keel reported.
++    fn awaiting_decision() -> Console {
++        let mut c = Console::new(&["alpha".to_string()]);
++        c.apply_next(
++            "alpha",
++            r#"{"specs":[{"slug":"login","stage":"spec_approval","complete":false,
++                 "command":"keel approve login --stage spec"}]}"#,
++        )
++        .unwrap();
++        c
++    }
++
++    #[test]
++    fn reject_key_collects_a_reason() {
++        // AC-1
++        let mut c = awaiting_decision();
++        assert_eq!(c.handle_key(Key::Char('x')), Action::None);
++        assert!(matches!(c.approval, Approval::Rejecting { .. }));
++        for ch in "too vague".chars() {
++            assert_eq!(c.handle_key(Key::Char(ch)), Action::None);
++        }
++        match &c.approval {
++            Approval::Rejecting { reason, .. } => assert_eq!(reason, "too vague"),
++            other => panic!("expected Rejecting, got {other:?}"),
++        }
++        // The typed reason did not leak into the agent input line.
++        assert_eq!(c.selected_project().unwrap().input, "");
++    }
++
++    #[test]
++    fn empty_reason_records_no_rejection() {
++        // AC-2
++        let mut c = awaiting_decision();
++        c.handle_key(Key::Char('x'));
++        assert_eq!(c.handle_key(Key::Enter), Action::None);
++        // Still collecting, nothing emitted, and it says why.
++        assert!(matches!(c.approval, Approval::Rejecting { .. }));
++        assert!(c.status.contains("needs a reason"), "{}", c.status);
++    }
++
++    #[test]
++    fn rejection_needs_a_second_key() {
++        // AC-3: Enter arms; only `y` records.
++        let mut c = awaiting_decision();
++        c.handle_key(Key::Char('x'));
++        for ch in "nope".chars() {
++            c.handle_key(Key::Char(ch));
++        }
++        assert_eq!(c.handle_key(Key::Enter), Action::None);
++        assert!(matches!(c.approval, Approval::RejectArmed { .. }));
++        match c.handle_key(Key::Char('y')) {
++            Action::Reject { slug, note, .. } => {
++                assert_eq!(slug, "login");
++                assert_eq!(note, "nope");
++            }
++            other => panic!("expected Reject, got {other:?}"),
++        }
++        // A non-y key cancels instead of recording.
++        let mut c2 = awaiting_decision();
++        c2.handle_key(Key::Char('x'));
++        c2.handle_key(Key::Char('z'));
++        c2.handle_key(Key::Enter);
++        assert_eq!(c2.handle_key(Key::Char('n')), Action::None);
++        assert!(matches!(c2.approval, Approval::Idle));
++    }
++
++    #[test]
++    fn escape_abandons_a_rejection() {
++        // AC-4
++        let mut c = awaiting_decision();
++        c.handle_key(Key::Char('x'));
++        c.handle_key(Key::Char('w'));
++        assert_eq!(c.handle_key(Key::Esc), Action::None); // not Quit
++        assert!(matches!(c.approval, Approval::Idle));
++        assert!(c.status.contains("abandoned"), "{}", c.status);
++    }
++
++    #[test]
++    fn rejection_uses_keels_own_command_and_note() {
++        // AC-5: keel's verbatim command, with the reason as the note.
++        let mut c = awaiting_decision();
++        c.handle_key(Key::Char('x'));
++        for ch in "needs rollback".chars() {
++            c.handle_key(Key::Char(ch));
++        }
++        c.handle_key(Key::Enter);
++        match c.handle_key(Key::Char('y')) {
++            Action::Reject { command, note, .. } => {
++                assert_eq!(command, vec!["keel", "approve", "login", "--stage", "spec"]);
++                assert_eq!(note, "needs rollback");
++            }
++            other => panic!("expected Reject, got {other:?}"),
++        }
++    }
++
++    #[test]
++    fn failing_checks_are_shown() {
++        // AC-6: the parser reads keel's real gate shape, and the frame
++        // draws the names.
++        let gate = r#"{"gate":"G1","verdict":"fail","checks":[
++            {"id":"schema","verdict":"pass","detail":"ok"},
++            {"id":"task-exit-conditions","verdict":"fail","detail":"no exit condition on T-1"},
++            {"id":"test-movement","verdict":"blocked","detail":"confirm the oracles"}]}"#;
++        let names = failing_checks(gate);
++        assert_eq!(names.len(), 2, "{names:?}");
++        assert!(names[0].starts_with("task-exit-conditions"), "{names:?}");
++        assert!(names[1].starts_with("test-movement"), "{names:?}");
++        // Not a gate record at all: no names, no error.
++        assert!(failing_checks("not json").is_empty());
++        assert!(failing_checks("").is_empty());
++
++        let mut c = Console::new(&["alpha".to_string()]);
++        c.projects[0].failing_checks = names;
++        let drawn = crate::studio::render::frame(&c, 100, 24);
++        assert!(drawn.contains("task-exit-conditions"), "{drawn}");
++    }
++
++    #[test]
++    fn failing_checks_come_through_the_host_on_refresh() {
++        // AC-6, at the boundary: refresh reads gate evidence via the Host
++        // for a spec at a gate, and only for one at a gate.
++        let gate = r#"{"gate":"G1","verdict":"fail","checks":[
++            {"id":"total-budget","verdict":"fail","detail":"446 lines"}]}"#;
++        let host = crate::studio::tests::FakeHost::new()
++            .with_running(&["alpha"])
++            .with_next(
++                r#"{"specs":[{"slug":"login","stage":"plan_gate","complete":false,
++                     "command":"keel gate g1 login"}]}"#,
++            )
++            .with_gate_json(gate);
++        let mut c = Console::new(&["alpha".to_string()]);
++        c.refresh(&host).unwrap();
++        assert_eq!(c.projects[0].failing_checks.len(), 1);
++        assert!(c.projects[0].failing_checks[0].starts_with("total-budget"));
++
++        // A spec that is not at a gate gets no gate read at all.
++        let host2 = crate::studio::tests::FakeHost::new()
++            .with_running(&["alpha"])
++            .with_next(
++                r#"{"specs":[{"slug":"login","stage":"spec_approval","complete":false,
++                     "command":"keel approve login --stage spec"}]}"#,
++            )
++            .with_gate_json(gate);
++        let mut c2 = Console::new(&["alpha".to_string()]);
++        c2.refresh(&host2).unwrap();
++        assert!(c2.projects[0].failing_checks.is_empty());
++    }
++
++    #[test]
++    fn gate_output_is_sanitized() {
++        // AC-7: a hostile check name cannot address the terminal.
++        let mut c = Console::new(&["alpha".to_string()]);
++        c.projects[0].failing_checks = vec!["evil\x1b[2J\x1b]0;pwned\x07check".to_string()];
++        let drawn = crate::studio::render::frame(&c, 100, 24);
++        assert!(!drawn.contains("\x1b[2J"), "escape survived: {drawn:?}");
++        assert!(!drawn.contains("\x1b]0;"), "OSC survived: {drawn:?}");
++        assert!(drawn.contains("evil"), "text lost: {drawn}");
++    }
+ }
+diff --git a/.keel/runs/2026-10-02-000/evidence/build.txt b/.keel/runs/2026-10-02-000/evidence/build.txt
+new file mode 100644
+index 0000000..c078b47
+--- /dev/null
++++ b/.keel/runs/2026-10-02-000/evidence/build.txt
+@@ -0,0 +1,2 @@
++$ cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml
++
+diff --git a/.keel/runs/2026-10-02-000/evidence/diff-stat.txt b/.keel/runs/2026-10-02-000/evidence/diff-stat.txt
+new file mode 100644
+index 0000000..05857a1
+--- /dev/null
++++ b/.keel/runs/2026-10-02-000/evidence/diff-stat.txt
+@@ -0,0 +1,29 @@
++     5      5  .github/copilot-instructions.md
++     9      0  .keel/chain.jsonl
++     2      0  .keel/runs/2026-10-02-000/evidence/build.txt
++     2      0  .keel/runs/2026-10-02-000/evidence/lint.txt
++    74      0  .keel/runs/2026-10-02-000/evidence/oracles.json
++    14      0  .keel/runs/2026-10-02-000/evidence/test.txt
++     9      0  .keel/runs/2026-10-02-000/run.json
++    16      0  .keel/runs/2026-10-02-000/trajectory.jsonl
++     1      0  .keel/specs/studio-authoring/approvals.jsonl
++    90      0  .keel/specs/studio-authoring/gates/G0.json
++   109      0  .keel/specs/studio-authoring/spec.md
++     2      0  .keel/specs/studio-decisions/approvals.jsonl
++    90      0  .keel/specs/studio-decisions/gates/G0.json
++    95      0  .keel/specs/studio-decisions/gates/G1.json
++    94      0  .keel/specs/studio-decisions/plan.md
++   110      0  .keel/specs/studio-decisions/spec.md
++    63      0  .keel/specs/studio-decisions/tasks.md
++    27     27  .keel/store/map/cli/src/CODEMAP.md
++     5      5  .keel/store/map/cli/src/commands/CODEMAP.md
++     1      1  .keel/store/map/cli/src/studio/CODEMAP.md
++    48     47  .keel/store/steering/structure.md
++    22     22  .kiro/steering/keel.md
++    22     22  AGENTS.md
++    22     22  CLAUDE.md
++    72      0  cli/src/studio/mod.rs
++    35      1  cli/src/studio/render.rs
++   357      0  cli/src/studio/state.rs
++
++27 file(s), +1396 -152 (1548 lines of churn) against c3c1d3d22afd99dbd815e48c9def6c4aea8ab363
+diff --git a/.keel/runs/2026-10-02-000/evidence/lint.txt b/.keel/runs/2026-10-02-000/evidence/lint.txt
+new file mode 100644
+index 0000000..edb91b9
+--- /dev/null
++++ b/.keel/runs/2026-10-02-000/evidence/lint.txt
+@@ -0,0 +1,2 @@
++$ cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml
++
+diff --git a/.keel/runs/2026-10-02-000/evidence/oracles.json b/.keel/runs/2026-10-02-000/evidence/oracles.json
+new file mode 100644
+index 0000000..1b5e0f2
+--- /dev/null
++++ b/.keel/runs/2026-10-02-000/evidence/oracles.json
+@@ -0,0 +1,74 @@
++{
++  "runs": [
++    {
++      "criterion": "AC-1",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml reject_key_collects_a_reason` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "\nrunning 1 test\ntest studio::state::tests::reject_key_collects_a_reason ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 203 filtered out; finished in 0.00s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.17s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
++    },
++    {
++      "criterion": "AC-2",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml empty_reason_records_no_rejection` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "\nrunning 1 test\ntest studio::state::tests::empty_reason_records_no_rejection ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 203 filtered out; finished in 0.00s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.25s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
++    },
++    {
++      "criterion": "AC-3",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml rejection_needs_a_second_key` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "\nrunning 1 test\ntest studio::state::tests::rejection_needs_a_second_key ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 203 filtered out; finished in 0.00s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.15s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
++    },
++    {
++      "criterion": "AC-4",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml escape_abandons_a_rejection` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "\nrunning 1 test\ntest studio::state::tests::escape_abandons_a_rejection ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 203 filtered out; finished in 0.00s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.13s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
++    },
++    {
++      "criterion": "AC-5",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml rejection_uses_keels_own_command_and_note` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "\nrunning 1 test\ntest studio::state::tests::rejection_uses_keels_own_command_and_note ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 203 filtered out; finished in 0.00s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.13s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
++    },
++    {
++      "criterion": "AC-6",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml failing_checks_are_shown` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "\nrunning 1 test\ntest studio::state::tests::failing_checks_are_shown ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 203 filtered out; finished in 0.00s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.13s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
++    },
++    {
++      "criterion": "AC-7",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml gate_output_is_sanitized` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "\nrunning 1 test\ntest studio::state::tests::gate_output_is_sanitized ... ok\n\ntest result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 203 filtered out; finished in 0.00s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.13s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
++    },
++    {
++      "criterion": "AC-8",
++      "kind": "cmd",
++      "oracle": "`cargo test --manifest-path cli/Cargo.toml` exits 0",
++      "outcome": "pass",
++      "exit_code": 0,
++      "output": "…\n\ntest secrets::tests::finds_copilot_device_token_source ... ok\ntest session::tests::a_missing_credential_points_at_the_host_side_fix ... ok\ntest session::tests::an_empty_turn_reports_what_claude_actually_said ... ok\ntest session::tests::brainstorm_grants_no_write_tool ... ok\ntest session::tests::build_role_has_verification_tools_but_no_shell ... ok\ntest compose::tests::secrets_become_compose_default_empty_env_lines ... ok\ntest session::tests::error_turn_is_detected_by_is_error ... ok\ntest session::tests::mcp_config_is_the_value_of_its_own_flag ... ok\ntest session::tests::no_role_can_reach_a_shell_or_a_subagent ... ok\ntest compose::tests::no_known_placeholder_survives_rendering ... ok\ntest session::tests::resume_is_passed_through_when_there_is_a_stored_session ... ok\ntest session::tests::the_prompt_precedes_every_variadic_flag ... ok\ntest compose::tests::no_secrets_still_renders_valid_yaml_shape ... ok\ntest commands::bundle_cmd::tests::a_failed_export_removes_the_partial_archive ... ok\ntest session::tests::unknown_role_is_rejected ... ok\ntest studio::render::tests::a_hostile_reply_cannot_reach_the_terminal_through_the_frame ... ok\ntest studio::render::tests::a_turn_in_flight_shows_moving_elapsed_time_next_to_the_input_line ... ok\ntest studio::render::tests::frame_marks_a_pending_project_and_names_an_armed_approval ... ok\ntest studio::render::tests::render_strips_control_sequences ... ok\ntest studio::render::tests::wrap_breaks_long_lines_and_long_words ... ok\ntest studio::state::tests::a_stopped_project_refuses_a_turn_instead_of_hanging_on_docker ... ok\ntest studio::state::tests::approval_requires_a_second_distinct_key ... ok\ntest studio::state::tests::edit_cycles_the_three_keel_artifacts ... ok\ntest studio::state::tests::empty_reason_records_no_rejection ... ok\ntest studio::state::tests::escape_abandons_a_rejection ... ok\ntest studio::state::tests::failing_checks_are_shown ... ok\ntest studio::state::tests::failing_checks_come_through_the_host_on_refresh ... ok\ntest studio::state::tests::gate_output_is_sanitized ... ok\ntest compose::tests::sandbox_gets_attestation_and_sink_without_bind_mounts ... ok\ntest studio::state::tests::refresh_issues_one_container_query ... ok\ntest studio::state::tests::reject_key_collects_a_reason ... ok\ntest studio::state::tests::rejection_needs_a_second_key ... ok\ntest studio::state::tests::rejection_uses_keels_own_command_and_note ... ok\ntest studio::state::tests::stage_is_read_from_keel_next ... ok\ntest studio::state::tests::switching_projects_isolates_sessions ... ok\ntest studio::state::tests::typed_text_wins_over_command_keys_once_a_question_is_started ... ok\ntest studio::tests::a_turn_that_fails_is_reported_as_a_failed_turn ... ok\ntest studio::tests::approve_refuses_anything_that_is_not_keels_own_approve ... ok\ntest compose::tests::sandbox_has_no_bind_mount_volume_entries ... ok\ntest compose::tests::extra_allow_domains_joined_with_commas ... ok\ntest studio::tests::input_is_handled_while_turn_is_pending ... ok\ntest studio::tests::console_writes_no_second_log ... ok\ntest secrets::tests::missing_device_token_is_noop ... ok\ntest session::tests::rejects_malformed_session_id ... ok\ntest compose::tests::sandbox_network_is_internal_only ... ok\ntest session::tests::turn_is_chained_without_content ... ok\ntest session::tests::emitted_recipe_round_trips ... ok\ntest compose::tests::project_name_is_substituted_everywhere_it_appears ... ok\ntest studio::tests::artifact_edit_writes_back_over_exec ... ok\ntest session::tests::transcript_is_redacted ... ok\ntest secrets::tests::status_reports_missing_when_neither_env_nor_keychain_has_it ... ok\ntest secrets::tests::device_token_not_persisted_by_moor ... ok\ntest audit::tests::legacy_chain_is_sealed_into_the_new_one ... ok\n\ntest result: ok. 204 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s\n\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.13s\n     Running unittests src/main.rs (cli/target/debug/deps/moor-1a24985d4ffdc483)"
++    }
++  ],
++  "criteria": 8,
++  "executed": 8,
++  "passed": 8,
++  "failed": 0,
++  "blocked": 0,
++  "human": 0
++}
+\ No newline at end of file
+diff --git a/.keel/runs/2026-10-02-000/evidence/test.txt b/.keel/runs/2026-10-02-000/evidence/test.txt
+new file mode 100644
+index 0000000..6c3589d
+--- /dev/null
++++ b/.keel/runs/2026-10-02-000/evidence/test.txt
+@@ -0,0 +1,14 @@
++$ cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml
++
++
++running 204 tests
++....................................................................................... 87/204
++....................................................................................... 174/204
++..............................
++test result: ok. 204 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
++
++
++running 8 tests
++........
++test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
++
+diff --git a/.keel/runs/2026-10-02-000/run.json b/.keel/runs/2026-10-02-000/run.json
+new file mode 100644
+index 0000000..a0ab2da
+--- /dev/null
++++ b/.keel/runs/2026-10-02-000/run.json
+@@ -0,0 +1,9 @@
++{
++  "schema": "keel.run/1",
++  "id": "2026-10-02-000",
++  "spec": "studio-decisions",
++  "keel_version": "0.11.0",
++  "store_hash": "96cfd67a4a896804c2be5909e885e46ae7a513e3764c726dfeaebf8828e8abf5",
++  "started_at": "2026-10-02T08:16:02.138278+02:00",
++  "base_commit": "c3c1d3d22afd99dbd815e48c9def6c4aea8ab363"
++}
+diff --git a/.keel/runs/2026-10-02-000/trajectory.jsonl b/.keel/runs/2026-10-02-000/trajectory.jsonl
+new file mode 100644
+index 0000000..8cb285a
+--- /dev/null
++++ b/.keel/runs/2026-10-02-000/trajectory.jsonl
+@@ -0,0 +1,16 @@
++{"t":"2026-10-02T08:16:02.139114+02:00","seq":1,"kind":"run_start","spec":"studio-decisions","keel_version":"0.11.0","store_hash":"96cfd67a4a896804c2be5909e885e46ae7a513e3764c726dfeaebf8828e8abf5"}
++{"t":"2026-10-02T08:16:02.142070+02:00","seq":2,"kind":"inject","source":".keel/store/steering/conventions.md","tokens":177,"bytes":705}
++{"t":"2026-10-02T08:16:02.142100+02:00","seq":3,"kind":"inject","source":".keel/store/steering/tech.md","tokens":85,"bytes":338}
++{"t":"2026-10-02T08:16:02.142139+02:00","seq":4,"kind":"inject","source":".keel/store/steering/structure.md","tokens":8270,"bytes":33079}
++{"t":"2026-10-02T08:16:02.145094+02:00","seq":5,"kind":"inject","source":".keel/specs/studio-decisions/spec.md","tokens":1051,"bytes":4203}
++{"t":"2026-10-02T08:16:03.559266+02:00","seq":6,"kind":"command","cmd":"cargo build --quiet --manifest-path cli/Cargo.toml && cargo build --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/build.txt"}
++{"t":"2026-10-02T08:16:03.904842+02:00","seq":7,"kind":"command","cmd":"cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/test.txt"}
++{"t":"2026-10-02T08:16:05.635397+02:00","seq":8,"kind":"command","cmd":"cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml","exit_code":0,"evidence":"evidence/lint.txt"}
++{"t":"2026-10-02T08:16:07.501882+02:00","seq":9,"kind":"oracle","criterion":"AC-1","oracle":"`cargo test --manifest-path cli/Cargo.toml reject_key_collects_a_reason` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-10-02T08:16:07.501918+02:00","seq":10,"kind":"oracle","criterion":"AC-2","oracle":"`cargo test --manifest-path cli/Cargo.toml empty_reason_records_no_rejection` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-10-02T08:16:07.501926+02:00","seq":11,"kind":"oracle","criterion":"AC-3","oracle":"`cargo test --manifest-path cli/Cargo.toml rejection_needs_a_second_key` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-10-02T08:16:07.501931+02:00","seq":12,"kind":"oracle","criterion":"AC-4","oracle":"`cargo test --manifest-path cli/Cargo.toml escape_abandons_a_rejection` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-10-02T08:16:07.501935+02:00","seq":13,"kind":"oracle","criterion":"AC-5","oracle":"`cargo test --manifest-path cli/Cargo.toml rejection_uses_keels_own_command_and_note` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-10-02T08:16:07.501939+02:00","seq":14,"kind":"oracle","criterion":"AC-6","oracle":"`cargo test --manifest-path cli/Cargo.toml failing_checks_are_shown` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-10-02T08:16:07.501943+02:00","seq":15,"kind":"oracle","criterion":"AC-7","oracle":"`cargo test --manifest-path cli/Cargo.toml gate_output_is_sanitized` exits 0","verdict":"pass","exit_code":0}
++{"t":"2026-10-02T08:16:07.501957+02:00","seq":16,"kind":"oracle","criterion":"AC-8","oracle":"`cargo test --manifest-path cli/Cargo.toml` exits 0","verdict":"pass","exit_code":0}
+diff --git a/.keel/specs/studio-authoring/approvals.jsonl b/.keel/specs/studio-authoring/approvals.jsonl
+new file mode 100644
+index 0000000..1646a4c
+--- /dev/null
++++ b/.keel/specs/studio-authoring/approvals.jsonl
+@@ -0,0 +1 @@
++{"schema":"keel.approval/1","stage":"spec","decision":"approved","artefact_hash":"868963a985b0b73723ba37829cd25e955c4187d55ae172f17b5a461f65dbb48e","gate_verdict":"pass","by":"Dane Balia","at":"2026-10-02T07:13:36.784853+02:00"}
+diff --git a/.keel/specs/studio-decisions/approvals.jsonl b/.keel/specs/studio-decisions/approvals.jsonl
+new file mode 100644
+index 0000000..de39cbc
+--- /dev/null
++++ b/.keel/specs/studio-decisions/approvals.jsonl
+@@ -0,0 +1,2 @@
++{"schema":"keel.approval/1","stage":"spec","decision":"approved","artefact_hash":"4f1e51afd89896a91d16d18f03b4ef8c7076738a845a10aaf9ad798e910e7288","gate_verdict":"pass","by":"Dane Balia","at":"2026-10-02T07:13:30.303637+02:00"}
++{"schema":"keel.approval/1","stage":"plan","decision":"approved","artefact_hash":"426edd4ee5407df3cd0f99c37d6f12d13c041d9d12f259704adc5c7ce5545d4d","gate_verdict":"pass","by":"Dane Balia","at":"2026-10-02T08:09:38.964495+02:00"}
+diff --git a/.keel/specs/studio-decisions/gates/G1.json b/.keel/specs/studio-decisions/gates/G1.json
+new file mode 100644
+index 0000000..fb27f02
+--- /dev/null
++++ b/.keel/specs/studio-decisions/gates/G1.json
+@@ -0,0 +1,95 @@
++{
++  "schema": "keel.gate/1",
++  "gate": "G1",
++  "run": "2026-10-02-000",
++  "spec": "studio-decisions",
++  "verdict": "pass",
++  "generated_at": "2026-10-02T08:06:48.526930+02:00",
++  "checks": [
++    {
++      "id": "schema",
++      "verdict": "pass",
++      "detail": "PLAN-0013 + TASKS-0013"
++    },
++    {
++      "id": "g0-passed",
++      "verdict": "pass",
++      "detail": "G0 passed in run 2026-10-01-007"
++    },
++    {
++      "id": "spec-approved",
++      "verdict": "pass",
++      "detail": "approved by Dane Balia"
++    },
++    {
++      "id": "tasks-present",
++      "verdict": "pass",
++      "detail": "8/15 tasks"
++    },
++    {
++      "id": "task-ids-unique",
++      "verdict": "pass",
++      "detail": "no duplicate task ids"
++    },
++    {
++      "id": "task-fields",
++      "verdict": "pass",
++      "detail": "all task fields recognised"
++    },
++    {
++      "id": "task-criterion-traceability",
++      "verdict": "pass",
++      "detail": "8 tasks all traced"
++    },
++    {
++      "id": "criteria-covered",
++      "verdict": "pass",
++      "detail": "8/8 criteria have a task"
++    },
++    {
++      "id": "task-budgets",
++      "verdict": "pass",
++      "detail": "all 8 tasks budgeted, total 400 lines"
++    },
++    {
++      "id": "total-budget",
++      "verdict": "pass",
++      "detail": "400/400 lines"
++    },
++    {
++      "id": "task-exit-conditions",
++      "verdict": "pass",
++      "detail": "every task states when it is done"
++    },
++    {
++      "id": "task-dependencies",
++      "verdict": "pass",
++      "detail": "1 wave(s), widths 8"
++    },
++    {
++      "id": "wave-isolation",
++      "verdict": "pass",
++      "detail": "1 wave(s), no file claimed twice within one"
++    },
++    {
++      "id": "task-files-in-scope",
++      "verdict": "pass",
++      "detail": "all task files inside the declared scope"
++    },
++    {
++      "id": "rollback-stated",
++      "verdict": "pass",
++      "detail": "git revert"
++    },
++    {
++      "id": "blast-radius-declared",
++      "verdict": "pass",
++      "detail": "4 file(s) at depth 2, 2225 lines"
++    },
++    {
++      "id": "blast-radius-current",
++      "verdict": "pass",
++      "detail": "4 files, 2225 lines — matches a fresh computation"
++    }
++  ]
++}
+diff --git a/.keel/specs/studio-decisions/plan.md b/.keel/specs/studio-decisions/plan.md
+new file mode 100644
+index 0000000..a5b10e5
+--- /dev/null
++++ b/.keel/specs/studio-decisions/plan.md
+@@ -0,0 +1,94 @@
++---
++id: PLAN-0013
++slug: studio-decisions
++schema: keel.plan/1
++blast:
++  depth: 2
++  declared:
++  - cli/src/studio/state.rs
++  - cli/src/studio/render.rs
++  - cli/src/studio/mod.rs
++  computed:
++  - cli/src/studio/mod.rs
++  - cli/src/studio/state.rs
++  - cli/src/studio/render.rs
++  - cli/src/main.rs
++  computed_lines: 2225
++rollback: git revert
++verified_at: 2026-10-02
++---
++
++# Design — studio-decisions
++
++## Approach
++
++Two seams, both already present and both extended rather than replaced:
++the **`Approval` state machine** in `state.rs` (which already arms and
++confirms an approval) and the **`Host` trait** in `mod.rs` (which already
++has `approve`).
++
++### Rejection
++
++`Approval` gains a rejecting variant that carries a reason buffer, so the
++one state machine covers both decisions and they cannot be confused:
++
++```
++Idle --x--> Rejecting{project, slug, command, reason: String}
++      type -> reason grows (Backspace shrinks it)
++      Enter -> RejectArmed{..} (only if reason is non-empty)
++      y     -> Action::Reject{project, slug, command, note}
++      Esc   -> Idle, nothing recorded
++```
++
++- AC-1/AC-3: `x` enters reason entry; `Enter` arms; a second distinct key
++  (`y`, as approval uses) confirms. Two keys, so no single press records a
++  decision.
++- AC-2: `Enter` on an empty reason leaves the state as it is and sets the
++  status line to say a reason is required — nothing is emitted.
++- AC-4: `Esc` returns to `Idle` from either rejecting state.
++- AC-5: the command is keel's own, taken from the same `keel next --json`
++  field `arm_approval` already reads, with `--reject --note <reason>`
++  appended — never reassembled from the stage name. `Host` gains
++  `reject(project, command)` beside `approve`, so `mod.rs`'s Docker impl
++  runs it through the same logged `keel_cmd` path.
++
++Keystrokes while rejecting must not reach the agent input, so
++`handle_key` matches the rejecting states before the ordinary
++`Key::Char` → `input.push` arm.
++
++### Gate output
++
++`Project` gains `failing_checks: Vec<String>`. `Host` gains
++`gate_output(project, slug) -> Result<String>` reading the newest
++`.keel/specs/<slug>/gates/G*.json` through the same `docker exec` read
++`read_artifact` already uses. `refresh` fills `failing_checks` for a
++project whose stage indicates a failed gate; `apply_next` stays the only
++place stage is set, so the two cannot disagree.
++
++- AC-6: `render::frame` lists the failing check names under the project.
++- AC-7: every name goes through the existing `render::sanitize` before it
++  is drawn — the same treatment agent text already gets, since gate JSON
++  comes from the sandbox.
++
++`frame` stays a pure function of `Console`, so AC-6/AC-7 are asserted on
++the string it returns, with no terminal and no container. The `FakeHost`
++in `mod.rs`'s tests gains the two new methods, which is how the host
++boundary stays testable.
++
++## Blast radius
++
++<!-- generated by `keel plan`; edits here are overwritten -->
++
++Computed from the import graph at depth 2: **4 files, 2225 lines**.
++
++| depth | file | lines |
++| --- | --- | --- |
++| scope | `cli/src/studio/mod.rs` | 717 |
++| scope | `cli/src/studio/state.rs` | 733 |
++| scope | `cli/src/studio/render.rs` | 356 |
++| +1 | `cli/src/main.rs` | 419 |
++
++
++## Rollback
++
++`git revert` — replace this if the change needs a different rollback.
+diff --git a/.keel/specs/studio-decisions/tasks.md b/.keel/specs/studio-decisions/tasks.md
+new file mode 100644
+index 0000000..1b9e269
+--- /dev/null
++++ b/.keel/specs/studio-decisions/tasks.md
+@@ -0,0 +1,63 @@
++---
++id: TASKS-0013
++slug: studio-decisions
++schema: keel.tasks/1
++---
++
++# Tasks
++
++Each task must name the criteria it satisfies, the files it touches, a line
++budget and an exit condition. G1 checks all four, and checks that every
++criterion in the spec is covered by at least one task.
++
++Add `- depends_on: T-1` where order matters. Tasks with no dependency on
++each other form a wave; `keel tasks` shows them.
++
++### T-1 A key begins a rejection and takes a reason
++- criteria: AC-1
++- files: scope
++- budget: 50
++- exit: `cargo test --manifest-path cli/Cargo.toml reject_key_collects_a_reason` exits 0
++
++### T-2 An empty reason records nothing
++- criteria: AC-2
++- files: scope
++- budget: 50
++- exit: `cargo test --manifest-path cli/Cargo.toml empty_reason_records_no_rejection` exits 0
++
++### T-3 Rejection is confirmed, not a single keypress
++- criteria: AC-3
++- files: scope
++- budget: 50
++- exit: `cargo test --manifest-path cli/Cargo.toml rejection_needs_a_second_key` exits 0
++
++### T-4 Escape abandons a rejection
++- criteria: AC-4
++- files: scope
++- budget: 50
++- exit: `cargo test --manifest-path cli/Cargo.toml escape_abandons_a_rejection` exits 0
++
++### T-5 The recorded rejection carries keel's own command and the reason
++- criteria: AC-5
++- files: scope
++- budget: 50
++- exit: `cargo test --manifest-path cli/Cargo.toml rejection_uses_keels_own_command_and_note` exits 0
++
++### T-6 A failing gate's checks are shown with the project
++- criteria: AC-6
++- files: scope
++- budget: 50
++- exit: `cargo test --manifest-path cli/Cargo.toml failing_checks_are_shown` exits 0
++
++### T-7 Gate output is sanitized before it is drawn
++- criteria: AC-7
++- files: scope
++- budget: 50
++- exit: `cargo test --manifest-path cli/Cargo.toml gate_output_is_sanitized` exits 0
++
++### T-8 Existing CLI tests stay green
++- criteria: AC-8
++- files: scope
++- budget: 50
++- exit: `cargo test --manifest-path cli/Cargo.toml` exits 0
++

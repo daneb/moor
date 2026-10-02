@@ -1,4 +1,4 @@
-<!-- keel:generated schema=keel.projection/1 adapter=agents store=13cd739bb32c body=18cabdd8af49 -->
+<!-- keel:generated schema=keel.projection/1 adapter=agents store=96cfd67a4a89 body=18cabdd8af49 -->
 <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
 
 # Project context

@@ -1,4 +1,4 @@
-<!-- keel:generated schema=keel.projection/1 adapter=copilot store=13cd739bb32c body=2644258bb9ce -->
+<!-- keel:generated schema=keel.projection/1 adapter=copilot store=96cfd67a4a89 body=2644258bb9ce -->
 <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
 
 # Project context
