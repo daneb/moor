@@ -8,6 +8,34 @@ Notable changes to moor. The format follows
 
 ### Added
 
+- **`moor studio` is now enough to run a project.** The console gained the
+  two things that previously sent you back to the CLI mid-flow:
+  - **reject** — `x` starts a rejection, you type the reason, `Enter`
+    arms it and a second key confirms (`Esc` abandons, an empty reason is
+    refused). The same armed two-key shape approval already had, so no
+    single keystroke records a decision.
+  - **a failing gate's checks, in place** — when a spec sits at a gate
+    that failed, the checks it failed are listed under the project, read
+    from keel's own gate record, so you can see what to fix without
+    leaving. (SPEC-0013)
+- **Turn a studio conversation into a spec.** `/` takes the agent's latest
+  answer and writes it out as a recipe draft, then names
+  `moor recipe <project> <file>` as the next step. The answer goes through
+  the same parse-before-write guard `moor ask --emit-recipe` uses, so an
+  answer that is not a valid recipe is kept as a `.draft` to fix rather
+  than installed or lost. (SPEC-0014)
+- **moor's own agent turns run on any configured agent.** `moor ask`,
+  `moor studio` and `moor recipe`'s authoring step were hardcoded to
+  Claude; they now drive **claude, copilot or kiro** from one profile
+  table (per-agent invocation, output shape, resume form and credential
+  hint), and the `agent-turn` chain entry names which agent produced it.
+  A project made with `--agent copilot` no longer builds with Copilot but
+  converses with Claude.
+  **Safety note:** kiro exposes only `--trust-tools` (auto-approval),
+  which [ADR-0008](docs/decisions/0008-agent-session-protocol.md) showed
+  does not restrain an agent, and no deny flag — so a role that withholds
+  tools is **refused** on kiro rather than run with every tool. Claude and
+  Copilot pass their own deny flags. (SPEC-0012)
 - **Seamless Copilot auth from a host `copilot /login`.** For a
   `copilot`-agent project, `moor up` discovers the OAuth device-flow token
   the Copilot CLI stored in the macOS Keychain (service `copilot-cli`) and
@@ -18,6 +46,24 @@ Notable changes to moor. The format follows
   persisted. (First host read of Copilot's Keychain item triggers a
   one-time macOS "Always Allow" prompt.) See
   [ADR-0012](docs/decisions/0012-copilot-device-flow-auth.md).
+
+### Changed
+
+- **Verified bundles are committed; raw run evidence is not.**
+  `.keel/runs/` was 12M of a 13M `.keel/` and growing quadratically — a
+  run records the working-tree diff, so while runs were themselves
+  tracked, every run's diff contained the previous runs' evidence
+  (measured: `diff.patch` went 63K → 333K → 508K → 1051K → 2150K in one
+  afternoon). `.keel/runs/` and `.keel/chain.jsonl` are now ignored and
+  `.keel/bundles/` is tracked, which is what `keel cover` already assumed:
+  a bundle is 232K against a 1.1M raw run and verifies on its own.
+  `make evidence` writes one and verifies it, failing rather than leaving
+  an unverifiable bundle to commit. Per-spec gate records and approvals
+  stay tracked, so what was *decided* is still in git. This also removes a
+  recurring merge conflict: the chain is append-only and hash-linked, so
+  parallel branches always conflicted in it and resolving always discarded
+  one side's entries. Rationale, numbers and the migration are in
+  [docs/EVIDENCE.md](docs/EVIDENCE.md). (SPEC-0015)
 
 ## [0.6.0] - 2026-10-01
 
