@@ -565,6 +565,9 @@ pub struct TurnOutcome {
 /// function.
 pub fn run_turn(project: &str, role: Role, prompt: &str, new_session: bool) -> Result<TurnOutcome> {
     let m = Manifest::load(&paths::manifest_path(project)?)?;
+    // Reconciled against the image: a Copilot sandbox never runs the
+    // `claude` CLI even if its manifest omits `agent:`. See Manifest::agent.
+    let agent = m.agent();
     crate::secrets::resolve_into_env(project, &m.secrets);
     paths::ensure_project_dirs(project)?;
 
@@ -577,15 +580,15 @@ pub fn run_turn(project: &str, role: Role, prompt: &str, new_session: bool) -> R
     // A restricted role on an agent with no way to deny tools would run
     // unrestricted — ADR-0008 established that an allow-list alone does
     // not restrain. Refuse rather than silently widen the role.
-    refuse_unrestrainable_role(m.agent, role)?;
-    let argv = build_turn_argv(m.agent, role, prompt, resume.as_deref());
+    refuse_unrestrainable_role(agent, role)?;
+    let argv = build_turn_argv(agent, role, prompt, resume.as_deref());
 
     let container = m.sandbox_container();
     let mut args: Vec<&str> = vec!["exec", &container];
     args.extend(argv.iter().map(String::as_str));
     let (status, out, err) = proc::run_capture_split("docker", &args)?;
 
-    let turn = parse_turn(m.agent, &out).map_err(|e| unparseable_turn(project, &out, &err, e))?;
+    let turn = parse_turn(agent, &out).map_err(|e| unparseable_turn(project, &out, &err, e))?;
     let failed = turn_failed(&turn, status.success());
     let session_id = next_session_id(&turn);
 
@@ -595,7 +598,7 @@ pub fn run_turn(project: &str, role: Role, prompt: &str, new_session: bool) -> R
         &paths::chain_log_path(project)?,
         &ChainedTurn {
             project,
-            agent: m.agent,
+            agent,
             role,
             session_id: session_id.as_deref(),
             prompt,
@@ -616,7 +619,7 @@ pub fn run_turn(project: &str, role: Role, prompt: &str, new_session: bool) -> R
     }
 
     let hint = failed
-        .then(|| failure_hint(m.agent, project, &turn.result))
+        .then(|| failure_hint(agent, project, &turn.result))
         .flatten();
     Ok(TurnOutcome {
         text: turn.result,
@@ -1131,6 +1134,29 @@ mod tests {
         for argv in [&claude, &copilot, &kiro] {
             assert!(argv.contains(&"hi".to_string()), "{argv:?}");
         }
+    }
+
+    #[test]
+    fn an_agent_less_copilot_manifest_runs_copilot_not_claude() {
+        // The regression this guards: a Copilot sandbox whose manifest
+        // omits `agent:` defaults the raw field to Claude, so turns went to
+        // the `claude` CLI and died with "Not logged in". `run_turn` reads
+        // the agent through `Manifest::agent()`, which reconciles against
+        // the image — so the invocation built for such a manifest must be
+        // the copilot CLI. Proven over the real argv builder, no mocking.
+        let yaml = "name: sc\nimage: moor/copilot-python:latest\n";
+        let m: crate::manifest::Manifest = serde_yaml::from_str(yaml).unwrap();
+        assert_eq!(m.agent, Agent::Claude, "raw field is the serde default");
+
+        let argv = build_turn_argv(m.agent(), Role::Brainstorm, "hi", None);
+        assert_eq!(argv[0], "copilot", "reconciled agent must drive the CLI");
+        assert_ne!(argv[0], "claude");
+
+        // And the auth hint it would show on failure is Copilot's host-side
+        // fix, not Claude's — so the operator is pointed at `copilot /login`.
+        let hint = failure_hint(m.agent(), "sc", "Not logged in").unwrap();
+        assert!(hint.contains("copilot /login"), "{hint}");
+        assert!(!hint.contains("setup-token"), "{hint}");
     }
 
     #[test]

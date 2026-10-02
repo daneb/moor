@@ -59,6 +59,19 @@ pub fn resolve_image(language_image: &str, agent: Agent) -> String {
     }
 }
 
+/// Whether an image is one of the opt-in Copilot layers (`moor/copilot`
+/// or `moor/copilot-<lang>`). This is the single place that recognises a
+/// Copilot image: `resolve_image` treats such an image as already-composed
+/// and leaves it unchanged, and `Manifest::agent` uses it to reconcile a
+/// manifest whose `agent` field is missing or disagrees with its image.
+pub fn image_is_copilot(image: &str) -> bool {
+    let repo = image.split_once(':').map(|(r, _)| r).unwrap_or(image);
+    let Some(name) = repo.strip_prefix("moor/") else {
+        return false;
+    };
+    name == "copilot" || name.starts_with("copilot-")
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Manifest {
     pub name: String,
@@ -152,6 +165,23 @@ impl Manifest {
         Ok(())
     }
 
+    /// The agent a turn should actually run, reconciled against the image.
+    ///
+    /// The `agent` field defaults to `Claude` so manifests written before
+    /// it existed still load — but a sandbox built from a `moor/copilot*`
+    /// image runs no `claude` CLI, so defaulting such a manifest to Claude
+    /// sends every turn to a binary that cannot authenticate (the symptom
+    /// is Claude Code's own misleading `Not logged in · /login`). When the
+    /// image is a Copilot image, the agent is Copilot regardless of a
+    /// missing or stale field. All turn/credential logic must read the
+    /// agent through here, never the raw field.
+    pub fn agent(&self) -> Agent {
+        if self.agent == Agent::Claude && image_is_copilot(&self.image) {
+            return Agent::Copilot;
+        }
+        self.agent
+    }
+
     pub fn sandbox_container(&self) -> String {
         format!("{}-sandbox", self.name)
     }
@@ -201,6 +231,57 @@ mod tests {
         let no_agent_yaml = "name: x\nimage: moor/base:latest\n";
         let loaded: Manifest = serde_yaml::from_str(no_agent_yaml).unwrap();
         assert_eq!(loaded.agent, Agent::Claude);
+    }
+
+    #[test]
+    fn image_is_copilot_recognises_the_opt_in_layers() {
+        for img in [
+            "moor/copilot:latest",
+            "moor/copilot-python:latest",
+            "moor/copilot-node:1.2",
+            "moor/copilot", // no tag
+        ] {
+            assert!(image_is_copilot(img), "expected copilot: {img}");
+        }
+        for img in [
+            "moor/base:latest",
+            "moor/python:latest",
+            "moor/rust:latest",
+            "ubuntu:22.04",
+            "copilot:latest", // not a moor/ image
+        ] {
+            assert!(!image_is_copilot(img), "expected not copilot: {img}");
+        }
+    }
+
+    #[test]
+    fn agent_reconciles_a_copilot_image_with_a_missing_field() {
+        // The real-world gap: a manifest built for Copilot (its image is a
+        // moor/copilot* layer) but whose `agent:` field is absent, so the
+        // serde default makes the raw field Claude. Running the `claude`
+        // CLI in that sandbox only ever yields "Not logged in". The
+        // reconciled accessor must report Copilot so the right CLI runs.
+        let yaml = "name: sc\nimage: moor/copilot-python:latest\n";
+        let m: Manifest = serde_yaml::from_str(yaml).unwrap();
+        assert_eq!(m.agent, Agent::Claude, "raw field still the serde default");
+        assert_eq!(m.agent(), Agent::Copilot, "reconciled against the image");
+    }
+
+    #[test]
+    fn agent_leaves_non_copilot_images_on_the_stored_value() {
+        // A Claude image stays Claude; an explicit agent is never
+        // downgraded or otherwise second-guessed by the image.
+        let claude = Manifest::new("a", "moor/python:latest");
+        assert_eq!(claude.agent(), Agent::Claude);
+
+        let mut explicit_copilot = Manifest::new("b", "moor/copilot-node:latest");
+        explicit_copilot.agent = Agent::Copilot;
+        assert_eq!(explicit_copilot.agent(), Agent::Copilot);
+
+        // An explicit non-default on a plain image is honoured as-is.
+        let mut kiro = Manifest::new("c", "moor/base:latest");
+        kiro.agent = Agent::Kiro;
+        assert_eq!(kiro.agent(), Agent::Kiro);
     }
 
     #[test]
