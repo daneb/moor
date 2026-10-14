@@ -123,8 +123,8 @@ fn parse(content: &str) -> Result<Draft> {
     let text = strip_rules(content);
     let (front, body) =
         front_matter(text).context("the spec needs front matter between `---` lines at the top")?;
-    let yaml: serde_yaml::Value =
-        serde_yaml::from_str(front).context("the spec's front matter isn't valid YAML")?;
+    let yaml: yaml_serde::Value =
+        yaml_serde::from_str(front).context("the spec's front matter isn't valid YAML")?;
     let slug = yaml
         .get("slug")
         .and_then(|v| v.as_str())

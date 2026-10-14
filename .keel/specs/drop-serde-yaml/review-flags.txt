@@ -1,0 +1,1 @@
+test-movement: no test changed with cli/Cargo.toml, cli/src/commands/recipe.rs, cli/src/commands/spec_cmd.rs, cli/src/compose.rs, cli/src/manifest.rs, cli/src/session.rs

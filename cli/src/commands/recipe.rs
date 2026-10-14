@@ -59,7 +59,7 @@ pub fn parse_recipe(path: &Path) -> Result<Recipe> {
     if description.is_empty() {
         anyhow::bail!("recipe has no description below the front matter — that's the part the agent actually reads");
     }
-    let front: FrontMatter = serde_yaml::from_str(yaml)
+    let front: FrontMatter = yaml_serde::from_str(yaml)
         .context("parsing recipe front matter (need at least `slug:`)")?;
     Ok(Recipe { front, description })
 }
