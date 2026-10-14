@@ -23,9 +23,54 @@ pub mod up;
 pub mod use_cmd;
 pub mod view;
 
-use crate::{compose, manifest::Manifest, paths};
+use crate::{compose, manifest::Manifest, paths, proc};
 use anyhow::{Context, Result};
 use std::io::{self, Write};
+use std::path::Path;
+
+/// The host's own GitHub credential, used for every credentialed git
+/// operation moor itself performs (`moor new --github`'s clone, `moor
+/// ship`'s push, `moor pull`'s fetch) — see ADR-0009. Resolved via `gh
+/// auth token`: `gh` already authenticates the operator's account, and
+/// `gh pr create` already assumes it's logged in. `None` means there's
+/// nothing to ship/clone/pull with; callers fail loudly rather than
+/// falling back to any in-sandbox value.
+pub(crate) fn host_github_token() -> Option<String> {
+    let (status, out) = proc::run_capture("gh", &["auth", "token"]).ok()?;
+    let token = out.trim().to_string();
+    (status.success() && !token.is_empty()).then_some(token)
+}
+
+/// Run a host `git` invocation authenticated by `token`, via a credential
+/// helper that reads it from an env var set only for this one call — never
+/// in `argv` (so never in `docker inspect`/`ps`), and never exported into
+/// the sandbox. The same pattern the sandbox's own (now-removed) in-container
+/// helper used, moved to the host and sourced from the host's credential
+/// instead of a sandbox secret.
+pub(crate) fn run_git_as_host(token: &str, argv: &[&str]) -> Result<(bool, String)> {
+    std::env::set_var("MOOR_HOST_GH_TOKEN", token);
+    let helper = "credential.helper=!f() { echo username=x-access-token; echo password=$MOOR_HOST_GH_TOKEN; }; f";
+    let mut args: Vec<&str> = vec!["-c", helper];
+    args.extend_from_slice(argv);
+    let result = proc::run_capture_combined("git", &args);
+    std::env::remove_var("MOOR_HOST_GH_TOKEN");
+    let (status, out) = result?;
+    Ok((status.success(), out))
+}
+
+/// Stream a local bundle file into the sandbox at `dest`, the same
+/// stdin-only mechanism `moor import` uses: the read-only rootfs defeats
+/// `docker cp` even onto a writable tmpfs path, but a byte stream through
+/// `docker exec -i`'s stdin only ever touches `dest`.
+pub(crate) fn stream_into_sandbox(container: &str, bundle_path: &Path, dest: &str) -> Result<()> {
+    let cmd = format!("cat > {dest}");
+    let status = proc::run_with_stdin_file(
+        "docker",
+        &["exec", "-i", container, "sh", "-c", &cmd],
+        bundle_path,
+    )?;
+    proc::require_success("streaming bundle into the sandbox", status)
+}
 
 /// Of all known projects, the ones whose sandbox container is currently
 /// running (`moor up`'d). A single `docker ps` covers every project at

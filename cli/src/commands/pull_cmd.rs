@@ -1,19 +1,17 @@
 //! `moor pull`: refresh the sandbox's current branch from its GitHub
-//! remote, over HTTPS with a token injected at runtime.
+//! remote, over HTTPS with the host's own credential (ADR-0009).
 //!
 //! Why this exists rather than `moor run <p> -- git pull`: the sandbox has
 //! no `ssh` binary by design (ADR-0010), so a `git pull` against an SSH
 //! `origin` (e.g. `git@github.com-sbg:owner/repo.git`) fails with "cannot
-//! run ssh". GitHub *is* reachable over HTTPS from the sandbox, so this
-//! derives the HTTPS URL from `origin` and pulls over it. The token is
-//! read from `$GITHUB_TOKEN` inside the container by a git credential
-//! helper — the same pattern `moor new`/`moor ship` use — so it is never
-//! in this process's argv (and thus never in `docker inspect`/`ps`), and
-//! the pull uses an explicit URL rather than a stored remote, so no
-//! credential is ever written to `.git/config`.
+//! run ssh". GitHub *is* reachable over HTTPS, so this derives the HTTPS
+//! URL from `origin` and fetches over it — but the fetch itself runs on
+//! the host, with the host's own `gh`-resolved credential: the sandbox
+//! never sees a token. The fetched commits are streamed into the sandbox
+//! as a git bundle and merged there with `--ff-only`.
 
 use crate::{audit, manifest::Manifest, paths, proc};
-use anyhow::Result;
+use anyhow::{Context, Result};
 
 /// The https://github.com/owner/repo.git URL for a GitHub remote, whatever
 /// form `origin` takes:
@@ -99,38 +97,110 @@ pub fn run(explicit: Option<String>) -> Result<()> {
         anyhow::bail!("the sandbox's repository isn't on a branch to pull");
     }
 
-    // The token lives in $GITHUB_TOKEN inside the container (injected by
-    // the compose template from the host's env/Keychain). Reading it in a
-    // credential helper keeps it out of this process's argv — the same
-    // pattern as `moor new`/`moor ship`. The explicit URL means no remote
-    // (and so no credential) is persisted to .git/config.
-    let helper = "credential.helper=!f() { echo username=x-access-token; echo \"password=$GITHUB_TOKEN\"; }; f";
-
-    println!(
-        "==> pulling {branch} from {https} (HTTPS, token injected in-container, nothing persisted)"
-    );
-    let (ok, out) = exec(
-        &name,
-        &m,
-        &["git", "-c", helper, "pull", "--ff-only", &https, branch],
-    )?;
-    // Scrub a token that could only appear if git echoed the URL back; the
-    // helper form above doesn't put it in the URL, but be defensive.
-    let shown = out.trim();
-    println!("{shown}");
-    if !ok {
+    let Some(token) = super::host_github_token() else {
         anyhow::bail!(
-            "pull failed. If the repo is private, make sure GITHUB_TOKEN is set for this project:\n\n  \
-             moor secrets set {name} GITHUB_TOKEN\n  moor up {name}\n\nthen try again."
+            "no GitHub credential on the host to pull with — run `gh auth login`, then try `moor pull` again."
         );
-    }
-    println!("\n==> {name} is up to date on {branch}.");
+    };
+
+    println!("==> pulling {branch} from {https} (fetched on the host, merged in the sandbox)");
+    pull_branch(&name, &m, &https, branch, &token)?;
+    println!(
+        "
+==> {name} is up to date on {branch}."
+    );
     Ok(())
+}
+
+/// The host `git` argv that fetches `branch` from `https` into `scratch`
+/// (AC-9) — a plain host invocation, never `docker`/`exec`.
+fn fetch_argv(scratch: &str, https: &str, branch: &str) -> Vec<String> {
+    vec![
+        "-C".to_string(),
+        scratch.to_string(),
+        "fetch".to_string(),
+        https.to_string(),
+        branch.to_string(),
+    ]
+}
+
+/// Fetch `branch` from `https` on the host with `token` (ADR-0009), then
+/// stream the fetched commits into the sandbox as a git bundle and merge
+/// them there with `--ff-only` — a pull never runs `git pull`/`fetch`
+/// directly inside the container, so no credential ever has to be there.
+fn pull_branch(name: &str, m: &Manifest, https: &str, branch: &str, token: &str) -> Result<()> {
+    let dir = std::env::temp_dir().join(format!("moor-pull-{name}-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).context("creating a scratch directory for the pull")?;
+    let cleanup = || {
+        let _ = std::fs::remove_dir_all(&dir);
+    };
+    let scratch = dir.join("scratch");
+    let scratch_str = scratch.to_string_lossy().to_string();
+
+    let result: Result<()> = (|| {
+        proc::require_success(
+            "git init (scratch)",
+            proc::run_capture("git", &["init", "-q", &scratch_str])?.0,
+        )?;
+
+        let argv = fetch_argv(&scratch_str, https, branch);
+        let args: Vec<&str> = argv.iter().map(String::as_str).collect();
+        let (ok, out) = super::run_git_as_host(token, &args)?;
+        if !ok {
+            anyhow::bail!(
+                "git fetch failed:
+{out}"
+            );
+        }
+
+        let bundle_path = dir.join("pull.bundle");
+        let bundle_str = bundle_path.to_string_lossy().to_string();
+        proc::require_success(
+            "git bundle create",
+            proc::run_capture(
+                "git",
+                &[
+                    "-C",
+                    &scratch_str,
+                    "bundle",
+                    "create",
+                    &bundle_str,
+                    "FETCH_HEAD",
+                ],
+            )?
+            .0,
+        )?;
+
+        let container = m.sandbox_container();
+        super::stream_into_sandbox(&container, &bundle_path, "/tmp/pull.bundle")?;
+        let (ok, out) = exec(
+            name,
+            m,
+            &[
+                "sh",
+                "-c",
+                "git fetch -q /tmp/pull.bundle FETCH_HEAD && git merge --ff-only FETCH_HEAD",
+            ],
+        )?;
+        let _ = proc::run_capture(
+            "docker",
+            &["exec", &container, "rm", "-f", "/tmp/pull.bundle"],
+        );
+        if !ok {
+            anyhow::bail!(
+                "merge failed in the sandbox:
+{out}"
+            );
+        }
+        Ok(())
+    })();
+    cleanup();
+    result
 }
 
 #[cfg(test)]
 mod tests {
-    use super::https_github_url;
+    use super::{fetch_argv, https_github_url};
 
     #[test]
     fn rewrites_scp_style_with_host_alias() {
@@ -188,5 +258,18 @@ mod tests {
     fn refuses_garbage() {
         assert_eq!(https_github_url("not a url"), None);
         assert_eq!(https_github_url(""), None);
+    }
+
+    #[test]
+    fn pull_runs_on_host() {
+        let argv = fetch_argv(
+            "/tmp/moor-pull-scratch",
+            "https://github.com/daneb/keel.git",
+            "main",
+        );
+        assert_eq!(argv[0], "-C");
+        assert_eq!(argv[2], "fetch");
+        assert!(argv.iter().any(|a| a.contains("github.com")));
+        assert!(!argv.iter().any(|a| a == "docker" || a == "exec"));
     }
 }

@@ -5,7 +5,11 @@ use anyhow::Result;
 /// through which code actually leaves the sandbox for real (as opposed
 /// to routine egress like `git fetch`/`clone`/package installs). Tagged
 /// distinctly in the audit chain so it stands out from routine execs.
-/// Best-effort by nature: it only sees commands run via `moor run`,
+/// Since ADR-0009, the sandbox carries no GitHub credential, so a push
+/// run this way (an operator's own `moor run <p> -- git push`, not
+/// `moor ship`) will fail to authenticate — still worth flagging, since
+/// an operator could point it at a non-GitHub remote that doesn't need
+/// one. Best-effort by nature: it only sees commands run via `moor run`,
 /// not ones typed inside an interactive `moor shell` session — see
 /// docs/THREAT-MODEL.md for why a git hook baked into the image isn't a
 /// stronger alternative (it runs inside the untrusted sandbox and the
@@ -129,7 +133,9 @@ fn resolve_commit(container: &str, dir: &str, git_ref: &str) -> Option<String> {
 
 /// The fields a `push` entry adds to an exec entry. `commit` is null when
 /// the ref did not resolve — recorded as unknown rather than omitted.
-fn push_data(git_ref: &str, commit: Option<&str>) -> serde_json::Value {
+/// Shared with `ship_cmd`, whose host-side push (ADR-0009) records with
+/// the same shape.
+pub(crate) fn push_data(git_ref: &str, commit: Option<&str>) -> serde_json::Value {
     serde_json::json!({ "ref": git_ref, "commit": commit })
 }
 

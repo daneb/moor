@@ -58,11 +58,12 @@ fn git_config_env_lines(identity: &[(&str, String)]) -> String {
 
 /// `render` with the host's git identity supplied, so it can be tested.
 pub fn render_with(m: &Manifest, identity: &[(&str, String)]) -> String {
-    let secret_env_lines = if m.secrets.is_empty() {
-        String::new()
-    } else {
+    // GITHUB_TOKEN never enters the sandbox, even for a manifest written
+    // before ADR-0009 that still lists it among its secrets: credentialed
+    // git now runs entirely on the host.
+    let secret_env_lines = {
         let mut lines = String::new();
-        for s in &m.secrets {
+        for s in m.secrets.iter().filter(|s| s.as_str() != "GITHUB_TOKEN") {
             lines.push_str(&format!("      {s}: \"${{{s}:-}}\"\n"));
         }
         // drop the trailing newline; the template line already provides one
@@ -138,7 +139,19 @@ mod tests {
         assert!(rendered.contains("CLAUDE_CODE_OAUTH_TOKEN: \"${CLAUDE_CODE_OAUTH_TOKEN:-}\""));
         assert!(rendered.contains("COPILOT_GITHUB_TOKEN: \"${COPILOT_GITHUB_TOKEN:-}\""));
         assert!(rendered.contains("GH_TOKEN: \"${GH_TOKEN:-}\""));
-        assert!(rendered.contains("GITHUB_TOKEN: \"${GITHUB_TOKEN:-}\""));
+        assert!(!rendered.contains("      GITHUB_TOKEN:"));
+    }
+
+    #[test]
+    fn sandbox_env_has_no_github_token() {
+        // AC-1: GITHUB_TOKEN never reaches the sandbox env, even for a
+        // manifest written before ADR-0009 that still lists it as a secret.
+        // (Checked as its own env line, not a bare substring, since
+        // COPILOT_GITHUB_TOKEN legitimately contains "GITHUB_TOKEN".)
+        let mut m = Manifest::new("sample-app", "moor/node:latest");
+        m.secrets.push("GITHUB_TOKEN".to_string());
+        let rendered = render(&m);
+        assert!(!rendered.contains("      GITHUB_TOKEN:"), "{rendered}");
     }
 
     #[test]
