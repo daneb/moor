@@ -135,18 +135,19 @@ impl Manifest {
             // COPILOT_GITHUB_TOKEN / GH_TOKEN authenticate the GitHub
             // Copilot CLI when a build runs with `keel run --driver
             // copilot` inside the sandbox. The `copilot` CLI reads them in
-            // the order COPILOT_GITHUB_TOKEN > GH_TOKEN > GITHUB_TOKEN, so
-            // GITHUB_TOKEN (already listed, for git push/pull) is the
-            // lowest-priority fallback and the two dedicated names are
-            // added ahead of it. Only whichever the operator actually
-            // stores gets injected — an unset secret resolves to empty and
-            // is a no-op (see secrets::resolve_into_env).
+            // the order COPILOT_GITHUB_TOKEN > GH_TOKEN, falling back to
+            // GITHUB_TOKEN only if that were set — which it deliberately
+            // never is here: credentialed git (clone/push/pull) now runs
+            // on the host with the host's own credential (ADR-0009), so
+            // GITHUB_TOKEN never enters the sandbox at all. Only whichever
+            // of these the operator actually stores gets injected — an
+            // unset secret resolves to empty and is a no-op (see
+            // secrets::resolve_into_env).
             secrets: vec![
                 "ANTHROPIC_API_KEY".to_string(),
                 "CLAUDE_CODE_OAUTH_TOKEN".to_string(),
                 "COPILOT_GITHUB_TOKEN".to_string(),
                 "GH_TOKEN".to_string(),
-                "GITHUB_TOKEN".to_string(),
             ],
             canary_token: canary::generate_token(),
         }
@@ -392,11 +393,11 @@ mod tests {
         assert_eq!(m.resources.pids, 512);
         assert!(m.secrets.contains(&"ANTHROPIC_API_KEY".to_string()));
         assert!(m.secrets.contains(&"CLAUDE_CODE_OAUTH_TOKEN".to_string()));
-        // Copilot driver auth: the two dedicated names plus GITHUB_TOKEN
-        // as the documented lowest-priority fallback.
+        // Copilot driver auth: the two dedicated names only — GITHUB_TOKEN
+        // is deliberately never a sandbox secret (ADR-0009).
         assert!(m.secrets.contains(&"COPILOT_GITHUB_TOKEN".to_string()));
         assert!(m.secrets.contains(&"GH_TOKEN".to_string()));
-        assert!(m.secrets.contains(&"GITHUB_TOKEN".to_string()));
+        assert!(!m.secrets.contains(&"GITHUB_TOKEN".to_string()));
         assert!(m.egress.allow.is_empty());
     }
 

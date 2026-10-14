@@ -33,41 +33,16 @@ pub fn run(name: &str, image: &str, agent: Agent, github: bool) -> Result<()> {
     super::compose_up(name)?;
 
     if let Some(repo) = &m.github_repo {
-        let clone_url = format!("https://github.com/{repo}.git");
+        let clone_url = github_clone_url(repo);
         println!("==> cloning {clone_url} into the sandbox workspace volume");
-        // Freshly created repos are private, so cloning needs a credential.
-        // GITHUB_TOKEN (if the operator exported it before `moor new`)
-        // is already sitting in the *container's own* environment via the
-        // compose template's ${GITHUB_TOKEN:-} substitution — so this
-        // reads it there, inside the container's shell, rather than
-        // passing the token as a CLI argument to `docker exec` (which
-        // would put it in this process's own argv and, from there, in
-        // `docker inspect`/`ps` output on the host).
-        let credential_helper =
-            "!f() { echo username=x-access-token; echo \"password=$GITHUB_TOKEN\"; }; f";
-        let status = proc::run_inherit(
-            "docker",
-            &[
-                "exec",
-                &m.sandbox_container(),
-                "git",
-                "-c",
-                &format!("credential.helper={credential_helper}"),
-                "clone",
-                &clone_url,
-                ".",
-            ],
-        )?;
-        audit::log_exec(
-            name,
-            &m,
-            "exec",
-            &["git".into(), "clone".into(), clone_url],
-            status.code(),
-        )?;
-        if !status.success() {
+        // Freshly created repos are private, so cloning needs a credential —
+        // since ADR-0009 that happens on the host, with the host's own `gh`
+        // credential: the sandbox never sees a token, in its environment
+        // or anywhere else.
+        let ok = clone_into_sandbox(name, &m, &clone_url)?;
+        if !ok {
             println!(
-                "note: clone failed — if '{repo}' is private, export GITHUB_TOKEN (e.g. `export GITHUB_TOKEN=$(gh auth token)`) before `moor new`/`up` so the sandbox can authenticate."
+                "note: clone failed — if '{repo}' is private, run `gh auth login` on this Mac so the host can authenticate, then `moor new`/`up` again."
             );
         }
     }
@@ -106,6 +81,77 @@ pub fn run(name: &str, image: &str, agent: Agent, github: bool) -> Result<()> {
         super::next_cmd::next_hint(name)
     );
     Ok(())
+}
+
+/// `https://github.com/<owner>/<repo>.git` for `repo` ("owner/repo").
+fn github_clone_url(repo: &str) -> String {
+    format!("https://github.com/{repo}.git")
+}
+
+/// The host `git` argv that clones `url` into `scratch` (AC-8) — a plain
+/// host invocation, never `docker`/`exec`, so the credential it runs with
+/// never has to cross into the sandbox.
+fn clone_argv(scratch: &str, url: &str) -> Vec<String> {
+    vec!["clone".to_string(), url.to_string(), scratch.to_string()]
+}
+
+/// Clone `url` on the host with the host's own GitHub credential (ADR-0009),
+/// then stream the result into the sandbox as a git bundle (mirroring
+/// `import_cmd`'s bundle-and-stream, but sourced from a host-side clone
+/// instead of an existing local repo). Returns `false` (no error) when
+/// there's no host credential to clone with, so the caller can print its
+/// own hint.
+fn clone_into_sandbox(name: &str, m: &Manifest, clone_url: &str) -> Result<bool> {
+    let Some(token) = super::host_github_token() else {
+        return Ok(false);
+    };
+    let dir = std::env::temp_dir().join(format!("moor-new-clone-{name}-{}", std::process::id()));
+    std::fs::create_dir_all(&dir).context("creating a scratch directory for the clone")?;
+    let cleanup = || {
+        let _ = std::fs::remove_dir_all(&dir);
+    };
+    let scratch = dir.join("scratch");
+    let scratch_str = scratch.to_string_lossy().to_string();
+
+    let result: Result<bool> = (|| {
+        let argv = clone_argv(&scratch_str, clone_url);
+        let args: Vec<&str> = argv.iter().map(String::as_str).collect();
+        let (ok, out) = super::run_git_as_host(&token, &args)?;
+        if !ok {
+            println!("{out}");
+            return Ok(false);
+        }
+
+        let bundle_path = dir.join("new.bundle");
+        let bundle_str = bundle_path.to_string_lossy().to_string();
+        proc::require_success(
+            "git bundle create",
+            proc::run_capture("git", &["-C", &scratch_str, "bundle", "create", &bundle_str, "--all"])?.0,
+        )?;
+
+        let container = m.sandbox_container();
+        super::stream_into_sandbox(&container, &bundle_path, "/tmp/new.bundle")?;
+        let status =
+            proc::run_inherit("docker", &["exec", &container, "git", "clone", "/tmp/new.bundle", "."])?;
+        audit::log_exec(
+            name,
+            m,
+            "exec",
+            &["git".into(), "clone".into(), clone_url.to_string()],
+            status.code(),
+        )?;
+        proc::require_success("git clone (bundle) in sandbox", status)?;
+        let _ = proc::run_capture("docker", &["exec", &container, "rm", "-f", "/tmp/new.bundle"]);
+
+        let status = proc::run_inherit(
+            "docker",
+            &["exec", &container, "git", "remote", "set-url", "origin", clone_url],
+        )?;
+        proc::require_success("git remote set-url origin", status)?;
+        Ok(true)
+    })();
+    cleanup();
+    result
 }
 
 /// Runs `argv` in the sandbox, quietly, logged like any exec.
@@ -156,4 +202,20 @@ fn ensure_first_commit(name: &str, m: &Manifest) -> Result<()> {
         );
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn github_clone_uses_host_credential() {
+        // AC-8: cloning runs on the host (plain `git clone`), never a
+        // `docker exec` into the sandbox — the credential it uses with it
+        // stays on the host.
+        let argv = clone_argv("/tmp/moor-new-scratch", &github_clone_url("daneb/keel"));
+        assert_eq!(argv[0], "clone");
+        assert!(argv.iter().any(|a| a.contains("github.com")));
+        assert!(!argv.iter().any(|a| a == "docker" || a == "exec"));
+    }
 }

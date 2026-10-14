@@ -1,16 +1,20 @@
 //! `moor ship`: take a spec whose merge you approved and get it to GitHub.
-//! Commits the spec's work on its own branch in the sandbox, pushes it from
-//! the sandbox, opens a pull request from the host, and returns the sandbox
-//! to its trunk so the next spec starts from a clean tree.
+//! Commits the spec's work on its own branch in the sandbox, then —
+//! since ADR-0009 — streams just that branch out as a git bundle and
+//! pushes it from the host with the host's own GitHub credential; the
+//! sandbox never sees a token. Opens a pull request from the host, and
+//! returns the sandbox to its trunk so the next spec starts from a clean
+//! tree.
 //!
 //! Approval stays a separate act (`moor approve`); shipping publishes, so
 //! it shows exactly what it will commit and asks first.
 
 use super::next_cmd::Target;
-use crate::{guide, manifest, proc};
+use crate::{audit, guide, manifest, proc};
 use anyhow::{Context, Result};
 use std::collections::HashMap;
 use std::io::{BufRead, IsTerminal, Write};
+use std::path::Path;
 
 /// Paths `git status --porcelain` reports, with a rename's new name.
 fn changed_paths(porcelain: &str) -> Vec<String> {
@@ -121,6 +125,103 @@ fn pick(t: &Target, report: &guide::NextReport, named: Option<&str>) -> Result<O
     })
 }
 
+/// AC-6: a missing host credential must stop shipping before anything is
+/// committed — only relevant once there's a GitHub remote to push to; a
+/// project with no remote never touches a credential at all.
+fn ensure_host_credential(repo: Option<&str>, token: Option<&str>) -> Result<()> {
+    if repo.is_some() && token.is_none() {
+        anyhow::bail!(
+            "no GitHub credential on the host to push with — run `gh auth login`, then try `moor ship` again. Nothing was committed."
+        );
+    }
+    Ok(())
+}
+
+/// `https://github.com/<owner>/<repo>.git` for `repo` ("owner/repo").
+fn github_https_url(repo: &str) -> String {
+    format!("https://github.com/{repo}.git")
+}
+
+/// The commit `moor ship` makes for a spec's work. Executed via
+/// `Target::exec` (`docker exec` into the sandbox) by every caller — never
+/// a bare host `git commit` — so the commit is authored by whatever git
+/// identity is configured inside the container (ADR-0007's synced host
+/// identity), not the host's own working directory.
+fn commit_argv(subject: &str, body: &str) -> Vec<String> {
+    ["git", "commit", "-q", "-m", subject, "-m", body].map(String::from).to_vec()
+}
+
+/// The `docker exec` argv that streams `branch`'s commits out of the
+/// sandbox as a git bundle to stdout (AC-4) — no bind mount, no `docker
+/// cp` (blocked by the read-only rootfs), just a stream through `docker
+/// exec`'s own stdout.
+fn bundle_argv(container: &str, branch: &str) -> Vec<String> {
+    ["exec", container, "git", "bundle", "create", "-", branch]
+        .map(String::from)
+        .to_vec()
+}
+
+/// The host `git` argv that pushes a scratch repo's `FETCH_HEAD` to
+/// `branch` on `https_url` (AC-5) — a plain host invocation, never
+/// `docker`/`exec`.
+fn push_argv(scratch: &str, https_url: &str, branch: &str) -> Vec<String> {
+    vec![
+        "-C".to_string(),
+        scratch.to_string(),
+        "push".to_string(),
+        https_url.to_string(),
+        format!("FETCH_HEAD:refs/heads/{branch}"),
+    ]
+}
+
+/// Get `branch`'s commits out of the sandbox and onto `https_url` with the
+/// host's own credential (ADR-0009): stream a bundle out via `docker exec`
+/// (AC-4), fetch it into an ephemeral scratch repo, then push from there
+/// with `token` (AC-5). Returns the pushed commit's sha for the audit
+/// record (AC-7). The host keeps no standing clone — the scratch
+/// directory is removed before returning.
+fn push_shipped_branch(t: &Target, branch: &str, https_url: &str, token: &str) -> Result<String> {
+    let container = t.m.sandbox_container();
+    let dir = std::env::temp_dir().join(format!("moor-ship-{}-{}", t.name, std::process::id()));
+    std::fs::create_dir_all(&dir).context("creating a scratch directory for the push")?;
+    let cleanup = || {
+        let _ = std::fs::remove_dir_all(&dir);
+    };
+
+    let bundle_path = dir.join("ship.bundle");
+    let argv = bundle_argv(&container, branch);
+    let args: Vec<&str> = argv.iter().map(String::as_str).collect();
+    let status = proc::run_stdin_to_file("docker", &args, Path::new("/dev/null"), &bundle_path);
+    let status = status.and_then(|s| proc::require_success("streaming the branch out of the sandbox", s));
+    if let Err(e) = status {
+        cleanup();
+        return Err(e);
+    }
+
+    let scratch = dir.join("scratch");
+    let scratch_str = scratch.to_string_lossy().to_string();
+    let bundle_str = bundle_path.to_string_lossy().to_string();
+    let result: Result<String> = (|| {
+        proc::require_success("git init (scratch)", proc::run_capture("git", &["init", "-q", &scratch_str])?.0)?;
+        proc::require_success(
+            "git fetch (bundle -> scratch)",
+            proc::run_capture_combined("git", &["-C", &scratch_str, "fetch", "-q", &bundle_str, branch])?.0,
+        )?;
+        let (_, sha) = proc::run_capture("git", &["-C", &scratch_str, "rev-parse", "FETCH_HEAD"])?;
+        let sha = sha.trim().to_string();
+
+        let argv = push_argv(&scratch_str, https_url, branch);
+        let args: Vec<&str> = argv.iter().map(String::as_str).collect();
+        let (ok, out) = super::run_git_as_host(token, &args)?;
+        if !ok {
+            anyhow::bail!("git push failed:\n{out}");
+        }
+        Ok(sha)
+    })();
+    cleanup();
+    result
+}
+
 pub fn run(explicit: Option<String>, named: Option<String>, yes: bool) -> Result<()> {
     let t = Target::resolve(explicit)?;
     let flag = t
@@ -184,6 +285,11 @@ pub fn run(explicit: Option<String>, named: Option<String>, yes: bool) -> Result
     let (title, id) = title_and_id(&spec_md, &slug);
     let run_id = super::flow_cmd::newest_run(&runs, &slug);
 
+    // AC-6: a missing host credential must stop shipping before anything
+    // is committed — checked here, before the branch is even created.
+    let token = repo.as_ref().and_then(|_| super::host_github_token());
+    ensure_host_credential(repo.as_deref(), token.as_deref())?;
+
     println!("{slug} will be committed on branch {branch}:\n");
     for line in listing(&paths) {
         println!("  {line}");
@@ -213,11 +319,11 @@ pub fn run(explicit: Option<String>, named: Option<String>, yes: bool) -> Result
         None => "Built and checked in a moor sandbox; merge approved.".to_string(),
     };
     let committed = t.exec("ship", &add)?.0
-        && t.exec(
-            "ship",
-            &["git", "commit", "-q", "-m", &subject, "-m", &body],
-        )?
-        .0;
+        && {
+            let commit: Vec<String> = commit_argv(&subject, &body);
+            let commit: Vec<&str> = commit.iter().map(String::as_str).collect();
+            t.exec("ship", &commit)?.0
+        };
     if !committed {
         t.exec("ship", &["git", "switch", &trunk])?;
         anyhow::bail!("couldn't commit {slug}'s work; nothing was pushed");
@@ -225,17 +331,18 @@ pub fn run(explicit: Option<String>, named: Option<String>, yes: bool) -> Result
     println!("==> committed on {branch}");
 
     let mut pr_url = None;
-    if let Some(repo) = &repo {
-        // The same credential helper `moor new --github` uses: the token is
-        // read inside the sandbox, never passed through any argv.
-        let helper =
-            "credential.helper=!f() { echo username=x-access-token; echo \"password=$GITHUB_TOKEN\"; }; f";
-        let pushed = super::run_cmd::run(
-            &t.name,
-            &["git", "-c", helper, "push", "-u", "origin", &branch].map(String::from),
-        );
-        match pushed {
-            Ok(()) => {
+    if let (Some(repo), Some(token)) = (&repo, &token) {
+        let https = github_https_url(repo);
+        match push_shipped_branch(&t, &branch, &https, token) {
+            Ok(sha) => {
+                audit::log_exec_with(
+                    &t.name,
+                    &t.m,
+                    "push",
+                    &["git".into(), "push".into(), branch.clone()],
+                    Some(0),
+                    super::run_cmd::push_data(&branch, Some(&sha)),
+                )?;
                 let pr_body = format!(
                     "{body}\n\nShipped with `moor ship`. The spec and its evidence are in `.keel/specs/{slug}/` and `.keel/runs/`."
                 );
@@ -389,5 +496,58 @@ mod tests {
         assert_eq!(title, "Greet [31mby name");
         assert_eq!(id.as_deref(), Some("SPEC-0016"));
         assert_eq!(title_and_id("no front matter", "s").0, "s");
+    }
+
+    #[test]
+    fn absent_host_credential_fails_before_commit() {
+        let err = ensure_host_credential(Some("daneb/keel"), None).unwrap_err();
+        assert!(err.to_string().contains("gh auth login"));
+        assert!(ensure_host_credential(Some("daneb/keel"), Some("tok")).is_ok());
+        // No remote at all: never needs a credential.
+        assert!(ensure_host_credential(None, None).is_ok());
+    }
+
+    #[test]
+    fn commit_runs_in_sandbox() {
+        // The commit's argv is plain `git commit`, meant to be run via
+        // `Target::exec` (docker exec into the sandbox) — never a bare
+        // host git invocation.
+        let argv = commit_argv("Greet (SPEC-1)", "body text");
+        assert_eq!(argv[0], "git");
+        assert_eq!(argv[1], "commit");
+        assert!(!argv.iter().any(|a| a == "docker"));
+    }
+
+    #[test]
+    fn commits_leave_via_bundle_stream() {
+        let argv = bundle_argv("sample-app-sandbox", "moor/greet");
+        assert_eq!(
+            argv,
+            ["exec", "sample-app-sandbox", "git", "bundle", "create", "-", "moor/greet"]
+                .map(String::from)
+                .to_vec()
+        );
+        assert!(!argv.iter().any(|a| a == "cp"));
+    }
+
+    #[test]
+    fn push_runs_on_host() {
+        let argv = push_argv(
+            "/tmp/moor-ship-scratch",
+            "https://github.com/daneb/keel.git",
+            "moor/greet",
+        );
+        assert_eq!(argv[0], "-C");
+        assert_eq!(argv[2], "push");
+        assert!(argv.iter().any(|a| a.contains("github.com")));
+        assert!(!argv.iter().any(|a| a == "docker" || a == "exec"));
+    }
+
+    #[test]
+    fn host_push_is_recorded_with_ref_and_commit() {
+        let sha = "0123456789abcdef0123456789abcdef01234567";
+        let data = super::super::run_cmd::push_data("moor/greet", Some(sha));
+        assert_eq!(data["ref"], "moor/greet");
+        assert_eq!(data["commit"], sha);
     }
 }
