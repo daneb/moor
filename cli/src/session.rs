@@ -1145,7 +1145,7 @@ mod tests {
         // the image — so the invocation built for such a manifest must be
         // the copilot CLI. Proven over the real argv builder, no mocking.
         let yaml = "name: sc\nimage: moor/copilot-python:latest\n";
-        let m: crate::manifest::Manifest = serde_yaml::from_str(yaml).unwrap();
+        let m: crate::manifest::Manifest = yaml_serde::from_str(yaml).unwrap();
         assert_eq!(m.agent, Agent::Claude, "raw field is the serde default");
 
         let argv = build_turn_argv(m.agent(), Role::Brainstorm, "hi", None);

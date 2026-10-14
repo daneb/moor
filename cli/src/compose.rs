@@ -225,7 +225,7 @@ mod tests {
         assert!(sandbox.contains("      GIT_CONFIG_KEY_1: \"user.email\""));
         assert!(sandbox.contains("      GIT_CONFIG_VALUE_1: \"dane@example.com\""));
         // Still valid YAML, and the value survives the round trip.
-        let doc: serde_yaml::Value = serde_yaml::from_str(&rendered).unwrap();
+        let doc: yaml_serde::Value = yaml_serde::from_str(&rendered).unwrap();
         let env = &doc["services"]["sandbox"]["environment"];
         assert_eq!(env["GIT_CONFIG_VALUE_0"], r#"Dane "D" Balia $$HOME\x"#);
     }
@@ -235,7 +235,7 @@ mod tests {
         let m = Manifest::new("sample-app", "moor/base:latest");
         let rendered = render_with(&m, &[]);
         assert!(!rendered.contains("GIT_CONFIG_"), "{rendered}");
-        serde_yaml::from_str::<serde_yaml::Value>(&rendered).unwrap();
+        yaml_serde::from_str::<yaml_serde::Value>(&rendered).unwrap();
     }
 
     #[test]

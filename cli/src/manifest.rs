@@ -155,11 +155,11 @@ impl Manifest {
     pub fn load(path: &Path) -> Result<Self> {
         let text = std::fs::read_to_string(path)
             .with_context(|| format!("reading manifest {}", path.display()))?;
-        serde_yaml::from_str(&text).with_context(|| format!("parsing manifest {}", path.display()))
+        yaml_serde::from_str(&text).with_context(|| format!("parsing manifest {}", path.display()))
     }
 
     pub fn save(&self, path: &Path) -> Result<()> {
-        let text = serde_yaml::to_string(self)?;
+        let text = yaml_serde::to_string(self)?;
         std::fs::write(path, text)
             .with_context(|| format!("writing manifest {}", path.display()))?;
         Ok(())
@@ -229,7 +229,7 @@ mod tests {
         let m = Manifest::new("sample", "moor/base:latest");
         assert_eq!(m.agent, Agent::Claude);
         let no_agent_yaml = "name: x\nimage: moor/base:latest\n";
-        let loaded: Manifest = serde_yaml::from_str(no_agent_yaml).unwrap();
+        let loaded: Manifest = yaml_serde::from_str(no_agent_yaml).unwrap();
         assert_eq!(loaded.agent, Agent::Claude);
     }
 
@@ -262,7 +262,7 @@ mod tests {
         // CLI in that sandbox only ever yields "Not logged in". The
         // reconciled accessor must report Copilot so the right CLI runs.
         let yaml = "name: sc\nimage: moor/copilot-python:latest\n";
-        let m: Manifest = serde_yaml::from_str(yaml).unwrap();
+        let m: Manifest = yaml_serde::from_str(yaml).unwrap();
         assert_eq!(m.agent, Agent::Claude, "raw field still the serde default");
         assert_eq!(m.agent(), Agent::Copilot, "reconciled against the image");
     }
@@ -291,9 +291,9 @@ mod tests {
         let mut m = Manifest::new("sample", "moor/python:latest");
         m.agent = "copilot".parse().unwrap();
         assert_eq!(m.agent, Agent::Copilot);
-        let yaml = serde_yaml::to_string(&m).unwrap();
+        let yaml = yaml_serde::to_string(&m).unwrap();
         assert!(yaml.contains("agent: copilot"), "{yaml}");
-        let back: Manifest = serde_yaml::from_str(&yaml).unwrap();
+        let back: Manifest = yaml_serde::from_str(&yaml).unwrap();
         assert_eq!(back.agent, Agent::Copilot);
     }
 
@@ -403,8 +403,8 @@ mod tests {
     #[test]
     fn manifest_round_trips_through_yaml() {
         let m = Manifest::new("sample", "moor/node:latest");
-        let text = serde_yaml::to_string(&m).unwrap();
-        let back: Manifest = serde_yaml::from_str(&text).unwrap();
+        let text = yaml_serde::to_string(&m).unwrap();
+        let back: Manifest = yaml_serde::from_str(&text).unwrap();
         assert_eq!(back.name, m.name);
         assert_eq!(back.image, m.image);
         assert_eq!(back.resources.pids, m.resources.pids);
