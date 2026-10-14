@@ -126,13 +126,19 @@ fn clone_into_sandbox(name: &str, m: &Manifest, clone_url: &str) -> Result<bool>
         let bundle_str = bundle_path.to_string_lossy().to_string();
         proc::require_success(
             "git bundle create",
-            proc::run_capture("git", &["-C", &scratch_str, "bundle", "create", &bundle_str, "--all"])?.0,
+            proc::run_capture(
+                "git",
+                &["-C", &scratch_str, "bundle", "create", &bundle_str, "--all"],
+            )?
+            .0,
         )?;
 
         let container = m.sandbox_container();
         super::stream_into_sandbox(&container, &bundle_path, "/tmp/new.bundle")?;
-        let status =
-            proc::run_inherit("docker", &["exec", &container, "git", "clone", "/tmp/new.bundle", "."])?;
+        let status = proc::run_inherit(
+            "docker",
+            &["exec", &container, "git", "clone", "/tmp/new.bundle", "."],
+        )?;
         audit::log_exec(
             name,
             m,
@@ -141,11 +147,16 @@ fn clone_into_sandbox(name: &str, m: &Manifest, clone_url: &str) -> Result<bool>
             status.code(),
         )?;
         proc::require_success("git clone (bundle) in sandbox", status)?;
-        let _ = proc::run_capture("docker", &["exec", &container, "rm", "-f", "/tmp/new.bundle"]);
+        let _ = proc::run_capture(
+            "docker",
+            &["exec", &container, "rm", "-f", "/tmp/new.bundle"],
+        );
 
         let status = proc::run_inherit(
             "docker",
-            &["exec", &container, "git", "remote", "set-url", "origin", clone_url],
+            &[
+                "exec", &container, "git", "remote", "set-url", "origin", clone_url,
+            ],
         )?;
         proc::require_success("git remote set-url origin", status)?;
         Ok(true)

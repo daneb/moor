@@ -148,7 +148,9 @@ fn github_https_url(repo: &str) -> String {
 /// identity is configured inside the container (ADR-0007's synced host
 /// identity), not the host's own working directory.
 fn commit_argv(subject: &str, body: &str) -> Vec<String> {
-    ["git", "commit", "-q", "-m", subject, "-m", body].map(String::from).to_vec()
+    ["git", "commit", "-q", "-m", subject, "-m", body]
+        .map(String::from)
+        .to_vec()
 }
 
 /// The `docker exec` argv that streams `branch`'s commits out of the
@@ -192,7 +194,8 @@ fn push_shipped_branch(t: &Target, branch: &str, https_url: &str, token: &str) -
     let argv = bundle_argv(&container, branch);
     let args: Vec<&str> = argv.iter().map(String::as_str).collect();
     let status = proc::run_stdin_to_file("docker", &args, Path::new("/dev/null"), &bundle_path);
-    let status = status.and_then(|s| proc::require_success("streaming the branch out of the sandbox", s));
+    let status =
+        status.and_then(|s| proc::require_success("streaming the branch out of the sandbox", s));
     if let Err(e) = status {
         cleanup();
         return Err(e);
@@ -202,10 +205,17 @@ fn push_shipped_branch(t: &Target, branch: &str, https_url: &str, token: &str) -
     let scratch_str = scratch.to_string_lossy().to_string();
     let bundle_str = bundle_path.to_string_lossy().to_string();
     let result: Result<String> = (|| {
-        proc::require_success("git init (scratch)", proc::run_capture("git", &["init", "-q", &scratch_str])?.0)?;
+        proc::require_success(
+            "git init (scratch)",
+            proc::run_capture("git", &["init", "-q", &scratch_str])?.0,
+        )?;
         proc::require_success(
             "git fetch (bundle -> scratch)",
-            proc::run_capture_combined("git", &["-C", &scratch_str, "fetch", "-q", &bundle_str, branch])?.0,
+            proc::run_capture_combined(
+                "git",
+                &["-C", &scratch_str, "fetch", "-q", &bundle_str, branch],
+            )?
+            .0,
         )?;
         let (_, sha) = proc::run_capture("git", &["-C", &scratch_str, "rev-parse", "FETCH_HEAD"])?;
         let sha = sha.trim().to_string();
@@ -318,12 +328,11 @@ pub fn run(explicit: Option<String>, named: Option<String>, yes: bool) -> Result
         Some(r) => format!("Built and checked in a moor sandbox (run {r}); merge approved."),
         None => "Built and checked in a moor sandbox; merge approved.".to_string(),
     };
-    let committed = t.exec("ship", &add)?.0
-        && {
-            let commit: Vec<String> = commit_argv(&subject, &body);
-            let commit: Vec<&str> = commit.iter().map(String::as_str).collect();
-            t.exec("ship", &commit)?.0
-        };
+    let committed = t.exec("ship", &add)?.0 && {
+        let commit: Vec<String> = commit_argv(&subject, &body);
+        let commit: Vec<&str> = commit.iter().map(String::as_str).collect();
+        t.exec("ship", &commit)?.0
+    };
     if !committed {
         t.exec("ship", &["git", "switch", &trunk])?;
         anyhow::bail!("couldn't commit {slug}'s work; nothing was pushed");
@@ -523,9 +532,17 @@ mod tests {
         let argv = bundle_argv("sample-app-sandbox", "moor/greet");
         assert_eq!(
             argv,
-            ["exec", "sample-app-sandbox", "git", "bundle", "create", "-", "moor/greet"]
-                .map(String::from)
-                .to_vec()
+            [
+                "exec",
+                "sample-app-sandbox",
+                "git",
+                "bundle",
+                "create",
+                "-",
+                "moor/greet"
+            ]
+            .map(String::from)
+            .to_vec()
         );
         assert!(!argv.iter().any(|a| a == "cp"));
     }

@@ -105,8 +105,10 @@ pub fn run(explicit: Option<String>) -> Result<()> {
 
     println!("==> pulling {branch} from {https} (fetched on the host, merged in the sandbox)");
     pull_branch(&name, &m, &https, branch, &token)?;
-    println!("
-==> {name} is up to date on {branch}.");
+    println!(
+        "
+==> {name} is up to date on {branch}."
+    );
     Ok(())
 }
 
@@ -136,21 +138,37 @@ fn pull_branch(name: &str, m: &Manifest, https: &str, branch: &str, token: &str)
     let scratch_str = scratch.to_string_lossy().to_string();
 
     let result: Result<()> = (|| {
-        proc::require_success("git init (scratch)", proc::run_capture("git", &["init", "-q", &scratch_str])?.0)?;
+        proc::require_success(
+            "git init (scratch)",
+            proc::run_capture("git", &["init", "-q", &scratch_str])?.0,
+        )?;
 
         let argv = fetch_argv(&scratch_str, https, branch);
         let args: Vec<&str> = argv.iter().map(String::as_str).collect();
         let (ok, out) = super::run_git_as_host(token, &args)?;
         if !ok {
-            anyhow::bail!("git fetch failed:
-{out}");
+            anyhow::bail!(
+                "git fetch failed:
+{out}"
+            );
         }
 
         let bundle_path = dir.join("pull.bundle");
         let bundle_str = bundle_path.to_string_lossy().to_string();
         proc::require_success(
             "git bundle create",
-            proc::run_capture("git", &["-C", &scratch_str, "bundle", "create", &bundle_str, "FETCH_HEAD"])?.0,
+            proc::run_capture(
+                "git",
+                &[
+                    "-C",
+                    &scratch_str,
+                    "bundle",
+                    "create",
+                    &bundle_str,
+                    "FETCH_HEAD",
+                ],
+            )?
+            .0,
         )?;
 
         let container = m.sandbox_container();
@@ -158,12 +176,21 @@ fn pull_branch(name: &str, m: &Manifest, https: &str, branch: &str, token: &str)
         let (ok, out) = exec(
             name,
             m,
-            &["sh", "-c", "git fetch -q /tmp/pull.bundle FETCH_HEAD && git merge --ff-only FETCH_HEAD"],
+            &[
+                "sh",
+                "-c",
+                "git fetch -q /tmp/pull.bundle FETCH_HEAD && git merge --ff-only FETCH_HEAD",
+            ],
         )?;
-        let _ = proc::run_capture("docker", &["exec", &container, "rm", "-f", "/tmp/pull.bundle"]);
+        let _ = proc::run_capture(
+            "docker",
+            &["exec", &container, "rm", "-f", "/tmp/pull.bundle"],
+        );
         if !ok {
-            anyhow::bail!("merge failed in the sandbox:
-{out}");
+            anyhow::bail!(
+                "merge failed in the sandbox:
+{out}"
+            );
         }
         Ok(())
     })();
