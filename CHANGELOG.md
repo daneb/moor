@@ -4,6 +4,41 @@ Notable changes to moor. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and moor uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Security
+
+- **The GitHub token no longer enters the sandbox.** Credentialed git —
+  `moor ship`'s push, the clone in `moor new`/`moor import`, and `moor
+  pull` — now runs on the host with the host's own GitHub credential; the
+  sandbox keeps only token-free local git. `GITHUB_TOKEN` is removed from
+  the sandbox's compose env and secret manifest. Commits are still made
+  in-sandbox (ADR-0007 authorship intact) and leave as a `git bundle`
+  streamed over `docker exec`; the host-side push re-emits the same
+  `git-push` audit entry (ref + commit). Verified live: `GITHUB_TOKEN`
+  absent from a new-binary sandbox's env, present in an old-binary one.
+  See [ADR-0014](docs/decisions/0014-git-on-host.md). (SPEC-0016)
+
+### Changed
+
+- **Dropped the unmaintained `serde_yaml` dependency.** `serde_yaml` 0.9
+  (deprecated) pulled in `unsafe-libyaml`, flagged by RUSTSEC-2024-0449.
+  Swapped to `yaml_serde` 0.10.7 across all 16 call sites; the API is
+  compatible, so manifest round-trip and front-matter parsing are
+  unchanged and existing tests pass unmodified. `cargo deny` advisories
+  now pass and `unsafe-libyaml` leaves the tree. (SPEC-0017)
+
+### Fixed
+
+- **A Copilot sandbox no longer tries to run the Claude CLI.** A
+  `copilot`-agent sandbox whose manifest omits `agent:` defaulted the
+  field to Claude (a serde default kept so old manifests still load), so
+  a turn ran the `claude` CLI inside a Copilot sandbox and died with
+  Claude Code's misleading `Not logged in · /login`. `Manifest::agent()`
+  now reconciles the stored agent against the image — a defaulted Claude
+  on a `moor/copilot*` image resolves to Copilot — and every turn and
+  credential read-site routes through it.
+
 ## [0.7.0] - 2026-10-02
 
 ### Added
