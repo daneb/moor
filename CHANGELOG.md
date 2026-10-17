@@ -4,6 +4,30 @@ Notable changes to moor. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and moor uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **`moor ui`: the console in a browser.** Every project at a glance,
+  with the ones waiting on you first; each spec as a map of its seven
+  steps plus ship, where every node opens the artefact, gate checks,
+  approval history and the action for that step; the agent (brainstorm
+  or build) with its recorded transcript and "turn this answer into a
+  recipe"; every run's gates, evidence files and trajectory, with
+  `moor bundle` a click away; the audit trail as a filterable timeline
+  with verify and export; and agent provider, keel driver, Keychain
+  credentials, egress allowlist and resources in one settings page.
+  Projects can be created and imported (with a repo picker) from it.
+  It binds 127.0.0.1 only and lives exactly as long as the command does;
+  a 192-bit key printed in the URL's fragment is required on every API
+  call and the `Host` header must be loopback. Every action runs the
+  `moor` binary itself, from a fixed table of kinds, so the page and the
+  command line can't disagree; every sandbox read is logged under
+  `kind: "ui"`. `guide::pick_active` now ignores those reads, so looking
+  at a spec never redirects `moor go`. No new dependencies: the HTTP
+  layer is hand-rolled over `std::net`, like the MCP server over stdio.
+  See [ADR-0015](docs/decisions/0015-browser-console.md).
+
 ## [0.7.2] - 2026-10-15
 
 ### Security

@@ -271,6 +271,27 @@ Two properties are load-bearing there rather than incidental:
   taken verbatim from `keel next --json`, and it is refused outright if
   it does not begin `keel approve`.
 
+### Console in a browser (`moor ui`, host)
+
+The same ground as the studio, served as a page from the `moor` process
+itself, for exactly as long as `moor ui` runs: every project and where
+its active spec stands (one `docker ps` for all of them, then `keel next
+--json` per sandbox that is up), each spec as a map of `guide`'s seven
+steps plus ship, the artefacts and gate evidence beside the decision they
+inform, the agent's transcript, every run's evidence, the audit chain and
+the project's settings.
+
+It binds `127.0.0.1` only, refuses any `Host` that isn't loopback, and
+takes a per-launch key — printed once in the URL's fragment, sent back as
+a header — on every `/api` call. Every action is the `moor` binary run as
+a child from a fixed table of kinds with validated fields (`ui/api.rs`),
+so the page never assembles a command line; a secret's value travels on
+the child's stdin and never in argv. Every sandbox read is `docker exec`
+logged through the same chained-audit path under `kind: "ui"`, and
+`guide::pick_active` skips those entries so a read never redirects `moor
+go`. Text from a sandbox is sanitized like the studio's and rendered as
+text. See [ADR-0015](decisions/0015-browser-console.md).
+
 ## Why no bind mount
 
 The container never has a host path mounted into it — not the project
