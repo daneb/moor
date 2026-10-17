@@ -78,22 +78,22 @@ fn printable(text: &str) -> String {
 
 /// keel's pipeline has seven steps before `complete` (keel
 /// `pipeline::Stage`, whose wire keys are a stable schema).
-const TOTAL_STEPS: u8 = 7;
+pub const TOTAL_STEPS: u8 = 7;
 
 /// What one stage means for the operator.
-struct Step {
-    n: u8,
-    title: &'static str,
-    what: &'static str,
+pub struct Step {
+    pub n: u8,
+    pub title: &'static str,
+    pub what: &'static str,
     /// The artifact to read before deciding, or to look at when the step's
     /// checks fail: `spec`, `plan`, or `report` (what a run did).
-    read: Option<&'static str>,
+    pub read: Option<&'static str>,
     /// The approval this step asks the operator for. `None` means the step
     /// is one `moor go` can take on its own.
-    decides: Option<&'static str>,
+    pub decides: Option<&'static str>,
 }
 
-fn step(stage: &str) -> Option<Step> {
+pub fn step(stage: &str) -> Option<Step> {
     let s = |n, title, what, read, decides| Step {
         n,
         title,
@@ -210,12 +210,19 @@ pub fn pick_active<'a>(
         [only] => active(only, Why::OnlyOne),
         _ => {
             // A slug appears quoted in any chain entry that concerns it: an
-            // exec's argv, or a folded keel gate/run/approval payload.
-            let recent = chain_lines.iter().rev().find_map(|line| {
-                open.iter()
-                    .find(|s| line.contains(&format!("\"{}\"", s.slug)))
-                    .copied()
-            });
+            // exec's argv, or a folded keel gate/run/approval payload. The
+            // console's own reads (`kind: "ui"`) are skipped: looking at a
+            // spec in a browser is not working on it, and must not redirect
+            // `moor go` at whatever was looked at last.
+            let recent = chain_lines
+                .iter()
+                .rev()
+                .filter(|line| !line.contains("\"kind\":\"ui\""))
+                .find_map(|line| {
+                    open.iter()
+                        .find(|s| line.contains(&format!("\"{}\"", s.slug)))
+                        .copied()
+                });
             match recent {
                 Some(spec) => active(spec, Why::MostRecent),
                 None => {
@@ -832,6 +839,18 @@ mod tests {
         let lines = render("p", None, &r, Some(&a));
         assert_eq!(lines[0], "Blocked: store drift.");
         assert_eq!(lines[1], "  Fix:  moor keel store render");
+    }
+
+    #[test]
+    fn a_console_read_does_not_make_a_spec_the_most_recent() {
+        let r = report(vec![spec("a", "plan"), spec("b", "run")]);
+        let chain = vec![
+            r#"{"kind":"exec","data":{"argv":["keel","gate","g1","a"]}}"#.to_string(),
+            r#"{"kind":"ui","data":{"argv":["keel","report","b","--json"]}}"#.to_string(),
+        ];
+        let a = pick_active(&r, None, &chain).unwrap();
+        assert_eq!(a.spec.slug, "a");
+        assert_eq!(a.why, Why::MostRecent);
     }
 
     #[test]

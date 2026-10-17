@@ -11,6 +11,7 @@ mod proc;
 mod secrets;
 mod session;
 mod studio;
+mod ui;
 
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
@@ -213,6 +214,19 @@ enum Command {
         #[arg(short = 'p', long = "project")]
         project: Option<String>,
     },
+    /// The console in your browser: every project, step, approval and record.
+    ///
+    /// Serves on 127.0.0.1 only, for as long as this command runs, with a
+    /// per-launch key in the URL it prints. Same actions as the command
+    /// line — each one runs `moor` itself — and the same audit trail.
+    Ui {
+        /// Port on 127.0.0.1 (0 picks a free one).
+        #[arg(long, default_value_t = 7474)]
+        port: u16,
+        /// Print the URL without opening a browser.
+        #[arg(long)]
+        no_open: bool,
+    },
     /// Open an interactive shell inside a project's sandbox.
     Shell { name: String },
     /// Run one command inside a project's sandbox.
@@ -404,6 +418,7 @@ fn main() {
             commands::ask_cmd::run(&name, &role, new, emit_recipe.as_deref(), &prompt)
         }),
         Command::Studio { project } => commands::studio_cmd::run(project),
+        Command::Ui { port, no_open } => commands::ui_cmd::run(port, no_open),
         Command::Recipe { name, file } => commands::recipe::run(&name, &file),
         Command::Logs {
             name,
