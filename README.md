@@ -64,6 +64,7 @@ stopping for your approval at every checkpoint.
 | | What you get |
 | --- | --- |
 | **Guided workflow** | `moor next` shows the step you're on and the command for it; `moor go`, `moor approve` and `moor reject` act on the active spec, so you never type a spec name or stage. |
+| **A console in your browser** | `moor ui` opens every project as a page: where each spec stands as a map you can step into, the spec or plan beside the decision it needs, every run's evidence, the audit trail, and agent, driver and credential setup. Loopback only, one key per run, every action is `moor` itself. |
 | **One record, one format** | moor writes its audit trail in the same hash-chained format the pipeline uses, so one verifier checks both. Old trails are sealed, not rewritten. |
 | **Sandbox attestation** | On `moor up`, moor inspects the running container and hands the pipeline a checked list: read-only, non-root, no capabilities, no mounts. The pipeline can refuse to run an agent without it. |
 | **Check results in the record** | Nothing inside the sandbox writes the record itself; moor collects the pipeline's entries and appends them from outside. |
@@ -120,7 +121,10 @@ for why the sandbox's git identity is synced from the host's, so
 approvals record a real name instead of "unknown",
 [docs/decisions/0008-agent-session-protocol.md](docs/decisions/0008-agent-session-protocol.md)
 for why the agent reaches the pipeline through moor's own MCP server rather
-than a scoped shell with a hand-maintained verb allowlist — and
+than a scoped shell with a hand-maintained verb allowlist,
+[docs/decisions/0015-browser-console.md](docs/decisions/0015-browser-console.md)
+for how `moor ui` puts all of this in a browser without opening the host —
+loopback only, a per-run key, every action the `moor` binary itself — and
 [docs/examples/ascii-banner](docs/examples/ascii-banner) for a small
 utility built end to end by a real Claude Code agent running inside a
 sandbox — including two real bugs that run found and fixed, and the
@@ -167,6 +171,10 @@ moor go --check                    # re-check a build you fixed, without the age
 moor approve                       # shows the spec/plan/run first, then asks
 moor reject "needs a rollback plan"
 moor ship                          # approved: commit on its own branch, push, open a PR
+
+# ...or do all of the above from a page: every project, the map of each
+# spec's steps, approvals, evidence and the audit trail
+moor ui                            # 127.0.0.1 only, for as long as it runs
 
 # read a spec, or its plan or tasks, without opening a shell
 moor view greet-name tasks
@@ -297,7 +305,8 @@ failures within half a second of a real recipe run producing them.
 - `cli/` — the `moor` Rust CLI, including `cli/templates/` (the
   per-project docker-compose template — lives inside the crate, not a
   top-level `compose/`, so a published crate can actually embed it)
-- `docs/` — threat model, architecture, transport, images
+- `docs/` — threat model, architecture, transport, images; `docs/UI.md`
+  is the short guide to `moor ui`
 - `Makefile` — local dev tooling (`make help`); mirrors
   `.github/workflows/ci.yml` so `make ci` runs the same checks locally
 

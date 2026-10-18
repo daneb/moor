@@ -19,6 +19,7 @@ pub mod ship_cmd;
 pub mod spec_cmd;
 pub mod status;
 pub mod studio_cmd;
+pub mod ui_cmd;
 pub mod up;
 pub mod use_cmd;
 pub mod view;

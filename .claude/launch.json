@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "moor-ui",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "MOOR_UI_DEV=cli/ui exec ./cli/target/debug/moor ui --port 7474 --no-open"],
+      "port": 7474
+    }
+  ]
+}
