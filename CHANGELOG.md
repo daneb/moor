@@ -4,7 +4,7 @@ Notable changes to moor. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and moor uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.8.0]
+## [Unreleased]
 
 ### Added
 
@@ -22,6 +22,18 @@ Notable changes to moor. The format follows
   is a no-op the turn's own auth hint reports. The default-deny egress
   allowlist gains the AWS SSO OIDC and CodeWhisperer host patterns a
   device-flow login and chat turn need. (SPEC-0018)
+
+### Security
+
+- **Patched two fixable HIGH CVEs in the base sandbox image.** `undici`
+  6.28.1 → 6.29.1 (CVE-2026-109869, unhandled stream-error DoS) in npm's
+  vendored tree, and `github.com/klauspost/compress` → v1.18.7
+  (CVE-2026-63209, integer-overflow DoS) in the from-source `gitleaks`
+  build — both following the base image's existing in-file patch
+  patterns. Surfaced by the CI image scan; applies to every image, since
+  they all inherit this base.
+
+## [0.8.0]
 
 ### Web UI - 2026-10-18
 
