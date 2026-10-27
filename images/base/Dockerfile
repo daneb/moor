@@ -35,18 +35,22 @@ RUN cargo install --locked --path /build/mcp --root /usr/local
 # Built rather than downloaded: the release binary is compiled with an older
 # Go and older golang.org/x/crypto and x/text, and the image scan in CI
 # fails on their fixed HIGH/CRITICAL CVEs. Same source (the tag, checked
-# against its commit), a current toolchain, and those two modules raised
+# against its commit), a current toolchain, and those modules raised
 # to fixed versions. Bump the pins here when the scan asks for it.
 FROM golang:1.27-bookworm AS gitleaks-build
 ARG GITLEAKS_VERSION=8.30.1
 ARG GITLEAKS_COMMIT=83d9cd684c87d95d656c1458ef04895a7f1cbd8e
 ARG X_CRYPTO_VERSION=v0.57.0
 ARG X_TEXT_VERSION=v0.42.0
+# klauspost/compress < 1.18.7 carries CVE-2026-63209 (integer-overflow DoS
+# in dictionary processing), fixable HIGH; raised the same way as the x/*
+# modules above.
+ARG COMPRESS_VERSION=v1.18.7
 WORKDIR /src
 RUN git clone --quiet --depth 1 --branch "v${GITLEAKS_VERSION}" \
         https://github.com/gitleaks/gitleaks.git . \
     && test "$(git rev-parse HEAD)" = "$GITLEAKS_COMMIT" \
-    && go get "golang.org/x/crypto@${X_CRYPTO_VERSION}" "golang.org/x/text@${X_TEXT_VERSION}" \
+    && go get "golang.org/x/crypto@${X_CRYPTO_VERSION}" "golang.org/x/text@${X_TEXT_VERSION}" "github.com/klauspost/compress@${COMPRESS_VERSION}" \
     && go mod tidy \
     && CGO_ENABLED=0 go build -trimpath \
         -ldflags "-s -w -X=github.com/zricethezav/gitleaks/v8/version.Version=v${GITLEAKS_VERSION}" \
@@ -92,20 +96,23 @@ RUN npm install -g npm@11 && npm cache clean --force
 # has picked up the fix for yet — verified: npm@11.20.0 and npm@12.1.0
 # both still bundle brace-expansion@5.0.9 and undici@6.28.0, which carry
 # fixable HIGH CVEs (CVE-2026-102276/102278 stack/recursion DoS, and
-# CVE-2026-19534 WebSocket DoS). These are transitive deps of npm's own
-# deps, so a top-level `npm install` or `overrides` can't reach them; the
-# only fix available today is to drop the patched releases straight into
-# npm's tree. Verified after doing so: npm still runs and does live
-# registry ops, and Trivy reports zero fixable HIGH/CRITICAL. This whole
-# step becomes redundant (and can be deleted) once an npm release bundles
-# the fixed versions — check on the next npm bump. Applies to every image,
+# CVE-2026-19534 WebSocket DoS). undici was later bumped again to 6.29.1
+# for CVE-2026-109869 (unhandled stream-error DoS on excessive content),
+# the lowest fixed release on undici's 6.x line so npm's vendored tree
+# stays compatible. These are transitive deps of npm's own deps, so a
+# top-level `npm install` or `overrides` can't reach them; the only fix
+# available today is to drop the patched releases straight into npm's
+# tree. Verified after doing so: npm still runs and does live registry
+# ops, and Trivy reports zero fixable HIGH/CRITICAL. This whole step
+# becomes redundant (and can be deleted) once an npm release bundles the
+# fixed versions — check on the next npm bump. Applies to every image,
 # since they all inherit this base.
-RUN npm pack brace-expansion@5.0.11 undici@6.28.1 --pack-destination /tmp >/dev/null \
+RUN npm pack brace-expansion@5.0.11 undici@6.29.1 --pack-destination /tmp >/dev/null \
     && tar xzf /tmp/brace-expansion-5.0.11.tgz -C /tmp \
     && rm -rf /usr/lib/node_modules/npm/node_modules/brace-expansion/* \
     && cp -r /tmp/package/. /usr/lib/node_modules/npm/node_modules/brace-expansion/ \
     && rm -rf /tmp/package \
-    && tar xzf /tmp/undici-6.28.1.tgz -C /tmp \
+    && tar xzf /tmp/undici-6.29.1.tgz -C /tmp \
     && rm -rf /usr/lib/node_modules/npm/node_modules/undici/* \
     && cp -r /tmp/package/. /usr/lib/node_modules/npm/node_modules/undici/ \
     && rm -rf /tmp/package /tmp/*.tgz \
