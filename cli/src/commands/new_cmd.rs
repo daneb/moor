@@ -14,6 +14,9 @@ pub fn run(name: &str, image: &str, agent: Agent, github: bool) -> Result<()> {
     let image = manifest::resolve_image(image, agent);
     let mut m = Manifest::new(name, &image);
     m.agent = agent;
+    // A kiro project records the Kiro credential env-var names; other
+    // agents are left with the default secret set.
+    m.declare_agent_secrets();
 
     if github {
         match super::create_github_repo_interactive(name)? {

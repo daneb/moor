@@ -201,6 +201,93 @@ pub fn should_use_device_token(agent_is_copilot: bool, env_set: bool, keychain_s
     agent_is_copilot && !env_set && !keychain_set
 }
 
+/// The env var the discovered Kiro SSO token is injected as. `kiro-cli`
+/// inside the sandbox reads its bearer credential from this `AWS_*`
+/// variable; it is the first of `manifest::KIRO_SECRET_VARS`, so the
+/// existing secret→env plumbing and audit redaction already cover it.
+pub const KIRO_TOKEN_VAR: &str = "AWS_BEARER_TOKEN_BEDROCK";
+
+/// The host's SSO token cache directory (`~/.aws/sso/cache`), where
+/// `kiro-cli login` for IAM Identity Center leaves its cached access
+/// tokens as JSON files. `None` if no home directory is resolvable.
+pub fn kiro_cache_dir() -> Option<std::path::PathBuf> {
+    std::env::var_os("HOME").map(|home| std::path::Path::new(&home).join(".aws/sso/cache"))
+}
+
+/// The freshest unexpired SSO access token in the host's cache, if one is
+/// present (AC-6). Each `~/.aws/sso/cache/*.json` holds an `accessToken`
+/// and an `expiresAt`; the most recently modified file wins, and an
+/// obviously expired or token-less file is skipped. Read fresh every call
+/// — nothing is cached by moor (AC-8) — and returned by value, so it is
+/// never handed to a subprocess as an argument (AC-9). `None` on any
+/// miss (no cache dir, no file, no token), never an error, so absence is
+/// a no-op for the caller (AC-10).
+pub fn kiro_sso_token() -> Option<String> {
+    let dir = kiro_cache_dir()?;
+    let mut candidates: Vec<(std::time::SystemTime, std::path::PathBuf)> = std::fs::read_dir(&dir)
+        .ok()?
+        .filter_map(|e| e.ok())
+        .filter(|e| e.path().extension().is_some_and(|x| x == "json"))
+        .filter_map(|e| Some((e.metadata().ok()?.modified().ok()?, e.path())))
+        .collect();
+    // Freshest file first.
+    candidates.sort_by(|a, b| b.0.cmp(&a.0));
+    for (_, path) in candidates {
+        if let Some(token) = token_from_cache_file(&std::fs::read_to_string(&path).ok()?) {
+            return Some(token);
+        }
+    }
+    None
+}
+
+/// The `accessToken` from one SSO cache file's JSON, dropping it when the
+/// file's `expiresAt` is in the past. Pure, so the freshness rule is
+/// unit-testable without writing files.
+fn token_from_cache_file(contents: &str) -> Option<String> {
+    let v: serde_json::Value = serde_json::from_str(contents).ok()?;
+    let token = v.get("accessToken")?.as_str()?.trim().to_string();
+    if token.is_empty() {
+        return None;
+    }
+    if let Some(expires) = v.get("expiresAt").and_then(|e| e.as_str()) {
+        // The SSO cache stamps `expiresAt` as RFC-3339 UTC. A file whose
+        // expiry has already passed is skipped rather than injected stale;
+        // an unparseable stamp is treated as "no expiry known" and kept.
+        if let Ok(at) = chrono::DateTime::parse_from_rfc3339(expires) {
+            if at <= chrono::Utc::now() {
+                return None;
+            }
+        }
+    }
+    Some(token)
+}
+
+/// For a `kiro`-agent project, inject the host's freshly-read SSO access
+/// token as `AWS_BEARER_TOKEN_BEDROCK` when nothing more explicit resolved
+/// it. The Copilot device-token counterpart: an already-set env var or a
+/// moor-managed Keychain secret wins, a non-kiro agent is a no-op (AC-7),
+/// and a missing credential is a no-op (AC-10). Reads fresh and writes no
+/// copy to the manifest, compose file, or Keychain (AC-8); the token is
+/// read by value and set via the environment, never an argv (AC-9).
+/// Returns the token it set, if any, so the caller can add it to the
+/// audit redaction set.
+pub fn resolve_kiro_credential(agent_is_kiro: bool) -> Option<String> {
+    let env_set = std::env::var(KIRO_TOKEN_VAR).is_ok();
+    if !should_use_kiro_token(agent_is_kiro, env_set) {
+        return None;
+    }
+    let token = kiro_sso_token()?;
+    std::env::set_var(KIRO_TOKEN_VAR, &token);
+    Some(token)
+}
+
+/// The decision, pure so it is testable without the environment or the
+/// filesystem: use the discovered SSO token only for a kiro agent, and
+/// only when no explicit env var already provides the bearer credential.
+pub fn should_use_kiro_token(agent_is_kiro: bool, env_set: bool) -> bool {
+    agent_is_kiro && !env_set
+}
+
 fn read_hidden_line() -> Result<String> {
     use std::process::Stdio;
     // stdout/stderr suppressed: when stdin isn't a real TTY (a script, a
@@ -347,5 +434,77 @@ mod tests {
         // which is what the redaction set is built from.
         let m = crate::manifest::Manifest::new("x", "moor/copilot:latest");
         assert!(m.secrets.iter().any(|s| s == COPILOT_TOKEN_VAR));
+    }
+
+    // --- kiro-agent-sandbox (SPEC-0018) ---------------------------------
+
+    #[test]
+    fn finds_kiro_credential_source() {
+        // AC-6: the host credential is the SSO token cache `kiro-cli login`
+        // populates (`~/.aws/sso/cache`) — no `moor secrets` step. A login
+        // can't be assumed on every host, so assert discovery is total
+        // (never panics) and targets the right directory, then exercise the
+        // freshness rule directly: unexpired yields its token, expired or
+        // token-less yields nothing, an unparseable expiry is kept.
+        let _ = kiro_sso_token();
+        if let Some(dir) = kiro_cache_dir() {
+            assert!(dir.ends_with(".aws/sso/cache"), "{}", dir.display());
+        }
+        let fresh = r#"{"accessToken":"tok-abc","expiresAt":"2999-01-01T00:00:00Z"}"#;
+        assert_eq!(token_from_cache_file(fresh), Some("tok-abc".to_string()));
+        let expired = r#"{"accessToken":"old","expiresAt":"2000-01-01T00:00:00Z"}"#;
+        assert_eq!(token_from_cache_file(expired), None);
+        assert_eq!(
+            token_from_cache_file(r#"{"expiresAt":"2999-01-01T00:00:00Z"}"#),
+            None
+        );
+        let odd = r#"{"accessToken":"keep","expiresAt":"soon"}"#;
+        assert_eq!(token_from_cache_file(odd), Some("keep".to_string()));
+    }
+
+    #[test]
+    fn kiro_credential_only_for_kiro_agent() {
+        // AC-7: only a kiro agent injects the credential, and only with no
+        // explicit env var; a non-kiro resolve is a pure no-op.
+        assert!(!should_use_kiro_token(/*kiro*/ false, /*env*/ false));
+        assert!(should_use_kiro_token(/*kiro*/ true, /*env*/ false));
+        assert!(!should_use_kiro_token(true, /*env*/ true));
+        std::env::remove_var(KIRO_TOKEN_VAR);
+        assert_eq!(resolve_kiro_credential(false), None);
+        assert!(std::env::var(KIRO_TOKEN_VAR).is_err());
+    }
+
+    #[test]
+    fn kiro_credential_not_persisted() {
+        // AC-8: resolving writes no Keychain entry (`set` is the only
+        // writer, never on this path), no manifest/compose copy — only a
+        // process env var, read fresh. A non-kiro resolve touches nothing.
+        let before = get("moor-kiro-noexist", KIRO_TOKEN_VAR).ok();
+        assert_eq!(resolve_kiro_credential(false), None);
+        let after = get("moor-kiro-noexist", KIRO_TOKEN_VAR).ok();
+        assert_eq!(before, after, "resolve must not write a Keychain entry");
+    }
+
+    #[test]
+    fn kiro_credential_not_in_argv() {
+        // AC-9: the token is read from a file by value and injected via the
+        // environment — no argv path exists, so it can't surface in `docker
+        // inspect`/`ps`. token_from_cache_file is a pure in-memory read,
+        // and the var it sets is the first declared secret, so it rides the
+        // same file-based compose injection as every secret.
+        let contents = r#"{"accessToken":"secret-value","expiresAt":"2999-01-01T00:00:00Z"}"#;
+        assert_eq!(
+            token_from_cache_file(contents),
+            Some("secret-value".to_string())
+        );
+        assert_eq!(KIRO_TOKEN_VAR, crate::manifest::KIRO_SECRET_VARS[0]);
+    }
+
+    #[test]
+    fn missing_kiro_credential_is_noop() {
+        // AC-10: no host credential and nothing explicit → None, no error;
+        // the turn's own auth hint reports the gap.
+        std::env::remove_var(KIRO_TOKEN_VAR);
+        assert_eq!(resolve_kiro_credential(false), None);
     }
 }

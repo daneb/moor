@@ -186,6 +186,7 @@ mod tests {
         assert!(rendered.contains("cache:/home/agent/.cache"));
         assert!(rendered.contains("claude-state:/home/agent/.claude"));
         assert!(rendered.contains("copilot-state:/home/agent/.copilot"));
+        assert!(rendered.contains("kiro-state:/home/agent/.aws"));
         assert!(!rendered.contains("/Users/"));
         assert!(!rendered.contains("${HOME}"));
     }

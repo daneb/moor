@@ -19,6 +19,21 @@
 # githubcopilot.com is included alongside its subdomains.
 ^([a-zA-Z0-9-]+\.)*githubcopilot\.com$
 
+# Kiro agent (kiro-cli) — IAM Identity Center device-flow login and chat
+# turns. `kiro-cli login` talks to AWS SSO OIDC; a turn authenticates
+# there and reaches the model through AWS CodeWhisperer/Amazon Q
+# (confirmed by the CodeWhisperer ARN in `kiro-cli whoami`). All are
+# regional (oidc.<region>.amazonaws.com, portal.sso.<region>...,
+# codewhisperer.<region>.amazonaws.com, q.<region>.amazonaws.com); the
+# leading `([a-zA-Z0-9-]+\.)*` matches the apex and any subdomain. The
+# operator's own IdC start-URL host (<id>.awsapps.com) — needed by the
+# device flow — is tenant-specific and added per-project via moor.yaml
+# `egress.allow`, not baked in here.
+^([a-zA-Z0-9-]+\.)*oidc\.[a-z0-9-]+\.amazonaws\.com$
+^([a-zA-Z0-9-]+\.)*sso\.[a-z0-9-]+\.amazonaws\.com$
+^([a-zA-Z0-9-]+\.)*codewhisperer\.[a-z0-9-]+\.amazonaws\.com$
+^([a-zA-Z0-9-]+\.)*q\.[a-z0-9-]+\.amazonaws\.com$
+
 # Language package registries (add more per-project via moor.yaml)
 ^([a-zA-Z0-9-]+\.)*crates\.io$
 ^registry\.npmjs\.org$

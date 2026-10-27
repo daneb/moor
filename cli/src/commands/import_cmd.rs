@@ -74,6 +74,9 @@ pub fn run(
 
     let mut m = Manifest::new(name, &image);
     m.agent = agent;
+    // A kiro project records the Kiro credential env-var names; other
+    // agents are left with the default secret set.
+    m.declare_agent_secrets();
 
     // Preserve the source repo's existing GitHub remote, if it has one —
     // this is the common case for something like keel, which already

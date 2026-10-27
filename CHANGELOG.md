@@ -6,6 +6,23 @@ Notable changes to moor. The format follows
 
 ## [0.8.0]
 
+### Added
+
+- **Run a project's sandbox on the Kiro CLI agent.** moor's turn
+  protocol already spoke Kiro; this adds the sandbox beneath it. A
+  `--agent kiro` project composes onto a new `moor/kiro-<lang>` image
+  layer (`images/kiro/Dockerfile`, opt-in exactly like the Copilot
+  layer), and `manifest::resolve_image` now reconciles a kiro image back
+  to the kiro agent. The enterprise credential — IAM Identity Center SSO
+  tokens under `~/.aws`, left by a host `kiro-cli login` — is discovered
+  fresh at each `moor up` and delivered into the sandbox by a
+  `kiro-state` volume mounted at `~/.aws`, never through a process
+  argument and never copied into the manifest, compose file, or
+  Keychain. It is injected only for kiro-agent projects, and its absence
+  is a no-op the turn's own auth hint reports. The default-deny egress
+  allowlist gains the AWS SSO OIDC and CodeWhisperer host patterns a
+  device-flow login and chat turn need. (SPEC-0018)
+
 ### Web UI - 2026-10-18
 
 - **`moor ui`: the console in a browser.** Every project at a glance,
