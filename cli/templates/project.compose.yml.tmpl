@@ -61,6 +61,13 @@ services:
       # Claude-only projects. The mount point is created agent-owned in
       # the copilot image so this volume inherits that ownership.
       - copilot-state:/home/agent/.copilot
+      # Kiro CLI's own state and the injected SSO credential under
+      # ~/.aws, for projects on the moor/kiro image. Same
+      # read-only-rootfs reason as the two state volumes above; harmless
+      # (an empty volume) for non-Kiro projects. The mount point is
+      # created agent-owned in the kiro image so this volume inherits
+      # that ownership.
+      - kiro-state:/home/agent/.aws
     command: ["sleep", "infinity"]
     depends_on:
       - egress
@@ -98,3 +105,5 @@ volumes:
     name: {{PROJECT_NAME}}-claude-state
   copilot-state:
     name: {{PROJECT_NAME}}-copilot-state
+  kiro-state:
+    name: {{PROJECT_NAME}}-kiro-state

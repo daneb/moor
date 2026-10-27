@@ -1,0 +1,90 @@
+{
+  "schema": "keel.gate/1",
+  "gate": "G0",
+  "run": "2026-10-27-000",
+  "spec": "kiro-agent-sandbox",
+  "verdict": "pass",
+  "generated_at": "2026-10-27T15:15:18.760344+02:00",
+  "checks": [
+    {
+      "id": "schema",
+      "verdict": "pass",
+      "detail": "SPEC-0018 (keel.spec/1)"
+    },
+    {
+      "id": "criteria-present",
+      "verdict": "pass",
+      "detail": "12 criteria"
+    },
+    {
+      "id": "criterion-ids-unique",
+      "verdict": "pass",
+      "detail": "no duplicate ids"
+    },
+    {
+      "id": "no-placeholders",
+      "verdict": "pass",
+      "detail": "no unfilled scaffold text"
+    },
+    {
+      "id": "ears-conformance",
+      "verdict": "pass",
+      "detail": "12/12 conform (event-driven, optional-feature, ubiquitous, unwanted-behaviour)"
+    },
+    {
+      "id": "oracle-presence",
+      "verdict": "pass",
+      "detail": "12 oracles across 12 criteria"
+    },
+    {
+      "id": "oracle-wellformed",
+      "verdict": "pass",
+      "detail": "all oracles parse"
+    },
+    {
+      "id": "ambiguity",
+      "verdict": "pass",
+      "detail": "no ambiguous phrasing in criteria"
+    },
+    {
+      "id": "criterion-budget",
+      "verdict": "pass",
+      "detail": "12/12 criteria"
+    },
+    {
+      "id": "spec-length",
+      "verdict": "pass",
+      "detail": "189/250 lines"
+    },
+    {
+      "id": "scope-declared",
+      "verdict": "pass",
+      "detail": "10 glob(s): cli/src/manifest.rs, cli/src/commands/new_cmd.rs, cli/src/commands/import_cmd.rs, cli/src/main.rs, cli/src/secrets.rs, cli/src/commands/up.rs, cli/src/compose.rs, images/kiro/Dockerfile, images/build.sh, proxy/allowlist.base.txt"
+    },
+    {
+      "id": "change-budget",
+      "verdict": "pass",
+      "detail": "420 lines of diff budgeted"
+    },
+    {
+      "id": "oracle-mix",
+      "verdict": "pass",
+      "detail": "12/12 runnable (12 cmd)"
+    },
+    {
+      "id": "human-cost",
+      "verdict": "pass",
+      "detail": "0 human oracle(s), none load-bearing"
+    },
+    {
+      "id": "store-drift",
+      "verdict": "pass",
+      "detail": "4 projections current"
+    },
+    {
+      "id": "shared-stores",
+      "verdict": "pass",
+      "detail": "none configured"
+    }
+  ]
+}

@@ -23,6 +23,12 @@ done
 echo "==> building moor/copilot:latest"
 docker build -t moor/copilot:latest --build-arg BASE_IMAGE=moor/base:latest ./copilot
 
+# The opt-in Kiro agent layer, on top of base. Kept out of moor/base for
+# the same reason as copilot: a non-default agent most projects never
+# select shouldn't be in every image. See images/kiro/Dockerfile.
+echo "==> building moor/kiro:latest"
+docker build -t moor/kiro:latest --build-arg BASE_IMAGE=moor/base:latest ./kiro
+
 echo "==> building moor/egress:latest"
 docker build -t moor/egress:latest ../proxy
 

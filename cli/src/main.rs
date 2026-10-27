@@ -45,9 +45,9 @@ enum Command {
         /// moor/base, moor/node, moor/rust, or moor/python
         #[arg(long, default_value = "moor/base:latest")]
         image: String,
-        /// Which agent the sandbox is set up for: `claude` (default) or
-        /// `copilot`. `copilot` composes with the image to select the
-        /// matching `moor/copilot-<lang>` layer.
+        /// Which agent the sandbox is set up for: `claude` (default),
+        /// `copilot`, or `kiro`. `copilot`/`kiro` compose with the image
+        /// to select the matching `moor/<agent>-<lang>` layer.
         #[arg(long, default_value = "claude")]
         agent: String,
         /// Also create a private GitHub repo via `gh repo create` (asks
@@ -70,9 +70,10 @@ enum Command {
         /// pyproject.toml/requirements.txt) if not given.
         #[arg(long)]
         image: Option<String>,
-        /// Which agent the sandbox is set up for: `claude` (default) or
-        /// `copilot`. `copilot` composes with the (detected or given)
-        /// image to select the matching `moor/copilot-<lang>` layer.
+        /// Which agent the sandbox is set up for: `claude` (default),
+        /// `copilot`, or `kiro`. `copilot`/`kiro` compose with the
+        /// (detected or given) image to select the matching
+        /// `moor/<agent>-<lang>` layer.
         #[arg(long, default_value = "claude")]
         agent: String,
         /// If the source repo has no GitHub remote, create one (asks for
