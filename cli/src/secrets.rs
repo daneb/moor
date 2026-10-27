@@ -231,7 +231,7 @@ pub fn kiro_sso_token() -> Option<String> {
         .filter_map(|e| Some((e.metadata().ok()?.modified().ok()?, e.path())))
         .collect();
     // Freshest file first.
-    candidates.sort_by(|a, b| b.0.cmp(&a.0));
+    candidates.sort_by_key(|a| std::cmp::Reverse(a.0));
     for (_, path) in candidates {
         if let Some(token) = token_from_cache_file(&std::fs::read_to_string(&path).ok()?) {
             return Some(token);
