@@ -1,12 +1,39 @@
 #!/usr/bin/env bash
 #
-# Release moor, in two steps because master is protected (changes arrive by
-# pull request only):
+# Release moor. Master is protected, so changes arrive by pull request only
+# and a release is two steps with a merge in between:
 #
+#   ./release.sh status              # where am I? what's the next command?
+#   ./release.sh unreleased          # scaffold CHANGELOG's [Unreleased] section
 #   ./release.sh prepare <version>   # open the release PR: version + CHANGELOG
 #   ./release.sh publish <version>   # after that PR merges: gate, publish, tag
 #
-# Add --dry-run to either to see what it would do without changing anything.
+# <version> is a semver string (1.2.3) or a bump keyword — patch, minor or
+# major — which the script resolves against the current version for you.
+# Add --dry-run to any step to see what it would do without changing anything.
+#
+# The normal path, start to finish:
+#
+#   1. ./release.sh unreleased          (once, if there's no [Unreleased] yet)
+#      …then write your changes under its Added/Changed/Fixed headings.
+#   2. ./release.sh prepare patch       opens the release PR. Review & merge it.
+#   3. git pull --ff-only
+#   4. ./release.sh publish 0.9.2       gates, publishes to crates.io, tags,
+#                                       and cuts the GitHub release.
+#
+# Lost? `./release.sh status` reads the repo and tells you which of these you
+# are at and the exact command to run next.
+#
+# --- what each step does ------------------------------------------------
+#
+# status:   read-only. Reports the current version, whether [Unreleased] has
+#   content, whether a release branch/PR is open, whether the tag and the
+#   crates.io publish exist — then prints the one command to run next.
+#
+# unreleased: read-only unless you confirm. If CHANGELOG.md has no
+#   "## [Unreleased]" section it inserts an empty one (Added/Changed/Fixed)
+#   at the top of the log, ready for you to fill in. Never touches an
+#   existing one.
 #
 # prepare: from an up-to-date master, puts <version> into cli/Cargo.toml and
 #   Cargo.lock, turns CHANGELOG.md's "## [Unreleased]" into "## [<version>] -
@@ -48,31 +75,32 @@ die()   { printf '\n%s✗ %s%s\n\n' "$C_RED" "$1" "$C_OFF" >&2; exit 1; }
 # ------------------------------------------------------------------- arguments
 
 MODE=""
-VERSION=""
+VERSION_ARG=""
 DRY_RUN=false
+
+# The whole leading comment block is the help: print it all, not a fixed
+# line range that silently drops anything added below it.
+print_help() {
+    awk 'NR == 1 { next }                       # shebang
+         /^#!?/  { sub(/^# ?/, ""); print; next }
+         { exit }' "$0"
+}
 
 while [ $# -gt 0 ]; do
     case "$1" in
-        --dry-run)        DRY_RUN=true ;;
-        -h|--help)        sed -n '3,25p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
-        -*)               die "unknown flag: $1" ;;
-        prepare|publish)  [ -n "$MODE" ] && die "mode given twice"; MODE="$1" ;;
-        *)                [ -n "$VERSION" ] && die "version given twice: $VERSION and $1"
-                          VERSION="$1" ;;
+        --dry-run)                   DRY_RUN=true ;;
+        -h|--help)                   print_help; exit 0 ;;
+        -*)                          die "unknown flag: $1" ;;
+        status|unreleased|prepare|publish)
+                                     [ -n "$MODE" ] && die "mode given twice"
+                                     MODE="$1" ;;
+        *)                           [ -n "$VERSION_ARG" ] && die "version/bump given twice: $VERSION_ARG and $1"
+                                     VERSION_ARG="$1" ;;
     esac
     shift
 done
 
-[ -n "$MODE" ] && [ -n "$VERSION" ] \
-    || die "usage: ./release.sh prepare|publish <version> [--dry-run]"
-
-# Semver, because the tag is a public API and "v1.2" sorts badly forever.
-[[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]] \
-    || die "not a semver version: $VERSION"
-
-readonly MODE VERSION DRY_RUN
-readonly TAG="v${VERSION}"
-readonly BRANCH="release/${TAG}"
+[ -n "$MODE" ] || die "usage: ./release.sh status|unreleased|prepare|publish [<version>] [--dry-run]"
 
 run() {
     if $DRY_RUN; then
@@ -95,7 +123,41 @@ changelog_section() {
     ' CHANGELOG.md | sed -e '/./,$!d'
 }
 
-printf '%smoor release %s — %s%s\n' "$C_BLD" "$TAG" "$MODE" "$C_OFF"
+# True when a CHANGELOG section has real content — at least one line that is
+# not blank and not a bare "### " subheading. A freshly scaffolded
+# [Unreleased] (empty Added/Changed/Fixed) is therefore *not* ready.
+section_has_content() {
+    changelog_section "$1" | grep -qvE '^(###? .*|\s*)$'
+}
+
+# Apply a patch/minor/major bump to an X.Y.Z version. Pre-release and build
+# suffixes are dropped — a bump always lands on a clean release number.
+bump() {
+    local part="$1" ver="${2%%-*}"
+    local major="${ver%%.*}" rest="${ver#*.}"
+    local minor="${rest%%.*}" patch="${rest#*.}"
+    case "$part" in
+        major) printf '%d.0.0\n'   "$((major + 1))" ;;
+        minor) printf '%d.%d.0\n'  "$major" "$((minor + 1))" ;;
+        patch) printf '%d.%d.%d\n' "$major" "$minor" "$((patch + 1))" ;;
+    esac
+}
+
+# Resolve a prepare/publish argument into a concrete semver version: a
+# bump keyword (patch/minor/major) is applied to the current crate version,
+# anything else must already be a semver string. Done after the repo-root
+# check so crate_version can be read.
+resolve_version() {
+    local arg="$1"
+    [ -n "$arg" ] || die "$MODE needs a version or a bump keyword: ./release.sh $MODE patch|minor|major|<x.y.z>"
+    case "$arg" in
+        patch|minor|major) bump "$arg" "$(crate_version)" ;;
+        *)  [[ "$arg" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]] \
+                || die "not a semver version or bump keyword (patch/minor/major): $arg"
+            printf '%s\n' "$arg" ;;
+    esac
+}
+
 $DRY_RUN && printf '%sdry run — nothing will be changed%s\n' "$C_YEL" "$C_OFF"
 
 # ------------------------------------------------------------- shared checks
@@ -104,6 +166,124 @@ step "Preconditions"
 
 [ -d .git ] && [ -f "$CRATE_DIR/Cargo.toml" ] && [ -f CHANGELOG.md ] \
     || die "run this from the root of the moor repository"
+ok "in the moor repository"
+
+# ================================================================= status
+#
+# Read-only. Works from any branch — it describes the release, it doesn't
+# perform one. Reports each checkpoint of the two-phase flow and ends on the
+# single command to run next.
+
+if [ "$MODE" = "status" ]; then
+    current=$(crate_version)
+    step "Release status"
+    note "current version:    $current  (cli/Cargo.toml)"
+
+    # Is there unreleased work staged in the CHANGELOG?
+    if grep -q '^## \[Unreleased\]' CHANGELOG.md; then
+        if section_has_content '## [Unreleased]'; then
+            ok "CHANGELOG:           [Unreleased] has content, ready to prepare"
+            unreleased_ready=true
+        else
+            warn "CHANGELOG:           [Unreleased] is empty — add your changes under Added/Changed/Fixed"
+            unreleased_ready=false
+        fi
+    else
+        warn "CHANGELOG:           no [Unreleased] section — run: ./release.sh unreleased"
+        unreleased_ready=false
+    fi
+
+    # The next version is a guess (patch), shown to make the next command copyable.
+    next=$(bump patch "$current")
+
+    # Is a release PR open for some version already?
+    open_pr=""
+    if command -v gh >/dev/null 2>&1; then
+        open_pr=$(gh pr list --repo "$REPO" --state open --head "release/v$next" --json number --jq '.[0].number' 2>/dev/null || true)
+    fi
+
+    # Is the current version already published / tagged?
+    tag_current="v$current"
+    on_crates=false
+    curl -fsS -o /dev/null -A "moor-release (github.com/$REPO)" \
+        "https://crates.io/api/v1/crates/$CRATE/$current" 2>/dev/null && on_crates=true
+    tagged_remote=false
+    git ls-remote --exit-code --tags origin "refs/tags/$tag_current" >/dev/null 2>&1 && tagged_remote=true
+
+    if $on_crates && $tagged_remote; then
+        ok "published:           $CRATE $current is on crates.io and tagged $tag_current"
+    else
+        note "published:           $CRATE $current not yet on crates.io / not tagged"
+    fi
+
+    step "Next"
+    if $tagged_remote && $on_crates && ! $unreleased_ready; then
+        note "$current is fully released. Start the next one with:  ./release.sh unreleased"
+    elif [ -n "$open_pr" ]; then
+        note "A release PR is open (#$open_pr). Merge it, then:  git pull --ff-only && ./release.sh publish $next"
+    elif $unreleased_ready; then
+        note "Open the release PR:  ./release.sh prepare patch   (→ $next)   or minor/major/<x.y.z>"
+    else
+        note "List your changes under [Unreleased] first (./release.sh unreleased if it's missing)."
+    fi
+    printf '\n'
+    exit 0
+fi
+
+# ================================================================= unreleased
+#
+# Scaffold the CHANGELOG's [Unreleased] section if it's missing. A local edit
+# only — no git, no branch, no network — so it runs from any branch.
+
+if [ "$MODE" = "unreleased" ]; then
+    step "CHANGELOG [Unreleased]"
+    if grep -q '^## \[Unreleased\]' CHANGELOG.md; then
+        ok "[Unreleased] already exists — add your changes under its headings"
+        if ! section_has_content '## [Unreleased]'; then
+            warn "it's currently empty"
+        fi
+        printf '\n'
+        exit 0
+    fi
+
+    # Insert a skeleton directly above the first released "## [" heading, so it
+    # sits at the top of the log below the file's preamble. awk prints the
+    # block line by line — a multiline -v string isn't portable (BSD awk
+    # rejects the embedded newlines).
+    note "will insert an empty [Unreleased] section (Added / Changed / Fixed) above the latest release"
+    if $DRY_RUN; then
+        note "dry run — CHANGELOG.md not changed"
+        exit 0
+    fi
+    awk '
+        !done && /^## \[/ {
+            print "## [Unreleased]"
+            print ""
+            print "### Added"
+            print ""
+            print "### Changed"
+            print ""
+            print "### Fixed"
+            print ""
+            done = 1
+        }
+        { print }
+    ' CHANGELOG.md > CHANGELOG.md.tmp && mv CHANGELOG.md.tmp CHANGELOG.md
+    grep -q '^## \[Unreleased\]' CHANGELOG.md || die "failed to insert [Unreleased] into CHANGELOG.md"
+    ok "added [Unreleased] to CHANGELOG.md"
+    printf '\n%sNow list your changes under Added / Changed / Fixed, then:%s  ./release.sh prepare patch\n\n' \
+        "$C_GRN" "$C_OFF"
+    exit 0
+fi
+
+# ---- from here down: prepare and publish, which act on the real release ----
+
+# Resolve the version now that crate_version is readable; set the derived refs.
+VERSION=$(resolve_version "$VERSION_ARG")
+readonly VERSION
+readonly TAG="v${VERSION}"
+readonly BRANCH="release/${TAG}"
+note "target version:     $VERSION  ($TAG)"
 
 branch=$(git rev-parse --abbrev-ref HEAD)
 [ "$branch" = "$TRUNK" ] || die "on branch '$branch', expected '$TRUNK'"
@@ -132,9 +312,9 @@ if [ "$MODE" = "prepare" ]; then
     note "$CRATE_DIR/Cargo.toml: $current → $VERSION"
 
     grep -q '^## \[Unreleased\]' CHANGELOG.md \
-        || die "CHANGELOG.md has no '## [Unreleased]' section — list the changes there first"
-    [ -n "$(changelog_section '## [Unreleased]')" ] \
-        || die "CHANGELOG.md's [Unreleased] section is empty"
+        || die "CHANGELOG.md has no '## [Unreleased]' section — run: ./release.sh unreleased, then list the changes"
+    section_has_content '## [Unreleased]' \
+        || die "CHANGELOG.md's [Unreleased] section is empty — add your changes under Added/Changed/Fixed first"
     today=$(date +%Y-%m-%d)
     note "CHANGELOG.md: [Unreleased] → [$VERSION] - $today"
 
