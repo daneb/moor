@@ -5,6 +5,7 @@
 #
 #   ./release.sh status              # where am I? what's the next command?
 #   ./release.sh unreleased          # scaffold CHANGELOG's [Unreleased] section
+#   ./release.sh unreleased --fixed -m "- **…**"   # …or file an entry straight in
 #   ./release.sh prepare <version>   # open the release PR: version + CHANGELOG
 #   ./release.sh publish <version>   # after that PR merges: gate, publish, tag
 #
@@ -15,7 +16,10 @@
 # The normal path, start to finish:
 #
 #   1. ./release.sh unreleased          (once, if there's no [Unreleased] yet)
-#      …then write your changes under its Added/Changed/Fixed headings.
+#      …then write your changes under its Added/Changed/Fixed headings — or
+#      file them straight in without opening the file:
+#         ./release.sh unreleased --fixed -m "- **Fixed X.** …"
+#         llm-that-wrote-the-note | ./release.sh unreleased --added -
 #   2. ./release.sh prepare patch       opens the release PR. Review & merge it.
 #   3. git pull --ff-only
 #   4. ./release.sh publish 0.9.2       gates, publishes to crates.io, tags,
@@ -32,8 +36,9 @@
 #
 # unreleased: read-only unless you confirm. If CHANGELOG.md has no
 #   "## [Unreleased]" section it inserts an empty one (Added/Changed/Fixed)
-#   at the top of the log, ready for you to fill in. Never touches an
-#   existing one.
+#   at the top of the log. Given an entry (--added/--changed/--fixed with
+#   -m "…" or piped on stdin via a trailing "-") it files that text verbatim
+#   under the chosen heading — made for pasting a note an LLM drafted.
 #
 # prepare: from an up-to-date master, puts <version> into cli/Cargo.toml and
 #   Cargo.lock, turns CHANGELOG.md's "## [Unreleased]" into "## [<version>] -
@@ -77,6 +82,10 @@ die()   { printf '\n%s✗ %s%s\n\n' "$C_RED" "$1" "$C_OFF" >&2; exit 1; }
 MODE=""
 VERSION_ARG=""
 DRY_RUN=false
+CATEGORY=""          # Added / Changed / Fixed, set by --added/--changed/--fixed
+MESSAGE=""           # entry text from --message
+MESSAGE_SET=false    # distinguishes an unset --message from an empty one
+READ_STDIN=false     # entry text comes from stdin (a trailing "-")
 
 # The whole leading comment block is the help: print it all, not a fixed
 # line range that silently drops anything added below it.
@@ -86,10 +95,22 @@ print_help() {
          { exit }' "$0"
 }
 
+set_category() {
+    [ -z "$CATEGORY" ] || die "only one of --added/--changed/--fixed"
+    CATEGORY="$1"
+}
+
 while [ $# -gt 0 ]; do
     case "$1" in
         --dry-run)                   DRY_RUN=true ;;
         -h|--help)                   print_help; exit 0 ;;
+        --added)                     set_category "Added" ;;
+        --changed)                   set_category "Changed" ;;
+        --fixed)                     set_category "Fixed" ;;
+        --message|-m)                shift; [ $# -gt 0 ] || die "--message needs an argument"
+                                     MESSAGE="$1"; MESSAGE_SET=true ;;
+        --message=*)                 MESSAGE="${1#--message=}"; MESSAGE_SET=true ;;
+        -)                           READ_STDIN=true ;;
         -*)                          die "unknown flag: $1" ;;
         status|unreleased|prepare|publish)
                                      [ -n "$MODE" ] && die "mode given twice"
@@ -129,6 +150,59 @@ changelog_section() {
 section_has_content() {
     changelog_section "$1" | grep -qvE '^(###? .*|\s*)$'
 }
+
+# Insert an empty "## [Unreleased]" block (Added/Changed/Fixed) above the
+# first released "## [" heading. No-op if one already exists. awk prints the
+# block line by line — a multiline -v string isn't portable (BSD awk rejects
+# the embedded newlines).
+scaffold_unreleased() {
+    grep -q '^## \[Unreleased\]' CHANGELOG.md && return 0
+    awk '
+        !done && /^## \[/ {
+            print "## [Unreleased]"; print ""
+            print "### Added";   print ""
+            print "### Changed"; print ""
+            print "### Fixed";   print ""
+            done = 1
+        }
+        { print }
+    ' CHANGELOG.md > CHANGELOG.md.tmp && mv CHANGELOG.md.tmp CHANGELOG.md
+    grep -q '^## \[Unreleased\]' CHANGELOG.md || die "failed to insert [Unreleased] into CHANGELOG.md"
+}
+
+# Insert a block of entry text under "### <category>" inside [Unreleased],
+# creating that subheading at the end of the section if it isn't there. The
+# text is read from a file (not awk -v) so multi-line, pasted content with
+# any characters survives verbatim. Assumes [Unreleased] already exists.
+insert_entry() {
+    local category="$1" textfile="$2"
+    awk -v cat="### $category" -v tf="$textfile" '
+        # Emit the entry file verbatim, preceded by a blank line for spacing.
+        function emit(   line) {
+            print ""
+            while ((getline line < tf) > 0) print line
+            close(tf)
+        }
+        # Track which top-level section we are in.
+        /^## \[/ {
+            # Leaving [Unreleased] without having seen the subheading: create
+            # it here, at the tail of the section, then emit the entry.
+            if (in_unrel && !placed) { print cat; emit(); placed = 1 }
+            in_unrel = ($0 ~ /^## \[Unreleased\]/)
+            print; next
+        }
+        # The target subheading inside [Unreleased]: print it, then the entry.
+        in_unrel && !placed && index($0, cat) == 1 {
+            print; emit(); placed = 1; next
+        }
+        { print }
+        END {
+            # [Unreleased] was the last section in the file and had no match.
+            if (in_unrel && !placed) { print cat; emit() }
+        }
+    ' CHANGELOG.md > CHANGELOG.md.tmp && mv CHANGELOG.md.tmp CHANGELOG.md
+}
+
 
 # Apply a patch/minor/major bump to an X.Y.Z version. Pre-release and build
 # suffixes are dropped — a bump always lands on a clean release number.
@@ -232,47 +306,75 @@ fi
 
 # ================================================================= unreleased
 #
-# Scaffold the CHANGELOG's [Unreleased] section if it's missing. A local edit
-# only — no git, no branch, no network — so it runs from any branch.
+# Prepare the CHANGELOG's [Unreleased] section. With no entry text it just
+# scaffolds an empty section (Added/Changed/Fixed) when one is missing. Given
+# text — inline via --message, or piped/typed on stdin with a trailing "-" —
+# it files that text verbatim under --added/--changed/--fixed, creating both
+# the section and the subheading as needed. A local edit only: no git, no
+# branch, no network, so it runs from any branch. Built for pasting an entry
+# an LLM drafted straight in, rather than hand-editing the file.
+#
+#   ./release.sh unreleased                         # scaffold empty section
+#   ./release.sh unreleased --fixed -m "- **X.** …"  # file one entry, inline
+#   some-llm | ./release.sh unreleased --added -     # …or piped on stdin
 
 if [ "$MODE" = "unreleased" ]; then
     step "CHANGELOG [Unreleased]"
-    if grep -q '^## \[Unreleased\]' CHANGELOG.md; then
-        ok "[Unreleased] already exists — add your changes under its headings"
-        if ! section_has_content '## [Unreleased]'; then
-            warn "it's currently empty"
-        fi
+
+    # Resolve the entry text, if any. --message wins; otherwise an explicit
+    # trailing "-", or a category with piped (non-tty) stdin, supplies it.
+    # Reading stdin only when asked keeps the bare `unreleased` scaffold
+    # working at an interactive prompt.
+    entry=""
+    have_entry=false
+    if $MESSAGE_SET; then
+        entry="$MESSAGE"; have_entry=true
+    elif $READ_STDIN; then
+        entry="$(cat)"; have_entry=true
+    elif [ -n "$CATEGORY" ] && [ ! -t 0 ]; then
+        entry="$(cat)"; have_entry=true
+    fi
+
+    # Category and text go together — one without the other is a mistake.
+    if $have_entry; then
+        [ -n "$CATEGORY" ] \
+            || die "which section? pass --added, --changed or --fixed with the entry text"
+        [ -n "${entry//[$' \t\n']/}" ] \
+            || die "the entry text is empty — nothing to add under ### $CATEGORY"
+    elif [ -n "$CATEGORY" ]; then
+        die "--$(printf '%s' "$CATEGORY" | tr '[:upper:]' '[:lower:]') needs entry text: add -m \"…\" or pipe it in with a trailing -"
+    fi
+
+    existed=false
+    grep -q '^## \[Unreleased\]' CHANGELOG.md && existed=true
+
+    if $DRY_RUN; then
+        $existed || note "would insert an empty [Unreleased] section (Added / Changed / Fixed)"
+        $have_entry && note "would file the entry under ### $CATEGORY"
+        note "dry run — CHANGELOG.md not changed"
         printf '\n'
         exit 0
     fi
 
-    # Insert a skeleton directly above the first released "## [" heading, so it
-    # sits at the top of the log below the file's preamble. awk prints the
-    # block line by line — a multiline -v string isn't portable (BSD awk
-    # rejects the embedded newlines).
-    note "will insert an empty [Unreleased] section (Added / Changed / Fixed) above the latest release"
-    if $DRY_RUN; then
-        note "dry run — CHANGELOG.md not changed"
-        exit 0
+    scaffold_unreleased
+    $existed || ok "added [Unreleased] to CHANGELOG.md"
+
+    if $have_entry; then
+        tmp=$(mktemp)
+        # shellcheck disable=SC2064  # expand tmp now, not at trap time
+        trap "rm -f '$tmp'" EXIT
+        printf '%s\n' "$entry" > "$tmp"
+        insert_entry "$CATEGORY" "$tmp"
+        section_has_content '## [Unreleased]' \
+            || die "entry did not land under ### $CATEGORY — CHANGELOG.md left unchanged on disk? check it"
+        ok "filed the entry under ### $CATEGORY"
+        printf '\n%sReview it, then:%s  ./release.sh prepare patch\n\n' "$C_GRN" "$C_OFF"
+    else
+        $existed && ok "[Unreleased] already exists — add your changes under its headings"
+        $existed && ! section_has_content '## [Unreleased]' && warn "it's currently empty"
+        printf '\n%sList changes under Added / Changed / Fixed (or pass --fixed -m \"…\"), then:%s  ./release.sh prepare patch\n\n' \
+            "$C_GRN" "$C_OFF"
     fi
-    awk '
-        !done && /^## \[/ {
-            print "## [Unreleased]"
-            print ""
-            print "### Added"
-            print ""
-            print "### Changed"
-            print ""
-            print "### Fixed"
-            print ""
-            done = 1
-        }
-        { print }
-    ' CHANGELOG.md > CHANGELOG.md.tmp && mv CHANGELOG.md.tmp CHANGELOG.md
-    grep -q '^## \[Unreleased\]' CHANGELOG.md || die "failed to insert [Unreleased] into CHANGELOG.md"
-    ok "added [Unreleased] to CHANGELOG.md"
-    printf '\n%sNow list your changes under Added / Changed / Fixed, then:%s  ./release.sh prepare patch\n\n' \
-        "$C_GRN" "$C_OFF"
     exit 0
 fi
 
