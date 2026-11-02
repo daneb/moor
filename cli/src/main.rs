@@ -128,6 +128,17 @@ enum Command {
         /// Why, so the next attempt can address it.
         why: String,
     },
+    /// Drop the active spec: abandon it without shipping, saying why.
+    ///
+    /// Unlike `reject` (which sends a spec back for revision), `drop` retires
+    /// the spec for good — it leaves the pipeline and stops appearing in
+    /// `moor next`.
+    Drop {
+        #[arg(short = 'p', long = "project")]
+        project: Option<String>,
+        /// Why the spec is being abandoned.
+        why: String,
+    },
     /// Ship an approved spec: commit it on its own branch, push it, open a PR.
     ///
     /// Shows exactly which files it will commit (the spec's change, its
@@ -392,6 +403,7 @@ fn main() {
         Command::Next { project, all } => commands::next_cmd::run(project, all),
         Command::Approve { project, yes } => commands::flow_cmd::approve(project, yes),
         Command::Reject { project, why } => commands::flow_cmd::reject(project, &why),
+        Command::Drop { project, why } => commands::flow_cmd::drop(project, &why),
         Command::Go { project, check } => commands::flow_cmd::go(project, check),
         Command::Ship { project, spec, yes } => commands::ship_cmd::run(project, spec, yes),
         Command::Use { name, spec } => commands::use_cmd::run(&name, spec.as_deref()),

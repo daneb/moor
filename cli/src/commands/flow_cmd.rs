@@ -231,6 +231,39 @@ pub fn reject(explicit: Option<String>, why: &str) -> Result<()> {
     Ok(())
 }
 
+/// The keel command `moor drop` runs to abandon a spec. Pure, so the
+/// boundary (drop sends `spec abandon`, never a gate rejection) is unit-tested
+/// without a sandbox. Takes the slug and reason as keel will receive them.
+fn abandon_argv<'a>(slug: &'a str, why: &'a str) -> Vec<&'a str> {
+    vec!["spec", "abandon", slug, "--reason", why]
+}
+
+/// `moor drop "why"`: abandon the active spec — retire it without shipping.
+///
+/// Distinct from `reject`: reject sends a spec *back* for revision by
+/// recording a gate rejection, whereas drop records a terminal abandonment
+/// via keel (`keel spec abandon`), so the spec leaves the pipeline for good.
+/// Works at any pre-merge stage without a `--force` flag, because abandonment
+/// is terminal regardless of where the spec sits.
+pub fn drop(explicit: Option<String>, why: &str) -> Result<()> {
+    if why.trim().is_empty() {
+        anyhow::bail!("say why this spec is being dropped: moor drop \"why\"");
+    }
+    let t = Target::resolve(explicit)?;
+    let report = t.report()?;
+
+    let Some(active) = t.active(&report) else {
+        println!("Nothing to drop: no spec is in progress.\n");
+        t.print_guidance(&report);
+        return Ok(());
+    };
+
+    exec(&t, &abandon_argv(&active.spec.slug, why))?;
+    println!();
+    t.print_guidance(&t.report()?);
+    Ok(())
+}
+
 /// `moor go`: take the active spec's automatic steps (checks, planning,
 /// the build run) one after another, stopping at the first thing that
 /// needs the operator, a failure, or a step that didn't move it on.
@@ -411,5 +444,73 @@ mod tests {
     fn subject_reads_naturally() {
         assert_eq!(subject("plan", "login"), "the plan for login");
         assert_eq!(subject("merge", "login"), "merging login");
+    }
+
+    // --- moor drop (SPEC-0019) ---------------------------------------------
+
+    #[test]
+    fn drop_records_abandonment_with_a_reason() {
+        // AC-1: drop sends keel the abandon command for the active spec,
+        // carrying the reason verbatim.
+        let argv = abandon_argv("login", "superseded by oauth");
+        assert_eq!(
+            argv,
+            [
+                "spec",
+                "abandon",
+                "login",
+                "--reason",
+                "superseded by oauth"
+            ]
+        );
+    }
+
+    #[test]
+    fn drop_refuses_an_empty_reason() {
+        // AC-2: a blank or whitespace-only reason is refused before anything
+        // is resolved or recorded.
+        for blank in ["", "   ", "\t\n"] {
+            let err = drop(None, blank).unwrap_err().to_string();
+            assert!(
+                err.contains("say why"),
+                "blank {blank:?} should be refused: {err}"
+            );
+        }
+    }
+
+    #[test]
+    fn drop_and_reject_send_distinct_keel_commands() {
+        // AC-3: drop maps to `spec abandon`; it must never be the rejection
+        // verb `approve --reject`, so the two decisions can't be confused.
+        let argv = abandon_argv("login", "why");
+        assert_eq!(argv[0..2], ["spec", "abandon"]);
+        assert!(
+            !argv.contains(&"approve"),
+            "drop must not use the approve verb"
+        );
+        assert!(
+            !argv.contains(&"--reject"),
+            "drop must not use the reject flag"
+        );
+    }
+
+    #[test]
+    fn drop_is_accepted_at_every_pre_merge_stage() {
+        // AC-6: the abandon command is the same whatever stage the spec is at —
+        // there is no stage-specific branch and no --force to supply.
+        let reference = abandon_argv("s", "r");
+        for slug in ["spec-stage", "plan-stage", "run-stage"] {
+            let argv = abandon_argv(slug, "r");
+            assert_eq!(
+                argv.len(),
+                reference.len(),
+                "stage must not change the command shape"
+            );
+            assert_eq!(argv[0..2], ["spec", "abandon"]);
+            assert!(
+                !argv.contains(&"--force"),
+                "drop needs no --force: {argv:?}"
+            );
+        }
     }
 }
