@@ -874,7 +874,10 @@ mod tests {
         // spec is chosen and the abandoned one is never pointed at.
         let r = report(vec![spec("dead", "abandoned"), spec("live", "run")]);
         let a = pick_active(&r, None, &[]).unwrap();
-        assert_eq!(a.spec.slug, "live", "the open spec should be active, not the abandoned one");
+        assert_eq!(
+            a.spec.slug, "live",
+            "the open spec should be active, not the abandoned one"
+        );
 
         // Even pinned, an abandoned spec falls through as a stale pin.
         let a = pick_active(&r, Some("dead"), &[]).unwrap();

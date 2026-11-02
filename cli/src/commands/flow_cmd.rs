@@ -453,7 +453,16 @@ mod tests {
         // AC-1: drop sends keel the abandon command for the active spec,
         // carrying the reason verbatim.
         let argv = abandon_argv("login", "superseded by oauth");
-        assert_eq!(argv, ["spec", "abandon", "login", "--reason", "superseded by oauth"]);
+        assert_eq!(
+            argv,
+            [
+                "spec",
+                "abandon",
+                "login",
+                "--reason",
+                "superseded by oauth"
+            ]
+        );
     }
 
     #[test]
@@ -462,7 +471,10 @@ mod tests {
         // is resolved or recorded.
         for blank in ["", "   ", "\t\n"] {
             let err = drop(None, blank).unwrap_err().to_string();
-            assert!(err.contains("say why"), "blank {blank:?} should be refused: {err}");
+            assert!(
+                err.contains("say why"),
+                "blank {blank:?} should be refused: {err}"
+            );
         }
     }
 
@@ -472,8 +484,14 @@ mod tests {
         // verb `approve --reject`, so the two decisions can't be confused.
         let argv = abandon_argv("login", "why");
         assert_eq!(argv[0..2], ["spec", "abandon"]);
-        assert!(!argv.contains(&"approve"), "drop must not use the approve verb");
-        assert!(!argv.contains(&"--reject"), "drop must not use the reject flag");
+        assert!(
+            !argv.contains(&"approve"),
+            "drop must not use the approve verb"
+        );
+        assert!(
+            !argv.contains(&"--reject"),
+            "drop must not use the reject flag"
+        );
     }
 
     #[test]
@@ -483,9 +501,16 @@ mod tests {
         let reference = abandon_argv("s", "r");
         for slug in ["spec-stage", "plan-stage", "run-stage"] {
             let argv = abandon_argv(slug, "r");
-            assert_eq!(argv.len(), reference.len(), "stage must not change the command shape");
+            assert_eq!(
+                argv.len(),
+                reference.len(),
+                "stage must not change the command shape"
+            );
             assert_eq!(argv[0..2], ["spec", "abandon"]);
-            assert!(!argv.contains(&"--force"), "drop needs no --force: {argv:?}");
+            assert!(
+                !argv.contains(&"--force"),
+                "drop needs no --force: {argv:?}"
+            );
         }
     }
 }
