@@ -282,6 +282,11 @@ fn read_command(slug: &str, artifact: &str, explicit: Option<&str>) -> String {
 
 /// The step a spec is at, as "step N of 7: title", or "done".
 pub fn step_label(spec: &NextSpec) -> String {
+    // An abandoned spec is terminal like a done one (keel sends it
+    // `complete: true`), but it was retired, not shipped — say so.
+    if spec.stage == "abandoned" {
+        return "abandoned".to_string();
+    }
     match (spec.complete, step(&spec.stage)) {
         (true, _) => "done".to_string(),
         (false, Some(s)) => {
@@ -562,13 +567,14 @@ mod tests {
             "plan_approval" => format!("keel approve {slug} --stage plan"),
             "run" => format!("keel run {slug}"),
             "complete" => "keel spec new <slug>".to_string(),
+            "abandoned" => "keel spec new <slug>".to_string(),
             _ => format!("keel {stage} {slug}"),
         };
         NextSpec {
             slug: slug.to_string(),
             stage: stage.to_string(),
             command,
-            complete: stage == "complete",
+            complete: stage == "complete" || stage == "abandoned",
             approval: None,
         }
     }
@@ -860,5 +866,30 @@ mod tests {
         let lines = render_all(&r, Some(&a));
         assert_eq!(lines[0], "▸ a   step 6 of 7: build it");
         assert_eq!(lines[1], "  bb  done");
+    }
+
+    #[test]
+    fn an_abandoned_spec_is_never_the_active_spec() {
+        // AC-4: keel sends an abandoned spec `complete: true`, so the one open
+        // spec is chosen and the abandoned one is never pointed at.
+        let r = report(vec![spec("dead", "abandoned"), spec("live", "run")]);
+        let a = pick_active(&r, None, &[]).unwrap();
+        assert_eq!(a.spec.slug, "live", "the open spec should be active, not the abandoned one");
+
+        // Even pinned, an abandoned spec falls through as a stale pin.
+        let a = pick_active(&r, Some("dead"), &[]).unwrap();
+        assert_eq!(a.spec.slug, "live");
+        assert_eq!(a.stale_pin.as_deref(), Some("dead"));
+
+        // With nothing else open, there is simply no active spec.
+        let only = report(vec![spec("dead", "abandoned")]);
+        assert!(pick_active(&only, None, &[]).is_none());
+    }
+
+    #[test]
+    fn step_label_of_an_abandoned_spec_is_abandoned() {
+        // AC-5: distinct from "done", so a retired spec reads as retired.
+        assert_eq!(step_label(&spec("dead", "abandoned")), "abandoned");
+        assert_eq!(step_label(&spec("shipped", "complete")), "done");
     }
 }
