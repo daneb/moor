@@ -4,6 +4,32 @@ Notable changes to moor. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and moor uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **`moor drop`: abandon the active spec.** A guided verb beside
+  `moor reject`, built on the same resolver seam. Where reject sends a
+  spec *back* for revision by recording a gate rejection, `drop "<why>"`
+  retires it for good — it records a terminal abandonment through keel
+  (`keel spec abandon`), so the spec leaves the pipeline and stops
+  appearing in `moor next`. It refuses an empty reason, needs no
+  `--force`, and works at any pre-merge stage. `guide::step_label` now
+  reports `abandoned`, and `pick_active` drops an abandoned spec (keel
+  reports it `complete`), so a retired spec never becomes the one
+  `moor go` points at. (SPEC-0019; depends on keel's abandoned terminal
+  state.)
+
+### Changed
+
+- **Retired four stalled draft specs.** `compose-project-namespace`,
+  `document-host-deployed-projects`, `agent-session-protocol` and
+  `studio-multi-project-console` had passed G0 but were never approved
+  or built; with no terminal abandoned state they surfaced in
+  `moor next` indefinitely. Moved to `.keel/specs/_abandoned/` as a
+  `git mv` — the specs and their G0 evidence stay in history and can be
+  revived — with a README recording why each was retired.
+
 ## [0.9.0] - 2026-10-27
 
 ### Added
