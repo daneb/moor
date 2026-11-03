@@ -2,20 +2,24 @@
 #
 # Point the cask at a published release:
 #
-#   packaging/homebrew/update-cask.sh <version> [cask-file]
+#   packaging/homebrew/update-cask.sh <version> [cask-file] [name]
 #
 # Reads the two .sha256 files the release workflow uploaded, then rewrites
 # the cask's version and checksums in place. The default cask-file is the
 # template in this repo; pass a tap checkout's Casks/moor.rb to update that.
+# <name> is the project (default moor): the release lives at daneb/<name> and
+# its tarballs are <name>-<version>-<arch>-apple-darwin.tar.gz, so the same
+# script serves every project in the tap.
 
 set -euo pipefail
 
-version="${1:?usage: update-cask.sh <version> [cask-file]}"
-cask="${2:-$(dirname "${BASH_SOURCE[0]}")/Casks/moor.rb}"
-repo="daneb/moor"
+version="${1:?usage: update-cask.sh <version> [cask-file] [name]}"
+name="${3:-moor}"
+cask="${2:-$(dirname "${BASH_SOURCE[0]}")/Casks/$name.rb}"
+repo="daneb/$name"
 
 sha_for() {
-    curl -fsSL "https://github.com/$repo/releases/download/v$version/moor-$version-$1-apple-darwin.tar.gz.sha256" \
+    curl -fsSL "https://github.com/$repo/releases/download/v$version/$name-$version-$1-apple-darwin.tar.gz.sha256" \
         | awk '{ print $1 }'
 }
 
