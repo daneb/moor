@@ -4,13 +4,19 @@ Notable changes to moor. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and moor uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.9.3] - 2026-11-03
+## 0.9.3 - 2026-11-03
 
-### Added
+- **Homebrew cask and macOS binaries.** Each GitHub release now carries
+  `keel-<version>-aarch64-apple-darwin.tar.gz` and
+  `keel-<version>-x86_64-apple-darwin.tar.gz` (with checksums), and the cask in
+  `daneb/homebrew-tap` is updated automatically. Install with
+  `brew install --cask daneb/tap/keel`.
 
 ### Changed
 
-### Fixed
+- Patch and minor dependency updates (five crates).
+
+### 0.9.2
 
 - **`moor drop` works in the sandbox again.** `moor drop` calls
   `keel spec abandon` inside the sandbox, a subcommand keel added in
