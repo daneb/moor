@@ -12,6 +12,14 @@ Notable changes to moor. The format follows
 
 ### Fixed
 
+- **`moor drop` works in the sandbox again.** `moor drop` calls
+  `keel spec abandon` inside the sandbox, a subcommand keel added in
+  0.12.0. The base image still pinned keel 0.11.0, so every sandbox
+  carried a keel too old for it and `moor drop` failed with
+  `unrecognized subcommand 'abandon'`. The base image now pins keel
+  0.12.0. Existing sandboxes need an image rebuild (`make images`) and a
+  `moor up` to pick it up.
+
 ## [0.9.1] - 2026-11-02
 
 ### Added
