@@ -1,4 +1,4 @@
-<!-- keel:generated schema=keel.projection/1 adapter=copilot store=5f6ba5f3b50f body=937ae6a338a3 -->
+<!-- keel:generated schema=keel.projection/1 adapter=copilot store=94ff2d2026e1 body=489992b228ca -->
 <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
 
 # Project context
@@ -19,6 +19,26 @@ become gate checks and stop costing context.
 - Change the smallest surface that solves the problem. If a fix needs a wider
   blast radius, say so before making it, not after.
 - A test that mocks away the behaviour under test is worse than no test.
+
+### Naming: which "keel" is which
+
+Four different things share the name. Do not run a bare `keel ...` unless you
+mean the first one.
+
+- `keel` on this machine's PATH works on THIS repository's own `.keel/`
+  (specs, store, `CLAUDE.md`/`AGENTS.md` generation). It is a development tool
+  for moor itself. Use `keel store render` after editing `.keel/store/`.
+- The keel inside a moor sandbox is a separate copy at a pinned version
+  (`KEEL_VERSION` in `images/base/Dockerfile`), working on that project's
+  workspace volume, never on this checkout. Reach it only through moor:
+  `moor next`, `go`, `approve`, `reject`, `ship`. `moor keel <args>` is the
+  hidden escape hatch.
+- `moor-keel-mcp` (`mcp/`) is the agent's route to `keel gate` and `keel next`
+  inside a sandbox. It cannot approve, by design.
+- keel the project is github.com/daneb/keel. moor depends on it, never edits it.
+
+When a user says "next step", "approve" or "run the spec", they mean the
+`moor` command, not `keel`.
 
 ### Rules
 
@@ -85,38 +105,19 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
 - `pub struct Project`  <sub>L39</sub>
 - `pub enum Approval`  <sub>L69</sub>
 - `pub enum Key`  <sub>L100</sub>
-- `pub enum Action`  <sub>L112</sub>
-- `struct NextSpec`  <sub>L153</sub>
-- `struct NextReport`  <sub>L162</sub>
-- `pub struct Console`  <sub>L168</sub>
-- `pub fn refresh(&mut self, host: &dyn super::Host) -> Result<()>` — sandboxes that are actually up — a stopped project has no container  <sub>L215</sub>
-- `pub fn apply_next(&mut self, project: &str, json: &str) -> Result<()>` — what files happen to exist — a displayed stage that disagrees with  <sub>L254</sub>
-- `pub fn arm_approval(&mut self)` — slug keel itself reported for it, captured now so a later selection  <sub>L338</sub>
-- `pub fn failing_checks(gate_json: &str) -> Vec<String>` — a missing or half-written evidence file is not worth failing a refresh  <sub>L650</sub>
-- `trait CheckedIndex` — Tiny helper so `send` can bail cleanly on an empty project list.  <sub>L682</sub>
 
-**`cli/src/studio/render.rs`** · 390 lines · imported by 1
-- `const BOLD: &str = "\x1b[1m";`  <sub>L8</sub>
-- `const DIM: &str = "\x1b[2m";`  <sub>L9</sub>
-- `const CYAN: &str = "\x1b[36m";`  <sub>L10</sub>
-- `const GREEN: &str = "\x1b[32m";`  <sub>L11</sub>
-- `pub fn sanitize(text: &str) -> String` — Newline and tab survive because they are layout, not addressing.  <sub>L29</sub>
-- `pub fn waiting_label(waited: std::time::Duration) -> String` — available while turns are request/response and nothing streams back  <sub>L82</sub>
-- `pub fn wrap(text: &str, width: usize) -> Vec<String>` — Wrap to the terminal width after sanitizing — a single very long line  <sub>L95</sub>
-- `pub fn frame(c: &Console, width: usize, height: usize) -> String` — The whole frame, as one string. Pure: takes state, returns bytes, so  <sub>L131</sub>
-
-_… 325 more lines in `.keel/store/steering/structure.md`._
+_… 344 more lines in `.keel/store/steering/structure.md`._
 
 ## What this is
 
 ### Purpose
 
-_One sentence: what does this repository do? Replace this line._
+moor runs an AI coding agent (Claude Code, Copilot or Kiro) inside a locked-down Docker sandbox per project, and records what it does in a tamper-evident audit trail on the host.
 
 ### Users and stakes
 
-_Who depends on it, and what goes wrong for them when it misbehaves?_
+One developer on a Mac using agents on code they do not fully trust. If moor misbehaves, the sandbox boundary or the audit trail stops meaning what it says, so changes to either need a test that proves the boundary, not one that mocks it.
 
 ### Out of scope
 
-_Name the things this repository deliberately does not do. This section stops more wasted work than the two above combined._
+moor does not replace the agent, does not defend against a kernel escape (shared `runc` kernel, see ADR-0001), and does not run on Linux or Windows hosts. It is not a spec tool: the spec/plan/build pipeline is keel's, and moor only drives it.

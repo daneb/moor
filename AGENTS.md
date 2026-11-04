@@ -1,4 +1,4 @@
-<!-- keel:generated schema=keel.projection/1 adapter=agents store=5f6ba5f3b50f body=94a3a5012e8d -->
+<!-- keel:generated schema=keel.projection/1 adapter=agents store=94ff2d2026e1 body=645404d18961 -->
 <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
 
 # Project context
@@ -19,6 +19,26 @@ become gate checks and stop costing context.
 - Change the smallest surface that solves the problem. If a fix needs a wider
   blast radius, say so before making it, not after.
 - A test that mocks away the behaviour under test is worse than no test.
+
+### Naming: which "keel" is which
+
+Four different things share the name. Do not run a bare `keel ...` unless you
+mean the first one.
+
+- `keel` on this machine's PATH works on THIS repository's own `.keel/`
+  (specs, store, `CLAUDE.md`/`AGENTS.md` generation). It is a development tool
+  for moor itself. Use `keel store render` after editing `.keel/store/`.
+- The keel inside a moor sandbox is a separate copy at a pinned version
+  (`KEEL_VERSION` in `images/base/Dockerfile`), working on that project's
+  workspace volume, never on this checkout. Reach it only through moor:
+  `moor next`, `go`, `approve`, `reject`, `ship`. `moor keel <args>` is the
+  hidden escape hatch.
+- `moor-keel-mcp` (`mcp/`) is the agent's route to `keel gate` and `keel next`
+  inside a sandbox. It cannot approve, by design.
+- keel the project is github.com/daneb/keel. moor depends on it, never edits it.
+
+When a user says "next step", "approve" or "run the spec", they mean the
+`moor` command, not `keel`.
 
 ### Rules
 
@@ -145,39 +165,19 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
 - `pub fn run(explicit: Option<String>, all: bool) -> Result<()>` — `moor next`: where the project's active spec stands and the one  <sub>L164</sub>
 
 **`cli/src/manifest.rs`** · 331 lines · imported by 3
-- `pub enum Agent`  <sub>L12</sub>
-- `impl FromStr for Agent`  <sub>L19</sub>
-- `pub fn resolve_image(language_image: &str, agent: Agent) -> String` — already a copilot image, is returned unchanged. Pure — unit-tested  <sub>L39</sub>
-- `pub struct Manifest`  <sub>L63</sub>
-- `pub struct Egress`  <sub>L85</sub>
-- `pub struct Resources`  <sub>L91</sub>
-- `impl Manifest`  <sub>L107</sub>
-- `pub fn new(name: &str, image: &str) -> Self`  <sub>L108</sub>
-- `pub fn load(path: &Path) -> Result<Self>`  <sub>L142</sub>
-- `pub fn save(&self, path: &Path) -> Result<()>`  <sub>L148</sub>
-- `pub fn sandbox_container(&self) -> String`  <sub>L155</sub>
-- `pub fn egress_container(&self) -> String`  <sub>L159</sub>
-- `pub fn validate_name(name: &str) -> Result<()>` — Validate a project name: lowercase alnum + dashes, matches what's safe  <sub>L166</sub>
-- `mod tests`  <sub>L182</sub>
 
-**`cli/src/session.rs`** · 1258 lines · imported by 2
-- `pub enum Role`  <sub>L25</sub>
-- `pub enum OutputShape`  <sub>L131</sub>
-- `pub struct AgentProfile`  <sub>L142</sub>
-- `pub fn profile(agent: Agent) -> AgentProfile` — *these*), whose semantics are the auto-approval that ADR-0008 showed  <sub>L164</sub>
-
-_… 264 more lines in `.keel/store/steering/structure.md`._
+_… 284 more lines in `.keel/store/steering/structure.md`._
 
 ## What this is
 
 ### Purpose
 
-_One sentence: what does this repository do? Replace this line._
+moor runs an AI coding agent (Claude Code, Copilot or Kiro) inside a locked-down Docker sandbox per project, and records what it does in a tamper-evident audit trail on the host.
 
 ### Users and stakes
 
-_Who depends on it, and what goes wrong for them when it misbehaves?_
+One developer on a Mac using agents on code they do not fully trust. If moor misbehaves, the sandbox boundary or the audit trail stops meaning what it says, so changes to either need a test that proves the boundary, not one that mocks it.
 
 ### Out of scope
 
-_Name the things this repository deliberately does not do. This section stops more wasted work than the two above combined._
+moor does not replace the agent, does not defend against a kernel escape (shared `runc` kernel, see ADR-0001), and does not run on Linux or Windows hosts. It is not a spec tool: the spec/plan/build pipeline is keel's, and moor only drives it.
