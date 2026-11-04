@@ -1,4 +1,4 @@
-<!-- keel:generated schema=keel.projection/1 adapter=kiro store=5f6ba5f3b50f body=b587fc55775b -->
+<!-- keel:generated schema=keel.projection/1 adapter=kiro store=94ff2d2026e1 body=5037dab277da -->
 <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
 
 # Project context
@@ -19,6 +19,26 @@ become gate checks and stop costing context.
 - Change the smallest surface that solves the problem. If a fix needs a wider
   blast radius, say so before making it, not after.
 - A test that mocks away the behaviour under test is worse than no test.
+
+### Naming: which "keel" is which
+
+Four different things share the name. Do not run a bare `keel ...` unless you
+mean the first one.
+
+- `keel` on this machine's PATH works on THIS repository's own `.keel/`
+  (specs, store, `CLAUDE.md`/`AGENTS.md` generation). It is a development tool
+  for moor itself. Use `keel store render` after editing `.keel/store/`.
+- The keel inside a moor sandbox is a separate copy at a pinned version
+  (`KEEL_VERSION` in `images/base/Dockerfile`), working on that project's
+  workspace volume, never on this checkout. Reach it only through moor:
+  `moor next`, `go`, `approve`, `reject`, `ship`. `moor keel <args>` is the
+  hidden escape hatch.
+- `moor-keel-mcp` (`mcp/`) is the agent's route to `keel gate` and `keel next`
+  inside a sandbox. It cannot approve, by design.
+- keel the project is github.com/daneb/keel. moor depends on it, never edits it.
+
+When a user says "next step", "approve" or "run the spec", they mean the
+`moor` command, not `keel`.
 
 ### Rules
 
@@ -165,39 +185,19 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
 - `pub enum OutputShape`  <sub>L131</sub>
 - `pub struct AgentProfile`  <sub>L142</sub>
 - `pub fn profile(agent: Agent) -> AgentProfile` — *these*), whose semantics are the auto-approval that ADR-0008 showed  <sub>L164</sub>
-- `pub struct TurnResult`  <sub>L201</sub>
-- `pub fn parse_turn(agent: Agent, stdout: &str) -> Result<TurnResult>` — plain-text agent emits the response and nothing else, so its stdout  <sub>L217</sub>
-- `pub fn valid_session_id(id: &str) -> bool` — different shape of output or something that came from the wrong place,  <sub>L238</sub>
-- `pub fn build_turn_argv(` — against `claude --help`, and against a live container) so it sits with  <sub>L380</sub>
-- `pub fn failure_hint(agent: Agent, project: &str, text: &str) -> Option<String>` — /login") is useless inside the sandbox, where there is no interactive  <sub>L433</sub>
-- `pub fn refuse_unrestrainable_role(agent: Agent, role: Role) -> Result<()>` — one the turn would run with everything available, which is the opposite  <sub>L451</sub>
-- `pub fn emit_recipe(dest: &Path, text: &str) -> Result<()>` — creates the file that drives its own next run — via a temp file beside  <sub>L506</sub>
-- `pub struct TurnOutcome` — terminal (`moor studio`) can draw it itself — the point being that  <sub>L550</sub>
-- `pub fn run_turn(project: &str, role: Role, prompt: &str, new_session: bool) -> Result<TurnOutcome>` — by construction — there is no path to a response that skips this  <sub>L566</sub>
-- `pub fn ask(` — `moor ask`: one turn, printed for a human.  <sub>L630</sub>
 
-**`cli/src/paths.rs`** · 122 lines · imported by 3
-- `pub fn moor_home() -> Result<PathBuf>`  <sub>L4</sub>
-- `pub fn project_dir(name: &str) -> Result<PathBuf>`  <sub>L9</sub>
-- `pub fn manifest_path(name: &str) -> Result<PathBuf>`  <sub>L13</sub>
-- `pub fn chain_log_path(name: &str) -> Result<PathBuf>` — folded-in egress verdicts, and tripwire hits all append here. See  <sub>L28</sub>
-- `pub fn egress_offset_path(name: &str) -> Result<PathBuf>` — How many raw lines of the egress gateway's access log have already  <sub>L34</sub>
-- `pub fn sink_offset_path(name: &str) -> Result<PathBuf>` — How many lines of keel's chain sink (inside the sandbox) have already  <sub>L40</sub>
-- `pub fn posture_path(name: &str) -> Result<PathBuf>` — The host's copy of the posture attestation last written into the  <sub>L46</sub>
-- `pub fn session_path(name: &str) -> Result<PathBuf>` — host-written only: nothing inside a sandbox has this path mounted, so  <sub>L53</sub>
-
-_… 244 more lines in `.keel/store/steering/structure.md`._
+_… 264 more lines in `.keel/store/steering/structure.md`._
 
 ## What this is
 
 ### Purpose
 
-_One sentence: what does this repository do? Replace this line._
+moor runs an AI coding agent (Claude Code, Copilot or Kiro) inside a locked-down Docker sandbox per project, and records what it does in a tamper-evident audit trail on the host.
 
 ### Users and stakes
 
-_Who depends on it, and what goes wrong for them when it misbehaves?_
+One developer on a Mac using agents on code they do not fully trust. If moor misbehaves, the sandbox boundary or the audit trail stops meaning what it says, so changes to either need a test that proves the boundary, not one that mocks it.
 
 ### Out of scope
 
-_Name the things this repository deliberately does not do. This section stops more wasted work than the two above combined._
+moor does not replace the agent, does not defend against a kernel escape (shared `runc` kernel, see ADR-0001), and does not run on Linux or Windows hosts. It is not a spec tool: the spec/plan/build pipeline is keel's, and moor only drives it.
