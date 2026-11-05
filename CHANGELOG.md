@@ -4,7 +4,7 @@ Notable changes to moor. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and moor uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.10.0] - 2026-11-05
 
 - **keel is now an internal detail.** The hidden `moor keel <args>` command is
   `moor pipeline <args>`, the agent's MCP server is `moor-mcp` with tools
@@ -13,6 +13,9 @@ Notable changes to moor. The format follows
   (`./images/build.sh`) for the renamed MCP binary.
 - **README rewritten** and shortened; the detail moved to `CONTRIBUTING.md` and
   `docs/`.
+- **keel 0.14.0 is pinned in the sandbox image** (was 0.12.0). It includes the
+  fix for a passing run that predates a re-approved spec or plan, which made
+  `moor go` skip a rebuild. Rebuild the images with `./images/build.sh`.
 
 ## [0.9.4] - 2026-11-03
 
