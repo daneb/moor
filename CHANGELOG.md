@@ -13,6 +13,9 @@ Notable changes to moor. The format follows
   (`./images/build.sh`) for the renamed MCP binary.
 - **README rewritten** and shortened; the detail moved to `CONTRIBUTING.md` and
   `docs/`.
+- **keel 0.14.0 is pinned in the sandbox image** (was 0.12.0). It includes the
+  fix for a passing run that predates a re-approved spec or plan, which made
+  `moor go` skip a rebuild. Rebuild the images with `./images/build.sh`.
 
 ## [0.9.4] - 2026-11-03
 
