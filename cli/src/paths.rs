@@ -73,7 +73,7 @@ pub fn ensure_project_dirs(name: &str) -> Result<()> {
 }
 
 /// Where `moor use` records the sticky default project, so commands
-/// like `moor keel`/`moor view` don't need `--project` spelled out on
+/// like `moor pipeline`/`moor view` don't need `--project` spelled out on
 /// every call just because more than one project happens to exist.
 pub fn current_project_path() -> Result<PathBuf> {
     Ok(moor_home()?.join("current"))

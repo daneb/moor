@@ -17,7 +17,7 @@ Neither opens a socket, binds a port, or crosses a network.
 │      │                                                             │
 │      │  ② inbound: MCP, JSON-RPC 2.0 over stdio                    │
 │      ▼                                                             │
-│   moor-keel-mcp ──► keel gate / keel next                          │
+│   moor-mcp ──► keel gate / keel next                          │
 │                     (`keel approve` is not reachable — see below)   │
 └────────────────────────────────────────────────────────────────────┘
 ```
@@ -101,7 +101,7 @@ second one is the one that does the work:
 | role | granted (`--allowedTools`) | denied (`--disallowedTools`) |
 | --- | --- | --- |
 | `brainstorm` | `Read`, `Glob`, `Grep` | shell/subagent + network + `Write`, `Edit`, `MultiEdit`, `NotebookEdit` |
-| `build` | + `Edit`, `Write`, `mcp__moor-keel__keel_gate`, `mcp__moor-keel__keel_next` | shell/subagent + network |
+| `build` | + `Edit`, `Write`, `mcp__moor__check`, `mcp__moor__next` | shell/subagent + network |
 
 where shell/subagent is `Bash`, `BashOutput`, `KillShell`, `KillBash`,
 `Task`, `SlashCommand`.
@@ -200,8 +200,8 @@ So moor ships its own MCP server into the sandbox instead.
 
 ### What it is
 
-`mcp/` builds `moor-keel-mcp`, installed at
-`/usr/local/bin/moor-keel-mcp`. Hand-rolled JSON-RPC 2.0 over
+`mcp/` builds `moor-mcp`, installed at
+`/usr/local/bin/moor-mcp`. Hand-rolled JSON-RPC 2.0 over
 newline-delimited stdio, `serde_json` as its only dependency — no SDK, no
 socket, nothing listening. `claude` spawns it as a child process and
 talks to it over pipes; moor points `claude` at it with
@@ -210,8 +210,8 @@ talks to it over pipes; moor points `claude` at it with
 ```json
 {
   "mcpServers": {
-    "moor-keel": {
-      "command": "/usr/local/bin/moor-keel-mcp",
+    "moor": {
+      "command": "/usr/local/bin/moor-mcp",
       "args": [],
       "env": {}
     }
@@ -233,15 +233,15 @@ nothing and answering nothing.
 
 ```
 $ printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}' \
-  | docker exec -i my-app-sandbox /usr/local/bin/moor-keel-mcp
+  | docker exec -i my-app-sandbox /usr/local/bin/moor-mcp
 ```
 
 Two tools, and that is the whole list:
 
 | tool | argv it can produce |
 | --- | --- |
-| `keel_gate` | `keel gate <g0\|g1\|g2\|g4> <slug>` |
-| `keel_next` | `keel next --json <slug>` |
+| `check` | `keel gate <g0\|g1\|g2\|g4> <slug>` |
+| `next` | `keel next --json <slug>` |
 
 **`keel approve` is not a tool this server defines.** There is no
 allowlist entry to maintain and no denial to enforce — the verb does not
@@ -280,10 +280,10 @@ itself, the way it reads a failing gate.
 printf '%s\n%s\n' \
  '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}' \
  '{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}' \
- | docker exec -i <name>-sandbox /usr/local/bin/moor-keel-mcp
+ | docker exec -i <name>-sandbox /usr/local/bin/moor-mcp
 ```
 
-`tools/list` should return exactly `keel_gate` and `keel_next`, and the
+`tools/list` should return exactly `check` and `next`, and the
 word `approve` should not appear anywhere in the response.
 
 The unit tests assert the same properties three ways — the tool names,

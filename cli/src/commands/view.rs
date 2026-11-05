@@ -101,7 +101,7 @@ pub fn run(project: &str, slug: &str, artifact: &str) -> Result<()> {
     if artifact == "report" {
         // Built by the pipeline from every run's gate results, not a file.
         crate::manifest::validate_name(slug).context("spec name")?;
-        return super::keel_cmd::run(project, &["report".to_string(), slug.to_string()]);
+        return super::pipeline_cmd::run(project, &["report".to_string(), slug.to_string()]);
     }
     let filename = artifact_filename(artifact)?;
     let m = Manifest::load(&paths::manifest_path(project)?)?;

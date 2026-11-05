@@ -149,7 +149,7 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
 - `pub fn session_path(name: &str) -> Result<PathBuf>` — host-written only: nothing inside a sandbox has this path mounted, so  <sub>L53</sub>
 - `pub fn active_spec_path(name: &str) -> Result<PathBuf>` — The spec `moor next` guides this project through, when pinned with  <sub>L59</sub>
 - `pub fn transcript_path(name: &str) -> Result<PathBuf>` — chain.jsonl on purpose: the chain carries hashes and is exported by  <sub>L66</sub>
-- `pub fn current_project_path() -> Result<PathBuf>` — like `moor keel`/`moor view` don't need `--project` spelled out on  <sub>L78</sub>
+- `pub fn current_project_path() -> Result<PathBuf>` — like `moor pipeline`/`moor view` don't need `--project` spelled out on  <sub>L78</sub>
 - `pub fn read_current_project() -> Result<Option<String>>`  <sub>L82</sub>
 - `pub fn write_current_project(name: &str) -> Result<()>`  <sub>L98</sub>
 - `pub fn all_project_names() -> Result<Vec<String>>`  <sub>L106</sub>

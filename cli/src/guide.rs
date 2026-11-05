@@ -265,17 +265,17 @@ pub fn is_automatic(spec: &NextSpec) -> bool {
 }
 
 /// keel's own command, made runnable from the host: `keel <args>` becomes
-/// `moor keel <args>`. Taken from keel rather than rebuilt here, so moor
+/// `moor pipeline <args>`. Taken from keel rather than rebuilt here, so moor
 /// follows keel if keel changes what a stage's next command is.
 pub fn host_command(keel_cmd: &str, explicit: Option<&str>) -> String {
     let args = keel_cmd.strip_prefix("keel ").unwrap_or(keel_cmd);
-    format!("moor keel{} {args}", project_flag(explicit))
+    format!("moor pipeline{} {args}", project_flag(explicit))
 }
 
 fn read_command(slug: &str, artifact: &str, explicit: Option<&str>) -> String {
     let flag = project_flag(explicit);
     match artifact {
-        "report" => format!("moor keel{flag} report {slug}"),
+        "report" => format!("moor pipeline{flag} report {slug}"),
         _ => format!("moor view{flag} {slug} {artifact}"),
     }
 }
@@ -722,11 +722,11 @@ mod tests {
     fn host_command_runs_on_the_host() {
         assert_eq!(
             host_command("keel approve a --stage spec", None),
-            "moor keel approve a --stage spec"
+            "moor pipeline approve a --stage spec"
         );
         assert_eq!(
             host_command("keel run a", Some("myapp")),
-            "moor keel --project myapp run a"
+            "moor pipeline --project myapp run a"
         );
     }
 
@@ -844,7 +844,7 @@ mod tests {
         let a = pick_active(&r, None, &[]).unwrap();
         let lines = render("p", None, &r, Some(&a));
         assert_eq!(lines[0], "Blocked: store drift.");
-        assert_eq!(lines[1], "  Fix:  moor keel store render");
+        assert_eq!(lines[1], "  Fix:  moor pipeline store render");
     }
 
     #[test]

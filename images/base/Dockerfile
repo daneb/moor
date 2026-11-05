@@ -123,7 +123,7 @@ RUN npm pack brace-expansion@5.0.11 undici@6.29.1 --pack-destination /tmp >/dev/
 RUN npm install -g @anthropic-ai/claude-code && npm cache clean --force
 
 COPY --from=keel-build /usr/local/cargo/bin/keel /usr/local/bin/keel
-COPY --from=keel-build /usr/local/bin/moor-keel-mcp /usr/local/bin/moor-keel-mcp
+COPY --from=keel-build /usr/local/bin/moor-mcp /usr/local/bin/moor-mcp
 COPY --from=keel-build /usr/local/cargo/bin/cargo-audit /usr/local/bin/cargo-audit
 COPY --from=gitleaks-build /usr/local/bin/gitleaks /usr/local/bin/gitleaks
 

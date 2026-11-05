@@ -5,10 +5,10 @@ pub mod doctor_cmd;
 pub mod down;
 pub mod flow_cmd;
 pub mod import_cmd;
-pub mod keel_cmd;
 pub mod logs;
 pub mod new_cmd;
 pub mod next_cmd;
+pub mod pipeline_cmd;
 pub mod pull_cmd;
 pub mod recipe;
 pub mod run_cmd;
@@ -144,7 +144,7 @@ fn pick_running_or_sole_project(
 }
 
 /// Resolve the project a command should act on when the operator didn't
-/// name one explicitly: `moor keel`/`moor view` are meant to be used
+/// name one explicitly: `moor pipeline`/`moor view` are meant to be used
 /// without repeating the project on every call. Precedence: an explicit
 /// `--project` flag; the sticky default set by `moor use`; the one
 /// project whose sandbox is actually running right now (keel ships
@@ -166,7 +166,7 @@ pub fn resolve_project(explicit: Option<String>) -> Result<(String, Option<Proje
 }
 
 /// `resolve_project`, but announces the result — used by commands (like
-/// `moor keel`/`moor view`) that can act on a project without it ever
+/// `moor pipeline`/`moor view`) that can act on a project without it ever
 /// appearing in the command line, so it's always visible which container
 /// is about to be touched, not just inferred silently.
 pub fn resolve_project_announced(explicit: Option<String>) -> Result<String> {

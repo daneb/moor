@@ -12,7 +12,7 @@ use std::io::{BufRead, IsTerminal, Write};
 /// like any `moor run`.
 fn exec(t: &Target, args: &[&str]) -> Result<()> {
     let args: Vec<String> = args.iter().map(|a| a.to_string()).collect();
-    super::keel_cmd::run(&t.name, &args)
+    super::pipeline_cmd::run(&t.name, &args)
 }
 
 /// What an approval is of, as a sentence fragment.
@@ -304,7 +304,7 @@ pub fn go(explicit: Option<String>, check: bool) -> Result<()> {
         last_stage = Some(spec.stage.clone());
         ran += 1;
 
-        let result = super::keel_cmd::run(&t.name, &args);
+        let result = super::pipeline_cmd::run(&t.name, &args);
         report = t.report()?;
         if let Err(e) = result {
             // A build that passed still makes keel exit non-zero: its last
