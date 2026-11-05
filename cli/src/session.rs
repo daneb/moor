@@ -62,8 +62,8 @@ impl Role {
                 "Grep",
                 "Edit",
                 "Write",
-                "mcp__moor-keel__keel_gate",
-                "mcp__moor-keel__keel_next",
+                "mcp__moor__check",
+                "mcp__moor__next",
             ],
         }
     }
@@ -924,8 +924,8 @@ mod tests {
     #[test]
     fn build_role_has_verification_tools_but_no_shell() {
         let tools = Role::Build.tools();
-        assert!(tools.contains(&"mcp__moor-keel__keel_gate"));
-        assert!(tools.contains(&"mcp__moor-keel__keel_next"));
+        assert!(tools.contains(&"mcp__moor__check"));
+        assert!(tools.contains(&"mcp__moor__next"));
         assert!(!tools.iter().any(|t| t.starts_with("Bash")));
         assert!(!tools.iter().any(|t| t.contains("approve")));
         // But `build` can still edit — that is the point of the role.

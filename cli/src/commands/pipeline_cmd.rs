@@ -1,12 +1,12 @@
 use super::run_cmd;
 use anyhow::Result;
 
-/// Builds the argv `moor keel` hands to `run_cmd`: `keel` prepended to
+/// Builds the argv `moor pipeline` hands to `run_cmd`: `keel` (the pipeline tool inside the sandbox) prepended to
 /// whatever the operator typed. Pulled out from `run` so the "keel goes
 /// first" rule is unit-testable without a container to exec into.
 fn build_argv(args: &[String]) -> Result<Vec<String>> {
     if args.is_empty() {
-        anyhow::bail!("usage: moor keel [--project <name>] <keel-args...>");
+        anyhow::bail!("usage: moor pipeline [--project <name>] <keel-args...>");
     }
     let mut cmd = vec!["keel".to_string()];
     cmd.extend(args.iter().cloned());
@@ -15,7 +15,7 @@ fn build_argv(args: &[String]) -> Result<Vec<String>> {
 
 /// Sugar for `moor run <project> -- keel <args...>`: since keel ships
 /// natively in every sandbox image, spelling it out after `--` on every
-/// call is pure boilerplate. `moor keel <args...>` (with `--project` to
+/// call is pure boilerplate. `moor pipeline <args...>` (with `--project` to
 /// disambiguate when more than one project exists) drops both the `--`
 /// and the repeated `keel`.
 pub fn run(project: &str, args: &[String]) -> Result<()> {

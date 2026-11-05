@@ -306,12 +306,12 @@ enum Command {
     /// `moor up`/`new`.
     #[command(subcommand)]
     Secrets(SecretsCommand),
-    /// Pass arguments straight to the workflow engine inside the sandbox.
+    /// Pass arguments straight to the pipeline inside the sandbox.
     ///
     /// The escape hatch under `moor next`/`go`/`approve`/`reject`, for
     /// anything they don't cover. See docs/ARCHITECTURE.md.
     #[command(hide = true)]
-    Keel {
+    Pipeline {
         #[arg(short = 'p', long = "project")]
         project: Option<String>,
         #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
@@ -384,8 +384,8 @@ fn main() {
         Command::Run { name, cmd } => commands::run_cmd::run(&name, &cmd),
         Command::Pull { project } => commands::pull_cmd::run(project),
         Command::Doctor { project } => commands::doctor_cmd::run(project),
-        Command::Keel { project, args } => commands::resolve_project_announced(project)
-            .and_then(|name| commands::keel_cmd::run(&name, &args)),
+        Command::Pipeline { project, args } => commands::resolve_project_announced(project)
+            .and_then(|name| commands::pipeline_cmd::run(&name, &args)),
         Command::Bundle { project, run, out } => commands::resolve_project_announced(project)
             .and_then(|name| commands::bundle_cmd::run(&name, run.as_deref(), out)),
         Command::View {

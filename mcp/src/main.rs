@@ -20,7 +20,7 @@ use std::io::{BufRead, Write};
 /// MCP revision this server speaks. Claude Code negotiates by echoing
 /// back what it can use; we answer with the one shape we implement.
 const PROTOCOL_VERSION: &str = "2024-11-05";
-const SERVER_NAME: &str = "moor-keel";
+const SERVER_NAME: &str = "moor";
 
 /// The tool surface, and the only place a caller-supplied string is ever
 /// allowed near a child process's argv.
@@ -42,16 +42,16 @@ mod tools {
     /// the pipeline want next?". Nothing here advances a stage.
     pub const TOOLS: &[Tool] = &[
         Tool {
-            name: "keel_gate",
-            description: "Run one keel gate against a spec and return its verdict. \
+            name: "check",
+            description: "Run one check against a spec and return its verdict. \
                           Verification only — it records a gate result, it cannot \
                           advance the spec past a human checkpoint.",
             verb: &["keel", "gate"],
             takes_gate: true,
         },
         Tool {
-            name: "keel_next",
-            description: "Ask keel what the next step is for a spec, as JSON.",
+            name: "next",
+            description: "Ask what the next step is for a spec, as JSON.",
             verb: &["keel", "next", "--json"],
             takes_gate: false,
         },
@@ -180,8 +180,8 @@ mod tools {
         #[test]
         fn surface_is_verification_only() {
             let names: Vec<&str> = TOOLS.iter().map(|t| t.name).collect();
-            assert!(names.contains(&"keel_gate"), "gate must be reachable");
-            assert!(names.contains(&"keel_next"), "next must be reachable");
+            assert!(names.contains(&"check"), "gate must be reachable");
+            assert!(names.contains(&"next"), "next must be reachable");
 
             for t in TOOLS {
                 assert_eq!(t.verb.first(), Some(&"keel"));
@@ -242,7 +242,7 @@ mod tools {
             ] {
                 let args = serde_json::json!({"slug": bad, "gate": "g0"});
                 assert!(
-                    build_argv("keel_gate", &args).is_err(),
+                    build_argv("check", &args).is_err(),
                     "slug '{bad}' should have been rejected"
                 );
             }
@@ -251,7 +251,7 @@ mod tools {
             for bad_gate in ["g0 --force", "approve", "g5", "G0", ""] {
                 let args = serde_json::json!({"slug": "valid-spec", "gate": bad_gate});
                 assert!(
-                    build_argv("keel_gate", &args).is_err(),
+                    build_argv("check", &args).is_err(),
                     "gate '{bad_gate}' should have been rejected"
                 );
             }
@@ -262,29 +262,27 @@ mod tools {
                 "gate": "g0",
                 "extra": "--dangerously-skip-permissions",
             });
-            assert!(build_argv("keel_gate", &smuggled).is_err());
+            assert!(build_argv("check", &smuggled).is_err());
             assert!(build_argv(
-                "keel_next",
+                "next",
                 &serde_json::json!({"slug": "valid-spec", "json": true})
             )
             .is_err());
-            assert!(build_argv("keel_next", &serde_json::json!({"slug": 7})).is_err());
-            assert!(build_argv("keel_next", &serde_json::json!("valid-spec")).is_err());
-            assert!(
-                build_argv("keel_approve", &serde_json::json!({"slug": "valid-spec"})).is_err()
-            );
+            assert!(build_argv("next", &serde_json::json!({"slug": 7})).is_err());
+            assert!(build_argv("next", &serde_json::json!("valid-spec")).is_err());
+            assert!(build_argv("approve", &serde_json::json!({"slug": "valid-spec"})).is_err());
 
             // The happy path is exactly the fixed verb plus the slug.
             assert_eq!(
                 build_argv(
-                    "keel_gate",
+                    "check",
                     &serde_json::json!({"slug": "valid-spec", "gate": "g1"})
                 )
                 .unwrap(),
                 vec!["keel", "gate", "g1", "valid-spec"]
             );
             assert_eq!(
-                build_argv("keel_next", &serde_json::json!({"slug": "valid-spec"})).unwrap(),
+                build_argv("next", &serde_json::json!({"slug": "valid-spec"})).unwrap(),
                 vec!["keel", "next", "--json", "valid-spec"]
             );
         }
@@ -326,7 +324,7 @@ mod tools {
                 assert_eq!(schema["additionalProperties"], serde_json::json!(false));
                 assert!(schema["properties"]["slug"].is_object());
             }
-            let gate = arr.iter().find(|t| t["name"] == "keel_gate").unwrap();
+            let gate = arr.iter().find(|t| t["name"] == "check").unwrap();
             assert_eq!(
                 gate["inputSchema"]["properties"]["gate"]["enum"],
                 serde_json::json!(GATES)
@@ -458,7 +456,7 @@ mod tests {
         // The agent has to be able to read and act on "that slug is
         // invalid"; a JSON-RPC error would just look like a broken server.
         let params = serde_json::json!({
-            "name": "keel_gate",
+            "name": "check",
             "arguments": {"slug": "Bad Slug", "gate": "g0"},
         });
         let r = handle("tools/call", &params).unwrap();
@@ -471,7 +469,7 @@ mod tests {
 
     #[test]
     fn calling_a_tool_that_does_not_exist_says_so() {
-        let params = serde_json::json!({"name": "keel_approve", "arguments": {"slug": "x"}});
+        let params = serde_json::json!({"name": "approve", "arguments": {"slug": "x"}});
         let r = handle("tools/call", &params).unwrap();
         assert_eq!(r["isError"], serde_json::json!(true));
         assert!(r["content"][0]["text"]

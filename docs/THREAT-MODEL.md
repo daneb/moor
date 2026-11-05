@@ -33,7 +33,7 @@ asks it to. moor's job is to make that assumption safe by making sure
 ```
 Untrusted  →  cloned repo content, `.keel/keel.toml`, agent output, anything
               the agent writes to disk or emits on stdout, every MCP
-              tool-call argument the agent sends to `moor-keel-mcp`
+              tool-call argument the agent sends to `moor-mcp`
 Sandboxed  →  the container: agent CLI, keel, the toolchain, the workspace
               volume, the sandbox's own process tree
 Trusted    →  the host: the moor CLI process, ~/.moor/, Docker

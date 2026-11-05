@@ -18,7 +18,7 @@ fn check_known(name: &str, names: &[String]) -> Result<()> {
     );
 }
 
-/// Set the sticky default project that `moor keel`/`moor view` (and any
+/// Set the sticky default project that `moor pipeline`/`moor view` (and any
 /// other command taking an optional `--project`) fall back to when it's
 /// omitted, so switching your working project doesn't mean typing its
 /// name on every subsequent command. `spec` also pins the spec `moor

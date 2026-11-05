@@ -26,7 +26,7 @@ compile two binaries that the runtime stage copies out:
 
 - `keel`, via `cargo install keel-harness --version "$KEEL_VERSION" --locked`
   from crates.io, at the version pinned by `ARG KEEL_VERSION`.
-- `moor-keel-mcp`, via `cargo install --locked --path /build/mcp` from
+- `moor-mcp`, via `cargo install --locked --path /build/mcp` from
   **this repository's own `mcp/` crate**. Built from source rather than
   fetched, so the tool surface inside the image can never lag the
   protocol the CLI on the host expects. See [MCP.md](MCP.md).
@@ -40,7 +40,7 @@ compile two binaries that the runtime stage copies out:
 | `npm@11` | NodeSource's bundled npm is routinely behind on CVE fixes for its own vendored deps (tar, minimatch, glob) |
 | `@anthropic-ai/claude-code` | the default agent (GitHub Copilot is a separate opt-in layer, `moor/copilot` — see below) |
 | `/usr/local/bin/keel` | the conductor; runs *inside* the sandbox, not on the host |
-| `/usr/local/bin/moor-keel-mcp` | the agent's only route to keel |
+| `/usr/local/bin/moor-mcp` | the agent's only route to keel |
 | `/etc/moor/mcp-config.json` | how `claude` finds that server — root-owned, outside every volume, on a read-only rootfs |
 | `/home/agent/.claude/settings.json` | pins Claude Code to its own `auto` permission mode ([ADR-0003](decisions/0003-claude-code-permissions.md)) |
 | user `agent`, uid/gid 10001 | nothing runs as root from container start |
@@ -196,7 +196,7 @@ patches at all, ever), the npm major (`npm@11`, not `@latest`, which has
 already moved to requiring Node ≥22.22/24.15 and would break this build
 the next time npm cuts a major), the Rust toolchain channel (`stable`),
 `keel-harness` at an exact version (`ARG KEEL_VERSION` in
-`images/base/Dockerfile`) with `--locked`, and `moor-keel-mcp` via `--locked`
+`images/base/Dockerfile`) with `--locked`, and `moor-mcp` via `--locked`
 against `mcp/Cargo.lock`.
 
 **Bumping keel.** Change `ARG KEEL_VERSION`, or run
@@ -262,5 +262,5 @@ docker run --rm moor/base:latest cat /etc/moor/mcp-config.json
 
 # the MCP server speaks only JSON-RPC on stdin — it has no --help
 printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}' \
-  | docker run -i --rm moor/base:latest /usr/local/bin/moor-keel-mcp
+  | docker run -i --rm moor/base:latest /usr/local/bin/moor-mcp
 ```

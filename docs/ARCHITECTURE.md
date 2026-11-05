@@ -14,7 +14,7 @@ Host (Mac Mini, OrbStack/Docker)
          │     network   = <name>-net (custom bridge, egress via proxy only)
          │     non-root user, read-only rootfs, cap-drop ALL, no-new-privileges,
          │     seccomp default, pids/mem/cpu limits, no docker.sock
-         │     claude ──stdio──► moor-keel-mcp ──► keel gate / keel next
+         │     claude ──stdio──► moor-mcp ──► keel gate / keel next
          │     /run/moor       tmpfs, root-owned 0755: posture.json (read-only to agent)
          │     /run/moor-sink  tmpfs, 1777: keel's chain payloads, folded by moor
          └─ <name>-egress    container   ← forward proxy, domain allowlist,
@@ -31,7 +31,7 @@ together a handful of tools, and this is where they are named:
 | **Docker** (via OrbStack on macOS) | Runs each project's sandbox and egress containers, via `docker compose`. | Host |
 | **Claude Code** (`claude`) | The coding agent. | Sandbox |
 | **[keel](https://github.com/daneb/keel)** | The spec → plan → build pipeline: specs, the checks on them (G0 for a spec, G1 for a plan, G2/G2.5/G3 after a build), approvals, build runs, and the evidence of all of it. | Sandbox |
-| **`moor-keel-mcp`** | The MCP server that is the agent's only route to keel: it can run checks and ask what's next, but cannot approve. See below and [MCP.md](MCP.md). | Sandbox |
+| **`moor-mcp`** | The MCP server that is the agent's only route to keel: it can run checks and ask what's next, but cannot approve. See below and [MCP.md](MCP.md). | Sandbox |
 | **tinyproxy** | The egress proxy: a domain allowlist, and a log of every request. | Egress container |
 
 How moor's commands map onto keel, for when you need to look underneath:
@@ -62,7 +62,7 @@ only in the exact shapes `SPEC-<digits>` and `keel.spec/<digits>`, so a
 compromised sandbox has no way to get its own text into a file on the
 host that a host-side AI assistant might then read.
 
-For anything the guided commands don't cover, `moor keel <args>` runs
+For anything the guided commands don't cover, `moor pipeline <args>` runs
 `keel <args>` in the project's sandbox, logged like any `moor run`. It is
 left out of `moor --help` on purpose: it's an escape hatch, not the way to
 work. keel's own documentation covers its commands and its credential
@@ -105,13 +105,13 @@ See [IMAGES.md](IMAGES.md) for what is in each image layer, what is
 pinned and what is not, and the three build mechanics (apt upgrade,
 `pipefail`, volume mount-point ownership) that are easy to get wrong.
 
-### The agent's route to keel (`moor-keel-mcp`, in the sandbox)
+### The agent's route to keel (`moor-mcp`, in the sandbox)
 
-A third binary ships inside the sandbox: `moor-keel-mcp`, built from
+A third binary ships inside the sandbox: `moor-mcp`, built from
 this repository's `mcp/` crate. It is an MCP server — hand-rolled
 JSON-RPC 2.0 over newline-delimited stdio, `serde_json` only — that
 `claude` spawns as a child process and reaches over pipes. It exposes
-keel's *verification* verbs as tools (`keel_gate`, `keel_next`) and
+keel's *verification* verbs as tools (`check`, `next`) and
 nothing else.
 
 `keel approve` is not a tool it defines, so advancing a spec past a human

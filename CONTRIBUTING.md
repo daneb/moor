@@ -15,9 +15,9 @@ Building, testing and releasing moor.
   attestation derived from `docker inspect` (unproven when a field is
   missing), push ref and commit capture, Keychain
   service-name scoping, `moor import`'s image auto-detection and
-  GitHub-URL parsing, `moor keel`/`moor view`'s project-resolution
+  GitHub-URL parsing, `moor pipeline`/`moor view`'s project-resolution
   precedence (explicit flag, sticky `moor use` default, the one sandbox
-  that's up, ambiguity errors), `moor keel`'s argv building, `moor use`'s
+  that's up, ambiguity errors), `moor pipeline`'s argv building, `moor use`'s
   known-project validation, `moor view`'s artifact-name mapping and
   markdown highlighting, the agent session protocol (role tool sets,
   `is_error`-based turn failure, UUID-validated session continuity, the

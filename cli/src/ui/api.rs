@@ -377,7 +377,7 @@ fn start_job(state: &State, b: &Value) -> Result<Value> {
                 _ => anyhow::bail!("gate must be g0 or g1"),
             };
             (
-                format!("moor keel gate {gate} {slug}"),
+                format!("moor pipeline gate {gate} {slug}"),
                 Some(p.clone()),
                 vec![
                     "keel".into(),

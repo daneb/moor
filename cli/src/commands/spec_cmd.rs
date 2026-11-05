@@ -257,7 +257,8 @@ pub fn push(explicit: Option<String>, file: &Path) -> Result<()> {
         draft.slug
     );
 
-    let checked = super::keel_cmd::run(&t.name, &["gate".into(), "g0".into(), draft.slug.clone()]);
+    let checked =
+        super::pipeline_cmd::run(&t.name, &["gate".into(), "g0".into(), draft.slug.clone()]);
     if checked.is_err() {
         anyhow::bail!(
             "the spec didn't pass its checks yet. Fix what's listed above in {}, then send it again.\n\n  Next:  moor spec push{flag} {}",

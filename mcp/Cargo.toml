@@ -1,13 +1,13 @@
 [package]
-name = "moor-keel-mcp"
+name = "moor-mcp"
 version = "0.1.0"
 edition = "2021"
-description = "MCP server exposing keel's verification verbs to an agent inside a moor sandbox"
+description = "MCP server letting an agent inside a moor sandbox run checks and ask what is next"
 license = "MIT"
 repository = "https://github.com/daneb/moor"
 
 [[bin]]
-name = "moor-keel-mcp"
+name = "moor-mcp"
 path = "src/main.rs"
 
 [dependencies]

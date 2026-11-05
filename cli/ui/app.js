@@ -587,7 +587,7 @@ function viewJourney(p, r) {
   if (p.report && p.report.blockers.length) {
     for (const b of p.report.blockers) {
       if (b.reason === 'no specs') continue;
-      out.push(h('div', { class: 'banner fail' }, h('div', {}, h('b', {}, 'Blocked: ' + b.reason), h('div', { class: 'mono small' }, 'Fix: moor keel ' + b.command.replace(/^keel\s+/, '')))));
+      out.push(h('div', { class: 'banner fail' }, h('div', {}, h('b', {}, 'Blocked: ' + b.reason), h('div', { class: 'mono small' }, 'Fix: moor pipeline ' + b.command.replace(/^keel\s+/, '')))));
     }
   }
   if (!spec) {
@@ -899,7 +899,7 @@ function viewAgent(p, r) {
   if (live) chat.appendChild(h('div', { class: 'turn' }, h('div', { class: 'bubble me' }, h('div', { class: 'meta' }, chip(live.role || S.ui.role), 'now'), live.prompt || '…'), h('div', { class: 'bubble agent live' }, h('div', { class: 'meta' }, h('span', { class: 'spin' }), ' thinking · ' + dur(live.started)), h('pre', { class: 'raw', style: 'max-height:200px' }, (live.lines || []).slice(-30).join('\n')))));
   out.push(chat);
   out.push(h('div', { class: 'composer' },
-    h('textarea', { placeholder: S.ui.role === 'build' ? 'Tell it what to change. It can edit files and run keel’s checks through MCP, nothing else.' : 'Ask it to think a change through against the real repository…', value: S.ui.composer, oninput: (e) => S.ui.composer = e.target.value, onkeydown: (e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); sendTurn(p); } } }),
+    h('textarea', { placeholder: S.ui.role === 'build' ? 'Tell it what to change. It can edit files and run the pipeline’s checks, nothing else.' : 'Ask it to think a change through against the real repository…', value: S.ui.composer, oninput: (e) => S.ui.composer = e.target.value, onkeydown: (e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); sendTurn(p); } } }),
     h('div', { class: 'row' }, h('div', { class: 'toggle' }, ['brainstorm', 'build'].map((role) => h('button', { class: S.ui.role === role ? 'on' : '', onclick: () => { S.ui.role = role; render(); } }, role))),
       h('label', { class: 'row small muted' }, h('input', { type: 'checkbox', checked: S.ui.newSession, onchange: (e) => S.ui.newSession = e.target.checked }), 'new session'),
       h('span', { class: 'right small dim' }, '⌘↵ to send'), btn(live ? [h('span', { class: 'spin' }), 'Waiting…'] : 'Send', () => sendTurn(p), 'primary', { disabled: !!live }))));
@@ -1039,12 +1039,12 @@ function viewSettings(p, r) {
   out.push(h('div', { class: 'card' }, h('h3', {}, 'Agent provider'), h('div', { class: 'small muted', style: 'margin-bottom:10px' }, 'Which agent the sandbox is set up for. Claude ships in every image; Copilot composes with the moor/copilot layer; Kiro uses the host login. Secrets are declared per project and resolved from your shell or the macOS Keychain on every start — values never live in the manifest.'), h('div', { class: 'providers' }, provCards)));
 
   // drivers
-  if (s.up) out.push(h('div', { class: 'card' }, h('h3', {}, 'Build driver (keel)'), h('div', { class: 'small muted', style: 'margin-bottom:8px' }, 'The driver keel runs a task through when it builds. The default is what `moor go` uses; a conformance check runs the driver in a scratch repository and records whether it behaves.'),
+  if (s.up) out.push(h('div', { class: 'card' }, h('h3', {}, 'Build driver'), h('div', { class: 'small muted', style: 'margin-bottom:8px' }, 'The driver the pipeline runs a task through when it builds. The default is what `moor go` uses; a conformance check runs the driver in a scratch repository and records whether it behaves.'),
     (s.drivers || []).map((d) => h('div', { class: 'driver' }, h('span', { class: 'radio' + (d.default ? ' on' : ''), style: 'cursor:pointer', onclick: async () => { try { await api(`/projects/${p.name}/drivers/default`, { method: 'POST', body: { id: d.id } }); toast(`Default driver is now ${d.id}.`, 'ok'); invalidate(p.name); render(); } catch (e) { toast(e.message, 'err'); } } }),
       h('div', {}, h('div', { class: 'did' }, d.id, d.default ? [' ', chip('default', 'yellow')] : null, PROVIDERS[s.agent] && PROVIDERS[s.agent].driver === d.id ? [' ', chip('matches agent', 'info')] : null), h('div', { class: 'dp' }, d.path)),
       btn('Check', () => startJob({ kind: 'driver_check', project: p.name, id: d.id }), 'sm ghost'), h('span', {}))),
     s.drivers && s.drivers.length === 0 ? h('div', { class: 'small dim' }, 'No drivers listed — is keel initialised in this workspace?') : null));
-  else out.push(h('div', { class: 'card' }, h('h3', {}, 'Build driver (keel)'), h('div', { class: 'small dim' }, 'Start the sandbox to see and change keel’s drivers.')));
+  else out.push(h('div', { class: 'card' }, h('h3', {}, 'Build driver'), h('div', { class: 'small dim' }, 'Start the sandbox to see and change the build drivers.')));
 
   // secrets
   out.push(h('div', { class: 'card' }, h('h3', {}, 'Credentials'), h('div', { class: 'small muted', style: 'margin-bottom:8px' }, 'Each declared name is resolved, in order, from your shell’s environment, then the macOS Keychain. Setting one here stores it in the Keychain for this project only; the value is sent to moor on stdin and never appears in a command line, this page’s job list, or the audit chain.'),

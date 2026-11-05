@@ -1,4 +1,4 @@
-<!-- keel:generated schema=keel.projection/1 adapter=copilot store=94ff2d2026e1 body=489992b228ca -->
+<!-- keel:generated schema=keel.projection/1 adapter=copilot store=7f4df00253eb body=0100b5c62adc -->
 <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
 
 # Project context
@@ -20,25 +20,21 @@ become gate checks and stop costing context.
   blast radius, say so before making it, not after.
 - A test that mocks away the behaviour under test is worse than no test.
 
-### Naming: which "keel" is which
+### Naming: keel is internal
 
-Four different things share the name. Do not run a bare `keel ...` unless you
-mean the first one.
+moor's users never type `keel`; everything is a `moor` command. keel
+(github.com/daneb/keel) is the pipeline engine moor installs inside each
+sandbox at a pinned version (`KEEL_VERSION` in `images/base/Dockerfile`).
 
-- `keel` on this machine's PATH works on THIS repository's own `.keel/`
-  (specs, store, `CLAUDE.md`/`AGENTS.md` generation). It is a development tool
-  for moor itself. Use `keel store render` after editing `.keel/store/`.
-- The keel inside a moor sandbox is a separate copy at a pinned version
-  (`KEEL_VERSION` in `images/base/Dockerfile`), working on that project's
-  workspace volume, never on this checkout. Reach it only through moor:
-  `moor next`, `go`, `approve`, `reject`, `ship`. `moor keel <args>` is the
-  hidden escape hatch.
-- `moor-keel-mcp` (`mcp/`) is the agent's route to `keel gate` and `keel next`
-  inside a sandbox. It cannot approve, by design.
-- keel the project is github.com/daneb/keel. moor depends on it, never edits it.
-
-When a user says "next step", "approve" or "run the spec", they mean the
-`moor` command, not `keel`.
+- To drive a project's pipeline, use `moor next`, `go`, `approve`, `reject`,
+  `ship`. `moor pipeline <args>` is the hidden escape hatch to the sandbox's
+  keel. When a user says "next step" or "approve", they mean the `moor` command.
+- `moor-mcp` (`mcp/`) is the agent's route to checks inside a sandbox
+  (`check`, `next`). It cannot approve, by design.
+- A bare `keel` on this machine's PATH works on THIS repo's `.keel/` (specs,
+  store, generating `CLAUDE.md`/`AGENTS.md`): development tooling only. Run
+  `keel store render` after editing `.keel/store/`. It is a different copy
+  from the sandbox's.
 
 ### Rules
 
@@ -105,8 +101,12 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
 - `pub struct Project`  <sub>L39</sub>
 - `pub enum Approval`  <sub>L69</sub>
 - `pub enum Key`  <sub>L100</sub>
+- `pub enum Action`  <sub>L112</sub>
+- `struct NextSpec`  <sub>L153</sub>
+- `struct NextReport`  <sub>L162</sub>
+- `pub struct Console`  <sub>L168</sub>
 
-_… 344 more lines in `.keel/store/steering/structure.md`._
+_… 340 more lines in `.keel/store/steering/structure.md`._
 
 ## What this is
 

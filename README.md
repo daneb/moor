@@ -92,14 +92,6 @@ Prefer a page to a terminal? `moor ui` opens a console in your browser
   `moor selftest`, but that's self-assessed. Known gaps:
   [docs/SECURITY-NOTES.md](docs/SECURITY-NOTES.md).
 
-## A note on the name "keel"
-
-Working on moor itself, or pointing an AI assistant at this repo? "keel" can
-mean the upstream project, the copy inside each sandbox, the MCP server that
-lets the agent run checks, or an optional copy on your Mac used only for this
-repo's own development. As a user, you only ever type `moor`. The details are
-in [CLAUDE.md](CLAUDE.md) and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
-
 ## Learn more
 
 - [Walkthrough](docs/WALKTHROUGH.md): a real idea-to-PR run, bugs included
