@@ -131,7 +131,7 @@ pub fn deny_shell_argv() -> Vec<String> {
 pub enum OutputShape {
     /// A JSON envelope with `is_error`/`result`/`session_id` (claude).
     Json,
-    /// The response on stdout, with no envelope (copilot, kiro).
+    /// The response on stdout, with no envelope (copilot).
     PlainText,
 }
 
@@ -158,9 +158,8 @@ pub struct AgentProfile {
 
 /// The profile for an agent. Verified against each CLI's own `--help`:
 /// claude has `--allowedTools`/`--disallowedTools`; copilot has
-/// `--allow-tool`/`--deny-tool`; kiro has only `--trust-tools` (trust
-/// *these*), whose semantics are the auto-approval that ADR-0008 showed
-/// does not restrain — so kiro's `deny_flag` is deliberately `None`.
+/// `--allow-tool`/`--deny-tool`. Both can deny tools, so a tool-restricting
+/// role is enforceable on either.
 pub fn profile(agent: Agent) -> AgentProfile {
     match agent {
         Agent::Claude => AgentProfile {
@@ -178,16 +177,6 @@ pub fn profile(agent: Agent) -> AgentProfile {
             resume_flag: Some("--resume"),
             output: OutputShape::PlainText,
             auth_hint: "this sandbox has no usable Copilot credential — run `copilot /login` on the host (device flow; a personal access token will not work), then `moor up <project>`.",
-        },
-        Agent::Kiro => AgentProfile {
-            argv_prefix: &["kiro-cli", "chat", "--no-interactive"],
-            allow_flag: Some("--trust-tools"),
-            // No denial mechanism: `--trust-tools` is an auto-approval
-            // list, not a restriction.
-            deny_flag: None,
-            resume_flag: None,
-            output: OutputShape::PlainText,
-            auth_hint: "this sandbox has no Kiro credential — run `kiro-cli login` on the host, then `moor up <project>`.",
         },
     }
 }
@@ -426,10 +415,9 @@ pub fn build_turn_argv(
 /// Translate an agent failure moor can recognise into the fix for *that*
 /// agent. Every one of them reports a missing credential as some variant
 /// of "not logged in", and every one has a different remedy — Claude's is
-/// an injected token, Copilot's is a host device-flow login, Kiro's is
-/// `kiro-cli login`. The interactive advice each CLI prints ("run
-/// /login") is useless inside the sandbox, where there is no interactive
-/// session and the fix is host-side.
+/// an injected token, Copilot's is a host device-flow login. The
+/// interactive advice each CLI prints ("run /login") is useless inside the
+/// sandbox, where there is no interactive session and the fix is host-side.
 pub fn failure_hint(agent: Agent, project: &str, text: &str) -> Option<String> {
     let looks_like_auth = text.contains("Not logged in")
         || text.contains("/login")
@@ -1107,14 +1095,6 @@ mod tests {
     // --- agent-session-abstraction (SPEC-0012) --------------------------
 
     #[test]
-    fn agent_parses_kiro() {
-        // AC-1
-        assert_eq!("kiro".parse::<Agent>().unwrap(), Agent::Kiro);
-        assert_eq!("KIRO".parse::<Agent>().unwrap(), Agent::Kiro);
-        assert!("kiro-cli".parse::<Agent>().is_err());
-    }
-
-    #[test]
     fn turn_argv_is_per_agent() {
         // AC-2: each agent gets its own invocation, not Claude's.
         let claude = build_turn_argv(Agent::Claude, Role::Brainstorm, "hi", None);
@@ -1126,12 +1106,8 @@ mod tests {
         assert!(copilot.contains(&"-p".to_string()));
         assert!(!copilot.contains(&"--print".to_string()));
 
-        let kiro = build_turn_argv(Agent::Kiro, Role::Brainstorm, "hi", None);
-        assert_eq!(kiro[0], "kiro-cli");
-        assert!(kiro.contains(&"chat".to_string()));
-
-        // The prompt is present for all three, after the prefix.
-        for argv in [&claude, &copilot, &kiro] {
+        // The prompt is present for both, after the prefix.
+        for argv in [&claude, &copilot] {
             assert!(argv.contains(&"hi".to_string()), "{argv:?}");
         }
     }
@@ -1160,16 +1136,15 @@ mod tests {
     }
 
     #[test]
-    fn restricted_role_refused_without_deny_support() {
-        // AC-3: a role that withholds tools cannot run on an agent with no
-        // denial mechanism — it would run unrestricted instead.
+    fn restricted_role_allowed_when_agent_can_deny() {
+        // A role that withholds tools runs on any agent with a denial
+        // mechanism. Both remaining agents (claude, copilot) have one, so
+        // every (agent, restricted-role) pair is allowed through. The guard
+        // that refuses a role on a deny-less agent is kept defensively in
+        // `refuse_unrestrainable_role` for any future agent that lacks one.
         assert!(!Role::Brainstorm.denied_tools().is_empty());
-        let err = refuse_unrestrainable_role(Agent::Kiro, Role::Brainstorm)
-            .expect_err("kiro has no deny flag, so a restricted role must be refused");
-        let msg = format!("{err}");
-        assert!(msg.contains("no way to deny"), "{msg}");
-        // Agents that can deny are allowed through.
         assert!(refuse_unrestrainable_role(Agent::Claude, Role::Brainstorm).is_ok());
+        assert!(refuse_unrestrainable_role(Agent::Copilot, Role::Brainstorm).is_ok());
         assert!(refuse_unrestrainable_role(Agent::Copilot, Role::Build).is_ok());
     }
 
@@ -1181,11 +1156,7 @@ mod tests {
         let copilot = build_turn_argv(Agent::Copilot, Role::Brainstorm, "hi", None);
         assert!(copilot.contains(&"--deny-tool".to_string()));
         assert!(!copilot.contains(&"--disallowedTools".to_string()));
-        // Kiro has none, so none is emitted.
-        let kiro = build_turn_argv(Agent::Kiro, Role::Brainstorm, "hi", None);
-        assert!(!kiro.contains(&"--deny-tool".to_string()));
-        assert!(!kiro.contains(&"--disallowedTools".to_string()));
-        // Bash is denied for every agent that can deny at all.
+        // Bash is denied for every agent.
         for argv in [&claude, &copilot] {
             assert!(argv.contains(&"Bash".to_string()), "{argv:?}");
         }
@@ -1198,8 +1169,6 @@ mod tests {
         let plain = parse_turn(Agent::Copilot, "READY\n").unwrap();
         assert_eq!(plain.result, "READY");
         assert!(!plain.is_error);
-        let kiro = parse_turn(Agent::Kiro, "done").unwrap();
-        assert_eq!(kiro.result, "done");
         let json = parse_turn(
             Agent::Claude,
             &result_json(
@@ -1218,19 +1187,13 @@ mod tests {
 
     #[test]
     fn resume_form_is_per_agent() {
-        // AC-6: the resume flag is the agent's own, and an agent with no
-        // resume form omits it entirely.
+        // The resume flag is the agent's own, carrying the session id.
         let id = "3f2504e0-4f89-11d3-9a0c-0305e82c3301";
         let claude = build_turn_argv(Agent::Claude, Role::Build, "go", Some(id));
         let at = claude.iter().position(|a| a == "--resume").unwrap();
         assert_eq!(claude[at + 1], id);
         let copilot = build_turn_argv(Agent::Copilot, Role::Build, "go", Some(id));
         assert!(copilot.contains(&"--resume".to_string()));
-        // Kiro declares no resume form: nothing is passed, and the id is
-        // not smuggled in some other position.
-        let kiro = build_turn_argv(Agent::Kiro, Role::Build, "go", Some(id));
-        assert!(!kiro.contains(&"--resume".to_string()));
-        assert!(!kiro.contains(&id.to_string()), "{kiro:?}");
     }
 
     #[test]
@@ -1242,10 +1205,8 @@ mod tests {
         let g = failure_hint(Agent::Copilot, "p", auth).unwrap();
         assert!(g.contains("copilot /login"), "{g}");
         assert!(!g.contains("CLAUDE_CODE_OAUTH_TOKEN"), "{g}");
-        let k = failure_hint(Agent::Kiro, "p", auth).unwrap();
-        assert!(k.contains("kiro-cli login"), "{k}");
         // A non-auth failure still gets no invented advice, for any agent.
-        for a in [Agent::Claude, Agent::Copilot, Agent::Kiro] {
+        for a in [Agent::Claude, Agent::Copilot] {
             assert_eq!(failure_hint(a, "p", "file not found"), None);
         }
     }

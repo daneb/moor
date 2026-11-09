@@ -4,6 +4,16 @@ Notable changes to moor. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and moor uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+### Changed
+
+- **Kiro agent support removed.** moor no longer offers `--agent kiro`: the `moor/kiro` image layer, the kiro keel driver, the kiro egress allowlist entries, and the `Agent::Kiro` variant (and its SSO-cache credential path) are gone. kiro-cli's only headless auth is `KIRO_API_KEY`, which is admin-gated on enterprise IAM Identity Center orgs and could not be relied on; Claude and Copilot remain fully supported. Existing kiro manifests will no longer parse — move them to `--agent copilot` or `claude`. The `.kiro/steering` generator (for people using the Kiro IDE on this repo) is unaffected; it is a separate concern from running kiro as a sandbox agent.
+
+### Fixed
+
 ## [0.10.4] - 2026-11-09
 
 ### Added

@@ -9,7 +9,7 @@ verified_at: 2026-09-17
 
 ## Purpose
 
-moor runs an AI coding agent (Claude Code, Copilot or Kiro) inside a locked-down Docker sandbox per project, and records what it does in a tamper-evident audit trail on the host.
+moor runs an AI coding agent (Claude Code or Copilot) inside a locked-down Docker sandbox per project, and records what it does in a tamper-evident audit trail on the host.
 
 ## Users and stakes
 

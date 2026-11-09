@@ -99,7 +99,6 @@ fn agent_name(a: Agent) -> &'static str {
     match a {
         Agent::Claude => "claude",
         Agent::Copilot => "copilot",
-        Agent::Kiro => "kiro",
     }
 }
 
@@ -709,12 +708,6 @@ pub fn cross_agent_image_error(image: &str, agent: Agent) -> Option<String> {
              set the agent to copilot first, or choose a {agent:?} image"
         ));
     }
-    if manifest::image_is_kiro(image) && agent != Agent::Kiro {
-        return Some(format!(
-            "'{image}' is a kiro image but this project's agent is {agent:?} — \
-             set the agent to kiro first, or choose a {agent:?} image"
-        ));
-    }
     None
 }
 
@@ -930,30 +923,25 @@ mod tests {
 
     #[test]
     fn update_manifest_rejects_cross_agent_image() {
-        // AC-7: editing a project's image to one in a different agent's
-        // layer than its agent is refused at the edit, with a message
-        // naming the mismatch — not saved as an unpullable image.
-        let kiro_on_copilot = cross_agent_image_error("moor/kiro-python:latest", Agent::Copilot);
+        // Editing a project's image to one in a different agent's layer than
+        // its agent is refused at the edit, with a message naming the
+        // mismatch — not saved as an unpullable image. With copilot the only
+        // opt-in layer, the mismatch case is a copilot image on a
+        // non-copilot (claude) project.
+        let copilot_on_claude =
+            cross_agent_image_error("moor/copilot-python:latest", Agent::Claude);
         assert!(
-            kiro_on_copilot
+            copilot_on_claude
                 .as_deref()
-                .is_some_and(|m| m.contains("kiro image") && m.contains("Copilot")),
-            "expected a mismatch message, got {kiro_on_copilot:?}"
-        );
-
-        let copilot_on_kiro = cross_agent_image_error("moor/copilot:latest", Agent::Kiro);
-        assert!(
-            copilot_on_kiro
-                .as_deref()
-                .is_some_and(|m| m.contains("copilot image") && m.contains("Kiro")),
-            "expected a mismatch message, got {copilot_on_kiro:?}"
+                .is_some_and(|m| m.contains("copilot image") && m.contains("Claude")),
+            "expected a mismatch message, got {copilot_on_claude:?}"
         );
 
         // Compatible pairs, and a plain language image on any agent, are
         // accepted (no error).
-        assert!(cross_agent_image_error("moor/kiro-python:latest", Agent::Kiro).is_none());
         assert!(cross_agent_image_error("moor/copilot:latest", Agent::Copilot).is_none());
+        assert!(cross_agent_image_error("moor/copilot-python:latest", Agent::Copilot).is_none());
         assert!(cross_agent_image_error("moor/python:latest", Agent::Claude).is_none());
-        assert!(cross_agent_image_error("moor/python:latest", Agent::Kiro).is_none());
+        assert!(cross_agent_image_error("moor/python:latest", Agent::Copilot).is_none());
     }
 }
