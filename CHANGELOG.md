@@ -4,6 +4,16 @@ Notable changes to moor. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and moor uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+### Changed
+
+### Fixed
+
+- **Kiro projects authenticate via `KIRO_API_KEY`, like every other agent.** moor's kiro support read the host IAM Identity Center SSO token (`~/.aws/sso/cache`) and injected it as `AWS_BEARER_TOKEN_BEDROCK` — an env var kiro-cli 2.37.1+ ignores for login, so every `moor go` turn blocked with a browser-login fallback. kiro-cli's headless mode authenticates from a single `KIRO_API_KEY` (a Kiro portal key), the same env-var pattern Claude and Copilot use. moor now declares `KIRO_API_KEY` as the kiro secret and resolves it through the normal env/Keychain path (`moor secrets set <project> KIRO_API_KEY`), removing the SSO-cache machinery entirely. Note: API-key access may be admin-disabled for an enterprise org; see ADR-0018. The keel `keel_emit` control-char guard from the prior fix is unaffected.
+
 ## [0.10.4] - 2026-11-09
 
 ### Added

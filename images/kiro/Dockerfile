@@ -15,12 +15,15 @@
 # Copilot layer — see images/copilot/Dockerfile. Only a project that opts
 # into Kiro (`--agent kiro`) pays the cost, and moor/base stays lean.
 #
-# No auth material is baked in. Kiro's enterprise auth is IAM Identity
-# Center via the device flow: the operator runs `kiro-cli login` ON THE
-# HOST, and moor reads the resulting cached SSO token fresh at each `moor
-# up`, injecting it as an env var (AWS_BEARER_TOKEN_BEDROCK) — never
-# stored in the image. Same rule as Claude Code in the base image; see
-# docs/decisions/0002-claude-code-authentication.md.
+# No auth material is baked in. kiro-cli's headless mode authenticates from
+# a single `KIRO_API_KEY` (an API key from the Kiro portal): the operator
+# stores it with `moor secrets set <project> KIRO_API_KEY` (or exports it),
+# and moor injects it as an env var at `moor up`, resolved like Claude's
+# `ANTHROPIC_API_KEY` — never stored in the image. (API-key access may need
+# an admin to enable it for an enterprise org; see ADR-0018. The earlier
+# IAM Identity Center SSO-cache scheme was removed because kiro-cli 2.37.1+
+# ignores the AWS_BEARER_TOKEN_BEDROCK env var.) Same rule as Claude Code in
+# the base image; see docs/decisions/0002-claude-code-authentication.md.
 #
 # BASE_IMAGE lets this stack on top of a language layer, so a project can
 # have both its toolchain and Kiro, e.g.:

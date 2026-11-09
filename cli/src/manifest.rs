@@ -108,16 +108,18 @@ fn image_is_agent_layer(image: &str, prefix: &str) -> bool {
     name == prefix || name.starts_with(&format!("{prefix}-"))
 }
 
-/// The environment-variable names a Kiro sandbox credential is carried
-/// in. Kiro's enterprise auth is IAM Identity Center via the device flow;
-/// the host credential is a cached SSO token (under `~/.aws/sso/cache`),
-/// and `kiro-cli` inside the sandbox reads it from these `AWS_*`
-/// variables. Declared as a kiro project's secrets so the existing
-/// secret→env plumbing (compose rendering, audit redaction) carries them
-/// the same way it carries Claude's and Copilot's — see
-/// `secrets::resolve_kiro_credential`.
-pub const KIRO_SECRET_VARS: [&str; 3] =
-    ["AWS_BEARER_TOKEN_BEDROCK", "AWS_REGION", "KIRO_START_URL"];
+/// The environment-variable name a Kiro sandbox credential is carried in.
+/// kiro-cli's headless mode authenticates from a single `KIRO_API_KEY`
+/// (an API key from the Kiro portal); setting it is the one thing that
+/// turns interactive login into headless. Declared as a kiro project's
+/// secret so the existing secret→env plumbing (compose rendering, audit
+/// redaction) carries it the same way it carries Claude's `ANTHROPIC_API_KEY`
+/// — resolved from the operator's env or moor's Keychain by
+/// `secrets::resolve_into_env`, with no bespoke host-store reader.
+///
+/// This replaces the earlier `AWS_BEARER_TOKEN_BEDROCK`/SSO-cache scheme,
+/// which kiro-cli 2.37.1+ ignores entirely (see ADR-0017/ADR-0018).
+pub const KIRO_SECRET_VARS: [&str; 1] = ["KIRO_API_KEY"];
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Manifest {

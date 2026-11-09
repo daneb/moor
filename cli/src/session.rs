@@ -187,7 +187,7 @@ pub fn profile(agent: Agent) -> AgentProfile {
             deny_flag: None,
             resume_flag: None,
             output: OutputShape::PlainText,
-            auth_hint: "this sandbox has no Kiro credential — run `kiro-cli login` on the host, then `moor up <project>`.",
+            auth_hint: "this sandbox has no Kiro credential — store one with `moor secrets set <project> KIRO_API_KEY` (an admin may need to enable API-key access for your org), then `moor up <project>`.",
         },
     }
 }
@@ -1243,7 +1243,8 @@ mod tests {
         assert!(g.contains("copilot /login"), "{g}");
         assert!(!g.contains("CLAUDE_CODE_OAUTH_TOKEN"), "{g}");
         let k = failure_hint(Agent::Kiro, "p", auth).unwrap();
-        assert!(k.contains("kiro-cli login"), "{k}");
+        assert!(k.contains("KIRO_API_KEY"), "{k}");
+        assert!(!k.contains("CLAUDE_CODE_OAUTH_TOKEN"), "{k}");
         // A non-auth failure still gets no invented advice, for any agent.
         for a in [Agent::Claude, Agent::Copilot, Agent::Kiro] {
             assert_eq!(failure_hint(a, "p", "file not found"), None);
