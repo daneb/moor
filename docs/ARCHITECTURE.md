@@ -18,7 +18,7 @@ Host (Mac Mini, OrbStack/Docker)
          │     /run/moor       tmpfs, root-owned 0755: posture.json (read-only to agent)
          │     /run/moor-sink  tmpfs, 1777: keel's chain payloads, folded by moor
          └─ <name>-egress    container   ← forward proxy, domain allowlist,
-               logs every request, holds the canary token watch
+               logs every allow/deny, flags the canary domain
 ```
 
 ## What moor is built from
@@ -131,9 +131,10 @@ A forward proxy that is the sandbox's only route to the internet
 can't just ignore the env vars). Allows CONNECT/requests only to hostnames
 listed in the project's `moor.yaml`. Does not terminate TLS — it
 allow-lists by SNI/CONNECT target, so the agent's connection to
-`api.anthropic.com` or `github.com` stays end-to-end encrypted. Logs every
-request (domain, verdict, size, timestamp) and watches every request body
-for the planted canary token.
+`api.anthropic.com` or `github.com` stays end-to-end encrypted. Logs the
+hostname and verdict of every connection; a request to the reserved
+canary domain is flagged as a tripwire. It does not inspect request
+bodies, so the planted canary token is not watched for.
 
 ### Audit pipeline
 

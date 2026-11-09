@@ -59,10 +59,14 @@ of trusting it equal to "one throwaway container," never "the Mac Mini."
    detected by the proxy's own access log plus `moor selftest`.
 3. **Secret exfiltration** — a secret value (API key, GitHub token)
    leaving the sandbox by any channel other than its intended use (e.g.
-   TLS to `api.anthropic.com`, or `git push` to `github.com`). Detected by
-   the canary-token watch in the egress proxy: a decoy secret is planted
-   alongside real ones, and the proxy flags any request — allowed
-   destination or not — whose payload contains that literal string.
+   TLS to `api.anthropic.com`, or `git push` to `github.com`). Limited,
+   not detected: a secret can only leave via a destination already on
+   the allow-list, and the sandbox is given no secret it doesn't need.
+   A decoy (`MOOR_CANARY_TOKEN`) is planted alongside real secrets, but
+   nothing scans request bodies for it — the proxy doesn't terminate
+   TLS, and tinyproxy has no body inspection even for plain HTTP (see
+   [proxy/README.md](../proxy/README.md)). A secret sent over HTTPS to an
+   allowed host is not caught.
 4. **Privilege escalation inside the container** — the agent process
    gaining root or new Linux capabilities it didn't start with. Prevented
    by `cap_drop: [ALL]`, `no-new-privileges`, non-root UID from container

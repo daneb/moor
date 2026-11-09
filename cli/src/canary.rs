@@ -9,11 +9,10 @@ pub const CANARY_DOMAIN: &str = "canary.moor.invalid";
 
 /// A decoy value planted in the sandbox's environment as
 /// `MOOR_CANARY_TOKEN`. It looks like a credential but authenticates
-/// nothing — its only purpose is to exist somewhere a real secret would,
-/// so a probe (in `moor selftest`'s breakout battery) can confirm it
-/// never reaches an unapproved destination. See proxy/README.md for why
-/// this is a secondary control, not the primary one (TLS isn't
-/// intercepted, so payload-level scanning only really covers plain HTTP).
+/// nothing — its only purpose is to exist somewhere a real secret would.
+/// Nothing watches for it yet: the proxy doesn't inspect request bodies
+/// (see proxy/README.md), and `moor selftest` probes only the canary
+/// domain.
 pub fn generate_token() -> String {
     let nanos = SystemTime::now()
         .duration_since(UNIX_EPOCH)
