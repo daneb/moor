@@ -68,6 +68,14 @@ services:
       # created agent-owned in the kiro image so this volume inherits
       # that ownership.
       - kiro-state:/home/agent/.aws
+      # Kiro CLI's local session database (~/.local/share/kiro-cli/
+      # data.sqlite3). Creating the dir agent-owned in the image is not
+      # enough: it sits on the read-only rootfs, so kiro-cli's SQLite open
+      # fails ("unable to open database file") until a writable volume
+      # backs it — distinct from ~/.aws above, which carries the
+      # credential, not the session DB. Harmless (an empty volume) for
+      # non-Kiro projects.
+      - kiro-data:/home/agent/.local/share/kiro-cli
     command: ["sleep", "infinity"]
     depends_on:
       - egress
@@ -107,3 +115,5 @@ volumes:
     name: {{PROJECT_NAME}}-copilot-state
   kiro-state:
     name: {{PROJECT_NAME}}-kiro-state
+  kiro-data:
+    name: {{PROJECT_NAME}}-kiro-data

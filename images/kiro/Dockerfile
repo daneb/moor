@@ -46,12 +46,17 @@ RUN curl -fsSL https://cli.kiro.dev/install | bash
 ENV PATH="/home/agent/.local/bin:${PATH}"
 
 # kiro-cli writes its own state (session bookkeeping, config, its local
-# token store) under these dirs. The sandbox's rootfs is read-only, so
-# moor mounts a named volume at ~/.aws (where the injected SSO credential
-# and kiro-cli's own cache live); the dir must exist, owned by `agent`, IN
-# THE IMAGE, or Docker creates the mount point root-owned and kiro-cli
-# dies on the read-only rootfs — the same mechanic as /home/agent/.claude
-# and /home/agent/.copilot. The others sit on the already-agent-owned home
-# and need no volume.
+# token store, and a SQLite session database) under these dirs. The
+# sandbox's rootfs is read-only, so moor mounts a named volume at BOTH
+# ~/.aws (the injected SSO credential and kiro-cli's own cache) AND
+# ~/.local/share/kiro-cli (the data.sqlite3 session DB) — a dir existing
+# agent-owned in the image is NOT enough on its own, because it still
+# lands on the read-only rootfs and kiro-cli's SQLite open fails with
+# "unable to open database file" until a writable volume backs it. Each
+# mount point must exist, owned by `agent`, IN THE IMAGE, or Docker
+# creates it root-owned and kiro-cli dies on the read-only rootfs — the
+# same mechanic as /home/agent/.claude and /home/agent/.copilot. ~/.kiro
+# sits on the already-agent-owned home and needs no volume (nothing
+# writes it at runtime).
 RUN mkdir -p /home/agent/.aws /home/agent/.local/share/kiro-cli /home/agent/.kiro \
     && chown -R agent:agent /home/agent/.aws /home/agent/.local /home/agent/.kiro
