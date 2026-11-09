@@ -5,7 +5,16 @@
 'use strict';
 
 /* ---------- token & api ---------- */
-const TOKEN = (() => {
+// The per-launch console token. `moor ui` mints a fresh one every run and
+// never persists it, so a restart (Ctrl-C and re-run, a rebuild, a crash)
+// invalidates whatever a still-open tab holds. We therefore re-read the
+// token on every call rather than capturing it once: if the operator
+// pastes the current run's `#<token>` URL into the open tab, the next
+// request (or a Retry) picks it up without a full reload. A fresh token in
+// the fragment is promoted to sessionStorage and then stripped from the
+// URL, so the token never lingers where it could be copied from the
+// address bar or a screenshot.
+function currentToken() {
   const m = location.hash.match(/^#([0-9a-f]{48})$/);
   if (m) {
     try { sessionStorage.setItem('moor-token', m[1]); } catch (_) {}
@@ -13,9 +22,14 @@ const TOKEN = (() => {
     return m[1];
   }
   try { return sessionStorage.getItem('moor-token') || ''; } catch (_) { return ''; }
-})();
+}
+// Promote a token present in the fragment at boot, so the first render
+// already has it (currentToken() also does this lazily, but calling it
+// once up front keeps the original load path unchanged).
+let TOKEN = currentToken();
 
 async function api(path, opts = {}) {
+  TOKEN = currentToken();
   const headers = { 'x-moor-token': TOKEN };
   let body = opts.body;
   if (body !== undefined && typeof body !== 'string') {
@@ -28,7 +42,16 @@ async function api(path, opts = {}) {
   let data = null;
   try { data = await r.json(); } catch (_) { data = { error: 'the console returned something that was not JSON' }; }
   if (!r.ok) {
-    const err = new Error(data.error || ('HTTP ' + r.status));
+    // A 401 means the token this tab holds is not the running server's —
+    // almost always because `moor ui` was restarted since the tab opened,
+    // minting a new token. Tag it so the UI can give the real remedy
+    // (reopen the current URL) instead of the raw server string, which
+    // reads like the operator did something wrong.
+    const err = new Error(
+      r.status === 401
+        ? 'This console session ended — `moor ui` was restarted, so this tab\'s key is stale. Reopen the http://127.0.0.1:…/#… URL the current `moor ui` printed in your terminal (then Retry).'
+        : (data.error || ('HTTP ' + r.status))
+    );
     err.status = r.status;
     throw err;
   }
@@ -49,6 +72,7 @@ const S = {
   evidence: {},
   loading: {},
   errors: {},
+  errorStatus: {},
   jobs: [],
   jobById: {},
   activeJob: null,
@@ -339,11 +363,13 @@ async function load(key, path, store, force = false) {
   if (S.loading[key]) return null;
   S.loading[key] = true;
   delete S.errors[key];
+  delete S.errorStatus[key];
   try {
     const v = await api(path);
     store[key] = v;
   } catch (e) {
     S.errors[key] = e.message;
+    S.errorStatus[key] = e.status || 0;
   } finally {
     delete S.loading[key];
     render();
@@ -553,7 +579,15 @@ function viewProject(r) {
   // render the load itself triggered — the unbounded request loop. Show
   // the banner (with Retry) instead; load()'s own error-guard is the
   // other half of stopping that loop.
-  if (S.errors[r.project]) return [h('div', { class: 'banner fail' }, h('div', {}, h('b', {}, 'Could not load ' + r.project), h('div', { class: 'small' }, S.errors[r.project])), h('span', { class: 'right' }), btn('Retry', () => { delete S.errors[r.project]; loadProject(r.project, true); }, 'sm'))];
+  if (S.errors[r.project]) {
+    const ended = S.errorStatus[r.project] === 401;
+    return [h('div', { class: 'banner fail' },
+      h('div', {},
+        h('b', {}, ended ? 'Console session ended' : 'Could not load ' + r.project),
+        h('div', { class: 'small' }, S.errors[r.project])),
+      h('span', { class: 'right' }),
+      btn('Retry', () => { delete S.errors[r.project]; delete S.errorStatus[r.project]; loadProject(r.project, true); }, 'sm'))];
+  }
   if (p === undefined) { loadProject(r.project); return [h('div', { class: 'skeleton' }), h('div', { class: 'skeleton' })]; }
   const tab = r.slug ? 'journey' : r.tab;
   switch (tab) {
