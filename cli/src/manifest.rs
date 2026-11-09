@@ -13,7 +13,6 @@ pub enum Agent {
     #[default]
     Claude,
     Copilot,
-    Kiro,
 }
 
 impl FromStr for Agent {
@@ -22,18 +21,17 @@ impl FromStr for Agent {
         match s.trim().to_ascii_lowercase().as_str() {
             "claude" => Ok(Agent::Claude),
             "copilot" => Ok(Agent::Copilot),
-            "kiro" => Ok(Agent::Kiro),
             other => {
-                anyhow::bail!("unknown agent '{other}' — expected 'claude', 'copilot' or 'kiro'")
+                anyhow::bail!("unknown agent '{other}' — expected 'claude' or 'copilot'")
             }
         }
     }
 }
 
 /// Compose a language image with the chosen agent. Claude leaves the
-/// language image unchanged (it is in every image); Copilot and Kiro map
-/// to their matching opt-in layer: `moor/base` → `moor/<agent>`, and
-/// `moor/<lang>` → `moor/<agent>-<lang>`. A non-`moor/` image, or one
+/// language image unchanged (it is in every image); Copilot maps to its
+/// matching opt-in layer: `moor/base` → `moor/copilot`, and
+/// `moor/<lang>` → `moor/copilot-<lang>`. A non-`moor/` image, or one
 /// already in the agent's own layer, is returned unchanged. Pure —
 /// unit-tested without Docker.
 pub fn resolve_image(language_image: &str, agent: Agent) -> String {
@@ -41,7 +39,6 @@ pub fn resolve_image(language_image: &str, agent: Agent) -> String {
         // Claude is in every image — the language image is used verbatim.
         Agent::Claude => return language_image.to_string(),
         Agent::Copilot => "copilot",
-        Agent::Kiro => "kiro",
     };
     // Split "moor/<name>:<tag>" into its parts; anything that isn't a moor
     // image, or is already in this agent's layer, is left as-is.
@@ -57,11 +54,11 @@ pub fn resolve_image(language_image: &str, agent: Agent) -> String {
     }
     // If the image is already in *another* agent's layer, do not stack a
     // second prefix onto it — that would produce an image that cannot
-    // exist (e.g. resolve_image("moor/kiro-python", Copilot) must not
-    // become "moor/copilot-kiro-python", which is never built and fails
-    // `up` with a registry pull). The only valid move here is to leave it
-    // alone; reconciling a genuine agent change is the caller's job, not
-    // a silent rename. See docs/decisions/0016-* (AC-5, AC-6).
+    // exist (never built, failing `up` with a registry pull). The only
+    // valid move is to leave it alone; reconciling a genuine agent change
+    // is the caller's job, not a silent rename. See docs/decisions/0016-*.
+    // (With copilot the only opt-in layer today this guard is inert, but
+    // it keeps resolve_image correct if another agent layer returns.)
     if AGENT_PREFIXES
         .iter()
         .any(|&other| other != prefix && (name == other || name.starts_with(&format!("{other}-"))))
@@ -78,7 +75,7 @@ pub fn resolve_image(language_image: &str, agent: Agent) -> String {
 /// Every agent layer's prefix (Claude has none — it is in every image).
 /// The single list `resolve_image` consults to recognise an image that is
 /// already in some agent's opt-in layer.
-const AGENT_PREFIXES: [&str; 2] = ["copilot", "kiro"];
+const AGENT_PREFIXES: [&str; 1] = ["copilot"];
 
 /// Whether an image is one of the opt-in Copilot layers (`moor/copilot`
 /// or `moor/copilot-<lang>`). This is the single place that recognises a
@@ -87,15 +84,6 @@ const AGENT_PREFIXES: [&str; 2] = ["copilot", "kiro"];
 /// manifest whose `agent` field is missing or disagrees with its image.
 pub fn image_is_copilot(image: &str) -> bool {
     image_is_agent_layer(image, "copilot")
-}
-
-/// Whether an image is one of the opt-in Kiro layers (`moor/kiro` or
-/// `moor/kiro-<lang>`). The Kiro counterpart of `image_is_copilot`:
-/// `resolve_image` leaves such an image unchanged (AC-2), and
-/// `Manifest::agent` uses it to reconcile a manifest whose `agent` field
-/// is missing or disagrees with its image (AC-3).
-pub fn image_is_kiro(image: &str) -> bool {
-    image_is_agent_layer(image, "kiro")
 }
 
 /// Whether `image` is in the `moor/<prefix>` opt-in layer — the apex
@@ -107,17 +95,6 @@ fn image_is_agent_layer(image: &str, prefix: &str) -> bool {
     };
     name == prefix || name.starts_with(&format!("{prefix}-"))
 }
-
-/// The environment-variable names a Kiro sandbox credential is carried
-/// in. Kiro's enterprise auth is IAM Identity Center via the device flow;
-/// the host credential is a cached SSO token (under `~/.aws/sso/cache`),
-/// and `kiro-cli` inside the sandbox reads it from these `AWS_*`
-/// variables. Declared as a kiro project's secrets so the existing
-/// secret→env plumbing (compose rendering, audit redaction) carries them
-/// the same way it carries Claude's and Copilot's — see
-/// `secrets::resolve_kiro_credential`.
-pub const KIRO_SECRET_VARS: [&str; 3] =
-    ["AWS_BEARER_TOKEN_BEDROCK", "AWS_REGION", "KIRO_START_URL"];
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Manifest {
@@ -200,21 +177,6 @@ impl Manifest {
         }
     }
 
-    /// Record the credential env-var names the chosen agent needs, on top
-    /// of the always-present Claude/Copilot names `new` seeds. Called by
-    /// `new`/`import` once the agent is set: a kiro project gains the
-    /// `KIRO_SECRET_VARS`; any other agent is left untouched, so those
-    /// names never appear in a non-kiro manifest (AC-5).
-    pub fn declare_agent_secrets(&mut self) {
-        if self.agent() == Agent::Kiro {
-            for name in KIRO_SECRET_VARS {
-                if !self.secrets.iter().any(|s| s == name) {
-                    self.secrets.push(name.to_string());
-                }
-            }
-        }
-    }
-
     pub fn load(path: &Path) -> Result<Self> {
         let text = std::fs::read_to_string(path)
             .with_context(|| format!("reading manifest {}", path.display()))?;
@@ -241,9 +203,6 @@ impl Manifest {
     pub fn agent(&self) -> Agent {
         if self.agent == Agent::Claude && image_is_copilot(&self.image) {
             return Agent::Copilot;
-        }
-        if self.agent == Agent::Claude && image_is_kiro(&self.image) {
-            return Agent::Kiro;
         }
         self.agent
     }
@@ -344,10 +303,12 @@ mod tests {
         explicit_copilot.agent = Agent::Copilot;
         assert_eq!(explicit_copilot.agent(), Agent::Copilot);
 
-        // An explicit non-default on a plain image is honoured as-is.
-        let mut kiro = Manifest::new("c", "moor/base:latest");
-        kiro.agent = Agent::Kiro;
-        assert_eq!(kiro.agent(), Agent::Kiro);
+        // An explicit non-default on a plain image is honoured as-is: a
+        // copilot agent set on a base image stays copilot (the image does
+        // not override an explicitly-set agent).
+        let mut explicit_on_base = Manifest::new("c", "moor/base:latest");
+        explicit_on_base.agent = Agent::Copilot;
+        assert_eq!(explicit_on_base.agent(), Agent::Copilot);
     }
 
     #[test]
@@ -417,125 +378,29 @@ mod tests {
         }
     }
 
-    // --- kiro-agent-sandbox (SPEC-0018) ---------------------------------
-
-    #[test]
-    fn kiro_composes_with_language() {
-        // AC-1: kiro + language image → the matching moor/kiro-<lang>
-        // layer, base → moor/kiro, a non-moor image left untouched.
-        assert_eq!(
-            resolve_image("moor/python:latest", Agent::Kiro),
-            "moor/kiro-python:latest"
-        );
-        assert_eq!(
-            resolve_image("moor/node:latest", Agent::Kiro),
-            "moor/kiro-node:latest"
-        );
-        assert_eq!(
-            resolve_image("moor/rust:latest", Agent::Kiro),
-            "moor/kiro-rust:latest"
-        );
-        assert_eq!(
-            resolve_image("moor/base:latest", Agent::Kiro),
-            "moor/kiro:latest"
-        );
-        assert_eq!(resolve_image("ubuntu:22.04", Agent::Kiro), "ubuntu:22.04");
-    }
-
-    #[test]
-    fn kiro_image_resolution_is_idempotent() {
-        // AC-2: an image already in the kiro layer resolves to itself —
-        // no second `kiro-` prefix is ever stacked on.
-        for img in [
-            "moor/kiro:latest",
-            "moor/kiro-python:latest",
-            "moor/kiro-node:1.2",
-            "moor/kiro",
-        ] {
-            assert_eq!(
-                resolve_image(img, Agent::Kiro),
-                img,
-                "not idempotent: {img}"
-            );
-        }
-    }
-
-    #[test]
-    fn kiro_image_reconciles_agent() {
-        // AC-3: a kiro-layer image with an absent (serde default Claude) or
-        // stale `agent` field reconciles to Kiro, as copilot does.
-        assert!(image_is_kiro("moor/kiro:latest"));
-        assert!(image_is_kiro("moor/kiro-rust:latest"));
-        assert!(!image_is_kiro("moor/base:latest"));
-        assert!(!image_is_kiro("moor/copilot-python:latest"));
-
-        let yaml = "name: sk\nimage: moor/kiro-python:latest\n";
-        let m: Manifest = yaml_serde::from_str(yaml).unwrap();
-        assert_eq!(m.agent, Agent::Claude, "raw field still the serde default");
-        assert_eq!(m.agent(), Agent::Kiro, "reconciled against the image");
-
-        let mut stale = Manifest::new("sk2", "moor/kiro:latest");
-        stale.agent = Agent::Claude;
-        assert_eq!(stale.agent(), Agent::Kiro);
-    }
-
-    #[test]
-    fn kiro_project_declares_kiro_secrets() {
-        // AC-5: a kiro project records the credential env-var names; a
-        // non-kiro project records none of them.
-        let mut kiro = Manifest::new("k", "moor/kiro:latest");
-        kiro.agent = Agent::Kiro;
-        kiro.declare_agent_secrets();
-        for name in KIRO_SECRET_VARS {
-            assert!(
-                kiro.secrets.iter().any(|s| s == name),
-                "kiro project missing secret {name}"
-            );
-        }
-
-        let mut claude = Manifest::new("c", "moor/base:latest");
-        claude.agent = Agent::Claude;
-        claude.declare_agent_secrets();
-        for name in KIRO_SECRET_VARS {
-            assert!(
-                !claude.secrets.iter().any(|s| s == name),
-                "non-kiro project should not carry {name}"
-            );
-        }
-    }
-
     // --- audit-chain-atomicity-and-agent-image (SPEC-0020) --------------
 
     #[test]
     fn resolve_image_does_not_cross_compose_agents() {
-        // AC-5: an image already in another agent's layer is returned
-        // unchanged, never prefixed a second time. This is the bug that
-        // produced the impossible `moor/copilot-kiro-python`.
+        // An image already in an agent's layer is returned unchanged, never
+        // prefixed a second time (the bug that produced the impossible
+        // `moor/copilot-kiro-python` before kiro was removed).
         assert_eq!(
-            resolve_image("moor/kiro-python:latest", Agent::Copilot),
-            "moor/kiro-python:latest"
-        );
-        assert_eq!(
-            resolve_image("moor/copilot-python:latest", Agent::Kiro),
+            resolve_image("moor/copilot-python:latest", Agent::Copilot),
             "moor/copilot-python:latest"
         );
         assert_eq!(
-            resolve_image("moor/kiro:latest", Agent::Copilot),
-            "moor/kiro:latest"
-        );
-        assert_eq!(
-            resolve_image("moor/copilot:latest", Agent::Kiro),
+            resolve_image("moor/copilot:latest", Agent::Copilot),
             "moor/copilot:latest"
         );
     }
 
     #[test]
     fn resolve_image_never_double_prefixes() {
-        // AC-6: across every agent and every apex/language variant of
-        // every agent layer, resolve_image never returns a repository
-        // whose name begins with one agent prefix immediately followed by
-        // another agent prefix (e.g. "moor/copilot-kiro-...").
-        let prefixes = ["copilot", "kiro"];
+        // Across every agent and every apex/language variant of the copilot
+        // layer, resolve_image never returns a repository whose name begins
+        // with one agent prefix immediately followed by another.
+        let prefixes = ["copilot"];
         let langs = ["", "-python", "-node", "-rust"];
         let mut images = vec![
             "moor/base:latest".to_string(),
@@ -549,7 +414,7 @@ mod tests {
             }
         }
         for img in &images {
-            for agent in [Agent::Claude, Agent::Copilot, Agent::Kiro] {
+            for agent in [Agent::Claude, Agent::Copilot] {
                 let out = resolve_image(img, agent);
                 let repo = out.split_once(':').map(|(r, _)| r).unwrap_or(&out);
                 if let Some(name) = repo.strip_prefix("moor/") {

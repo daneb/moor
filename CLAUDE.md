@@ -1,4 +1,4 @@
-<!-- keel:generated schema=keel.projection/1 adapter=claude store=7f4df00253eb body=c429cd4c1068 -->
+<!-- keel:generated schema=keel.projection/1 adapter=claude store=16695c08f9bc body=ab4064686787 -->
 <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
 
 # Project context
@@ -171,7 +171,7 @@ _… 281 more lines in `.keel/store/steering/structure.md`._
 
 ### Purpose
 
-moor runs an AI coding agent (Claude Code, Copilot or Kiro) inside a locked-down Docker sandbox per project, and records what it does in a tamper-evident audit trail on the host.
+moor runs an AI coding agent (Claude Code or Copilot) inside a locked-down Docker sandbox per project, and records what it does in a tamper-evident audit trail on the host.
 
 ### Users and stakes
 

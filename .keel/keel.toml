@@ -124,12 +124,6 @@ default = false
 timeout_secs = 900
 
 [[driver]]
-id = "kiro"
-cmd = ".keel/drivers/kiro"
-default = false
-timeout_secs = 900
-
-[[driver]]
 id = "noop"
 cmd = ".keel/drivers/noop"
 default = false

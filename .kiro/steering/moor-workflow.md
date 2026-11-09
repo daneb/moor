@@ -7,7 +7,7 @@ inside a locked-down container with an audit trail.
 
 ## Per feature/project, use this flow
 
-1. `moor new <name> [--image moor/base|moor/node|moor/rust|moor/python] [--agent claude|copilot|kiro]`
+1. `moor new <name> [--image moor/base|moor/node|moor/rust|moor/python] [--agent claude|copilot]`
    — scaffold a new sandboxed project. Each distinct piece of work gets its own project.
 2. `moor use <name>` — make it the default so later commands need no `--project`.
 3. `moor spec new <feature> [--title "..."] [--scope "src/**"]` — write a starter spec,

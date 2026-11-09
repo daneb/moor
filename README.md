@@ -3,7 +3,7 @@
 Run an AI coding agent on your Mac without giving it your Mac.
 
 moor puts each project in its own locked-down Docker container and runs the
-agent there (Claude Code today; Copilot and Kiro are supported too). The agent
+agent there (Claude Code today; Copilot is supported too). The agent
 can't see your files, can only reach the internet through an allowlist, and
 can't approve its own work. moor stays outside, keeps a tamper-evident record
 of what happened, and tells you what to do next.
@@ -91,7 +91,7 @@ project's code directly — it lives inside a sandbox container, not on the host
 
 The lifecycle, one project per feature:
 
-1. `moor new <name> [--image moor/base|moor/node|moor/rust|moor/python] [--agent claude|copilot|kiro]`
+1. `moor new <name> [--image moor/base|moor/node|moor/rust|moor/python] [--agent claude|copilot]`
 2. `moor use <name>` — set the default so later commands need no `--project`.
 3. `moor spec new <feature>`, fill in the acceptance criteria, then `moor spec push <file>`.
 4. `moor next` — tells you the one command that moves the active spec on.
@@ -135,7 +135,7 @@ rules hold for every agent:
 
 First check the project's **agent matches the credential you set**: `moor.yaml`'s
 `agent:` (and the default driver in `.keel/keel.toml`) must be the agent you
-authenticated. A kiro credential does nothing for a `claude` project, etc.
+authenticated. A copilot credential does nothing for a `claude` project, etc.
 Then, by agent:
 
 **Claude** (`agent: claude`) — needs `CLAUDE_CODE_OAUTH_TOKEN` *or*
@@ -151,18 +151,6 @@ Then, by agent:
   (`gho_`) token in the macOS Keychain under service `copilot-cli`, and moor
   auto-forwards it as `COPILOT_GITHUB_TOKEN` when nothing more explicit resolved
   it. The CLI reads `COPILOT_GITHUB_TOKEN` then `GH_TOKEN`.
-
-**Kiro** (`agent: kiro`) — needs `AWS_BEARER_TOKEN_BEDROCK`.
-- Run `kiro-cli login` on the host (add
-  `--license pro --identity-provider <start-url> --region <region>` for Identity
-  Center). moor reads the host's freshest unexpired IAM Identity Center SSO
-  token from `~/.aws/sso/cache/*.json` and injects it as
-  `AWS_BEARER_TOKEN_BEDROCK` on each run. An expired host login re-blocks it;
-  re-run `kiro-cli login`.
-- Caveat: this path reads IAM Identity Center SSO cache files. A Builder ID /
-  GitHub / Google ("free") login may store its credential elsewhere; if
-  `moor secrets status` and a confirmed host login still leave `moor go`
-  blocked, that credential may not land in `~/.aws/sso/cache`.
 
 `moor secrets status <project>` shows where each declared credential currently
 resolves from (shell env, Keychain, or missing) — run it first when unsure.
