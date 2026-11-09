@@ -4,6 +4,23 @@ Notable changes to moor. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and moor uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+### Changed
+
+### Fixed
+
+- **`moor ui` no longer spins when a project page fails to load.** Opening a
+  project URL without the per-launch token (or on any failed fetch) left the
+  console firing the same `/api/projects/<p>` request in an unbounded loop —
+  thousands of 401s pegging the browser, which looked like a hang. The loader
+  now stops re-requesting a view whose last attempt errored, and the project
+  page shows a "Could not load" banner with the reason and a Retry button
+  (for a missing token: "reopen the URL moor ui printed") instead of a silent,
+  looping skeleton.
+
 ## [0.10.1] - 2026-11-09
 
 ### Added
