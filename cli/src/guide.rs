@@ -280,6 +280,18 @@ fn read_command(slug: &str, artifact: &str, explicit: Option<&str>) -> String {
     }
 }
 
+/// Whether a spec is approved work still waiting to ship: its build was
+/// merge-approved (keel marks it `complete`) but it hasn't been committed
+/// out yet. An *abandoned* spec is also `complete`, so it must be excluded
+/// explicitly — retiring a spec writes to its `.keel/specs/<slug>/` folder,
+/// which would otherwise make `unshipped` (and so `moor next`/`moor ship`)
+/// offer to ship a spec that was dropped, not approved. Pure so the rule
+/// lives next to `pick_active`'s matching `!complete` filter and is tested
+/// without a sandbox.
+pub fn is_unshipped(spec: &NextSpec) -> bool {
+    spec.complete && spec.stage != "abandoned"
+}
+
 /// The step a spec is at, as "step N of 7: title", or "done".
 pub fn step_label(spec: &NextSpec) -> String {
     // An abandoned spec is terminal like a done one (keel sends it
@@ -894,5 +906,24 @@ mod tests {
         // AC-5: distinct from "done", so a retired spec reads as retired.
         assert_eq!(step_label(&spec("dead", "abandoned")), "abandoned");
         assert_eq!(step_label(&spec("shipped", "complete")), "done");
+    }
+
+    #[test]
+    fn an_abandoned_spec_is_not_unshipped_work() {
+        // An abandoned spec is `complete: true` just like a merge-approved one,
+        // so filtering on `complete` alone wrongly offered it for `moor ship`
+        // and made `moor next` report a dropped spec as "approved, not shipped
+        // yet". `is_unshipped` excludes the abandoned stage so neither happens.
+        assert!(
+            !is_unshipped(&spec("dead", "abandoned")),
+            "a dropped spec must never count as unshipped work"
+        );
+        assert!(
+            is_unshipped(&spec("shipped", "complete")),
+            "a merge-approved spec is genuine unshipped work"
+        );
+        // An in-progress spec is not complete, so never unshipped.
+        assert!(!is_unshipped(&spec("live", "run")));
+        assert!(!is_unshipped(&spec("live", "plan_approval")));
     }
 }

@@ -4,6 +4,17 @@ Notable changes to moor. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and moor uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+### Changed
+
+### Fixed
+
+- **`moor next` no longer reports a dropped spec as "approved, not shipped yet".** An abandoned spec is `complete: true` just like a merge-approved one, so `Target::unshipped` — filtering on `complete` alone — offered it for `moor ship` and made the guidance advertise shipping a spec that was retired. A new pure `guide::is_unshipped` excludes the abandoned stage, so neither `moor next` nor `moor ship` picks up a dropped spec.
+- **`moor drop` now names the spec it will abandon, and why it was chosen, before acting.** Drop targets the active spec, which can differ from the one `moor next` happened to foreground; a silent "dropped X" was how the wrong spec got retired. It now prints the slug, its stage, and the selection reason (only one in progress / most recently worked on / furthest along / pinned) first.
+
 ## [0.10.2] - 2026-11-09
 
 ### Added

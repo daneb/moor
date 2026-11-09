@@ -72,7 +72,7 @@ impl Target {
         Ok(report
             .specs
             .iter()
-            .filter(|s| s.complete)
+            .filter(|s| guide::is_unshipped(s))
             .filter(|s| {
                 let dir = format!(".keel/specs/{}/", s.slug);
                 out.lines()
