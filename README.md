@@ -81,6 +81,41 @@ Prefer a page to a terminal? `moor ui` opens a console in your browser
 `moor selftest` (re-check the lockdown), `moor shell`, `moor recipe`.
 `moor --help` lists them all.
 
+## For AI agents — READ THIS
+
+If you are an AI agent (or an LLM asked to build software in a moor project),
+this is the contract. Point your agent at this section.
+
+**Do all work through `moor` commands. Never edit, build, test, or ship the
+project's code directly — it lives inside a sandbox container, not on the host.**
+
+The lifecycle, one project per feature:
+
+1. `moor new <name> [--image moor/base|moor/node|moor/rust|moor/python] [--agent claude|copilot|kiro]`
+2. `moor use <name>` — set the default so later commands need no `--project`.
+3. `moor spec new <feature>`, fill in the acceptance criteria, then `moor spec push <file>`.
+4. `moor next` — tells you the one command that moves the active spec on.
+5. `moor go` — runs the next phase and its gate.
+6. `moor approve` / `moor reject "<why>"` — a **human** does this, not you.
+7. `moor ship` — after the merge is approved.
+
+Non-negotiable rules:
+
+- **Approval is human-only.** You and `moor-mcp` can run gates and ask what's
+  next; you **cannot** approve or reject. Never try to approve on a human's
+  behalf — stop and ask the human to run `moor approve` / `moor reject`.
+- **A gate runs after every phase.** G0 checks the spec, G1 checks the plan,
+  and G2/G2.5/G3 check the build. `moor go` runs the gate for the phase it's
+  at. Never advance a phase whose gate is failing; a passing gate is the
+  precondition for asking a human to approve.
+- **Gate a build without a driver.** `moor go --check` re-runs G2/G2.5/G3 on
+  the work already in the sandbox *without* invoking the agent (underneath:
+  `keel run <spec> --no-driver`). Use it to check a hand-made fix or to review
+  a proposed change before merge.
+- **Don't bypass the sandbox.** No direct file edits or local builds of the
+  generated code. Prefer `moor <command>` over the `moor pipeline <args>`
+  escape hatch.
+
 ## What it isn't
 
 - **macOS only** for now, built around Docker/OrbStack.
