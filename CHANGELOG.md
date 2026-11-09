@@ -14,6 +14,8 @@ Notable changes to moor. The format follows
 
 ### Fixed
 
+- **A driver that fails by printing ANSI no longer yields an opaque "stdout is not JSON" error.** keel's `keel_emit` (in `.keel/drivers/_common.sh`) escaped quotes and backslashes but stripped only newlines, so a raw ESC or spinner in a tool's failure output broke the driverresult JSON and the host rejected the whole result with `control character … found` — hiding the real reason. `keel_emit` now deletes the entire C0 control range (`tr -d '\\000-\\037'`), so `detail` is always valid JSON and the true failure (e.g. an auth error) reaches the operator. Defence-in-depth for every driver.
+
 ## [0.10.4] - 2026-11-09
 
 ### Added

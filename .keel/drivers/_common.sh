@@ -13,13 +13,23 @@
 # Always prints exactly one keel.driverresult/1 object. Every exit path in an
 # adapter must go through this: a driver that dies without emitting is
 # indistinguishable from one that hung.
+#
+# detail is escaped for a JSON string: backslash and quote escaped, then ALL
+# C0 control characters (0x00-0x1F) deleted. The control-char strip is not
+# cosmetic — a tool that fails by writing ANSI to stdout (e.g. kiro-cli
+# printing a cursor-hide + spinner when it falls back to an interactive login
+# it cannot complete headlessly) would otherwise embed a raw ESC in the JSON
+# string, and the host rejects the whole result with "stdout is not JSON:
+# control character found", hiding the real failure. Stripping them makes the
+# detail always valid JSON, so the true reason (an auth/credential error)
+# reaches the operator instead of a parse error about the symptom.
 keel_emit() {
   _status="$1"
   _detail="$2"
   _files="${3:-[]}"
   printf '{"schema":"keel.driverresult/1","status":"%s","files_changed":%s,"detail":"%s"}\n' \
     "$_status" "$_files" \
-    "$(printf '%s' "$_detail" | sed 's/\\/\\\\/g; s/"/\\"/g' | tr -d '\n' | cut -c1-500)"
+    "$(printf '%s' "$_detail" | sed 's/\\/\\\\/g; s/"/\\"/g' | tr -d '\000-\037' | cut -c1-500)"
 }
 
 # keel_require <binary> <install hint>
