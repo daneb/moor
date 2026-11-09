@@ -116,36 +116,56 @@ Non-negotiable rules:
   generated code. Prefer `moor <command>` over the `moor pipeline <args>`
   escape hatch.
 
-### If `moor go` blocks with "Not logged in" / an auth error (kiro projects)
+### If `moor go` blocks with "Not logged in" / an auth error
 
 This is a **host credential** problem, not a reason to log in inside the
-sandbox. moor does not auto-mint credentials and never logs in for you, but for
-a `kiro`-agent project it *does* forward the host's credential automatically:
+sandbox. moor never mints or stores an agent login itself — the credential
+always lives on the Mac and moor forwards it into the sandbox on each run. Two
+rules hold for every agent:
 
-- On each run, moor reads the host's freshest unexpired IAM Identity Center SSO
-  token from `~/.aws/sso/cache/*.json` and injects it into the sandbox as
-  `AWS_BEARER_TOKEN_BEDROCK`. The credential lives on the Mac, not in the
-  container — so a container rebuild/restart (`moor up`, an image change) never
-  removes it, but an expired host login does.
-- So the fix is on the **host**, not via `moor shell`: run `kiro-cli login`
-  (add `--license pro --identity-provider <start-url> --region <region>` for
-  Identity Center) on your Mac, then re-run `moor go`. Do **not** run
-  `kiro-cli login` inside the sandbox — moor's plumbing reads the host cache,
-  not an in-container login.
+- **Fix it on the host, never via `moor shell`.** Logging an agent CLI in
+  *inside* the container is the wrong place — moor's plumbing reads the host's
+  credential, and an in-container login does not survive a rebuild (`moor up`,
+  an image change) anyway. The code lives in a volume; the agent's credentials
+  do not.
+- **Resolution precedence** (`secrets::resolve_into_env`): an already-set env
+  var in your shell wins first, then a `moor secrets`-managed Keychain entry,
+  then the agent's own auto-forwarded host credential below. A stale env var
+  therefore silently beats a fresh host login — unset it if in doubt.
 
-Check these three causes, in order, before anything else:
-1. **The project's agent must be `kiro`.** If `moor.yaml` says `agent: claude`
-   (or the default driver in `.keel/keel.toml` is `claude-code`), the kiro
-   token is never injected — fix the agent/driver first.
-2. **A valid host SSO token must exist** in `~/.aws/sso/cache` — re-run
-   `kiro-cli login` on the host if it expired.
-3. **`AWS_BEARER_TOKEN_BEDROCK` must not be set stale** in your shell — an
-   already-set env var wins over the fresh cache.
+First check the project's **agent matches the credential you set**: `moor.yaml`'s
+`agent:` (and the default driver in `.keel/keel.toml`) must be the agent you
+authenticated. A kiro credential does nothing for a `claude` project, etc.
+Then, by agent:
 
-Caveat: this path reads IAM Identity Center SSO cache files. A Builder
-ID / GitHub / Google ("free") login may store its credential elsewhere; if
-`moor secrets status` and a confirmed host login still leave `moor go`
-blocked, that credential may not land in `~/.aws/sso/cache`.
+**Claude** (`agent: claude`) — needs `CLAUDE_CODE_OAUTH_TOKEN` *or*
+`ANTHROPIC_API_KEY`.
+- OAuth token (a claude.ai subscription): run `claude setup-token` on the host.
+  When both are set, the `claude` CLI prefers `CLAUDE_CODE_OAUTH_TOKEN` — that
+  precedence is the CLI's own, not moor's.
+- API key: `moor secrets set <project> ANTHROPIC_API_KEY` (stored in the
+  Keychain), or export it in your shell.
+
+**Copilot** (`agent: copilot`) — needs `COPILOT_GITHUB_TOKEN`.
+- Run `copilot /login` on the host. The Copilot CLI stores its own OAuth
+  (`gho_`) token in the macOS Keychain under service `copilot-cli`, and moor
+  auto-forwards it as `COPILOT_GITHUB_TOKEN` when nothing more explicit resolved
+  it. The CLI reads `COPILOT_GITHUB_TOKEN` then `GH_TOKEN`.
+
+**Kiro** (`agent: kiro`) — needs `AWS_BEARER_TOKEN_BEDROCK`.
+- Run `kiro-cli login` on the host (add
+  `--license pro --identity-provider <start-url> --region <region>` for Identity
+  Center). moor reads the host's freshest unexpired IAM Identity Center SSO
+  token from `~/.aws/sso/cache/*.json` and injects it as
+  `AWS_BEARER_TOKEN_BEDROCK` on each run. An expired host login re-blocks it;
+  re-run `kiro-cli login`.
+- Caveat: this path reads IAM Identity Center SSO cache files. A Builder ID /
+  GitHub / Google ("free") login may store its credential elsewhere; if
+  `moor secrets status` and a confirmed host login still leave `moor go`
+  blocked, that credential may not land in `~/.aws/sso/cache`.
+
+`moor secrets status <project>` shows where each declared credential currently
+resolves from (shell env, Keychain, or missing) — run it first when unsure.
 
 ## What it isn't
 
