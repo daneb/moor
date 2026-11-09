@@ -116,6 +116,57 @@ Non-negotiable rules:
   generated code. Prefer `moor <command>` over the `moor pipeline <args>`
   escape hatch.
 
+### If `moor go` blocks with "Not logged in" / an auth error
+
+This is a **host credential** problem, not a reason to log in inside the
+sandbox. moor never mints or stores an agent login itself — the credential
+always lives on the Mac and moor forwards it into the sandbox on each run. Two
+rules hold for every agent:
+
+- **Fix it on the host, never via `moor shell`.** Logging an agent CLI in
+  *inside* the container is the wrong place — moor's plumbing reads the host's
+  credential, and an in-container login does not survive a rebuild (`moor up`,
+  an image change) anyway. The code lives in a volume; the agent's credentials
+  do not.
+- **Resolution precedence** (`secrets::resolve_into_env`): an already-set env
+  var in your shell wins first, then a `moor secrets`-managed Keychain entry,
+  then the agent's own auto-forwarded host credential below. A stale env var
+  therefore silently beats a fresh host login — unset it if in doubt.
+
+First check the project's **agent matches the credential you set**: `moor.yaml`'s
+`agent:` (and the default driver in `.keel/keel.toml`) must be the agent you
+authenticated. A kiro credential does nothing for a `claude` project, etc.
+Then, by agent:
+
+**Claude** (`agent: claude`) — needs `CLAUDE_CODE_OAUTH_TOKEN` *or*
+`ANTHROPIC_API_KEY`.
+- OAuth token (a claude.ai subscription): run `claude setup-token` on the host.
+  When both are set, the `claude` CLI prefers `CLAUDE_CODE_OAUTH_TOKEN` — that
+  precedence is the CLI's own, not moor's.
+- API key: `moor secrets set <project> ANTHROPIC_API_KEY` (stored in the
+  Keychain), or export it in your shell.
+
+**Copilot** (`agent: copilot`) — needs `COPILOT_GITHUB_TOKEN`.
+- Run `copilot /login` on the host. The Copilot CLI stores its own OAuth
+  (`gho_`) token in the macOS Keychain under service `copilot-cli`, and moor
+  auto-forwards it as `COPILOT_GITHUB_TOKEN` when nothing more explicit resolved
+  it. The CLI reads `COPILOT_GITHUB_TOKEN` then `GH_TOKEN`.
+
+**Kiro** (`agent: kiro`) — needs `AWS_BEARER_TOKEN_BEDROCK`.
+- Run `kiro-cli login` on the host (add
+  `--license pro --identity-provider <start-url> --region <region>` for Identity
+  Center). moor reads the host's freshest unexpired IAM Identity Center SSO
+  token from `~/.aws/sso/cache/*.json` and injects it as
+  `AWS_BEARER_TOKEN_BEDROCK` on each run. An expired host login re-blocks it;
+  re-run `kiro-cli login`.
+- Caveat: this path reads IAM Identity Center SSO cache files. A Builder ID /
+  GitHub / Google ("free") login may store its credential elsewhere; if
+  `moor secrets status` and a confirmed host login still leave `moor go`
+  blocked, that credential may not land in `~/.aws/sso/cache`.
+
+`moor secrets status <project>` shows where each declared credential currently
+resolves from (shell env, Keychain, or missing) — run it first when unsure.
+
 ## What it isn't
 
 - **macOS only** for now, built around Docker/OrbStack.
