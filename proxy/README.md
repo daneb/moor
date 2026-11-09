@@ -13,13 +13,13 @@ passes the encrypted stream through untouched. That means:
 
 - **Domain-level allow/deny is fully enforced and logged**, for HTTP and
   HTTPS alike. This is the primary control.
-- **Payload inspection (e.g. a canary token appearing inside a request
-  body) only works for plain HTTP traffic.** Almost everything a sandbox
-  legitimately talks to (github.com, api.anthropic.com, package
-  registries) is HTTPS, so in practice the canary-token-in-payload
-  tripwire described in the plan is a secondary control, not the primary
-  one — don't rely on it to catch a credential leaving over an allowed
-  HTTPS destination. The primary defenses against secret exfiltration are
+- **There is no payload inspection.** Nothing scans request bodies for
+  the planted canary token (`MOOR_CANARY_TOKEN`): tinyproxy has no such
+  feature, and nothing else is in the path. Even if one were added, it
+  could only see plain HTTP — almost everything a sandbox legitimately
+  talks to (github.com, api.anthropic.com, package registries) is HTTPS.
+  A credential leaving over an allowed HTTPS destination is not caught.
+  The defenses against secret exfiltration are
   (a) the allow-list itself (a secret can only leave via a destination
   that's already permitted) and (b) never granting the sandbox a secret
   it doesn't need in the first place.
