@@ -258,6 +258,26 @@ pub fn drop(explicit: Option<String>, why: &str) -> Result<()> {
         return Ok(());
     };
 
+    // Name the spec being dropped, and why it was the one chosen, before
+    // abandoning it — drop is terminal, and `t.active` can resolve to a
+    // different spec than the one `moor next` happened to foreground (e.g.
+    // an approved-but-unshipped spec), so a silent "dropped X" is how the
+    // wrong spec gets retired.
+    let why_chosen = match active.why {
+        guide::Why::Pinned => " (the spec you pinned with `moor use`)",
+        guide::Why::OnlyOne => " (the only spec in progress)",
+        guide::Why::MostRecent => " (the spec worked on most recently)",
+        guide::Why::FurthestAlong => " (the spec furthest along)",
+    };
+    println!(
+        "Dropping `{}`{why_chosen} — it is at {}.",
+        active.spec.slug,
+        guide::step_label(active.spec)
+    );
+    if let Some(stale) = &active.stale_pin {
+        println!("  (pinned spec `{stale}` is done or gone, so this one was chosen instead)");
+    }
+
     exec(&t, &abandon_argv(&active.spec.slug, why))?;
     println!();
     t.print_guidance(&t.report()?);
