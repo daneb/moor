@@ -330,6 +330,12 @@ window.addEventListener('hashchange', () => {
 /* ---------- loading ---------- */
 async function load(key, path, store, force = false) {
   if (!force && store[key] !== undefined && store[key] !== null) return store[key];
+  // Do not re-request a key whose last attempt errored. The view calls
+  // load() on every render; without this guard a failing fetch (e.g. a
+  // 401 when the URL carries no token) re-fires on the render it itself
+  // triggers, spinning into an unbounded request loop. `force` (refresh,
+  // or a user retry) clears the error and tries again.
+  if (!force && S.errors[key] !== undefined) return null;
   if (S.loading[key]) return null;
   S.loading[key] = true;
   delete S.errors[key];
@@ -541,8 +547,14 @@ function activeSpecOf(p, r) {
 
 function viewProject(r) {
   const p = S.projects[r.project];
-  if (p === undefined) { loadProject(r.project); return [h('div', { class: 'skeleton' }), h('div', { class: 'skeleton' })]; }
+  // Error check before the skeleton: a failed load (e.g. 401 with no
+  // token) leaves S.projects[r.project] undefined AND sets an error. If
+  // the skeleton branch ran first it would re-call loadProject on the
+  // render the load itself triggered — the unbounded request loop. Show
+  // the banner (with Retry) instead; load()'s own error-guard is the
+  // other half of stopping that loop.
   if (S.errors[r.project]) return [h('div', { class: 'banner fail' }, h('div', {}, h('b', {}, 'Could not load ' + r.project), h('div', { class: 'small' }, S.errors[r.project])), h('span', { class: 'right' }), btn('Retry', () => { delete S.errors[r.project]; loadProject(r.project, true); }, 'sm'))];
+  if (p === undefined) { loadProject(r.project); return [h('div', { class: 'skeleton' }), h('div', { class: 'skeleton' })]; }
   const tab = r.slug ? 'journey' : r.tab;
   switch (tab) {
     case 'specs': return viewSpecs(p, r);
