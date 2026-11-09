@@ -89,19 +89,55 @@ struct LegacyEntry {
     hash: String,
 }
 
+/// The last well-formed entry in a chain, tolerant of a damaged tail.
+///
+/// The chain's invariant is one JSON object per physical line, and the
+/// only writer here upholds it (`append_entry`). But a chain damaged by
+/// an older non-atomic writer — or any single corrupt line — must not
+/// brick every command that reads the chain to find the next seq. So this
+/// is deliberately forgiving in two ways, without ever accepting a *hash*
+/// it cannot parse as a real entry:
+///
+///   * A physical line may hold more than one concatenated JSON object
+///     (the exact damage an interleaved append produced). We decode every
+///     object on the line with a streaming deserializer and take the last
+///     one — that is the true tail entry (AC-3).
+///   * If a line yields no decodable entry at all, we walk backwards to
+///     the previous non-empty line rather than erroring (AC-4). Losing a
+///     corrupt tail line is the truncation case `verify_chain` already
+///     treats as non-tampering; a new append then re-links from the last
+///     good entry.
 fn last_entry(path: &Path) -> Result<Option<ChainEntry>> {
     if !path.exists() {
         return Ok(None);
     }
     let text = std::fs::read_to_string(path)?;
-    match text.lines().rev().find(|l| !l.trim().is_empty()) {
-        Some(line) => {
-            Ok(Some(serde_json::from_str(line).with_context(|| {
-                format!("parsing last line of {}", path.display())
-            })?))
+    for line in text.lines().rev() {
+        if line.trim().is_empty() {
+            continue;
         }
-        None => Ok(None),
+        if let Some(entry) = last_entry_on_line(line) {
+            return Ok(Some(entry));
+        }
+        // An unparseable line: fall through to the previous one.
     }
+    Ok(None)
+}
+
+/// The last `ChainEntry` decodable from one physical line, or `None` if
+/// the line yields none. A well-formed line holds exactly one object and
+/// returns it; a line damaged by a non-atomic append may hold several
+/// concatenated objects, and the last is the true tail.
+fn last_entry_on_line(line: &str) -> Option<ChainEntry> {
+    let mut stream = serde_json::Deserializer::from_str(line).into_iter::<ChainEntry>();
+    let mut last = None;
+    for item in stream.by_ref() {
+        match item {
+            Ok(entry) => last = Some(entry),
+            Err(_) => break, // stop at the first thing that isn't an entry
+        }
+    }
+    last
 }
 
 /// `chain.jsonl` → `chain.legacy.jsonl`, beside it.
@@ -120,6 +156,23 @@ pub fn append_chained(path: &Path, kind: &str, data: Value) -> Result<ChainEntry
 }
 
 fn append_entry(path: &Path, kind: &str, data: Value) -> Result<ChainEntry> {
+    // Open the chain for the whole read-compute-write cycle and hold an
+    // exclusive advisory lock across it, so two moor processes (e.g. a
+    // `ui` exec-log firing while another command appends) cannot each
+    // read the same tail, compute the same next seq, and interleave their
+    // writes onto one line. The lock is advisory and process-local to
+    // moor — nothing in a sandbox has this path — so it adds no new trust
+    // assumption, only mutual exclusion between moor's own writers.
+    // See docs/decisions/0016-atomic-audit-chain-and-image-guard.md (AC-2).
+    let file = std::fs::OpenOptions::new()
+        .create(true)
+        .read(true)
+        .append(true)
+        .open(path)
+        .with_context(|| format!("opening audit log {}", path.display()))?;
+    rustix::fs::flock(&file, rustix::fs::FlockOperation::LockExclusive)
+        .with_context(|| format!("locking audit log {}", path.display()))?;
+
     let (seq, prev_hash) = match last_entry(path)? {
         Some(e) => (e.seq + 1, e.hash),
         None => (1, GENESIS_HASH.to_string()),
@@ -137,12 +190,17 @@ fn append_entry(path: &Path, kind: &str, data: Value) -> Result<ChainEntry> {
         hash,
     };
 
-    let mut f = std::fs::OpenOptions::new()
-        .create(true)
-        .append(true)
-        .open(path)
-        .with_context(|| format!("opening audit log {}", path.display()))?;
-    writeln!(f, "{}", serde_json::to_string(&entry)?)?;
+    // One line, one write: build the serialised entry plus its trailing
+    // newline into a single buffer and emit it with a single `write_all`,
+    // rather than `writeln!` which may split into several `write` calls.
+    // With O_APPEND each `write(2)` lands atomically at end-of-file, so a
+    // single-buffer write makes the whole line one atomic append (AC-1).
+    let mut line = serde_json::to_string(&entry)?;
+    line.push('\n');
+    let mut file = file;
+    file.write_all(line.as_bytes())
+        .with_context(|| format!("appending to audit log {}", path.display()))?;
+    // Lock releases when `file` drops at end of scope.
     Ok(entry)
 }
 
@@ -636,6 +694,153 @@ mod tests {
             verify_chain(&path).unwrap(),
             VerifyOutcome::Ok { entries: 1 }
         );
+        let _ = std::fs::remove_file(&path);
+    }
+
+    // --- audit-chain-atomicity-and-agent-image (SPEC-0020) --------------
+
+    #[test]
+    fn append_writes_entry_as_one_line() {
+        // AC-1: each append lands as exactly one physical line — the
+        // serialised entry plus a single trailing newline — so a reader
+        // that splits on '\n' always sees one object per line. (The code
+        // emits it in a single write_all of one buffer; the observable
+        // guarantee is one line per entry, with a final newline.)
+        let path = temp_path("one-line");
+        append_chained(&path, "exec", json!({"n": 0})).unwrap();
+        append_chained(&path, "exec", json!({"n": 1})).unwrap();
+        let bytes = std::fs::read(&path).unwrap();
+        assert_eq!(bytes.last(), Some(&b'\n'), "file must end in a newline");
+        let text = String::from_utf8(bytes).unwrap();
+        let lines: Vec<&str> = text.lines().collect();
+        assert_eq!(lines.len(), 2, "two appends → two physical lines");
+        for line in lines {
+            // Each line parses as exactly one object with nothing trailing.
+            let mut it = serde_json::Deserializer::from_str(line).into_iter::<ChainEntry>();
+            assert!(it.next().is_some(), "line holds an entry: {line}");
+            assert!(it.next().is_none(), "line holds exactly one entry: {line}");
+        }
+        assert_eq!(
+            verify_chain(&path).unwrap(),
+            VerifyOutcome::Ok { entries: 2 }
+        );
+        let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    fn concurrent_appends_do_not_interleave() {
+        // AC-2: many threads appending to the same chain at once produce a
+        // file where every physical line is exactly one JSON object — no
+        // line holds two concatenated records — and the chain still
+        // verifies (contiguous seqs, linked hashes). Without the advisory
+        // lock around the read-compute-write cycle, racing writers would
+        // read the same tail, pick the same seq, and glue records onto one
+        // line — the exact corruption this spec exists to prevent.
+        let path = temp_path("concurrent");
+        let threads = 8;
+        let per_thread = 25;
+        let handles: Vec<_> = (0..threads)
+            .map(|t| {
+                let p = path.clone();
+                std::thread::spawn(move || {
+                    for i in 0..per_thread {
+                        append_chained(&p, "exec", json!({"t": t, "i": i})).unwrap();
+                    }
+                })
+            })
+            .collect();
+        for h in handles {
+            h.join().unwrap();
+        }
+
+        let text = std::fs::read_to_string(&path).unwrap();
+        let mut count = 0;
+        for line in text.lines() {
+            if line.trim().is_empty() {
+                continue;
+            }
+            let mut it = serde_json::Deserializer::from_str(line).into_iter::<ChainEntry>();
+            assert!(it.next().is_some(), "line holds an entry: {line}");
+            assert!(
+                it.next().is_none(),
+                "a line held more than one record — appends interleaved: {line}"
+            );
+            count += 1;
+        }
+        assert_eq!(count, threads * per_thread, "every append present once");
+        assert_eq!(
+            verify_chain(&path).unwrap(),
+            VerifyOutcome::Ok {
+                entries: (threads * per_thread) as usize
+            },
+            "the chain must still verify after concurrent appends"
+        );
+        let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    fn last_entry_reads_final_record_of_a_glued_line() {
+        // AC-3: a last physical line holding two concatenated objects (the
+        // historical corruption) is read as its *last* record, so the next
+        // append links from the true tail rather than crashing.
+        let path = temp_path("glued");
+        let e1 = append_chained(&path, "exec", json!({"n": 1})).unwrap();
+        let e2 = append_chained(&path, "exec", json!({"n": 2})).unwrap();
+        // Glue a third record onto the second line's physical line, with no
+        // separating newline, mimicking a non-atomic append.
+        let e3 = {
+            let seq = e2.seq + 1;
+            let ts = chrono::Utc::now().to_rfc3339();
+            let data = json!({"n": 3});
+            let hash = compute_hash(&e2.hash, seq, &ts, "exec", WRITER, &data);
+            ChainEntry {
+                schema: CHAIN_SCHEMA.to_string(),
+                seq,
+                ts,
+                kind: "exec".to_string(),
+                writer: WRITER.to_string(),
+                data,
+                prev_hash: e2.hash.clone(),
+                hash,
+            }
+        };
+        // Rewrite the file so the last line is e2 + e3 concatenated.
+        let text = std::fs::read_to_string(&path).unwrap();
+        let mut lines: Vec<String> = text.lines().map(String::from).collect();
+        let last = lines.pop().unwrap(); // this is e2's line
+        let glued = format!("{last}{}", serde_json::to_string(&e3).unwrap());
+        lines.push(glued);
+        std::fs::write(&path, lines.join("\n") + "\n").unwrap();
+
+        let tail = last_entry(&path).unwrap().expect("a tail entry");
+        assert_eq!(tail.seq, e3.seq, "read the last record of the glued line");
+        assert_eq!(tail.hash, e3.hash);
+        assert_ne!(tail.seq, e1.seq);
+        let _ = std::fs::remove_file(&path);
+    }
+
+    #[test]
+    fn malformed_line_does_not_crash_read() {
+        // AC-4: a single unparseable last line does not error the read; it
+        // walks back to the last good entry, so `moor next` still works.
+        let path = temp_path("malformed");
+        let e1 = append_chained(&path, "exec", json!({"n": 1})).unwrap();
+        let _e2 = append_chained(&path, "exec", json!({"n": 2})).unwrap();
+        // Corrupt the tail: append a junk line that is not a ChainEntry.
+        {
+            use std::io::Write;
+            let mut f = std::fs::OpenOptions::new()
+                .append(true)
+                .open(&path)
+                .unwrap();
+            writeln!(f, "{{not valid json at all").unwrap();
+        }
+        // The read must not error, and must find a real entry (the last
+        // good one before the junk).
+        let tail = last_entry(&path)
+            .expect("read must not error on a malformed tail line")
+            .expect("a last good entry");
+        assert!(tail.seq >= e1.seq, "recovered a real prior entry");
         let _ = std::fs::remove_file(&path);
     }
 

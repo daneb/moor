@@ -466,6 +466,7 @@ dependencies = [
  "clap",
  "crossterm",
  "hex",
+ "rustix",
  "serde",
  "serde_json",
  "sha2",
