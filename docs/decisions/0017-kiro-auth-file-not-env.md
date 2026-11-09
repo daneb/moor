@@ -81,6 +81,35 @@ reads its login from the `kiro-auth-token.json` *file* in the SSO cache, which
 moor never populates inside the sandbox. The env-var approach that worked on
 2.19.1 is no longer a supported login mode.
 
+### Update (2026-11-09): the token-file hypothesis was tested and is WRONG
+
+The "inject the `kiro-auth-token.json` file" idea below was tested directly
+and **does not authenticate**. Streaming the host's `kiro-auth-token.json`
+*and* `kiro-connection.json` into the sandbox's `~/.aws/sso/cache/` still left
+`kiro-cli whoami` saying "Not logged in". The reason: kiro-cli 2.37.1 keeps
+its login in its own **`~/.kiro` store** (a `data.sqlite3` plus an
+`enterprise-management/` client registration), not in a portable SSO token
+file. On the host, `~/.kiro` is where the identity lives; in the sandbox
+`~/.kiro` is **empty and on the read-only rootfs** (only
+`~/.local/share/kiro-cli` has a writable volume).
+
+So headless kiro auth is **not** reconstructable by copying token files, and
+the real contract for 2.37.1+ is still unknown. Open questions a correct fix
+must answer first:
+
+1. Does kiro-cli 2.37.1+ support **any** non-interactive auth (a device-flow
+   token, or an `AWS_*`/`KIRO_*` bearer mode this version actually honours),
+   or is interactive `kiro-cli login` the only path?
+2. If it needs `~/.kiro` state, is that state portable host→sandbox at all, or
+   machine-bound (client registration)? Would a writable `~/.kiro` volume plus
+   a one-time in-sandbox `kiro-cli login --use-device-flow` be the model?
+3. What exact version should the image pin to, re-verified against whichever
+   of the above is true?
+
+Until those are answered, the credential-injection decision below is
+**deferred** — do not implement it as written (file injection is disproven).
+
+
 ## Decision (proposed — needs review before implementing)
 
 **Make moor place the host's kiro credential into the sandbox as the file
@@ -104,13 +133,29 @@ Concretely, for review:
    image ships 2.37.1, the host runs 3.1.0. Pin the sandbox's kiro-cli version
    (as `KEEL_VERSION` is pinned) so a future auth change is a deliberate bump
    with a re-verification, not a silent break.
-4. **Harden `keel_emit` against control characters.** Independently of auth,
-   the kiro driver must never emit non-JSON: `keel_emit` should strip or
-   `\u`-escape control characters (as `guide::printable` already does for
-   sandbox text), so a tool that prints ANSI on failure yields a *blocked*
-   result with a readable detail instead of an unparseable one. This is a
-   defence-in-depth fix: it turns the opaque "stdout is not JSON" into the
-   real "kiro-cli is not authenticated" message.
+4. **Harden `keel_emit` against control characters. (IMPLEMENTED — see below.)**
+   Independently of auth, the kiro driver must never emit non-JSON:
+   `keel_emit` should strip or `\u`-escape control characters (as
+   `guide::printable` already does for sandbox text), so a tool that prints
+   ANSI on failure yields a *blocked* result with a readable detail instead of
+   an unparseable one. This is a defence-in-depth fix: it turns the opaque
+   "stdout is not JSON" into the real "kiro-cli is not authenticated" message.
+
+### Implemented in this change: the `keel_emit` control-char guard (step 4)
+
+`.keel/drivers/_common.sh`'s `keel_emit` now deletes the whole C0 control
+range (`tr -d '\000-\037'`) from `detail`, not just newlines. Verified: a
+`detail` carrying an ESC + ANSI spinner + carriage return (exactly kiro-cli's
+failed-login output) now serialises to valid JSON. Confirmed end to end on the
+live `sc-analyze` sandbox — the run that previously blocked with
+`invalid driver result — stdout is not JSON: control character … column 112`
+now blocks with `kiro-cli is not authenticated: … Failed to open browser …
+Run kiro-cli login …`, i.e. the true reason and remedy.
+
+This is the only part of the decision that is safe to ship now: it changes
+only moor's own driver escaping (keel owns the quoting), fixes nothing about
+auth, and strictly improves every driver's failure legibility. The auth
+injection (steps 1–3) stays deferred pending the open questions above.
 
 ## Why these choices
 
