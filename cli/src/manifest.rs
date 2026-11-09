@@ -55,12 +55,30 @@ pub fn resolve_image(language_image: &str, agent: Agent) -> String {
     if name == prefix || name.starts_with(&format!("{prefix}-")) {
         return language_image.to_string();
     }
+    // If the image is already in *another* agent's layer, do not stack a
+    // second prefix onto it — that would produce an image that cannot
+    // exist (e.g. resolve_image("moor/kiro-python", Copilot) must not
+    // become "moor/copilot-kiro-python", which is never built and fails
+    // `up` with a registry pull). The only valid move here is to leave it
+    // alone; reconciling a genuine agent change is the caller's job, not
+    // a silent rename. See docs/decisions/0016-* (AC-5, AC-6).
+    if AGENT_PREFIXES
+        .iter()
+        .any(|&other| other != prefix && (name == other || name.starts_with(&format!("{other}-"))))
+    {
+        return language_image.to_string();
+    }
     if name == "base" {
         format!("moor/{prefix}:{tag}")
     } else {
         format!("moor/{prefix}-{name}:{tag}")
     }
 }
+
+/// Every agent layer's prefix (Claude has none — it is in every image).
+/// The single list `resolve_image` consults to recognise an image that is
+/// already in some agent's opt-in layer.
+const AGENT_PREFIXES: [&str; 2] = ["copilot", "kiro"];
 
 /// Whether an image is one of the opt-in Copilot layers (`moor/copilot`
 /// or `moor/copilot-<lang>`). This is the single place that recognises a
@@ -483,6 +501,70 @@ mod tests {
                 !claude.secrets.iter().any(|s| s == name),
                 "non-kiro project should not carry {name}"
             );
+        }
+    }
+
+    // --- audit-chain-atomicity-and-agent-image (SPEC-0020) --------------
+
+    #[test]
+    fn resolve_image_does_not_cross_compose_agents() {
+        // AC-5: an image already in another agent's layer is returned
+        // unchanged, never prefixed a second time. This is the bug that
+        // produced the impossible `moor/copilot-kiro-python`.
+        assert_eq!(
+            resolve_image("moor/kiro-python:latest", Agent::Copilot),
+            "moor/kiro-python:latest"
+        );
+        assert_eq!(
+            resolve_image("moor/copilot-python:latest", Agent::Kiro),
+            "moor/copilot-python:latest"
+        );
+        assert_eq!(
+            resolve_image("moor/kiro:latest", Agent::Copilot),
+            "moor/kiro:latest"
+        );
+        assert_eq!(
+            resolve_image("moor/copilot:latest", Agent::Kiro),
+            "moor/copilot:latest"
+        );
+    }
+
+    #[test]
+    fn resolve_image_never_double_prefixes() {
+        // AC-6: across every agent and every apex/language variant of
+        // every agent layer, resolve_image never returns a repository
+        // whose name begins with one agent prefix immediately followed by
+        // another agent prefix (e.g. "moor/copilot-kiro-...").
+        let prefixes = ["copilot", "kiro"];
+        let langs = ["", "-python", "-node", "-rust"];
+        let mut images = vec![
+            "moor/base:latest".to_string(),
+            "moor/python:latest".to_string(),
+            "moor/node:latest".to_string(),
+            "moor/rust:latest".to_string(),
+        ];
+        for p in prefixes {
+            for l in langs {
+                images.push(format!("moor/{p}{l}:latest"));
+            }
+        }
+        for img in &images {
+            for agent in [Agent::Claude, Agent::Copilot, Agent::Kiro] {
+                let out = resolve_image(img, agent);
+                let repo = out.split_once(':').map(|(r, _)| r).unwrap_or(&out);
+                if let Some(name) = repo.strip_prefix("moor/") {
+                    for a in prefixes {
+                        for b in prefixes {
+                            let bad = format!("{a}-{b}-");
+                            assert!(
+                                !name.starts_with(&bad),
+                                "double prefix '{bad}' in {out} \
+                                 (resolve_image({img:?}, {agent:?}))"
+                            );
+                        }
+                    }
+                }
+            }
         }
     }
 

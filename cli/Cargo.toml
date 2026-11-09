@@ -26,6 +26,11 @@ hex = "0.4"
 # only thing taken on for it: rendering stays hand-rolled ANSI, the same
 # call `commands/view.rs` made for markdown highlighting.
 crossterm = "0.29"
+# Advisory file locking (flock) so two moor processes cannot interleave a
+# read-compute-write append to a project's audit chain — see
+# docs/decisions/0016-*. Already resolved transitively via crossterm, so
+# declaring it direct adds no new fetch; the `fs` feature exposes `flock`.
+rustix = { version = "1", features = ["fs"] }
 
 [profile.release]
 opt-level = 2

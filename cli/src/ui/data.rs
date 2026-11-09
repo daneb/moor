@@ -697,6 +697,27 @@ fn valid_host(h: &str) -> bool {
             .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'-' | b'.' | b'*'))
 }
 
+/// The error message for an image that belongs to a different agent's
+/// layer than `agent`, or `None` when the image and agent are compatible.
+/// Pure (no disk, no docker) so the cross-agent rejection in
+/// `update_manifest` is unit-testable without a manifest on disk.
+/// See docs/decisions/0016-* (AC-7).
+pub fn cross_agent_image_error(image: &str, agent: Agent) -> Option<String> {
+    if manifest::image_is_copilot(image) && agent != Agent::Copilot {
+        return Some(format!(
+            "'{image}' is a copilot image but this project's agent is {agent:?} — \
+             set the agent to copilot first, or choose a {agent:?} image"
+        ));
+    }
+    if manifest::image_is_kiro(image) && agent != Agent::Kiro {
+        return Some(format!(
+            "'{image}' is a kiro image but this project's agent is {agent:?} — \
+             set the agent to kiro first, or choose a {agent:?} image"
+        ));
+    }
+    None
+}
+
 /// Apply a settings change to the manifest on the host. Takes effect on
 /// the next `moor up`, which the page offers right after.
 pub fn update_manifest(name: &str, patch: &Value) -> Result<Value> {
@@ -707,6 +728,15 @@ pub fn update_manifest(name: &str, patch: &Value) -> Result<Value> {
     if let Some(image) = patch["image"].as_str() {
         if !valid_image(image) {
             anyhow::bail!("'{image}' isn't an image name");
+        }
+        // Reject an image that belongs to a different agent's layer than
+        // the manifest's agent, at the point of edit — otherwise
+        // resolve_image leaves it unchanged and we would save, say, a
+        // kiro image on a copilot project, which `up` cannot run. Naming
+        // the mismatch here beats discovering it as a registry-pull
+        // failure later. See docs/decisions/0016-* (AC-7).
+        if let Some(msg) = cross_agent_image_error(image, m.agent()) {
+            anyhow::bail!("{msg}");
         }
         m.image = manifest::resolve_image(image, m.agent);
     }
@@ -896,5 +926,34 @@ mod tests {
         let v = json!({"a": ["x\x1b[31m", {"b": "y\r"}]});
         let s = sanitize_value(v);
         assert_eq!(s, json!({"a": ["x", {"b": "y"}]}));
+    }
+
+    #[test]
+    fn update_manifest_rejects_cross_agent_image() {
+        // AC-7: editing a project's image to one in a different agent's
+        // layer than its agent is refused at the edit, with a message
+        // naming the mismatch — not saved as an unpullable image.
+        let kiro_on_copilot = cross_agent_image_error("moor/kiro-python:latest", Agent::Copilot);
+        assert!(
+            kiro_on_copilot
+                .as_deref()
+                .is_some_and(|m| m.contains("kiro image") && m.contains("Copilot")),
+            "expected a mismatch message, got {kiro_on_copilot:?}"
+        );
+
+        let copilot_on_kiro = cross_agent_image_error("moor/copilot:latest", Agent::Kiro);
+        assert!(
+            copilot_on_kiro
+                .as_deref()
+                .is_some_and(|m| m.contains("copilot image") && m.contains("Kiro")),
+            "expected a mismatch message, got {copilot_on_kiro:?}"
+        );
+
+        // Compatible pairs, and a plain language image on any agent, are
+        // accepted (no error).
+        assert!(cross_agent_image_error("moor/kiro-python:latest", Agent::Kiro).is_none());
+        assert!(cross_agent_image_error("moor/copilot:latest", Agent::Copilot).is_none());
+        assert!(cross_agent_image_error("moor/python:latest", Agent::Claude).is_none());
+        assert!(cross_agent_image_error("moor/python:latest", Agent::Kiro).is_none());
     }
 }
