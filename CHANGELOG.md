@@ -4,6 +4,35 @@ Notable changes to moor. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and moor uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+### Changed
+
+### Fixed
+
+- **A corrupt audit-chain line no longer bricks a project.** `moor next`,
+  `moor ui` and every logged `docker exec` read the project's hash chain to
+  find the next entry; a single malformed last line made all of them fail
+  with `trailing characters at line 1 column N`. The reader now recovers the
+  last well-formed entry — reading the final record off a line that holds
+  more than one, and walking back past an unparseable line — so one bad line
+  degrades gracefully instead of stopping every command.
+- **Audit-chain appends are atomic and serialised.** Each entry is written
+  as a single line in one `write_all`, and the read-compute-write cycle holds
+  an exclusive advisory lock, so two `moor` processes writing at once can no
+  longer interleave two records onto one line (the corruption the fix above
+  recovers from). See `docs/decisions/0016-*`.
+- **`moor up` no longer tries to pull an impossible image.** Setting a
+  project's agent and image to disagree (e.g. a kiro-layer image on a copilot
+  project) composed a name like `moor/copilot-kiro-python` that is never
+  built, so `up` fell through to a registry pull and failed with
+  `pull access denied`. `resolve_image` now refuses to stack a second agent
+  prefix onto an image already in another agent's layer, and the console's
+  settings edit rejects a cross-agent image with a message naming the
+  mismatch.
+
 ## [0.10.0] - 2026-11-05
 
 - **keel is now an internal detail.** The hidden `moor keel <args>` command is
