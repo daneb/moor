@@ -4,6 +4,16 @@ Notable changes to moor. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and moor uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+### Changed
+
+### Fixed
+
+- **A kiro project's agent can now open its session database.** The sandbox mounted a writable volume for kiro-cli's credential dir (`~/.aws`) but not for its SQLite session store (`~/.local/share/kiro-cli/data.sqlite3`), which fell on the read-only rootfs — so every `moor go` turn blocked with `kiro-cli exited non-zero: Failed to open database … unable to open database file` after a 60s lock wait. A second named volume (`kiro-data`) now backs that path, matching how `.claude` and `.copilot` are handled. Re-render compose with `moor up <project>` to pick it up.
+
 ## [0.10.3] - 2026-11-09
 
 ### Added
