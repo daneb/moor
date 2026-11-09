@@ -135,6 +135,45 @@ crate_version() {
     awk -F'"' '/^version = /{ print $2; exit }' "$CRATE_DIR/Cargo.toml"
 }
 
+# The marketing site (docs/index.html, GitHub Pages) carries two facts that
+# drift silently between releases: the version badge and the unit-test count.
+# Both are re-stamped here from source at prepare time, so the release PR
+# always lands them in step with cli/Cargo.toml — no hand edit, no stale "170".
+readonly SITE="docs/index.html"
+
+# A floored, honest test count: the number of #[test]/#[tokio::test]
+# attributes in the crate, rounded down to a ten and shown as "N+". Floored
+# so it never overstates, and coarse so a single added test doesn't churn the
+# page on every release. Static (no build, no network) to match prepare.
+site_test_count() {
+    local n floored
+    n=$(grep -rEh '#\[(tokio::)?test\]' "$CRATE_DIR/src" 2>/dev/null | wc -l | tr -d ' ')
+    floored=$(( n / 10 * 10 ))
+    printf '%s+' "$floored"
+}
+
+# Rewrite docs/index.html's version badge and both test-count mentions in
+# place. awk once per file (BSD/GNU sed -i disagree). Idempotent: re-running
+# with the same inputs changes nothing. $1 is the version (no leading v).
+stamp_website() {
+    local version="$1" tests="$2"
+    [ -f "$SITE" ] || die "$SITE not found — cannot stamp the website"
+    awk -v v="$version" -v t="$tests" '
+        # Hero eyebrow badge: "… macOS · v0.10.2"
+        /class="eyebrow"/ { sub(/v[0-9]+\.[0-9]+\.[0-9]+/, "v" v) }
+        # QUALITY pillar line: "<b>270+ unit tests</b>, clippy clean…"
+        /unit tests<\/b>/ { sub(/<b>[0-9]+\+? unit tests<\/b>/, "<b>" t " unit tests</b>") }
+        # Proof stat number: <div class="n">270+</div> for the unit-tests stat.
+        /class="n">[0-9]+\+?<\/div><div class="d">unit tests/ {
+            sub(/class="n">[0-9]+\+?<\/div>/, "class=\"n\">" t "</div>")
+        }
+        { print }
+    ' "$SITE" > "$SITE.tmp" && mv "$SITE.tmp" "$SITE"
+
+    grep -q "v$version" "$SITE" || die "failed to stamp version into $SITE"
+    grep -q "$tests unit tests" "$SITE" || die "failed to stamp test count into $SITE"
+}
+
 # The CHANGELOG section for a heading, everything up to the next "## [".
 changelog_section() {
     awk -v heading="$1" '
@@ -420,6 +459,9 @@ if [ "$MODE" = "prepare" ]; then
     today=$(date +%Y-%m-%d)
     note "CHANGELOG.md: [Unreleased] → [$VERSION] - $today"
 
+    site_tests=$(site_test_count)
+    note "$SITE: version badge → v$VERSION, test count → $site_tests"
+
     if git rev-parse --verify --quiet "refs/heads/$BRANCH" >/dev/null \
         || git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null 2>&1; then
         die "branch $BRANCH already exists — is a release PR already open?"
@@ -428,7 +470,7 @@ if [ "$MODE" = "prepare" ]; then
 
     step "Release PR"
     if $DRY_RUN; then
-        note "would create $BRANCH, commit the version and CHANGELOG, push, and open a PR"
+        note "would create $BRANCH, commit the version, CHANGELOG and $SITE, push, and open a PR"
     else
         git switch -q -c "$BRANCH"
         # BSD and GNU sed disagree about -i, so awk, once per file.
@@ -443,7 +485,8 @@ if [ "$MODE" = "prepare" ]; then
             !done && /^## \[Unreleased\]/ { print "## [" v "] - " d; done = 1; next }
             { print }
         ' CHANGELOG.md > CHANGELOG.md.tmp && mv CHANGELOG.md.tmp CHANGELOG.md
-        git add "$CRATE_DIR/Cargo.toml" "$CRATE_DIR/Cargo.lock" CHANGELOG.md
+        stamp_website "$VERSION" "$site_tests"
+        git add "$CRATE_DIR/Cargo.toml" "$CRATE_DIR/Cargo.lock" CHANGELOG.md "$SITE"
         git commit -q -m "Release ${TAG}: version and CHANGELOG"
         git push -q -u origin "$BRANCH"
         url=$(gh pr create --repo "$REPO" --base "$TRUNK" --head "$BRANCH" \
