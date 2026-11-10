@@ -1,0 +1,90 @@
+{
+  "schema": "keel.gate/1",
+  "gate": "G0",
+  "run": "2026-11-10-004",
+  "spec": "sandbox-trunk-sync",
+  "verdict": "pass",
+  "generated_at": "2026-11-10T11:32:35.395816+02:00",
+  "checks": [
+    {
+      "id": "schema",
+      "verdict": "pass",
+      "detail": "SPEC-0023 (keel.spec/1)"
+    },
+    {
+      "id": "criteria-present",
+      "verdict": "pass",
+      "detail": "10 criteria"
+    },
+    {
+      "id": "criterion-ids-unique",
+      "verdict": "pass",
+      "detail": "no duplicate ids"
+    },
+    {
+      "id": "no-placeholders",
+      "verdict": "pass",
+      "detail": "no unfilled scaffold text"
+    },
+    {
+      "id": "ears-conformance",
+      "verdict": "pass",
+      "detail": "10/10 conform (event-driven, state-driven, ubiquitous, unwanted-behaviour)"
+    },
+    {
+      "id": "oracle-presence",
+      "verdict": "pass",
+      "detail": "10 oracles across 10 criteria"
+    },
+    {
+      "id": "oracle-wellformed",
+      "verdict": "pass",
+      "detail": "all oracles parse"
+    },
+    {
+      "id": "ambiguity",
+      "verdict": "pass",
+      "detail": "no ambiguous phrasing in criteria"
+    },
+    {
+      "id": "criterion-budget",
+      "verdict": "pass",
+      "detail": "10/10 criteria"
+    },
+    {
+      "id": "spec-length",
+      "verdict": "pass",
+      "detail": "139/250 lines"
+    },
+    {
+      "id": "scope-declared",
+      "verdict": "pass",
+      "detail": "6 glob(s): cli/src/commands/sync_cmd.rs, cli/src/commands/pull_cmd.rs, cli/src/commands/doctor_cmd.rs, cli/src/commands/mod.rs, cli/src/main.rs, docs/decisions/0017-*.md"
+    },
+    {
+      "id": "change-budget",
+      "verdict": "pass",
+      "detail": "560 lines of diff budgeted"
+    },
+    {
+      "id": "oracle-mix",
+      "verdict": "pass",
+      "detail": "9/10 runnable (1 cmd, 1 human, 8 test)"
+    },
+    {
+      "id": "human-cost",
+      "verdict": "pass",
+      "detail": "1 criteria verifiable only by a person — budget review time: AC-3 (human: A reviewer confirms the sync path only calls `git)"
+    },
+    {
+      "id": "store-drift",
+      "verdict": "pass",
+      "detail": "4 projections current"
+    },
+    {
+      "id": "shared-stores",
+      "verdict": "pass",
+      "detail": "none configured"
+    }
+  ]
+}

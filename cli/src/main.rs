@@ -255,6 +255,18 @@ enum Command {
         #[arg(short = 'p', long = "project")]
         project: Option<String>,
     },
+    /// Keep the sandbox's trunk branch current with origin.
+    ///
+    /// Fetches on the host with the host's own credential and lands the
+    /// result as a ref update: a fast-forward if trunk is itself checked
+    /// out (refused if the tree is dirty), otherwise the trunk branch's
+    /// own ref is advanced directly, leaving whatever's checked out (and
+    /// its `.keel/` pipeline state) untouched. See
+    /// docs/decisions/0017-sandbox-trunk-sync.md.
+    Sync {
+        #[arg(short = 'p', long = "project")]
+        project: Option<String>,
+    },
     /// Show the sandbox's git state before you build on it.
     ///
     /// Read-only: which branch it's on (and whether that's the trunk),
@@ -382,6 +394,7 @@ fn main() {
         Command::Shell { name } => commands::shell::run(&name),
         Command::Run { name, cmd } => commands::run_cmd::run(&name, &cmd),
         Command::Pull { project } => commands::pull_cmd::run(project),
+        Command::Sync { project } => commands::sync_cmd::run(project),
         Command::Doctor { project } => commands::doctor_cmd::run(project),
         Command::Pipeline { project, args } => commands::resolve_project_announced(project)
             .and_then(|name| commands::pipeline_cmd::run(&name, &args)),

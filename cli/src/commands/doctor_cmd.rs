@@ -4,8 +4,12 @@
 //! The sandbox is isolated, so you otherwise cannot see which branch the
 //! repo is on, whether it has uncommitted work, or whether it is behind
 //! the remote — all of which matter before starting a feature. This
-//! reports that state. It changes nothing (no fetch, no checkout): it is
-//! purely a lens. The hard gate that will *refuse* to build on a bad
+//! reports that state. It changes no branch, HEAD, or working-tree file
+//! (no checkout, no merge): it is purely a lens. The one exception is a
+//! best-effort host-side fetch that refreshes trunk's local
+//! remote-tracking ref before reporting (AC-7, see sync_cmd::TrunkRef),
+//! so the behind count below is truthful rather than only as fresh as
+//! the last fetch. The hard gate that will *refuse* to build on a bad
 //! state is a separate, later change built on top of this.
 
 use crate::{manifest::Manifest, paths, proc};
@@ -107,6 +111,32 @@ pub fn summary(st: &GitState, trunk: &str) -> String {
     parts.join(" · ")
 }
 
+/// Best-effort: advance the sandbox's local trunk *tracking* ref
+/// (`refs/remotes/origin/<trunk>`) from origin via a host fetch (AC-7),
+/// so the behind count reported below reflects origin's current tip
+/// rather than only the last fetch. Never touches HEAD, the index, any
+/// branch ref, or the working tree (`sync_cmd::TrunkRef::Tracking`), and
+/// never fails doctor's own report: a non-GitHub origin or a missing
+/// host credential just leaves the count as fresh as the last fetch,
+/// same as before this existed.
+fn refresh_trunk_tracking(name: &str, m: &Manifest) {
+    let _ = crate::commands::sync_cmd::fetch_trunk(
+        name,
+        m,
+        crate::commands::sync_cmd::TrunkRef::Tracking,
+    );
+}
+
+/// The "behind trunk" advice line (AC-8): names `moor sync`, the ref
+/// update that never disturbs an active build, not `moor pull`, which
+/// rewrites whatever branch is currently checked out.
+fn behind_advice(name: &str, behind: u32, upstream: Option<&str>) -> String {
+    format!(
+        "  ! {behind} commit(s) behind {} — refresh first:  moor sync -p {name}",
+        upstream.unwrap_or("the remote")
+    )
+}
+
 /// The sandbox's git state, or None if the workspace isn't a git repo.
 fn git_state(m: &Manifest) -> Result<Option<GitState>> {
     let container = m.sandbox_container();
@@ -142,6 +172,10 @@ pub fn run(explicit: Option<String>) -> Result<()> {
         );
     }
 
+    // AC-7: refresh trunk's tracking ref from origin first, best-effort,
+    // so the behind count below isn't stale.
+    refresh_trunk_tracking(&name, &m);
+
     // The trunk to compare against: the upstream's branch if tracked, else
     // "master" as the common default. Read-only — doctor never changes it.
     let state = git_state(&m)?;
@@ -173,9 +207,8 @@ pub fn run(explicit: Option<String>) -> Result<()> {
             }
             if st.behind > 0 {
                 println!(
-                    "  ! {} commit(s) behind {} — refresh first:  moor pull -p {name}",
-                    st.behind,
-                    st.upstream.as_deref().unwrap_or("the remote")
+                    "{}",
+                    behind_advice(&name, st.behind, st.upstream.as_deref())
                 );
             }
             if st.is_clean()
@@ -272,5 +305,25 @@ u UU N... ... foo
         assert!(s.contains("on master"), "{s}");
         assert!(s.contains("clean"), "{s}");
         assert!(s.contains("up to date"), "{s}");
+    }
+
+    #[test]
+    fn behind_count_reflects_a_host_fetch() {
+        // Before refresh_trunk_tracking's host fetch lands origin's new
+        // commits into the local tracking ref, the ab line (and so the
+        // behind count) reflects only what the last fetch already knew.
+        let stale = "# branch.head master\n# branch.upstream origin/master\n# branch.ab +0 -0\n";
+        // After it runs, the same `git status` on the same checkout
+        // reports the real count against origin's current tip.
+        let fresh = "# branch.head master\n# branch.upstream origin/master\n# branch.ab +0 -5\n";
+        assert_eq!(parse_porcelain_v2(stale).behind, 0);
+        assert_eq!(parse_porcelain_v2(fresh).behind, 5);
+    }
+
+    #[test]
+    fn behind_advice_names_sync_not_pull() {
+        let advice = behind_advice("demo", 3, Some("origin/master"));
+        assert!(advice.contains("moor sync"));
+        assert!(!advice.contains("moor pull"));
     }
 }
