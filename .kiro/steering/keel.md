@@ -1,4 +1,4 @@
-<!-- keel:generated schema=keel.projection/1 adapter=kiro store=16695c08f9bc body=a051c1516194 -->
+<!-- keel:generated schema=keel.projection/1 adapter=kiro store=59f43d9ab526 body=6e9f2f075d66 -->
 <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
 
 # Project context
@@ -35,6 +35,54 @@ sandbox at a pinned version (`KEEL_VERSION` in `images/base/Dockerfile`).
   store, generating `CLAUDE.md`/`AGENTS.md`): development tooling only. Run
   `keel store render` after editing `.keel/store/`. It is a different copy
   from the sandbox's.
+
+### Steering agents working in a moor project
+
+The contract for any AI agent (or LLM) asked to build software here. Do all
+work through `moor` commands: the project's code lives inside a sandbox
+container, not on the host, so never edit, build, test, or ship it directly.
+
+Lifecycle, one project per feature:
+
+1. `moor new <name> [--image moor/base|node|rust|python] [--agent claude|copilot]`
+2. `moor use <name>` — set the default so later commands need no `--project`.
+3. `moor spec new <feature>`, fill in the acceptance criteria, `moor spec push <file>`.
+4. `moor next` — the one command that moves the active spec on.
+5. `moor go` — runs the next phase and its gate.
+6. `moor approve` / `moor reject "<why>"` — a human does this, not the agent.
+7. `moor ship` — after the merge is approved.
+
+Non-negotiable:
+
+- **Approval is human-only.** The agent and `moor-mcp` can run gates and ask
+  what's next; they cannot approve or reject. Never approve on a human's
+  behalf — stop and ask the human to run `moor approve` / `moor reject`.
+- **A gate runs after every phase.** G0 checks the spec, G1 the plan,
+  G2/G2.5/G3 the build. Never advance a phase whose gate is failing; a passing
+  gate is the precondition for asking a human to approve.
+- **Gate a build without a driver** with `moor go --check` (underneath:
+  `keel run <spec> --no-driver`) — to check a hand-made fix or review a change
+  before merge.
+- **How code leaves the sandbox:** only `moor ship`. It commits on a branch
+  inside the sandbox, streams that branch out as a `git bundle` over `docker
+  exec` stdout, then fetches and `git push`es it from the host with the host's
+  own `gh` credential, and opens a PR — targeting a branch, never a direct push
+  to the trunk. The sandbox never holds a GitHub token (ADR-0014).
+
+#### When `moor go` blocks with "Not logged in" / an auth error
+
+A host-credential problem, not a reason to log in inside the sandbox. moor
+forwards the host's credential into the sandbox on each run; an in-container
+login is the wrong place and does not survive a rebuild.
+
+- Check the project's `agent:` in `moor.yaml` (and the default driver in
+  `.keel/keel.toml`) matches the credential you set — a copilot credential
+  does nothing for a `claude` project.
+- **Claude:** needs `CLAUDE_CODE_OAUTH_TOKEN` (run `claude setup-token` on the
+  host) or `ANTHROPIC_API_KEY` (`moor secrets set <project> ANTHROPIC_API_KEY`).
+- **Copilot:** run `copilot /login` on the host; moor auto-forwards its Keychain
+  token as `COPILOT_GITHUB_TOKEN`.
+- `moor secrets status <project>` shows where each credential resolves from.
 
 ### Rules
 
@@ -137,56 +185,8 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
 - `pub struct Active<'a>`  <sub>L167</sub>
 - `pub fn pick_active<'a>(` — chain touched last, else the one furthest along. `chain_lines` is the  <sub>L182</sub>
 - `pub fn pending_decision(spec: &NextSpec) -> Option<&'static str>` — The approval a spec's current stage is waiting on (`spec`, `plan` or  <sub>L244</sub>
-- `pub fn step_label(spec: &NextSpec) -> String` — The step a spec is at, as "step N of 7: title", or "done".  <sub>L277</sub>
-- `pub fn render(` — The full guidance for one project, as printable lines.  <sub>L293</sub>
-- `pub fn build_failed(slug: &str, explicit: Option<&str>) -> String` — the spec, without the agent ever being told what failed, so the first  <sub>L484</sub>
-- `pub fn render_ship(` — Guidance for a spec whose merge is approved but whose work hasn't been  <sub>L506</sub>
-- `pub fn render_all(report: &NextReport, active: Option<&Active>) -> Vec<String>` — Every spec and its step, the active one marked.  <sub>L532</sub>
 
-**`cli/src/canary.rs`** · 23 lines · imported by 3
-- `pub const CANARY_DOMAIN: &str = "canary.moor.invalid";` — deny, because there is no legitimate reason for it to ever be  <sub>L8</sub>
-- `pub fn generate_token() -> String` — this is a secondary control, not the primary one (TLS isn't  <sub>L17</sub>
-
-**`cli/src/commands/next_cmd.rs`** · 177 lines · imported by 4
-- `pub struct Target` — The project a guided command acts on, resolved once and shared by  <sub>L7</sub>
-- `impl Target`  <sub>L15</sub>
-- `pub fn resolve(explicit: Option<String>) -> Result<Self>` — Resolves the project and checks its sandbox is up — every guided  <sub>L18</sub>
-- `pub fn report(&self) -> Result<guide::NextReport>` — Where every spec stands, from the sandbox. Logged like any exec.  <sub>L32</sub>
-- `pub fn exec(&self, kind: &str, argv: &[&str]) -> Result<(bool, String)>` — Runs `argv` in the sandbox, capturing its combined output, logged  <sub>L45</sub>
-- `pub fn unshipped(&self, report: &guide::NextReport) -> Result<Vec<String>>` — Specs whose folder has uncommitted changes: approved work that  <sub>L57</sub>
-- `pub fn active<'a>(&self, report: &'a guide::NextReport) -> Option<guide::Active<'a>>` — The spec guidance is about — see `guide::pick_active`.  <sub>L86</sub>
-- `pub fn print_guidance(&self, report: &guide::NextReport)` — The guidance block, ending on its "Next:" line (plus a tip when  <sub>L96</sub>
-- `pub(crate) fn read_pin(name: &str) -> Option<String>` — The pinned spec, if one is set and still a well-formed slug. A  <sub>L144</sub>
-- `pub fn next_hint(name: &str) -> String` — The closing line for a command that isn't itself guided: how to ask  <sub>L153</sub>
-- `pub fn run(explicit: Option<String>, all: bool) -> Result<()>` — `moor next`: where the project's active spec stands and the one  <sub>L164</sub>
-
-**`cli/src/manifest.rs`** · 331 lines · imported by 3
-- `pub enum Agent`  <sub>L12</sub>
-- `impl FromStr for Agent`  <sub>L19</sub>
-- `pub fn resolve_image(language_image: &str, agent: Agent) -> String` — already a copilot image, is returned unchanged. Pure — unit-tested  <sub>L39</sub>
-- `pub struct Manifest`  <sub>L63</sub>
-- `pub struct Egress`  <sub>L85</sub>
-- `pub struct Resources`  <sub>L91</sub>
-- `impl Manifest`  <sub>L107</sub>
-- `pub fn new(name: &str, image: &str) -> Self`  <sub>L108</sub>
-- `pub fn load(path: &Path) -> Result<Self>`  <sub>L142</sub>
-- `pub fn save(&self, path: &Path) -> Result<()>`  <sub>L148</sub>
-- `pub fn sandbox_container(&self) -> String`  <sub>L155</sub>
-- `pub fn egress_container(&self) -> String`  <sub>L159</sub>
-- `pub fn validate_name(name: &str) -> Result<()>` — Validate a project name: lowercase alnum + dashes, matches what's safe  <sub>L166</sub>
-- `mod tests`  <sub>L182</sub>
-
-**`cli/src/session.rs`** · 1258 lines · imported by 2
-- `pub enum Role`  <sub>L25</sub>
-- `pub enum OutputShape`  <sub>L131</sub>
-- `pub struct AgentProfile`  <sub>L142</sub>
-- `pub fn profile(agent: Agent) -> AgentProfile` — *these*), whose semantics are the auto-approval that ADR-0008 showed  <sub>L164</sub>
-- `pub struct TurnResult`  <sub>L201</sub>
-- `pub fn parse_turn(agent: Agent, stdout: &str) -> Result<TurnResult>` — plain-text agent emits the response and nothing else, so its stdout  <sub>L217</sub>
-- `pub fn valid_session_id(id: &str) -> bool` — different shape of output or something that came from the wrong place,  <sub>L238</sub>
-- `pub fn build_turn_argv(` — against `claude --help`, and against a live container) so it sits with  <sub>L380</sub>
-
-_… 260 more lines in `.keel/store/steering/structure.md`._
+_… 308 more lines in `.keel/store/steering/structure.md`._
 
 ## What this is
 

@@ -1,4 +1,4 @@
-<!-- keel:generated schema=keel.projection/1 adapter=copilot store=16695c08f9bc body=1455d4e716d3 -->
+<!-- keel:generated schema=keel.projection/1 adapter=copilot store=59f43d9ab526 body=c0fe819a1b43 -->
 <!-- Source of truth: .keel/store/ — regenerate with `keel store render`. Edits here are drift and will be reported by `keel store check`. -->
 
 # Project context
@@ -36,9 +36,23 @@ sandbox at a pinned version (`KEEL_VERSION` in `images/base/Dockerfile`).
   `keel store render` after editing `.keel/store/`. It is a different copy
   from the sandbox's.
 
-### Rules
+### Steering agents working in a moor project
 
-_Add rules as you find yourself repeating them. One line each, imperative mood._
+The contract for any AI agent (or LLM) asked to build software here. Do all
+work through `moor` commands: the project's code lives inside a sandbox
+container, not on the host, so never edit, build, test, or ship it directly.
+
+Lifecycle, one project per feature:
+
+1. `moor new <name> [--image moor/base|node|rust|python] [--agent claude|copilot]`
+2. `moor use <name>` — set the default so later commands need no `--project`.
+3. `moor spec new <feature>`, fill in the acceptance criteria, `moor spec push <file>`.
+4. `moor next` — the one command that moves the active spec on.
+5. `moor go` — runs the next phase and its gate.
+6. `moor approve` / `moor reject "<why>"` — a human does this, not the agent.
+7. `moor ship` — after the merge is approved.
+
+_… 36 more lines in `.keel/store/steering/conventions.md`._
 
 ## Stack and constraints
 
@@ -90,23 +104,8 @@ Files are ordered by import-graph centrality, not alphabetically. Signatures onl
 - `pub fn spawn_turn<F>(tx: &Sender<Event>, project: String, work: F)` — goes to its own thread and reports back through the channel. The caller  <sub>L264</sub>
 - `pub fn edit_artifact(` — changed — an unmodified file is not written back, so opening one to  <sub>L287</sub>
 - `struct RawMode;` — Restores the terminal however the loop ends — clean exit, `?`, or  <sub>L334</sub>
-- `pub fn run(names: Vec<String>) -> Result<()>`  <sub>L369</sub>
-- `fn drain(console: &mut Console, rx: &Receiver<Event>)` — Fold every turn that has come back since the last pass into the  <sub>L464</sub>
-- `pub mod tests`  <sub>L476</sub>
-- `pub struct FakeHost` — refresh costs, what the write-back carries — so the boundary is  <sub>L485</sub>
 
-**`cli/src/studio/state.rs`** · 1191 lines · imported by 2
-- `pub enum Line`  <sub>L11</sub>
-- `pub fn waited(&self) -> Option<std::time::Duration>` — How long the in-flight turn has been running.  <sub>L23</sub>
-- `pub struct Project`  <sub>L39</sub>
-- `pub enum Approval`  <sub>L69</sub>
-- `pub enum Key`  <sub>L100</sub>
-- `pub enum Action`  <sub>L112</sub>
-- `struct NextSpec`  <sub>L153</sub>
-- `struct NextReport`  <sub>L162</sub>
-- `pub struct Console`  <sub>L168</sub>
-
-_… 340 more lines in `.keel/store/steering/structure.md`._
+_… 355 more lines in `.keel/store/steering/structure.md`._
 
 ## What this is
 

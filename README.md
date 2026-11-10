@@ -84,76 +84,15 @@ Prefer a page to a terminal? `moor ui` opens a console in your browser
 ## For AI agents — READ THIS
 
 If you are an AI agent (or an LLM asked to build software in a moor project),
-this is the contract. Point your agent at this section.
+the full contract lives in **[AGENTS.md](AGENTS.md)** (and the matching
+`CLAUDE.md` / `.github/copilot-instructions.md`). In one line:
 
 **Do all work through `moor` commands. Never edit, build, test, or ship the
-project's code directly — it lives inside a sandbox container, not on the host.**
+project's code directly — it lives inside a sandbox container, not on the
+host. Approval is human-only. If you forget everything else, run `moor next`.**
 
-The lifecycle, one project per feature:
-
-1. `moor new <name> [--image moor/base|moor/node|moor/rust|moor/python] [--agent claude|copilot]`
-2. `moor use <name>` — set the default so later commands need no `--project`.
-3. `moor spec new <feature>`, fill in the acceptance criteria, then `moor spec push <file>`.
-4. `moor next` — tells you the one command that moves the active spec on.
-5. `moor go` — runs the next phase and its gate.
-6. `moor approve` / `moor reject "<why>"` — a **human** does this, not you.
-7. `moor ship` — after the merge is approved.
-
-Non-negotiable rules:
-
-- **Approval is human-only.** You and `moor-mcp` can run gates and ask what's
-  next; you **cannot** approve or reject. Never try to approve on a human's
-  behalf — stop and ask the human to run `moor approve` / `moor reject`.
-- **A gate runs after every phase.** G0 checks the spec, G1 checks the plan,
-  and G2/G2.5/G3 check the build. `moor go` runs the gate for the phase it's
-  at. Never advance a phase whose gate is failing; a passing gate is the
-  precondition for asking a human to approve.
-- **Gate a build without a driver.** `moor go --check` re-runs G2/G2.5/G3 on
-  the work already in the sandbox *without* invoking the agent (underneath:
-  `keel run <spec> --no-driver`). Use it to check a hand-made fix or to review
-  a proposed change before merge.
-- **Don't bypass the sandbox.** No direct file edits or local builds of the
-  generated code. Prefer `moor <command>` over the `moor pipeline <args>`
-  escape hatch.
-
-### If `moor go` blocks with "Not logged in" / an auth error
-
-This is a **host credential** problem, not a reason to log in inside the
-sandbox. moor never mints or stores an agent login itself — the credential
-always lives on the Mac and moor forwards it into the sandbox on each run. Two
-rules hold for every agent:
-
-- **Fix it on the host, never via `moor shell`.** Logging an agent CLI in
-  *inside* the container is the wrong place — moor's plumbing reads the host's
-  credential, and an in-container login does not survive a rebuild (`moor up`,
-  an image change) anyway. The code lives in a volume; the agent's credentials
-  do not.
-- **Resolution precedence** (`secrets::resolve_into_env`): an already-set env
-  var in your shell wins first, then a `moor secrets`-managed Keychain entry,
-  then the agent's own auto-forwarded host credential below. A stale env var
-  therefore silently beats a fresh host login — unset it if in doubt.
-
-First check the project's **agent matches the credential you set**: `moor.yaml`'s
-`agent:` (and the default driver in `.keel/keel.toml`) must be the agent you
-authenticated. A copilot credential does nothing for a `claude` project, etc.
-Then, by agent:
-
-**Claude** (`agent: claude`) — needs `CLAUDE_CODE_OAUTH_TOKEN` *or*
-`ANTHROPIC_API_KEY`.
-- OAuth token (a claude.ai subscription): run `claude setup-token` on the host.
-  When both are set, the `claude` CLI prefers `CLAUDE_CODE_OAUTH_TOKEN` — that
-  precedence is the CLI's own, not moor's.
-- API key: `moor secrets set <project> ANTHROPIC_API_KEY` (stored in the
-  Keychain), or export it in your shell.
-
-**Copilot** (`agent: copilot`) — needs `COPILOT_GITHUB_TOKEN`.
-- Run `copilot /login` on the host. The Copilot CLI stores its own OAuth
-  (`gho_`) token in the macOS Keychain under service `copilot-cli`, and moor
-  auto-forwards it as `COPILOT_GITHUB_TOKEN` when nothing more explicit resolved
-  it. The CLI reads `COPILOT_GITHUB_TOKEN` then `GH_TOKEN`.
-
-`moor secrets status <project>` shows where each declared credential currently
-resolves from (shell env, Keychain, or missing) — run it first when unsure.
+Those files are generated from `.keel/store/`; edit the steering sources
+there, not the generated files.
 
 ## What it isn't
 
