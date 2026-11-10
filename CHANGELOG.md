@@ -4,6 +4,16 @@ Notable changes to moor. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and moor uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+### Changed
+
+- **keel pinned to 0.14.1** in the sandbox image (was 0.14.0). Rebuild with `./images/build.sh`.
+
+### Fixed
+
 ## [0.11.0] - 2026-11-10
 
 ### Added
