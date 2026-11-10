@@ -4,6 +4,20 @@ Notable changes to moor. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and moor uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **`moor sync`.** Keeps a project's trunk current with origin by advancing the local trunk ref from a host-side fetch (streamed in as a git bundle, ADR-0014), without a checkout or merge of whatever branch — and whatever uncommitted `.keel/` pipeline state — is active. When trunk itself is checked out it fast-forwards `--ff-only`, refused on a dirty tree. See docs/decisions/0017-sandbox-trunk-sync.md.
+
+### Changed
+
+- **`moor doctor` reports a truthful "behind" count.** It now fetches the trunk tracking ref on the host before reading git status, so the count reflects origin's current tip rather than the last fetch, and it recommends `moor sync` rather than `moor pull` when behind.
+
+### Fixed
+
+- **The browser console's "Run G1/G0 checks" action works again.** It built its command with the pre-0.10.0 `keel` subcommand name, so it failed with `unrecognized subcommand 'keel'`; it now runs through `moor pipeline` (SPEC-0026).
+
 ## [0.10.5] - 2026-11-09
 
 ### Added
