@@ -86,7 +86,7 @@ max_reviewable_lines = 1100
 [[driver]]
 id = "claude-code"
 cmd = ".keel/drivers/claude-code"
-default = true
+default = false
 timeout_secs = 900
 
 [verify]
@@ -95,7 +95,7 @@ test = "cargo test --quiet --manifest-path cli/Cargo.toml && cargo test --quiet 
 lint = "cargo clippy --all-targets --quiet --manifest-path cli/Cargo.toml && cargo clippy --all-targets --quiet --manifest-path mcp/Cargo.toml"
 
 [oracle]
-test_cmd = ""
+test_cmd = "cargo test --quiet --manifest-path cli/Cargo.toml {id} 2>&1 | grep -qE '[1-9][0-9]* passed'"
 doctest_cmd = ""
 
 [learn]
@@ -120,7 +120,7 @@ timeout_secs = 900
 [[driver]]
 id = "copilot"
 cmd = ".keel/drivers/copilot"
-default = false
+default = true
 timeout_secs = 900
 
 [[driver]]
