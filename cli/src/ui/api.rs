@@ -265,6 +265,23 @@ fn image_field(b: &Value) -> Result<Option<String>> {
     }
 }
 
+/// The label and argv for a `gate` action: `moor pipeline gate <gate>
+/// <slug>`, dispatched through `Command::Pipeline` (the sandbox escape
+/// hatch keel used to answer to directly, before the 0.10.0 rename).
+fn gate_job(p: String, gate: &str, slug: &str) -> (String, Vec<String>) {
+    (
+        format!("moor pipeline gate {gate} {slug}"),
+        vec![
+            "pipeline".into(),
+            "-p".into(),
+            p,
+            "gate".into(),
+            gate.into(),
+            slug.into(),
+        ],
+    )
+}
+
 /// One job kind → one `moor` argv. The table is the whole surface: a
 /// kind not here is not something the console can run.
 fn start_job(state: &State, b: &Value) -> Result<Value> {
@@ -376,18 +393,8 @@ fn start_job(state: &State, b: &Value) -> Result<Value> {
                 Some("g1") => "g1",
                 _ => anyhow::bail!("gate must be g0 or g1"),
             };
-            (
-                format!("moor pipeline gate {gate} {slug}"),
-                Some(p.clone()),
-                vec![
-                    "keel".into(),
-                    "-p".into(),
-                    p,
-                    "gate".into(),
-                    gate.into(),
-                    slug.into(),
-                ],
-            )
+            let (label, argv) = gate_job(p.clone(), gate, slug);
+            (label, Some(p), argv)
         }
         "new" => {
             let name = str_field(b, "name")?;
@@ -590,5 +597,17 @@ mod tests {
         )
         .unwrap_err();
         assert!(err.to_string().contains("no project") || err.to_string().contains("why"));
+    }
+
+    #[test]
+    fn gate_argv_dispatches_through_pipeline() {
+        let (_, argv) = gate_job("p".into(), "g1", "s");
+        assert_eq!(argv, vec!["pipeline", "-p", "p", "gate", "g1", "s"]);
+    }
+
+    #[test]
+    fn gate_label_names_moor_pipeline() {
+        let (label, _) = gate_job("p".into(), "g1", "s");
+        assert!(label.starts_with("moor pipeline gate"));
     }
 }
